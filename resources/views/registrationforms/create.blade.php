@@ -88,6 +88,9 @@
         .select2-container--open .select2-dropdown.country-select-dropdown  {
 		min-width: 230px !important;
 	}
+	.mr-2 {
+   		 margin-right: 8px;
+	}
 	</style>
     @if(app()->getLocale() == "en")
     <style>
@@ -296,7 +299,7 @@
                 <div class="col-md-6">
                     <label class="form-label required">{{ __('booking.phone_label') }}</label>
                     <div class="input-group">
-                        <span class="input-group-text mr-5"><i class="bi bi-telephone"></i></span>
+                        <span class="input-group-text mr-2"><i class="bi bi-telephone"></i></span>
                         <input type="tel" name="mobile_phone" class="form-control @error('mobile_phone') is-invalid @enderror"
                                placeholder="{{ __('booking.phone_ph') }}" value="{{ old('mobile_phone') }}" required>
                     </div>
