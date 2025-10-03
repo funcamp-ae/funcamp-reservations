@@ -73,7 +73,7 @@
                                                 'prefill_mobile' => $rf->mobile_phone,
                                                 'prefill_email'  => $rf->email,
                                             ];
-
+                                            \Log::info($prefillForOrder);
                                             $prefillQuery = http_build_query(
                                                 array_filter($prefillForOrder, fn($v) => $v !== null && $v !== ''),
                                                 '', '&', PHP_QUERY_RFC3986

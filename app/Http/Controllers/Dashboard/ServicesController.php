@@ -32,7 +32,7 @@ class ServicesController extends Controller
             abort(403, 'Unauthorized');
         }
         
-        $stocks = Stock::all();
+        $stocks = Stock::latest()->get();
         return view('dashboard.services.create', compact('stocks'));
     }
 

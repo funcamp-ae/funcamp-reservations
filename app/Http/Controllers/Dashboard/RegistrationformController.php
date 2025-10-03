@@ -7,7 +7,7 @@ use App\Models\{Customer,Registrationform};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
-
+use Carbon\Carbon;
 class RegistrationformController extends Controller
 {
     /**
@@ -30,7 +30,7 @@ class RegistrationformController extends Controller
                        ->orWhere('request_code', 'like', "%{$q}%")
                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$q}%"]);
 
-                });
+            });
             })
             ->latest()
             ->get();
@@ -180,9 +180,9 @@ class RegistrationformController extends Controller
             'rf_id'         => $rf->id,
             'people_count'  => (int) $rf->persons,
             'service_ids'   => [$rf->service_id],
-            'date'          => optional($rf->booking_date)->format('Y-m-d'),
-            'time_from'     => $from->format('H:i'),
-            'time_to'       => $to->format('H:i'),
+            'date'          => optional(Carbon::parse($rf->booking_date))->format('Y-m-d'),
+            'time_from'     => (Carbon::parse($from))->format('H:i'),
+            'time_to'       => (Carbon::parse($to))->format('H:i'),
             'notes'         => (string) $rf->notes,
             'prefill_mobile'=> (string) $rf->mobile_phone,
             'prefill_email' => (string) $rf->email,

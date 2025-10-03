@@ -34,6 +34,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Expense;
 use App\Models\GeneralPayment;
 use App\Models\OrderItem;
+use App\Models\Payment;
 use App\Models\OrderInternalNote;
 use App\Repositories\IUserRepository;
 use App\Repositories\IOrderRepository;
@@ -47,6 +48,7 @@ use App\Services\StockAdjustmentService;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use App\Http\Requests\UpdateOrderSignInRequest;
+
 
 class OrderController extends Controller
 {
@@ -122,8 +124,8 @@ class OrderController extends Controller
         $this->authorize('create', Order::class);
         $scheduledDate = $request->query('scheduledDate');
         $request->query->replace([]);
-        $customers = Customer::select('id', 'name')->get();
-        $services = Service::select('id', 'name', 'price')->get();
+        $customers = Customer::latest()->select('id', 'name')->get();
+        $services = Service::latest()->select('id', 'name', 'price')->get();
 
         $internalNotes = InternalNote::orderBy('created_at', 'desc')->get();
 

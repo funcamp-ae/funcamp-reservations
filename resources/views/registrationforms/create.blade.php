@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale()==='ar' ? 'rtl' : 'ltr' }}">
+<html lang="{{ app()->getLocale() }}" id="htmlElement" dir="{{ app()->getLocale()==='ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
     <title>{{ __('booking.meta_title') }} |
@@ -89,6 +89,13 @@
 		min-width: 230px !important;
 	}
 	</style>
+    @if(app()->getLocale() == "en")
+    <style>
+        .country-select-wrap{
+            direction: rtl;
+        }
+    </style>
+    @endif
 </head>
 <body>
 <div class="container container-narrow py-3">
@@ -116,9 +123,9 @@
         </div>
         <div class="lang-switch btn-group" role="group" aria-label="Language">
             @if(app()->getLocale()==='ar')
-                <a href="{{ route('set-lang' , 'en') }}" class=" @if(app()->getLocale()==='en') active @endif"><span class="badge bg-primary">EN</span></a>
+                <a href="{{ route('set-lang' , 'registrationforms-en') }}" class=" @if(app()->getLocale()==='en') active @endif"><span class="badge bg-primary">EN</span></a>
             @else
-                <a href="{{ route('set-lang' , 'ar') }}" class="@if(app()->getLocale()==='ar') active @endif"><span class="badge bg-primary">عربي</span></a>
+                <a href="{{ route('set-lang' , 'registrationforms-ar') }}" class="@if(app()->getLocale()==='ar') active @endif"><span class="badge bg-primary">عربي</span></a>
             @endif
         </div>
     </div>
@@ -289,7 +296,7 @@
                 <div class="col-md-6">
                     <label class="form-label required">{{ __('booking.phone_label') }}</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                        <span class="input-group-text mr-5"><i class="bi bi-telephone"></i></span>
                         <input type="tel" name="mobile_phone" class="form-control @error('mobile_phone') is-invalid @enderror"
                                placeholder="{{ __('booking.phone_ph') }}" value="{{ old('mobile_phone') }}" required>
                     </div>

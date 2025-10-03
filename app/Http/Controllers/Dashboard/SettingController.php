@@ -92,12 +92,19 @@ class SettingController extends Controller
                 session() -> forget( 'lang' );
 
             session() -> put( 'lang', $lang );
+            
 
         } else {
             if ( session() -> has( 'lang' ) )
                 session() -> forget( 'lang' );
 
             session() -> put( 'lang', 'ar' );
+        }
+        if ($lang == 'registrationforms-ar' || $lang == 'registrationforms-en') {
+            if ( session() -> has( 'registrationforms-lang' ) ){
+                session() -> forget( 'registrationforms-lang' );
+            }
+            session() -> put( 'registrationforms-lang', $lang );
         }
         return back();
     }
