@@ -16,20 +16,20 @@
 
         <!--begin::Card body-->
         <div class="card-body pt-0">
+
+            <!-- وقت الاستلام + ملاحظات -->
             <div class="form-group mb-4">
                 <label for="time_of_receipt">{{ __('dashboard.signin_time') }}</label>
                 <input type="time" name="time_of_receipt" id="time_of_receipt" class="form-control"
                        value="{{ old('time_of_receipt', $order->time_of_receipt) }}">
             </div>
-
             <div class="form-group mb-5">
                 <label for="time_of_receipt_notes">{{ __('dashboard.receiving_time_notes') }}</label>
-                <textarea name="time_of_receipt_notes" id="time_of_receipt_notes" class="form-control"
-                >{{ old('time_of_receipt_notes', $order->time_of_receipt_notes) }}</textarea>
+                <textarea name="time_of_receipt_notes" id="time_of_receipt_notes" class="form-control">{{ old('time_of_receipt_notes', $order->time_of_receipt_notes) }}</textarea>
             </div>
 
             <div class="row g-3">
-                <!-- PHOTO (before receiving) -->
+                <!-- PHOTO -->
                 <div class="col-md-4">
                     <label class="form-label">📷 @lang('dashboard.photo_attachment')</label>
                     <div class="media-upload-container" data-type="photo">
@@ -49,12 +49,12 @@
                                 <i class="bi bi-upload"></i> {{ __('dashboard.upload') }}
                             </button>
                         </div>
-                        <input type="file" name="image_before_receiving" class="media-input d-none" accept="image/*">
+                        <input type="file" name="image_before_receiving" class="media-input d-none" accept="image/*" capture="environment">
                         <input type="hidden" name="remove_photo" value="0" class="remove-flag">
                     </div>
                 </div>
 
-                <!-- AUDIO (signin) -->
+                <!-- AUDIO -->
                 <div class="col-md-4">
                     <label class="form-label">🎵 @lang('dashboard.audio_attachment')</label>
                     <div class="media-upload-container" data-type="audio">
@@ -81,31 +81,31 @@
                     </div>
                 </div>
 
-                <!-- VIDEO (signin) -->
+                <!-- VIDEO (FilePond) -->
                 <div class="col-md-4">
                     <label class="form-label">🎬 @lang('dashboard.video_attachment')</label>
-                    <div class="media-upload-container" data-type="video">
-                        <div class="preview-video-container mb-2" style="{{ $order->video_note_url ? '' : 'display:none;' }}">
-                            @if($order->video_note_url)
-                                <video controls class="preview-video w-100" height="240">
-                                    <source src="{{ $order->video_note_url }}">
-                                </video>
-                            @endif
-                            <button type="button" class="btn btn-sm btn-danger mt-2 remove-media w-100">
-                                <i class="bi bi-trash"></i> {{ __('dashboard.remove') }}
-                            </button>
-                        </div>
-                        <div class="btn-group w-100">
-                            <button type="button" class="btn btn-sm btn-primary capture-media" data-media-type="video">
-                                <i class="bi bi-camera-video"></i> {{ __('dashboard.record_video') }}
-                            </button>
-                            <button type="button" class="btn btn-sm btn-secondary upload-media">
-                                <i class="bi bi-upload"></i> {{ __('dashboard.upload') }}
-                            </button>
-                        </div>
-                        <input type="file" name="video_note" class="media-input d-none" accept="video/*">
-                        <input type="hidden" name="remove_video" value="0" class="remove-flag">
+
+                    <div class="preview-video-container mb-2">
+                        @if($order->video_note_direct_key)
+                            <video controls width="100%" style="border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.2)">
+                                <source src="{{ Storage::disk('hetzner')->url($order->video_note_direct_key) }}" type="video/mp4">
+                            </video>
+                        @endif
                     </div>
+
+                    <div class="btn-group w-100 mb-2">
+                        <button type="button" id="capture-video-btn" class="btn btn-sm btn-primary">
+                            🎥 {{ __('dashboard.start_recording_video') }}
+                        </button>
+                    </div>
+
+                    <input type="file" id="pond-video" accept="video/*">
+                    <input type="hidden" name="remove_video" id="remove_video_flag" value="0">
+                    <input type="hidden" id="video_note_direct_key" name="video_note_direct_key" value="">
+                    <input type="hidden" id="video_upload_id" value="">
+
+
+                    <div id="video-error" class="text-danger small mt-1" style="display:none;"></div>
                 </div>
             </div>
         </div>
@@ -119,237 +119,333 @@
 </div>
 @endsection
 
-@push('js')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    let isSubmitting = false;
-
-    function initializeMediaHandlers() {
-        const mediaContainers = {
-            photo: {
-                input: document.querySelector('[data-type="photo"] .media-input'),
-                previewContainer: document.querySelector('[data-type="photo"] .preview-image-container'),
-                captureBtn: document.querySelector('[data-type="photo"] .capture-media'),
-                uploadBtn: document.querySelector('[data-type="photo"] .upload-media'),
-                removeFlag: document.querySelector('[data-type="photo"] .remove-flag'),
-                container: document.querySelector('[data-type="photo"]')
-            },
-            audio: {
-                input: document.querySelector('[data-type="audio"] .media-input'),
-                previewContainer: document.querySelector('[data-type="audio"] .preview-audio-container'),
-                captureBtn: document.querySelector('[data-type="audio"] .capture-media'),
-                uploadBtn: document.querySelector('[data-type="audio"] .upload-media'),
-                removeFlag: document.querySelector('[data-type="audio"] .remove-flag'),
-                container: document.querySelector('[data-type="audio"]')
-            },
-            video: {
-                input: document.querySelector('[data-type="video"] .media-input'),
-                previewContainer: document.querySelector('[data-type="video"] .preview-video-container'),
-                captureBtn: document.querySelector('[data-type="video"] .capture-media'),
-                uploadBtn: document.querySelector('[data-type="video"] .upload-media'),
-                removeFlag: document.querySelector('[data-type="video"] .remove-flag'),
-                container: document.querySelector('[data-type="video"]')
-            }
-        };
-
-        Object.keys(mediaContainers).forEach(type => {
-            const container = mediaContainers[type];
-            if (!container.input) return;
-
-            if (container.uploadBtn) {
-                container.uploadBtn.addEventListener('click', () => container.input.click());
-            }
-
-            container.input.addEventListener('change', e => handleFileUpload(e, type, container));
-
-            if (container.captureBtn) {
-                container.captureBtn.addEventListener('click', function() {
-                    if (type === 'photo') startPhotoCapture(container);
-                    else toggleMediaRecording(type, container);
-                });
-            }
-
-            const existingRemoveBtn = container.previewContainer.querySelector('.remove-media');
-            if (existingRemoveBtn) {
-                existingRemoveBtn.addEventListener('click', () => clearMediaPreview(type, container));
-            }
-        });
-    }
-
-    initializeMediaHandlers();
-
-    document.getElementById('media-form').addEventListener('submit', function() {
-        if (isSubmitting) return false;
-        isSubmitting = true;
-        const submitBtn = document.getElementById('submit-btn');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
-    });
-
-    function toggleMediaRecording(type, container) {
-        if (container.captureBtn.classList.contains('recording')) {
-            stopMediaRecording(type, container);
-            container.captureBtn.classList.remove('recording', 'btn-danger');
-            container.captureBtn.classList.add('btn-primary');
-            container.captureBtn.innerHTML = `<i class="bi bi-${type === 'audio' ? 'mic' : 'camera-video'}"></i> ${type === 'audio' ? 'Record' : 'Record Video'}`;
-        } else {
-            startMediaRecording(type, container);
-            container.captureBtn.classList.add('recording', 'btn-danger');
-            container.captureBtn.classList.remove('btn-primary');
-            container.captureBtn.innerHTML = `<i class="bi bi-stop"></i> Stop`;
-        }
-    }
-
-    function startMediaRecording(type, container) {
-        const constraints = {
-            audio: true,
-            video: type === 'video' ? { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } } : false
-        };
-
-        navigator.mediaDevices.getUserMedia(constraints)
-            .then(stream => {
-                container.mediaStream = stream;
-
-                if (type === 'video') {
-                    const videoPreview = document.createElement('video');
-                    videoPreview.srcObject = stream;
-                    videoPreview.autoplay = true;
-                    videoPreview.muted = true;
-                    videoPreview.controls = false;
-                    videoPreview.style.width = '100%';
-
-                    container.previewContainer.innerHTML = '';
-                    container.previewContainer.appendChild(videoPreview);
-                    container.previewContainer.style.display = 'block';
-                    container.livePreview = videoPreview;
-                }
-
-                container.mediaRecorder = new MediaRecorder(stream);
-                container.recordedChunks = [];
-
-                container.mediaRecorder.ondataavailable = e => {
-                    if (e.data.size > 0) container.recordedChunks.push(e.data);
-                };
-
-                container.mediaRecorder.onstop = () => {
-                    const blob = new Blob(container.recordedChunks, { type: container.mediaRecorder.mimeType });
-                    if (container.livePreview) container.livePreview.srcObject = null;
-                    stream.getTracks().forEach(track => track.stop());
-                    createMediaPreview(blob, type, container);
-                };
-
-                container.mediaRecorder.start();
-            })
-            .catch(err => {
-                console.error('Error accessing media devices:', err);
-                alert('Error: ' + err.message);
-            });
-    }
-
-    function stopMediaRecording(type, container) {
-        if (container.mediaRecorder && container.mediaRecorder.state !== 'inactive') container.mediaRecorder.stop();
-        if (container.mediaStream) container.mediaStream.getTracks().forEach(track => track.stop());
-        if (container.livePreview) container.livePreview.srcObject = null;
-    }
-
-    // ✅ NEW: Photo Capture using getUserMedia
-    function startPhotoCapture(container) {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-            .then(stream => {
-                const video = document.createElement('video');
-                video.srcObject = stream;
-                video.autoplay = true;
-                video.style.width = '100%';
-
-                const snapBtn = document.createElement('button');
-                snapBtn.type = 'button';
-                snapBtn.className = 'btn btn-sm btn-success mt-2';
-                snapBtn.innerHTML = '<i class="bi bi-camera"></i> Snap';
-
-                container.previewContainer.innerHTML = '';
-                container.previewContainer.appendChild(video);
-                container.previewContainer.appendChild(snapBtn);
-                container.previewContainer.style.display = 'block';
-
-                snapBtn.addEventListener('click', function() {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    canvas.getContext('2d').drawImage(video, 0, 0);
-
-                    stream.getTracks().forEach(track => track.stop());
-
-                    canvas.toBlob(function(blob) {
-                        createMediaPreview(blob, 'photo', container);
-                    }, 'image/png');
-                });
-            })
-            .catch(err => {
-                console.error('Error accessing camera:', err);
-                alert('Error: ' + err.message);
-            });
-    }
-
-    function handleFileUpload(event, type, container) {
-        const file = event.target.files[0];
-        if (file) createMediaPreview(file, type, container);
-    }
-
-    function createMediaPreview(blob, type, container) {
-        container.previewContainer.innerHTML = '';
-        container.removeFlag.value = '0';
-
-        const url = URL.createObjectURL(blob);
-        let mediaElement;
-
-        if (type === 'photo') {
-            mediaElement = document.createElement('img');
-            mediaElement.src = url;
-            mediaElement.className = 'preview-image img-thumbnail';
-            mediaElement.style.maxWidth = '100%';
-        } else {
-            mediaElement = document.createElement(type);
-            mediaElement.controls = true;
-            mediaElement.className = `preview-${type} w-100`;
-            mediaElement.src = url;
-        }
-
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'btn btn-sm btn-danger mt-2 remove-media';
-        removeBtn.innerHTML = '<i class="bi bi-trash"></i> Remove';
-        removeBtn.addEventListener('click', () => clearMediaPreview(type, container));
-
-        container.previewContainer.appendChild(mediaElement);
-        container.previewContainer.appendChild(removeBtn);
-        container.previewContainer.style.display = 'block';
-
-        const dataTransfer = new DataTransfer();
-        if (blob instanceof File) {
-            dataTransfer.items.add(blob);
-        } else {
-            const fileName = `${type}-${Date.now()}.${type === 'photo' ? 'png' : 'webm'}`;
-            const file = new File([blob], fileName, { type: blob.type || (type === 'photo' ? 'image/png' : type === 'audio' ? 'audio/webm' : 'video/webm') });
-            dataTransfer.items.add(file);
-        }
-        container.input.files = dataTransfer.files;
-    }
-
-    function clearMediaPreview(type, container) {
-        container.previewContainer.style.display = 'none';
-        container.previewContainer.innerHTML = '';
-        container.removeFlag.value = '1';
-        container.input.value = '';
-        if (container.mediaRecorder) stopMediaRecording(type, container);
-    }
-});
-</script>
+@push('css')
+<link href="https://unpkg.com/filepond/dist/filepond.min.css" rel="stylesheet">
+<style>
+.media-upload-container{border:1px dashed #ddd;border-radius:4px;padding:10px;background:#f9f9f9}
+.remove-media{width:100%}
+.preview-audio-container audio,.preview-video-container video{max-width:100%;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+</style>
 @endpush
 
-@push('css')
-<style>
-.media-upload-container{border:1px dashed #ddd;border-radius:4px;padding:10px;background-color:#f9f9f9}
-.remove-media{width:100%}
-.spinner-border-sm{width:1rem;height:1rem}
-</style>
+
+
+
+
+@push('js')
+<!-- FilePond -->
+<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const CSRF       = '{{ csrf_token() }}';
+  const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
+  const isMobile   = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+  const ACCEPTED_VIDEOS = [
+    'video/mp4','video/webm','video/avi','video/quicktime','video/x-matroska',
+    'video/x-flv','video/3gpp','video/mpeg','video/mpg','video/x-ms-wmv'
+  ];
+
+  // Helpers
+  function setInputFile(input, file){
+    if (!input) return;
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+  }
+  function clearPreview(el){ el.innerHTML=''; el.style.display='none'; }
+
+  // ================== PHOTO ==================
+  (function initPhoto(){
+    const box = document.querySelector('[data-type="photo"]');
+    if (!box) return;
+    const input = box.querySelector('.media-input');
+    const preview = box.querySelector('.preview-image-container');
+    const captureBtn = box.querySelector('.capture-media');
+    const uploadBtn = box.querySelector('.upload-media');
+    const removeFlag = box.querySelector('.remove-flag');
+
+    uploadBtn?.addEventListener('click', ()=> input?.click());
+
+    captureBtn?.addEventListener('click', ()=>{
+      if (isMobile) {
+        input?.click();
+      } else {
+        navigator.mediaDevices.getUserMedia({ video:true })
+          .then(stream=>{
+            preview.style.display='block';
+            preview.innerHTML='';
+            const v=document.createElement('video');
+            v.autoplay=true; v.muted=true; v.srcObject=stream;
+            v.style.width='100%';
+            preview.appendChild(v);
+
+            const btn=document.createElement('button');
+            btn.type='button'; btn.className='btn btn-sm btn-success mt-2 w-100';
+            btn.innerHTML='<i class="bi bi-camera"></i> Snap';
+            preview.appendChild(btn);
+
+            btn.addEventListener('click', ()=>{
+              const canvas=document.createElement('canvas');
+              canvas.width=v.videoWidth||640; canvas.height=v.videoHeight||480;
+              canvas.getContext('2d').drawImage(v,0,0);
+              stream.getTracks().forEach(t=>t.stop());
+              canvas.toBlob(blob=>{
+                const file=new File([blob],'photo_'+Date.now()+'.png',{type:'image/png'});
+                setInputFile(input, file);
+                preview.innerHTML='';
+                const img=document.createElement('img');
+                img.src=URL.createObjectURL(file);
+                img.className='img-thumbnail';
+                img.style.maxWidth='100%';
+                preview.appendChild(img);
+                removeFlag.value='0';
+              },'image/png');
+            });
+          })
+          .catch(err=> alert("Camera error: "+err.message));
+      }
+    });
+
+    input?.addEventListener('change',(e)=>{
+      const f=e.target.files?.[0]; if(!f) return;
+      preview.style.display='block';
+      preview.innerHTML='<img src="'+URL.createObjectURL(f)+'" class="img-thumbnail" style="max-width:100%">';
+      removeFlag.value='0';
+    });
+
+    // زر الحذف
+    const removeBtn = box.querySelector('.remove-media');
+    if(removeBtn){
+      removeBtn.addEventListener('click', ()=>{
+        preview.style.display='none'; input.value=''; removeFlag.value='1';
+      });
+    }
+  })();
+// ================== AUDIO ==================
+(function initAudio(){
+  const box = document.querySelector('[data-type="audio"]');
+  if (!box) return;
+  const input = box.querySelector('.media-input');
+  const preview = box.querySelector('.preview-audio-container');
+  const captureBtn = box.querySelector('.capture-media');
+  const uploadBtn = box.querySelector('.upload-media');
+  const removeFlag = box.querySelector('.remove-flag');
+  let recorder=null, chunks=[], indicator=null;
+
+  uploadBtn?.addEventListener('click', ()=> input?.click());
+
+  captureBtn?.addEventListener('click', async ()=>{
+    if (recorder && recorder.state==='recording'){
+      // إيقاف التسجيل
+      recorder.stop();
+      captureBtn.className='btn btn-sm btn-primary';
+      captureBtn.innerHTML='<i class="bi bi-mic"></i> {{ __("dashboard.record") }}';
+      if(indicator){ indicator.remove(); indicator=null; }
+      return;
+    }
+    try {
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      chunks=[];
+      recorder=new MediaRecorder(stream);
+      recorder.ondataavailable=e=>{ if(e.data.size>0) chunks.push(e.data); };
+
+      recorder.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(chunks, { type: 'audio/webm' });
+        const file = new File([blob], 'audio_' + Date.now() + '.webm', { type: 'audio/webm' });
+        setInputFile(input, file);
+
+        preview.style.display = 'block';
+        preview.innerHTML = '';
+
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.className = 'w-100';
+        audio.src = URL.createObjectURL(file);
+
+        preview.appendChild(audio);
+        removeFlag.value = '0';
+      };
+
+      recorder.start();
+
+      captureBtn.className='btn btn-sm btn-danger';
+      captureBtn.innerHTML='<i class="bi bi-stop"></i> {{ __("dashboard.stop") }}';
+
+      // نخلي preview ظاهر من البداية
+      preview.style.display = 'block';
+      indicator=document.createElement('div');
+      indicator.className='text-danger mt-2 small';
+      indicator.innerText='🔴 Recording...';
+      preview.innerHTML='';
+      preview.appendChild(indicator);
+
+    }catch(e){ alert("Mic error: "+e.message); }
+  });
+
+  input?.addEventListener('change',(e)=>{
+    const f=e.target.files?.[0]; if(!f) return;
+    preview.style.display='block';
+    preview.innerHTML='<audio controls class="w-100" src="'+URL.createObjectURL(f)+'"></audio>';
+    removeFlag.value='0';
+  });
+
+  // زر الحذف
+  const removeBtn = box.querySelector('.remove-media');
+  if(removeBtn){
+    removeBtn.addEventListener('click', ()=>{
+      preview.style.display='none';
+      preview.innerHTML = '';
+      input.value='';
+      removeFlag.value='1';
+    });
+  }
+})();
+
+
+
+  // ================== VIDEO (FilePond) ==================
+  if (window.FilePond) {
+    try {
+      FilePond.registerPlugin(
+        window.FilePondPluginFileValidateType || (()=>{}),
+        window.FilePondPluginFileValidateSize || (()=>{})
+      );
+    } catch(_) {}
+  }
+
+  const elVideo = document.getElementById('pond-video');
+  let pondVideo = null;
+
+  if (elVideo && window.FilePond) {
+    pondVideo = FilePond.create(elVideo, {
+      allowMultiple:false,
+      credits:false,
+      acceptedFileTypes:ACCEPTED_VIDEOS,
+      labelIdle:'🎬 {{ __("dashboard.upload") }}',
+      server:{
+        process:(fieldName,file,metadata,load,error,progress,abort)=>{
+          let cancelled=false,currentXhr=null,uploadId='',key='';
+          const parts=[]; let uploadedBase=0;
+          progress(true,0,file.size);
+
+          (async()=>{
+            try{
+              const createRes=await fetch(`{{ route('multipart.create') }}`,{
+                method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF},
+                body:JSON.stringify({fileName:file.name,contentType:file.type,fileSize:file.size,prefix:'uploads/signin/videos'})
+              });
+              if(!createRes.ok) throw new Error('createMultipart failed');
+              const createJson=await createRes.json();
+              uploadId=createJson.uploadId; key=createJson.key;
+              document.getElementById('video_upload_id').value=uploadId;
+              document.getElementById('video_note_direct_key').value=key;
+
+              const totalParts=Math.ceil(file.size/CHUNK_SIZE);
+              for(let partNumber=1;partNumber<=totalParts;partNumber++){
+                if(cancelled) return;
+                const start=(partNumber-1)*CHUNK_SIZE,end=Math.min(start+CHUNK_SIZE,file.size);
+                const blob=file.slice(start,end);
+                const signRes=await fetch(`{{ route('multipart.sign') }}`,{
+                  method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF},
+                  body:JSON.stringify({key,uploadId,partNumber})
+                });
+                if(!signRes.ok) throw new Error('signPart failed');
+                const {url}=await signRes.json();
+
+                await new Promise((resolve,reject)=>{
+                  const xhr=new XMLHttpRequest();
+                  currentXhr=xhr; xhr.open('PUT',url,true);
+                  xhr.upload.onprogress=(e)=>{ if(e.lengthComputable) progress(true,uploadedBase+e.loaded,file.size); };
+                  xhr.onload=()=>{
+                    currentXhr=null;
+                    if(xhr.status>=200&&xhr.status<300){
+                      const etag=(xhr.getResponseHeader('ETag')||'').replace(/"/g,'');
+                      if(!etag) return reject(new Error('Missing ETag'));
+                      parts.push({ETag:etag,PartNumber:partNumber});
+                      uploadedBase+=blob.size; progress(true,uploadedBase,file.size);
+                      resolve();
+                    } else reject(new Error('PUT failed: '+xhr.status));
+                  };
+                  xhr.onerror=()=>reject(new Error('Network error'));
+                  xhr.onabort=()=>reject(new Error('Aborted'));
+                  xhr.send(blob);
+                });
+              }
+
+              if(cancelled) return;
+              const completeRes=await fetch(`{{ route('multipart.complete') }}`,{
+                method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF},
+                body:JSON.stringify({key,uploadId,parts})
+              });
+              if(!completeRes.ok) throw new Error('completeMultipart failed');
+              progress(true,file.size,file.size);
+              load(key);
+            }catch(e){
+              if(cancelled) return;
+              console.error(e); error(e.message||'upload failed');
+              document.getElementById('video-error').style.display='block';
+              document.getElementById('video-error').textContent='فشل رفع الفيديو. حاول من جديد.';
+            }
+          })();
+
+          return{abort:async()=>{cancelled=true;try{if(currentXhr) currentXhr.abort();}catch(_){};abort();}};
+        }
+      }
+    });
+  }
+
+  // زر حذف الفيديو
+  const videoRemoveBtn = document.querySelector('.remove-video');
+  if(videoRemoveBtn){
+    videoRemoveBtn.addEventListener('click', ()=>{
+      const preview = document.querySelector('.preview-video-container');
+      if(preview) preview.style.display='none';
+      document.getElementById('remove_video_flag').value = '1';
+      document.getElementById('video_note_direct_key').value = '';
+      document.getElementById('video_upload_id').value = '';
+    });
+  }
+
+  // ================== RECORD VIDEO ==================
+  (function initVideoRecord(){
+    const btn=document.getElementById('capture-video-btn');
+    const preview=document.querySelector('.preview-video-container');
+    if(!btn||!preview) return;
+    let recorder=null,chunks=[],stream=null;
+
+    btn.addEventListener('click',async()=>{
+      if(recorder&&recorder.state==='recording'){
+        recorder.stop();
+        btn.className='btn btn-sm btn-primary w-100';
+        btn.innerHTML='🎥 {{ __("dashboard.capture_video") }}';
+        return;
+      }
+      try{
+        stream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+        preview.style.display='block'; preview.innerHTML='';
+        const v=document.createElement('video'); v.srcObject=stream;
+        v.autoplay=true; v.muted=true; v.style.width='100%'; preview.appendChild(v);
+
+        chunks=[]; recorder=new MediaRecorder(stream,{mimeType:'video/webm'});
+        recorder.ondataavailable=e=>{if(e.data.size>0) chunks.push(e.data);};
+        recorder.onstop=()=>{
+          stream.getTracks().forEach(t=>t.stop());
+          const blob=new Blob(chunks,{type:'video/webm'});
+          const file=new File([blob],'recorded_'+Date.now()+'.webm',{type:'video/webm'});
+          preview.innerHTML='<video controls style="width:100%" src="'+URL.createObjectURL(blob)+'"></video>';
+          if(pondVideo) pondVideo.addFile(file);
+        };
+        recorder.start();
+        btn.className='btn btn-sm btn-danger w-100';
+        btn.innerHTML='<i class="bi bi-stop"></i> {{ __("dashboard.stop") }}';
+      }catch(e){ alert("Camera error: "+e.message); }
+    });
+  })();
+});
+</script>
 @endpush
