@@ -1777,6 +1777,9 @@ return [
     'amount_details' => 'د اندازې تفصیلات',
 
     // Delete confirmation and payment translations
+    'light' => 'روښانه حالت',
+    'dark' => 'تیاره حالت',
+    'system' => 'سیستم حالت',
     'confirm_delete' => 'آیا تاسو ډاډه یاست چې غواړئ دا توکي حذف کړئ؟',
     'delete_warning_message' => 'دا عمل بیرته راګرځیدونکی نه دی. دا به دا توکي د تل لپاره حذف کړي.',
     'yes_delete' => 'هو، حذف یې کړه!',

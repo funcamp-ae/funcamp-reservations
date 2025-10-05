@@ -140,7 +140,7 @@
             id="kt_ecommerce_category_table">
             <!--begin::Table head-->
             <thead>
-                <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                <tr class="text-start  fw-bolder fs-7 text-uppercase gs-0">
                     <th>@lang('dashboard.Employee')</th>
                     <th>@lang('dashboard.service')</th>
                     <th>@lang('dashboard.orders')</th>
@@ -158,7 +158,7 @@
             <!--end::Table head-->
 
             <!--begin::Table body-->
-            <tbody class="fw-bold text-gray-600">
+            <tbody class="fw-bold ">
                 @foreach ($topServices as $service)
                     <tr data-id="{{ $service->id }}">
                         <td>
@@ -168,7 +168,7 @@
                             <div class="d-flex">
                                 <div class="ms-5">
                                     <a href="{{ route('services.edit', $service->id) }}"
-                                        class="text-gray-800 text-hover-primary fs-5 fw-bolder mb-1"
+                                        class="text-hover-primary fs-5 fw-bolder mb-1"
                                         data-kt-ecommerce-category-filter="category_name">{{ $service->name }}</a>
                                 </div>
                             </div>
@@ -301,7 +301,6 @@
             width: 90%;
             max-width: 1600px;
             margin: auto;
-            background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
@@ -315,7 +314,6 @@
         }
 
         .stat-item {
-            background-color: #ffffff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -325,13 +323,11 @@
         .stat-item h3 {
             margin: 10px 0;
             font-size: 24px;
-            color: #333;
             font-weight: bold;
         }
 
         .stat-item p {
             font-size: 16px;
-            color: #777;
         }
 
         .chart-container {
@@ -362,7 +358,6 @@
         p {
             font-size: 18px;
             margin-bottom: 20px;
-            color: #555;
             text-align: center;
         }
     </style>

@@ -1847,6 +1847,9 @@ return [
     'confirm_delete' => 'هل أنت متأكد أنك تريد حذف هذا العنصر؟',
     'delete_warning_message' => 'لا يمكن التراجع عن هذا الإجراء. سيتم حذف العنصر بشكل دائم.',
     'yes_delete' => 'نعم، احذف!',
+    'light' => 'الوضع المضيء',
+    'dark' => 'الوضع المظلم',
+    'system' => 'وضع النظام',
     'cancel' => 'إلغاء',
     'processing' => 'جاري المعالجة...',
     'please_wait' => 'الرجاء الانتظار...',
@@ -1857,5 +1860,6 @@ return [
     'payment_deleted_successfully' => 'تم حذف المدفعة بنجاح',
     'form_code' => 'كود الاستمارة',
     'confiscated_amount' => 'المبلغ المصادر',
+    
 ];
 

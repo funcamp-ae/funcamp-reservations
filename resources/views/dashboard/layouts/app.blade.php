@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" direction="{{app()->getLocale() == 'en' ? 'ltr' : 'rtl' }}" dir="{{app()->getLocale() == 'en' ? 'ltr' : 'rtl' }}" style="direction: {{ app()->getLocale() == 'en' ? 'ltr' : 'rtl'}}">
+<html lang="{{ app()->getLocale() }}" 
+      direction="{{app()->getLocale() == 'en' ? 'ltr' : 'rtl' }}" 
+      dir="{{app()->getLocale() == 'en' ? 'ltr' : 'rtl' }}" 
+      style="direction: {{ app()->getLocale() == 'en' ? 'ltr' : 'rtl'}}"
+      data-theme="{{ session('theme', 'light') }}"
+      data-bs-theme="{{ session('theme', 'light') }}">
 <!--begin::Head-->
 
 <head>
@@ -31,6 +36,8 @@
 
 	<link href="https://fonts.googleapis.com/css2?family=Changa:wght@200;400&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
+	<!-- Bootstrap 5.3.2 CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="{{asset('dashboard/custom/css/main.css')}}" rel="stylesheet" />
 
 	@if(app()->getLocale() == "en")
@@ -62,7 +69,193 @@
 	@endif
 
 	<style>
-		/* Global Select Validation Styles */
+        /* Theme variables */
+        :root {
+            --bs-body-bg: #f5f8fa;
+            --bs-body-color: #3f4254;
+            --bs-border-color: #e4e6ef;
+            --bs-card-bg: #ffffff;
+			--bs-table-header : #ce6316ce ;
+            --bs-card-color: #3f4254;
+            --bs-modal-bg: #ffffff;
+            --bs-modal-color: #3f4254;
+            --bs-table-bg: #f9f9f9;
+            --bs-table-color: #3f4254;
+            --bs-header-bg: #ffffff;
+            --bs-toolbar-bg: #f9f9f9;
+            --bs-box-shadow: 0 0 20px 0 rgba(76, 87, 125, 0.1);
+        }
+        
+        [data-theme="dark"] {
+            --bs-body-bg: #323248;
+            --bs-body-color:rgb(61, 61, 65);
+            --bs-border-color: #323248;
+	    --bs-table-header :#bb8322;
+            --bs-card-bg: #323248;
+            --bs-card-color: white; 
+	    --bs-header-color : white;
+            --bs-modal-bg: #323248;
+            --bs-modal-color: #e1e1f0;
+            --bs-table-bg: #3a3a57;
+            --bs-table-color: #e1e1f0;
+            --bs-header-bg: #2b2b40;
+            --bs-toolbar-bg: #323248;
+            --bs-box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.4);
+            --bs-primary: #3699ff;
+            --bs-secondary: #6c757d;
+            --bs-success: #1bc5bd;
+            --bs-info: #8950fc;
+            --bs-warning: #ffa800;
+            --bs-danger: #f64e60;
+            color-scheme: dark;
+        }
+
+        /*
+*/
+        
+        /* Apply theme colors */
+        body {
+            background-color: var(--bs-body-bg) !important ;
+            color: var(--bs-body-color) !important ;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        /* Header and Toolbar */
+        .header, .header-menu, .toolbar {
+            background-color: var(--bs-header-bg) !important;
+            border-color: var(--bs-border-color) !important;
+        }
+        h1 , h2 , h3 , h4 , h5 {
+            color: var(--bs-card-color);
+		}
+		
+        /* Cards and Modals */
+        .card, .modal-content, .dropdown-menu, .menu {
+            background-color: var(--bs-card-bg);
+            color: var(--bs-card-color);
+            border-color: var(--bs-border-color);
+            box-shadow: var(--bs-box-shadow) !important;
+        }
+        
+        /* Tables */
+        .table {
+            background-color: var(--bs-card-bg);
+            color: var(--bs-card-color);
+            border-color: var(--bs-border-color);
+        }
+        .card-header {
+			background-color: var(--bs-table-header) !important;
+
+		}
+		.card-label {
+			color: var(--bs-table-color)!important;
+		}
+		/*span {
+			color: var(--bs-table-color) !important;
+		}*/
+
+        .table thead th {
+            background-color: var(--bs-table-bg);
+            color: var(--bs-table-color);
+            border-bottom-color: var(--bs-border-color);
+        }
+        
+        .table > :not(:first-child) {
+            border-top: 2px solid var(--bs-border-color);
+        }
+        
+        /* Form Elements */
+        .form-control, .form-select , input  , .form-control .form-control-solid , span.menu-title , label , .aside-logo , table thead th  {
+            background-color: var(--bs-card-bg) !important ;
+            color: var(--bs-card-color) !important;
+            border-color: var(--bs-border-color) !important;
+        }
+	.btn {
+	color : white ; 
+	}
+	.card-header .card-title h1 ,.card-header .card-title h2 , .card-header .card-title  h3 ,.card-header .card-title h4 , .card-header .card-title h5 {
+		color : white ;
+	}
+	span.select2-selection__choice__display  , select2-selection__choice__remove{
+	color : black !important ;
+	}
+
+        .form-select.form-select-solid {
+ 	    background-color: var(--bs-card-bg);
+            color: var(--bs-card-color);
+            border-color: var(--bs-border-color);
+}
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bs-card-bg);
+            color: var(--bs-card-color);
+            border-color: var(--bs-border-color);
+            box-shadow: 0 0 0 0.25rem rgba(54, 153, 255, 0.15) !important;
+        }
+        
+        /* Navigation and Menu Items */
+        .menu-item, .menu-link, .menu-title {
+            color: var(--bs-card-color) !important;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item:hover .menu-link, 
+        .menu-item.here .menu-link,
+        .menu-item.active .menu-link {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            color: var(--bs-primary) !important;
+        }
+        
+        .menu-link.active {
+            background-color: rgba(54, 153, 255, 0.1) !important;
+            color: var(--bs-primary) !important;
+        }
+        
+        .menu-sub {
+            background-color: var(--bs-card-bg) !important;
+            border-left: 1px solid var(--bs-border-color) !important;
+        }
+        
+        .menu-item .menu-link .menu-bullet > span {
+            background-color: var(--bs-card-color) !important;
+        }
+        
+        .menu-item.here > .menu-link .menu-title,
+        .menu-item.active > .menu-link .menu-title {
+            color: var(--bs-primary) !important;
+        }
+        
+        /* Toolbar */
+        .toolbar {
+            background-color: var(--bs-toolbar-bg) !important;
+            border-color: var(--bs-border-color) !important;
+        }
+        
+        /* Sidebar/Menu */
+        .aside {
+            background-color: var(--bs-card-bg) !important;
+            border-right: 1px solid var(--bs-border-color) !important;
+        }
+        
+        .modal-content {
+            background-color: var(--bs-modal-bg);
+            color: var(--bs-modal-color);
+        }
+        
+        .table {
+            --bs-table-bg: var(--bs-card-bg);
+            --bs-table-color: var(--bs-card-color);
+            --bs-table-border-color: var(--bs-border-color);
+        }
+        
+        .dropdown-menu {
+            --bs-dropdown-bg: var(--bs-card-bg);
+            --bs-dropdown-color: var(--bs-card-color);
+            --bs-dropdown-link-color: var(--bs-card-color);
+            --bs-dropdown-link-hover-color: var(--bs-primary);
+            --bs-dropdown-link-hover-bg: rgba(var(--bs-primary-rgb), 0.1);
+        }
+
+        /* Global Select Validation Styles */
 		select.is-invalid {
 			border-color: #dc3545 !important;
 			box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
@@ -99,7 +292,6 @@
 		table thead th {
 			font-weight: 900 !important;
 			font-size: 0.875rem !important;
-			color: #ffffff !important;
 			text-transform: uppercase !important;
 			letter-spacing: 0.5px !important;
 			padding: 1rem 0.75rem !important;
@@ -377,7 +569,39 @@
 		min-width: 230px !important;
 	}
 	</style>
-
+	
+	<!-- Theme Mode JS -->
+    <style>
+        :root {
+            --bs-body-bg: #ffffff;
+            --bs-body-color: #212529;
+            --bs-border-color: #dee2e6;
+        }
+        
+        [data-bs-theme="dark"] {
+            --bs-body-bg: #1e1e2d;
+            --bs-body-color: #e1e1e1;
+            --bs-border-color: #2b2b40;
+            color-scheme: dark;
+        }
+        
+        body {
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+        }
+        
+        .card, .modal-content, .form-control, .dropdown-menu, .table {
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+            border-color: var(--bs-border-color);
+        }
+        
+        .form-control:focus {
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+            border-color: var(--bs-border-color);
+        }
+    </style>
 </head>
 <!--end::Head-->
 <!--begin::Body-->
@@ -386,7 +610,6 @@
 <body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled toolbar-fixed aside-enabled aside-fixed" style="--kt-toolbar-height:55px;--kt-toolbar-height-tablet-and-mobile:55px">
 @else
 <body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled toolbar-fixed " style="--kt-toolbar-height:55px;--kt-toolbar-height-tablet-and-mobile:55px">
-
 @endif
 	<div class="d-flex flex-column flex-root">
 		<!--begin::Page-->
@@ -453,7 +676,7 @@
 	</script>
 	<script src="{{asset('dashboard/assets/js/jquery.js')}}"></script>
 	<script src="{{asset('dashboard/assets/js/popper.js')}}"></script>
-	<script src="{{asset('dashboard/assets/js/bootstrap.js')}}"></script>
+	<!-- <script src="{{asset('dashboard/assets/js/bootstrap.js')}}"></script> -->
 	<!--begin::Global Javascript Bundle(used by all pages)-->
 	<script src="{{asset('dashboard/assets/plugins/global/plugins.bundle.js')}}"></script>
 	<script src="{{asset('dashboard/assets/js/scripts.bundle.js')}}"></script>
@@ -479,7 +702,7 @@
 	<script src="{{asset('dashboard/assets/js/custom/utilities/modals/create-app.js')}}"></script>
 	<script src="{{asset('dashboard/assets/js/custom/utilities/modals/users-search.js')}}"></script>
 	<!--end::Page Custom Javascript-->
-		<!-- Include intl-tel-input from CDN -->
+	<!-- Include intl-tel-input from CDN -->
 	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 	<script src="{{ asset('js/country-select.js') }}"></script>
 
@@ -498,6 +721,7 @@
 	<!-- Global Select Validation Script -->
 	<script>
 	$(document).ready(function() {
+		
 		// Global function to validate select fields with default values
 		window.validateSelectFields = function(form) {
 			let isValid = true;
@@ -733,6 +957,8 @@
 	});
 	</script>
 
+    <!-- Bootstrap 5.3.2 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 <!--end::Body-->
 

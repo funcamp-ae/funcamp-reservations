@@ -62,9 +62,9 @@
                     <!--begin::Menu-->
                     <div class="menu menu-sub menu-sub-dropdown menu-column w-350px w-lg-375px" data-kt-menu="true" dir="rtl">
                         <!--begin::Heading-->
-                        <div class="d-flex flex-column bgi-no-repeat rounded-top" style="background-color: #f8f5ff">
+                        <div class="d-flex flex-column bgi-no-repeat rounded-top">
                             <!--begin::Title-->
-                            <h3 class="text-dark fw-bold px-9 mt-10 mb-6 text-end">
+                            <h3 class="fw-bold px-9 mt-10 mb-6">
                                 @lang('dashboard.notifications')
                                 @auth
                                     <span class="fs-8 opacity-75 pe-3">{{ auth()->user()->unreadNotifications->count() }} @lang('dashboard.unread')</span>
@@ -96,18 +96,18 @@
                                                 </div>
                                                 <!--end::Symbol-->
                                                 <!--begin::Title-->
-                                                <div class="mb-0 ms-2 text-end">
+                                                <div class="mb-0 ms-2 ">
                                                     <a href="{{ $data['url'] ?? '#' }}"
-                                                       class="text-gray-800 text-hover-primary fw-bold"
+                                                       class=" text-hover-primary fw-bold"
                                                        onclick="event.preventDefault(); markNotificationAsRead('{{ $notification->id }}', '{{ isset($data['url']) ? $data['url'] : '' }}')">
                                                         {{ isset($data['title']) ? __("dashboard.".$data['title']) : '' }}
                                                     </a>
                                                     @if(isset($data['employee_name']))
-                                                    <div class="text-gray-500 fs-7">{{ isset($data['message']) ? __("dashboard.".$data['message'] , ['name' => $data['employee_name']]) : ''}}</div>
+                                                    <div class=" fs-7">{{ isset($data['message']) ? __("dashboard.".$data['message'] , ['name' => $data['employee_name']]) : ''}}</div>
                                                     @elseif(isset($data['task_title']))
-                                                    <div class="text-gray-500 fs-7">{{ isset($data['message']) ? __("dashboard.".$data['message'] , ['title' => $data['task_title']]) : ''}}</div>
+                                                    <div class="fs-7">{{ isset($data['message']) ? __("dashboard.".$data['message'] , ['title' => $data['task_title']]) : ''}}</div>
                                                     @else
-                                                    <div class="text-gray-500 fs-7">{{ isset($data['message']) ? __("dashboard.".$data['message']) : ''}}</div>
+                                                    <div class="fs-7">{{ isset($data['message']) ? __("dashboard.".$data['message']) : ''}}</div>
                                                     @endif
                                                 </div>
                                                 <!--end::Title-->
@@ -117,7 +117,7 @@
                                         <!--end::Item-->
                                     @empty
                                         <div class="text-center py-10">
-                                            <i class="fas fa-bell-slash fs-2x text-gray-400 mb-4"></i>
+                                            <i class="fas fa-bell-slash fs-2x mb-4"></i>
                                             <div class="text-gray-600">@lang('dashboard.no_new_notifications')</div>
                                         </div>
                                     @endforelse
@@ -140,6 +140,11 @@
                     <!--end::Menu-->
                 </div>
                 <!--end::Notifications-->
+                
+
+                <!--begin::Theme switcher-->
+                @include('dashboard.components.theme-switcher')
+                <!--end::Theme switcher-->
                 @auth
                 <!--begin::User menu-->
                     <div class="d-flex align-items-center ms-1 ms-lg-3" id="kt_header_user_menu_toggle">
@@ -175,7 +180,7 @@
                             <div class="menu-item px-5" data-kt-menu-trigger="hover" data-kt-menu-placement="left-start">
                                 <a href="#" class="menu-link px-5">
                                     <span class="menu-title position-relative">@lang('dashboard.language')
-                                    <span class="fs-8 rounded bg-light px-3 py-2 position-absolute translate-middle-y top-50 end-0">{{session()->get( 'lang' ) == "en" ? "English" : "العربية"}}
+                                    <span class="fs-8 rounded text-end px-3 py-2 position-absolute translate-middle-y top-50 end-0">{{session()->get( 'lang' ) == "en" ? "English" : "العربية"}}
                                 </a>
                                 <!--begin::Menu sub-->
                                 <div class="menu-sub menu-sub-dropdown w-175px py-4">
