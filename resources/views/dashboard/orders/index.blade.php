@@ -427,50 +427,50 @@
                             }, 1500);
                             {
                                 {
-                                    --
+                                     
                                 } else {
-                                    --
+                                     
                                 }
                             } {
                                 {
-                                    --resultContainer.textContent = "@lang('dashboard.invalid_qr_code')";
-                                    --
+                                     resultContainer.textContent = "@lang('dashboard.invalid_qr_code')";
+                                     
                                 }
                             } {
                                 {
-                                    --resultContainer.classList.remove('alert-info');
-                                    --
+                                     resultContainer.classList.remove('alert-info');
+                                     
                                 }
                             } {
                                 {
-                                    --resultContainer.classList.add('alert-warning');
-                                    --
+                                     resultContainer.classList.add('alert-warning');
+                                     
                                 }
                             }
 
                             {
                                 {
-                                    -- // Show the start button again after a delay--}}
+                                      // Show the start button again after a delay }}
                                     {
                                         {
-                                            --setTimeout(() => {
-                                                    --
+                                             setTimeout(() => {
+                                                     
                                                 }
                                             } {
                                                 {
-                                                    --resetScanner();
-                                                    --
+                                                     resetScanner();
+                                                     
                                                 }
                                             } {
                                                 {
-                                                    --
+                                                     
                                                 }, 3000);
-                                            --
+                                             
                                         }
                                     } {
                                         {
-                                            --
-                                        }--
+                                             
+                                        } 
                                     }
                                 }
                             }
