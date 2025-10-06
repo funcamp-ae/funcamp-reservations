@@ -414,7 +414,7 @@
                             inversionAttempts: "dontInvert",
                         });
 
-                        if (code) {
+              if (code) {
                             // QR code detected!
                             stopScanning();
                             resultContainer.textContent = "@lang('dashboard.qr_detected_redirecting')";
