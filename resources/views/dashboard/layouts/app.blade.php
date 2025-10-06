@@ -161,6 +161,7 @@
         .table thead th {
             color: var(--bs-table-color);
             border-bottom-color: var(--bs-border-color);
+            background-color: var(--bs-table-header) !important;
         }
         table tbody tr:nth-child(even) {
    	 background-color: var(--even-row) !important;
