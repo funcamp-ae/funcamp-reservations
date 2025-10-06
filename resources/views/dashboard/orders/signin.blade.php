@@ -101,6 +101,8 @@
                                 <button type="button" class="btn btn-sm btn-danger remove-media">
                                     <i class="bi bi-trash"></i> {{ __('dashboard.remove') }}
                                 </button>
+                                <input type="file" id="camera-photo-input" accept="image/*" capture="environment" hidden>
+
                             </div>
 
                             <input type="file" name="image_before_receiving[]" class="media-input d-none"
@@ -770,7 +772,8 @@
                             try {
                                 finalFile = await compressImage(f, 0.7);
                             } catch {
-                                /* HEIC أو فشل → نخليه */ }
+                                /* HEIC أو فشل → نخليه */
+                            }
                             // نضيف للـ state بدون تكرار، ونرسم المعاينة
                             const added = addFileUnique(finalFile);
                             if (added) addPhotoToSlider(URL.createObjectURL(finalFile));
@@ -787,14 +790,16 @@
 
                 // ---------- زر الالتقاط ----------
                 const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+                const camPhotoInput = document.getElementById('camera-photo-input');
+
                 captureBtn?.addEventListener('click', () => {
-                    // على الهاتف: أيضاً نفتح المعرض (وفي iOS يبان خيار "التقاط صورة")
-                    if (isMobile) {
-                        openGalleryPicker();
+                    // 📱 على الهاتف: افتح الكاميرا الأصلية مباشرة
+                    if (isMobile && camPhotoInput) {
+                        camPhotoInput.click();
                         return;
                     }
 
-                    // ديسكتوب: كاميرا ويب + Snap
+                    // 💻 على الديسكتوب: كاميرا ويب + Snap
                     (async () => {
                         try {
                             const stream = await navigator.mediaDevices.getUserMedia({
@@ -823,6 +828,7 @@
                             v.playsInline = true;
                             v.srcObject = stream;
                             v.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+
                             const snapBtn = document.createElement('button');
                             snapBtn.type = 'button';
                             snapBtn.className = 'btn btn-sm btn-success';
@@ -875,6 +881,22 @@
                         }
                     })();
                 });
+
+                // 📱 معالجة الصورة الملتقطة من كاميرا الهاتف
+                camPhotoInput?.addEventListener('change', async (e) => {
+                    const files = Array.from(e.target.files || []);
+                    for (const f of files) {
+                        let finalFile = f;
+                        try {
+                            finalFile = await compressImage(f, 0.7);
+                        } catch {}
+                        const added = addFileUnique(finalFile);
+                        if (added) addPhotoToSlider(URL.createObjectURL(finalFile));
+                    }
+                    if (removeFlag) removeFlag.value = '0';
+                    camPhotoInput.value = ''; // نفرغ بعد الاستعمال
+                });
+
 
                 // ---------- حذف الكل ----------
                 box.querySelector('.remove-media')?.addEventListener('click', () => {
@@ -965,7 +987,7 @@
 
                             recorder = new MediaRecorder(stream, {
                                 mimeType,
-                                videoBitsPerSecond: 1000000,
+                                videoBitsPerSecond: 800000,
                                 audioBitsPerSecond: 64000
                             });
                             recorder.ondataavailable = e => {

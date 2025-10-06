@@ -83,6 +83,8 @@
                                 <button type="button" class="btn btn-sm btn-danger remove-media">
                                     <i class="bi bi-trash"></i> {{ __('dashboard.remove') }}
                                 </button>
+                                <input type="file" id="camera-photo-input-logout" accept="image/*" capture="environment" hidden>
+
                             </div>
                             <input type="file" name="image_after_delivery[]" class="media-input d-none"
                                 accept="image/*"multiple>
@@ -756,100 +758,103 @@
                 // مهم: لا نستعمل change على input الأصلي حتى ما نكرّروش الملفات
                 // لو كان عندك listeners قدام مرتبطين بـ .media-input، انزعهم.
 
+
+
                 // ===== التقاط =====
-                const isMobileUA = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-                captureBtn?.addEventListener('click', () => {
-                    // على الهاتف نخليها كيف "رفع" (المعرض + خيار التقاط في iOS)
-                    if (isMobileUA) {
-                        openGalleryPicker();
+                // ===== التقاط =====
+const camPhotoInputLogout = document.getElementById('camera-photo-input-logout');
+const isMobileUA = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+captureBtn?.addEventListener('click', () => {
+    // 📱 على الهاتف → افتح كاميرا الهاتف الأصلية
+    if (isMobileUA && camPhotoInputLogout) {
+        camPhotoInputLogout.click();
+        return;
+    }
+
+    // 💻 ديسكتوب: كاميرا ويب + Snap
+    (async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { ideal: 'environment' },
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    aspectRatio: { ideal: 16 / 9 }
+                },
+                audio: false
+            });
+
+            const overlay = document.createElement('div');
+            overlay.style.cssText =
+                'position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:2;';
+            const v = document.createElement('video');
+            v.autoplay = v.muted = true;
+            v.playsInline = true;
+            v.srcObject = stream;
+            v.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+
+            const snapBtn = document.createElement('button');
+            snapBtn.type = 'button';
+            snapBtn.className = 'btn btn-sm btn-success';
+            snapBtn.innerHTML = '<i class="bi bi-camera"></i> Snap';
+            Object.assign(snapBtn.style, {
+                position: 'absolute',
+                bottom: '10px',
+                left: '50%',
+                transform: 'translateX(-50%)'
+            });
+
+            overlay.appendChild(v);
+            overlay.appendChild(snapBtn);
+            viewport.appendChild(overlay);
+            sliderWrap.classList.remove('d-none');
+
+            snapBtn.addEventListener('click', async () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = v.videoWidth || 640;
+                canvas.height = v.videoHeight || 480;
+                canvas.getContext('2d').drawImage(v, 0, 0);
+                try { stream.getTracks().forEach(t => t.stop()); } catch {}
+
+                canvas.toBlob(async blob => {
+                    if (!blob) {
+                        overlay.remove();
                         return;
                     }
+                    let file = new File([blob], 'photo_' + Date.now() + '.jpg', { type: 'image/jpeg' });
+                    try { file = await compressImage(file, 0.7); } catch {}
+                    const added = addFileUnique(file);
+                    if (added) {
+                        const url = URL.createObjectURL(file);
+                        addPhotoToSlider(url, true);
+                    }
+                    if (removeFlag) removeFlag.value = '0';
+                    overlay.remove();
+                }, 'image/jpeg', 0.95);
+            });
+        } catch (err) {
+            alert('Camera error: ' + (err?.message || err));
+        }
+    })();
+});
 
-                    // ديسكتوب: كاميرا ويب + Snap
-                    (async () => {
-                        try {
-                            const stream = await navigator.mediaDevices.getUserMedia({
-                                video: {
-                                    facingMode: {
-                                        ideal: 'environment'
-                                    },
-                                    width: {
-                                        ideal: 1280
-                                    },
-                                    height: {
-                                        ideal: 720
-                                    },
-                                    aspectRatio: {
-                                        ideal: 16 / 9
-                                    }
-                                },
-                                audio: false
-                            });
+// 📱 معالجة الصورة من كاميرا الهاتف
+camPhotoInputLogout?.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files || []);
+    for (const f of files) {
+        let finalFile = f;
+        try { finalFile = await compressImage(f, 0.7); } catch {}
+        const added = addFileUnique(finalFile);
+        if (added) {
+            const url = URL.createObjectURL(finalFile);
+            addPhotoToSlider(url, true);
+        }
+    }
+    if (removeFlag) removeFlag.value = '0';
+    e.target.value = '';
+});
 
-                            const overlay = document.createElement('div');
-                            overlay.style.cssText =
-                                'position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:2;';
-                            const v = document.createElement('video');
-                            v.autoplay = v.muted = true;
-                            v.playsInline = true;
-                            v.srcObject = stream;
-                            v.style.cssText = 'width:100%;height:100%;object-fit:contain;';
-
-                            const snapBtn = document.createElement('button');
-                            snapBtn.type = 'button';
-                            snapBtn.className = 'btn btn-sm btn-success';
-                            snapBtn.innerHTML = '<i class="bi bi-camera"></i> Snap';
-                            Object.assign(snapBtn.style, {
-                                position: 'absolute',
-                                bottom: '10px',
-                                left: '50%',
-                                transform: 'translateX(-50%)'
-                            });
-
-                            overlay.appendChild(v);
-                            overlay.appendChild(snapBtn);
-                            viewport.appendChild(overlay);
-                            sliderWrap.classList.remove('d-none');
-
-                            snapBtn.addEventListener('click', async () => {
-                                const canvas = document.createElement('canvas');
-                                canvas.width = v.videoWidth || 640;
-                                canvas.height = v.videoHeight || 480;
-                                canvas.getContext('2d').drawImage(v, 0, 0);
-                                try {
-                                    stream.getTracks().forEach(t => t.stop());
-                                } catch {}
-
-                                canvas.toBlob(async blob => {
-                                    if (!blob) {
-                                        overlay.remove();
-                                        return;
-                                    }
-                                    let file = new File([blob],
-                                        'photo_' + Date.now() +
-                                        '.jpg', {
-                                            type: 'image/jpeg'
-                                        });
-                                    try {
-                                        file = await compressImage(file,
-                                            0.7);
-                                    } catch {}
-                                    const added = addFileUnique(file);
-                                    if (added) {
-                                        const url = URL.createObjectURL(
-                                            file);
-                                        addPhotoToSlider(url, true);
-                                    }
-                                    if (removeFlag) removeFlag.value =
-                                        '0';
-                                    overlay.remove();
-                                }, 'image/jpeg', 0.95);
-                            });
-                        } catch (err) {
-                            alert('Camera error: ' + (err?.message || err));
-                        }
-                    })();
-                });
 
                 // ===== حذف الكل =====
                 box.querySelector('.remove-media')?.addEventListener('click', () => {
@@ -941,7 +946,7 @@
 
                             recorder = new MediaRecorder(stream, {
                                 mimeType,
-                                videoBitsPerSecond: 1000000,
+                                videoBitsPerSecond: 800000,
                                 audioBitsPerSecond: 64000
                             });
                             recorder.ondataavailable = e => {
