@@ -159,7 +159,7 @@
 		}*/
 
         .table thead th {
-            color: var(--bs-table-color);
+            color: white;
             border-bottom-color: var(--bs-border-color);
             background-color: var(--bs-table-header) !important;
         }
