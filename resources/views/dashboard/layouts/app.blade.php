@@ -96,7 +96,7 @@
             --bs-border-color: #323248;
 	    --bs-table-header :#bb8322;
             --bs-card-bg: #323248;
-            --bs-card-color: white; 
+            --bs-card-color: black; 
 	    --bs-header-color : white;
             --bs-modal-bg: #323248;
             --bs-modal-color: #e1e1f0;
@@ -171,7 +171,7 @@
         }
 
         /* Form Elements */
-        .form-control, .form-select , input  , .form-control .form-control-solid , span.menu-title , label , .aside-logo  {
+        .form-control, .form-select , input  , .form-control .form-control-solid  , label , .aside-logo  {
             background-color: var(--bs-card-bg) !important ;
             color: var(--bs-card-color) !important;
             border-color: var(--bs-border-color) !important;
