@@ -36,7 +36,6 @@
 	<link href="https://fonts.googleapis.com/css2?family=Changa:wght@200;400&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
 	<!-- Bootstrap 5.3.2 CSS -->
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="{{asset('dashboard/custom/css/main.css')}}" rel="stylesheet" />
 
 	@if(app()->getLocale() == "en")
@@ -403,7 +402,7 @@
 	</script>
 	<script src="{{asset('dashboard/assets/js/jquery.js')}}"></script>
 	<script src="{{asset('dashboard/assets/js/popper.js')}}"></script>
-	 <script src="{{asset('dashboard/assets/js/bootstrap.js')}}"></script> 
+    <script src="{{asset('dashboard/assets/js/bootstrap.js')}}"></script> 
 	<!--begin::Global Javascript Bundle(used by all pages)-->
 	<script src="{{asset('dashboard/assets/plugins/global/plugins.bundle.js')}}"></script>
 	<script src="{{asset('dashboard/assets/js/scripts.bundle.js')}}"></script>
@@ -683,9 +682,6 @@
 		});
 	});
 	</script>
-
-    <!-- Bootstrap 5.3.2 JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 <!--end::Body-->
 
