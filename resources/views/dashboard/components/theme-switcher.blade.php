@@ -27,16 +27,7 @@
             </a>
         </div>
         <!--end::Menu item-->
-        <!--begin::Menu item-->
-        <div class="menu-item px-3">
-            <a href="{{ route('theme.switch', ['theme' => 'system']) }}" class="menu-link px-3 py-2" data-theme="system">
-                <span class="menu-icon" data-kt-element="icon">
-                    <i class="fas fa-desktop fs-3"></i>
-                </span>
-                <span class="menu-title">@lang('dashboard.system')</span>
-            </a>
-        </div>
-        <!--end::Menu item-->
+       
     </div>
     <!--end::Menu-->
 </div>
