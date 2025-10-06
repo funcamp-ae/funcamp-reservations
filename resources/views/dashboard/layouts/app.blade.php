@@ -46,6 +46,8 @@
 	<link href="{{asset('dashboard/assets/plugins/custom/datatables/datatables.bundle.css')}}" rel="stylesheet" type="text/css" />
 	<link href="{{asset('dashboard/assets/plugins/global/plugins.bundle.css')}}" rel="stylesheet" type="text/css" />
 	<link href="{{asset('dashboard/assets/css/style.bundle.css')}}" rel="stylesheet" type="text/css" />
+
+	<link href="{{asset('dashboard/assets/css/style.bundle.css')}}" rel="stylesheet" type="text/css" />
 	<!--end::Global Stylesheets Bundle-->
 	<!--EN-->
 	@else
@@ -75,8 +77,8 @@
             --bs-body-color: #3f4254;
             --bs-border-color: #e4e6ef;
             --bs-card-bg: #ffffff;
+            --bs-card-color: black; 
 			--bs-table-header : #ce6316ce ;
-            --bs-card-color: #3f4254;
             --bs-modal-bg: #ffffff;
             --bs-modal-color: #3f4254;
             --bs-table-bg: #f9f9f9;
@@ -84,11 +86,13 @@
             --bs-header-bg: #ffffff;
             --bs-toolbar-bg: #f9f9f9;
             --bs-box-shadow: 0 0 20px 0 rgba(76, 87, 125, 0.1);
+	    --even-row : #f5f8fa;
+            --hover-row : #f5f8fa;
         }
         
         [data-theme="dark"] {
             --bs-body-bg: #323248;
-            --bs-body-color:rgb(61, 61, 65);
+            --bs-body-color:white;
             --bs-border-color: #323248;
 	    --bs-table-header :#bb8322;
             --bs-card-bg: #323248;
@@ -107,6 +111,9 @@
             --bs-info: #8950fc;
             --bs-warning: #ffa800;
             --bs-danger: #f64e60;
+	    --even-row : #12111117;
+            --hover-row : #3699ff
+
             color-scheme: dark;
         }
 
@@ -143,10 +150,7 @@
             color: var(--bs-card-color);
             border-color: var(--bs-border-color);
         }
-        .card-header {
-			background-color: var(--bs-table-header) !important;
 
-		}
 		.card-label {
 			color: var(--bs-table-color)!important;
 		}
@@ -155,17 +159,19 @@
 		}*/
 
         .table thead th {
-            background-color: var(--bs-table-bg);
-            color: var(--bs-table-color);
+            color: white;
             border-bottom-color: var(--bs-border-color);
+            background-color: var(--bs-table-header) !important;
         }
-        
+        table tbody tr:nth-child(even) {
+   	 background-color: var(--even-row) !important;
+	}
         .table > :not(:first-child) {
             border-top: 2px solid var(--bs-border-color);
         }
-        
+
         /* Form Elements */
-        .form-control, .form-select , input  , .form-control .form-control-solid , span.menu-title , label , .aside-logo , table thead th  {
+        .form-control, .form-select , input  , .form-control .form-control-solid  , label , .aside-logo  {
             background-color: var(--bs-card-bg) !important ;
             color: var(--bs-card-color) !important;
             border-color: var(--bs-border-color) !important;
@@ -299,13 +305,10 @@
 			text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
 		}
 
-		/* Alternating row colors for better readability */
-		table tbody tr:nth-child(even) {
-			background-color: #f8f9fa !important;
-		}
+		/* Alternating row colors for better readability 
 
 		table tbody tr:hover {
-			background-color: #e3f2fd !important;
+			background-color: var(--hover-row) !important;
 			transition: background-color 0.2s ease-in-out !important;
 		}
 
@@ -579,9 +582,9 @@
         }
         
         [data-bs-theme="dark"] {
-            --bs-body-bg: #1e1e2d;
-            --bs-body-color: #e1e1e1;
-            --bs-border-color: #2b2b40;
+            --bs-body-bg: #1e1e2d !important;
+            --bs-body-color: white !important;
+            --bs-border-color: #2b2b40 !important;
             color-scheme: dark;
         }
         
