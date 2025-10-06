@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Storage;
 class Order extends Model
 {
     use HasFactory, UploadTrait;
-    
+
     protected $fillable = [
         'customer_id',
         'price',
@@ -289,8 +289,8 @@ class Order extends Model
         $builder->when($filters['price'] ?? false, fn($builder, $value) => $builder->where('price', 'like', "%{$value}%"));
     }
 
-    public function items() 
-    { 
+    public function items()
+    {
         return $this->hasMany(OrderItem::class);
     }
 
@@ -310,7 +310,7 @@ class Order extends Model
         return OrderItem::where('verified', true)->where("order_id", $this->id)->sum('total_price');
     }
 
-    public function totalPaymentsPrice() 
+    public function totalPaymentsPrice()
     {
         $deposit = $this->payments()->where('statement', 'deposit')->where("verified", "1")->sum('price');
         $insurances = $this->payments()->where('statement','the_insurance')->where("verified", "1")->sum('price');
@@ -319,7 +319,7 @@ class Order extends Model
         return $this->price - $deposit + $insurances + $addons + $warehouseSales;
     }
 
-    public function totalPaidAmount() 
+    public function totalPaidAmount()
     {
         $totalPayment = $this->payments()->sum('price');
         $totalWareHouse = OrderItem::where("order_id", $this->id)->sum('total_price');
@@ -327,13 +327,13 @@ class Order extends Model
         return $totalPayment + $totalWareHouse + $addons;
     }
 
-    public function verifiedItems() 
+    public function verifiedItems()
     {
         return $this->items()->where('verified', true);
-    } 
+    }
 
-    public function stocksItems() 
-    { 
+    public function stocksItems()
+    {
         return $this->belongsToMany(Stock::class, 'order_items')
             ->withPivot(['unit_price','quantity'])
             ->using(OrderItemPivot::class)
@@ -354,4 +354,31 @@ class Order extends Model
     {
         return $this->hasOne(SurveyEmailLog::class);
     }
+
+    // App\Models\Order.php
+public function signinPhotos()  { return $this->hasMany(\App\Models\PreLoginImage::class, 'order_id'); }
+public function signoutPhotos() { return $this->hasMany(\App\Models\PreLogoutImage::class, 'order_id'); }
+
+public function signinVideos() {
+    return $this->hasMany(PreLoginVideo::class);
+}
+public function signoutVideos() {
+    return $this->hasMany(PreLogoutVideo::class);
+}
+
+
+public function signinAudios()
+{
+    return $this->hasMany(PreLoginAudio::class, 'order_id');
+}
+
+
+
+    public function signoutAudios()
+    {
+        return $this->hasMany(PreLogoutAudio::class);
+    }
+
+
+
 }

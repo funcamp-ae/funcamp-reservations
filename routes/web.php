@@ -13,6 +13,8 @@ use App\Http\Controllers\Dashboard\MeetingLocationController;
 use App\Http\Controllers\Dashboard\NotificationController;
 use App\Http\Controllers\Dashboard\OrderController as rateOrderController;
 use App\Http\Controllers\Dashboard\OrderController;
+use App\Http\Controllers\Dashboard\OrderCheckinController;
+
 use App\Http\Controllers\Dashboard\S3MultipartUploadController;
 use App\Http\Controllers\Dashboard\OrderStatusController;
 use App\Http\Controllers\Dashboard\QuestionController;
@@ -651,11 +653,10 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
 
     # orders store
     Route::get('orders/{id}/signin', [
-        'uses' => 'OrderController@signin',
-        'as' => 'bookings.signin',
-        'title' => ['actions.add', 'dashboard.signin']
-    ]);
-
+    'uses' => 'OrderCheckinController@signin',
+    'as'   => 'bookings.signin',
+    'title'=> ['actions.add', 'dashboard.signin']
+]);
     # orders registeration-forms
     Route::get('orders/registeration-forms/search', [
         'uses' => 'RegistrationformController@search',
@@ -715,39 +716,39 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
 
     # orders store
     Route::put('orders/{id}/updatesignin', [
-        'uses' => 'OrderController@updatesignin',
-        'as' => 'orders.updatesignin',
-        'title' => ['actions.add', 'dashboard.signin']
-    ]);
+    'uses' => 'OrderCheckinController@updatesignin',
+    'as'   => 'orders.updatesignin',
+    'title'=> ['actions.add', 'dashboard.signin']
+]);
 
     # orders store
     Route::post('orders/upload-temporary-image', [
-        'uses' => 'OrderController@uploadTemporaryImage',
-        'as' => 'orders.uploadTemporaryImage',
-        'title' => ['actions.add', 'dashboard.signin']
-    ]);
+    'uses' => 'OrderCheckinController@uploadTemporaryImage',
+    'as'   => 'orders.uploadTemporaryImage',
+    'title'=> ['actions.add', 'dashboard.signin']
+]);
 
     # orders remove-image
     Route::delete('orders/remove-image/{id}', [
-        'uses' => 'OrderController@removeImage',
-        'as' => 'orders.removeImage',
-        'title' => ['actions.add', 'dashboard.signin']
-    ]);
+    'uses' => 'OrderCheckinController@removeImage',
+    'as'   => 'orders.removeImage',
+    'title'=> ['actions.add', 'dashboard.signin']
+]);
 
 
     # orders logout
     Route::get('orders/{id}/logout', [
-        'uses' => 'OrderController@logout',
-        'as' => 'bookings.logout',
-        'title' => ['actions.add', 'dashboard.logout']
-    ]);
+    'uses' => 'OrderCheckinController@logout',
+    'as'   => 'bookings.logout',
+    'title'=> ['actions.add', 'dashboard.logout']
+]);
 
     # orders store
-    Route::put('orders/{id}/updatesignout', [   // 👈 غيّرت من updatelogout إلى updatesignout
-        'uses' => 'OrderController@updatesignout',
-        'as' => 'orders.updatesignout',
-        'title' => ['actions.add', 'dashboard.logout']
-    ]);
+    Route::put('orders/{id}/updatesignout', [
+    'uses' => 'OrderCheckinController@updateSignout',
+    'as'   => 'orders.updatesignout',
+    'title'=> ['actions.add', 'dashboard.logout']
+]);
 
     # orders store
     Route::get('orders/{id}/insurance', [
@@ -1973,3 +1974,36 @@ Route::prefix('uploads/multipart')->name('multipart.')->group(function () {
     Route::post('/complete', [S3MultipartUploadController::class, 'completeMultipart'])->name('complete'); // multipart.complete
     Route::post('/abort',    [S3MultipartUploadController::class, 'abortMultipart'])->name('abort');    // multipart.abort
 });
+
+Route::post('orders/upload-temporary-video', [OrderCheckinController::class, 'uploadTemporaryVideo'])->name('orders.uploadTemporaryVideo');
+Route::delete('orders/remove-video/{id}', [OrderCheckinController::class, 'removeVideo'])->name('orders.removeVideo');
+
+
+# ============ SIGNOUT UPLOAD ROUTES ============
+# رفع صورة مؤقتة لتسجيل الخروج
+Route::post('orders/upload-temporary-image-logout', [
+    'uses' => 'OrderCheckinController@uploadTemporaryImageLogout',
+    'as'   => 'orders.uploadTemporaryImageLogout',
+    'title'=> ['actions.add', 'dashboard.logout']
+]);
+
+# حذف صورة مؤقتة لتسجيل الخروج
+Route::delete('orders/remove-image-logout/{id}', [
+    'uses' => 'OrderCheckinController@removeImageLogout',
+    'as'   => 'orders.removeImageLogout',
+    'title'=> ['actions.add', 'dashboard.logout']
+]);
+
+# رفع فيديو مؤقت لتسجيل الخروج
+Route::post('orders/upload-temporary-video-logout', [
+    'uses' => 'OrderCheckinController@uploadTemporaryVideoLogout',
+    'as'   => 'orders.uploadTemporaryVideoLogout',
+    'title'=> ['actions.add', 'dashboard.logout']
+]);
+
+# حذف فيديو مؤقت لتسجيل الخروج
+Route::delete('orders/remove-video-logout/{id}', [
+    'uses' => 'OrderCheckinController@removeVideoLogout',
+    'as'   => 'orders.removeVideoLogout',
+    'title'=> ['actions.add', 'dashboard.logout']
+]);

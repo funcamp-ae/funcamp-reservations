@@ -15,10 +15,10 @@ class S3MultipartUploadController extends Controller
     private function s3Client(): S3Client
     {
         return new S3Client([
-            'version' => 'latest',
-            'region'  => env('AWS_DEFAULT_REGION', 'eu-central'),
-            'endpoint'=> env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => true,
+            'version'     => 'latest',
+            'region'      => env('AWS_DEFAULT_REGION', 'eu-central'),
+            'endpoint'    => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => false, // Hetzner يفضل false
             'credentials' => [
                 'key'    => env('AWS_ACCESS_KEY_ID'),
                 'secret' => env('AWS_SECRET_ACCESS_KEY'),
@@ -55,16 +55,17 @@ class S3MultipartUploadController extends Controller
                 'Bucket'      => $bucket,
                 'Key'         => $key,
                 'ContentType' => $validated['contentType'],
+                'ACL'         => 'public-read', // باش يولي متاح
             ]);
 
             return response()->json([
                 'uploadId'    => $result['UploadId'],
                 'key'         => $key,
                 'bucket'      => $bucket,
-                'partMinSize' => $this->minPartSize
+                'partMinSize' => $this->minPartSize,
             ]);
         } catch (\Throwable $e) {
-            \Log::error("Multipart error: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            \Log::error("Multipart error: ".$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -89,11 +90,9 @@ class S3MultipartUploadController extends Controller
             ]);
 
             $requestSigned = $client->createPresignedRequest($cmd, '+60 minutes');
-            $url = (string)$requestSigned->getUri();
-
-            return response()->json(['url' => $url]);
+            return response()->json(['url' => (string)$requestSigned->getUri()]);
         } catch (\Throwable $e) {
-            \Log::error("SignPart error: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            \Log::error("SignPart error: ".$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -130,7 +129,7 @@ class S3MultipartUploadController extends Controller
                 'bucket'   => $bucket,
             ]);
         } catch (\Throwable $e) {
-            \Log::error("CompleteMultipart error: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            \Log::error("CompleteMultipart error: ".$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -154,7 +153,7 @@ class S3MultipartUploadController extends Controller
 
             return response()->json(['aborted' => true]);
         } catch (\Throwable $e) {
-            \Log::error("AbortMultipart error: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            \Log::error("AbortMultipart error: ".$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
