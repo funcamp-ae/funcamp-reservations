@@ -344,7 +344,7 @@
 @push('js')
 <!-- Include the QR scanning library -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     const scannerModal = document.getElementById('qrScannerModal');
     const video = document.getElementById('qr-video');
@@ -451,7 +451,7 @@ document.addEventListener('DOMContentLoaded', function() {
         stopScanning();
     });
 });
-
+</script>
 <!-- Fix delete functionality -->
 <script>
     // Override confirmDelete function specifically for this page
