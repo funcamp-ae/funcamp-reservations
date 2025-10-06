@@ -19,7 +19,7 @@
         <!--end::Menu item-->
         <!--begin::Menu item-->
         <div class="menu-item px-3 mb-2">
-            <a href="{{ route('theme.switch', ['theme' => 'dark']) }}" class="menu-link px-3 py-2" data-theme="dark">
+            <a href="{{ route('theme.switch', ['theme' => 'dark']) }}" class="menu-link px-3 py-2" >
                 <span class="menu-icon" data-kt-element="icon">
                     <i class="fas fa-moon fs-3"></i>
                 </span>
