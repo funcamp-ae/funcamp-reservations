@@ -1932,6 +1932,7 @@ Route::group(['middleware' => ['auth', 'admin']], function () {
     Route::get('survey/{response_id}/answer', [SurveyController::class, 'answer'])->name('surveys.answer')->middleware(['auth']);
     Route::put('surveys/{survey}', [SurveyController::class, 'update'])->name('surveys.update')->middleware(['auth']);
     Route::get('surveys/{survey}/results', [SurveyController::class, 'results'])->name('surveys.results')->middleware(['auth']);
+    Route::delete('survey-responses/{response}', [SurveyController::class, 'destroyResponse'])->name('survey-responses.destroy')->middleware(['auth']);
     Route::get('surveys/{survey}/statistics', [SurveyController::class, 'statistics'])->name('surveys.statistics')->middleware(['auth']);
     Route::get('surveys/settings', [SurveyController::class, 'settings'])->name('surveys.settings')->middleware(['auth']);
     Route::put('surveys/{survey}/settings', [SurveyController::class, 'updateSettings'])->name('surveys.settings.update')->middleware(['auth']);

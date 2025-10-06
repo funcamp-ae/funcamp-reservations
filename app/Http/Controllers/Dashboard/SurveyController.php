@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Artisan;
 use Maatwebsite\Excel\Facades\Excel;
 use Mpdf\Mpdf;
 use Mpdf\Output\Destination;
+use Illuminate\Support\Facades\DB;
 
 class SurveyController extends Controller
 {
@@ -857,4 +858,41 @@ class SurveyController extends Controller
             ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
     }
 
+    /**
+     * Delete a survey response.
+     *
+     * @param  \App\Models\SurveyResponse  $response
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroyResponse(SurveyResponse $response)
+    {
+        try {
+            // Check if the user is authorized to delete this response
+            $this->authorize('delete', $response);
+            
+            DB::beginTransaction();
+            
+            // Delete all answers associated with this response
+            $response->answers()->delete();
+            
+            // Delete the response itself
+            $response->delete();
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => __('dashboard.deleted_successfully')
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Error deleting survey response: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

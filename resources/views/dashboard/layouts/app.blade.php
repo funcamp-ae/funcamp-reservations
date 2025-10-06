@@ -3,8 +3,7 @@
       direction="{{app()->getLocale() == 'en' ? 'ltr' : 'rtl' }}" 
       dir="{{app()->getLocale() == 'en' ? 'ltr' : 'rtl' }}" 
       style="direction: {{ app()->getLocale() == 'en' ? 'ltr' : 'rtl'}}"
-      data-theme="{{ session('theme', 'light') }}"
-      data-bs-theme="{{ session('theme', 'light') }}">
+    ">
 <!--begin::Head-->
 
 <head>
@@ -71,282 +70,12 @@
 	@endif
 
 	<style>
-        /* Theme variables */
-        :root {
-            --bs-body-bg: #f5f8fa;
-            --bs-body-color: #3f4254;
-            --bs-border-color: #e4e6ef;
-            --bs-card-bg: #ffffff;
-            --bs-card-color: black; 
-			--bs-table-header : #ce6316ce ;
-            --bs-modal-bg: #ffffff;
-            --bs-modal-color: #3f4254;
-            --bs-table-bg: #f9f9f9;
-            --bs-table-color: #3f4254;
-            --bs-header-bg: #ffffff;
-            --bs-toolbar-bg: #f9f9f9;
-            --bs-box-shadow: 0 0 20px 0 rgba(76, 87, 125, 0.1);
-	    --even-row : #f5f8fa;
-            --hover-row : #f5f8fa;
-        }
+        /* Theme variables 
         
-        [data-theme="dark"] {
-            --bs-body-bg: #323248;
-            --bs-body-color:white;
-            --bs-border-color: #323248;
-	    --bs-table-header :#bb8322;
-            --bs-card-bg: #323248;
-            --bs-card-color: white; 
-	    --bs-header-color : white;
-            --bs-modal-bg: #323248;
-            --bs-modal-color: #e1e1f0;
-            --bs-table-bg: #3a3a57;
-            --bs-table-color: #e1e1f0;
-            --bs-header-bg: #2b2b40;
-            --bs-toolbar-bg: #323248;
-            --bs-box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.4);
-            --bs-primary: #3699ff;
-            --bs-secondary: #6c757d;
-            --bs-success: #1bc5bd;
-            --bs-info: #8950fc;
-            --bs-warning: #ffa800;
-            --bs-danger: #f64e60;
-	    --even-row : #12111117;
-            --hover-row : #3699ff
-
-            color-scheme: dark;
-        }
-
+      
         /*
 */
         
-        /* Apply theme colors */
-        body {
-            background-color: var(--bs-body-bg) !important ;
-            color: var(--bs-body-color) !important ;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        
-        /* Header and Toolbar */
-        .header, .header-menu, .toolbar {
-            background-color: var(--bs-header-bg) !important;
-            border-color: var(--bs-border-color) !important;
-        }
-        h1 , h2 , h3 , h4 , h5 {
-            color: var(--bs-card-color);
-		}
-		
-        /* Cards and Modals */
-        .card, .dropdown-menu, .menu {
-            background-color: var(--bs-card-bg);
-            color: var(--bs-card-color);
-            border-color: var(--bs-border-color);
-            box-shadow: var(--bs-box-shadow) !important;
-        }
-        
-        /* Tables */
-        .table {
-            background-color: var(--bs-card-bg);
-            color: var(--bs-card-color);
-            border-color: var(--bs-border-color);
-        }
-
-		.card-label {
-			color: var(--bs-table-color)!important;
-		}
-		/*span {
-			color: var(--bs-table-color) !important;
-		}*/
-
-        .table thead th {
-            color: white;
-            border-bottom-color: var(--bs-border-color);
-            background-color: var(--bs-table-header) !important;
-        }
-        table tbody tr:nth-child(even) {
-   	 background-color: var(--even-row) !important;
-	}
-        .table > :not(:first-child) {
-            border-top: 2px solid var(--bs-border-color);
-        }
-
-        /* Form Elements */
-        .form-control, .form-select , input  , .form-control .form-control-solid  , label , .aside-logo  {
-            background-color: var(--bs-card-bg) !important ;
-            color: var(--bs-card-color) !important;
-            border-color: var(--bs-border-color) !important;
-        }
-	.btn {
-	color : white ; 
-	}
-	.card-header .card-title h1 ,.card-header .card-title h2 , .card-header .card-title  h3 ,.card-header .card-title h4 , .card-header .card-title h5 {
-		color : white ;
-	}
-	span.select2-selection__choice__display  , select2-selection__choice__remove{
-	color : black !important ;
-	}
-
-        .form-select.form-select-solid {
- 	    background-color: var(--bs-card-bg);
-            color: var(--bs-card-color);
-            border-color: var(--bs-border-color);
-}
-        .form-control:focus, .form-select:focus {
-            background-color: var(--bs-card-bg);
-            color: var(--bs-card-color);
-            border-color: var(--bs-border-color);
-            box-shadow: 0 0 0 0.25rem rgba(54, 153, 255, 0.15) !important;
-        }
-        
-        /* Navigation and Menu Items */
-        .menu-item, .menu-link, .menu-title {
-            color: var(--bs-card-color) !important;
-            transition: all 0.3s ease;
-        }
-        
-        .menu-item:hover .menu-link, 
-        .menu-item.here .menu-link,
-        .menu-item.active .menu-link {
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            color: var(--bs-primary) !important;
-        }
-        
-        .menu-link.active {
-            background-color: rgba(54, 153, 255, 0.1) !important;
-            color: var(--bs-primary) !important;
-        }
-        
-        .menu-sub {
-            background-color: var(--bs-card-bg) !important;
-            border-left: 1px solid var(--bs-border-color) !important;
-        }
-        
-        .menu-item .menu-link .menu-bullet > span {
-            background-color: var(--bs-card-color) !important;
-        }
-        
-        .menu-item.here > .menu-link .menu-title,
-        .menu-item.active > .menu-link .menu-title {
-            color: var(--bs-primary) !important;
-        }
-        
-        /* Toolbar */
-        .toolbar {
-            background-color: var(--bs-toolbar-bg) !important;
-            border-color: var(--bs-border-color) !important;
-        }
-        
-        /* Sidebar/Menu */
-        .aside {
-            background-color: var(--bs-card-bg) !important;
-            border-right: 1px solid var(--bs-border-color) !important;
-        }
-    
-        .table {
-            --bs-table-bg: var(--bs-card-bg);
-            --bs-table-color: var(--bs-card-color);
-            --bs-table-border-color: var(--bs-border-color);
-        }
-        
-        .dropdown-menu {
-            --bs-dropdown-bg: var(--bs-card-bg);
-            --bs-dropdown-color: var(--bs-card-color);
-            --bs-dropdown-link-color: var(--bs-card-color);
-            --bs-dropdown-link-hover-color: var(--bs-primary);
-            --bs-dropdown-link-hover-bg: rgba(var(--bs-primary-rgb), 0.1);
-        }
-
-        /* Global Select Validation Styles */
-		select.is-invalid {
-			border-color: #dc3545 !important;
-			box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
-		}
-		
-		select.is-invalid:focus {
-			border-color: #dc3545 !important;
-			box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
-		}
-		
-		.form-group label .text-danger {
-			color: #dc3545 !important;
-		}
-		
-		/* Enhanced Table Styling */
-		table th,
-		table td,
-		table td div,
-		table .text-end {
-			text-align: center !important;
-		}
-
-		table td div a {
-			text-align: center !important;
-			display: block
-		}
-
-		/* Enhanced Table Header Styling */
-		table thead tr {
-			background: linear-gradient(135deg, #ce6316ce 0%, #b16e17ff 100%) !important; /* Dark brown gradient */
-			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
-		}
-
-		table thead th {
-			font-weight: 900 !important;
-			font-size: 0.875rem !important;
-			text-transform: uppercase !important;
-			letter-spacing: 0.5px !important;
-			padding: 1rem 0.75rem !important;
-			border: none !important;
-			text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
-		}
-
-		/* Alternating row colors for better readability 
-
-		table tbody tr:hover {
-			background-color: var(--hover-row) !important;
-			transition: background-color 0.2s ease-in-out !important;
-		}
-
-		/* Enhanced badge styling */
-		.badge {
-			font-size: 0.75rem !important;
-			padding: 0.5rem 0.75rem !important;
-			border-radius: 0.375rem !important;
-			font-weight: 600 !important;
-		}
-
-		/* Utility spacing helpers */
-		.mb-25 { margin-bottom: 25px !important; }
-		.mb-10 { margin-bottom: 10px !important; }
-
-		/* Money/Amount column styling */
-		td[data-kt-ecommerce-category-filter="category_name"] {
-			font-weight: 700 !important;
-			color: #28a745 !important;
-			font-size: 1rem !important;
-		}
-
-		/* Action buttons styling */
-		.btn-sm {
-			padding: 0.375rem 0.75rem !important;
-			font-size: 0.875rem !important;
-			border-radius: 0.25rem !important;
-		}
-		
-		/* Center checkboxes */
-		.form-check-input {
-			margin: 0 auto !important;
-		}
-
-		/* Responsive table improvements */
-		.table-responsive {
-			border-radius: 0.5rem !important;
-			box-shadow: 0
-			4px 6px rgba(0, 0, 0, 0.07) !important;
-		}
-		.w-45 {
-    		width: 45%;
-		}
 
 	</style>
 
@@ -588,7 +317,7 @@
             color: var(--bs-body-color);
         }
         
-        .card, .modal-content, .form-control, .dropdown-menu, .table {
+        .card, .form-control, .dropdown-menu, .table {
             background-color: var(--bs-body-bg);
             color: var(--bs-body-color);
             border-color: var(--bs-border-color);
@@ -605,9 +334,9 @@
 <!--begin::Body-->
 
 @if(auth()->check())
-<body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled toolbar-fixed aside-enabled aside-fixed" style="--kt-toolbar-height:55px;--kt-toolbar-height-tablet-and-mobile:55px">
+<body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled toolbar-fixed aside-enabled aside-fixed" style="--kt-toolbar-height:55px;--kt-toolbar-height-tablet-and-mobile:55px" data-kt-app-layout="dark-sidebar" data-kt-app-header-fixed="true" data-kt-app-sidebar-enabled="true" data-kt-app-sidebar-fixed="true" data-kt-app-sidebar-hoverable="true" data-kt-app-sidebar-push-header="true" data-kt-app-sidebar-push-toolbar="true" data-kt-app-sidebar-push-footer="true">
 @else
-<body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled toolbar-fixed " style="--kt-toolbar-height:55px;--kt-toolbar-height-tablet-and-mobile:55px">
+<body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled toolbar-fixed" style="--kt-toolbar-height:55px;--kt-toolbar-height-tablet-and-mobile:55px">
 @endif
 	<div class="d-flex flex-column flex-root">
 		<!--begin::Page-->
@@ -674,7 +403,7 @@
 	</script>
 	<script src="{{asset('dashboard/assets/js/jquery.js')}}"></script>
 	<script src="{{asset('dashboard/assets/js/popper.js')}}"></script>
-	<!-- <script src="{{asset('dashboard/assets/js/bootstrap.js')}}"></script> -->
+	 <script src="{{asset('dashboard/assets/js/bootstrap.js')}}"></script> 
 	<!--begin::Global Javascript Bundle(used by all pages)-->
 	<script src="{{asset('dashboard/assets/plugins/global/plugins.bundle.js')}}"></script>
 	<script src="{{asset('dashboard/assets/js/scripts.bundle.js')}}"></script>

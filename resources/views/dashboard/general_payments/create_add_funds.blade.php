@@ -228,7 +228,7 @@
                                     </td>
                                     <!--begin::Description-->
                                     <td data-kt-ecommerce-category-filter="category_name">
-                                        {{ $payment->description ?? $payment->notes ?? '-' }}
+                                        {{ $payment->description ?? $payment->notes ?? '-' }} - {{ $payment->notes ?? '-' }}
                                     </td>
                                     <!--begin::Date-->
                                     <td>{{ \Carbon\Carbon::parse($payment->date)->format('Y-m-d') }}</td>

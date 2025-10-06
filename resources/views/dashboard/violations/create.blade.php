@@ -22,16 +22,16 @@
 
                 <div class="mb-10">
                     <div class="row g-5">
-                        <div class="col-md-6">
-                            <label class="form-label required">@lang('dashboard.employee')</label>
-                            <select name="employee_id" class="form-select form-select-solid" required>
-                                <option value="">@lang('dashboard.select_employee')</option>
+                        <div class="col-md-12">
+                            <label class="form-label required">@lang('dashboard.employees')</label>
+                            <select name="employee_ids[]" class="form-select form-select-solid select2-multiple" multiple="multiple" required>
                                 @foreach($employees as $employee)
-                                    <option value="{{ $employee->id }}" {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
+                                    <option value="{{ $employee->id }}" {{ is_array(old('employee_ids')) && in_array($employee->id, old('employee_ids')) ? 'selected' : '' }}>
                                         {{ $employee->name }}
                                     </option>
                                 @endforeach
                             </select>
+                            <div class="text-muted fs-7">@lang('dashboard.select_one_or_more_employees')</div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label required">@lang('dashboard.violation_type')</label>
@@ -122,34 +122,42 @@
 
                 <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>
-                        @lang('dashboard.save')
                     </button>
                 </div>
             </form>
         </div>
     </div>
-@endsection
-
-@push('js')
+@endpush('scripts')
     <script>
         $(document).ready(function() {
-            // Action taken dropdown handler
+            // Initialize Select2
+            $('.select2-multiple').select2({
+                placeholder: "@lang('dashboard.select_employee')",
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $('form'),
+                multiple: true
+            });
+
+            // Show/hide deduction amount field based on action taken
             $('#action-taken').change(function() {
                 if ($(this).val() === 'deduction') {
-                    $('#deduction-amount-container').html(`
-                        <label class="form-label required">@lang('dashboard.deduction_amount')</label>
-                        <input type="number" name="deduction_amount" class="form-control form-control-solid"
-                            value="{{ old('deduction_amount') }}" step="0.01" min="0" required>
-                    `).show();
+                    if ($('#deduction-amount-container').is(':empty')) {
+                        $('#deduction-amount-container').html(`
+                            <label class="form-label required">@lang('dashboard.deduction_amount')</label>
+                            <input type="number" name="deduction_amount" class="form-control form-control-solid"
+                                   value="{{ old('deduction_amount') }}" step="0.01" min="0" required>
+                        `).show();
+                    } else {
+                        $('#deduction-amount-container').show();
+                    }
                 } else {
-                    $('#deduction-amount-container').empty().hide();
+                    $('#deduction-amount-container').hide();
                 }
             });
 
             // Media upload handlers
             const mediaContainer = $('.media-upload-container');
-            const input = mediaContainer.find('.media-input');
             const previewContainer = mediaContainer.find('.preview-image-container');
             const preview = mediaContainer.find('.preview-image');
             const captureBtn = mediaContainer.find('.capture-media');

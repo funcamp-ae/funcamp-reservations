@@ -1138,6 +1138,7 @@ return [
     'remaining :priceAferConfiscation' => 'د ضبط څخه وروسته پاتې :priceAferConfiscation',
     'confiscation_amount' => 'د ضبط اندازه',
     "no_insurance_payment_verified" => "هیڅ تایید شوې بیمه نشته",
+    'error_occurred_while_creating_violations' => 'په داسې حال کې چې د سرغړونو په جوړولو کې یوه تېروتنه رامنځته شوې. مهرباني وکړئ بیا هڅه وکړئ.',
     'expense_type' => 'د لګښت ډول',
 
     "general_expenses" => "عمومي",
@@ -1185,6 +1186,10 @@ return [
     'addon_receipts' => 'د اضافو رسیدونه',
     'payment_receipts' => 'د تادیاتو رسیدونه',
     'warehouse_receipts' => 'د ګودام پلورنې رسیدونه',
+    'select_one_or_more_employees' => 'یو یا څو کارمندان وټاکئ',
+    'violation_recorded_successfully' => 'نابریالیتوب په بریالیتوب سره ثبت شو',
+    'violation_recorded_for_employees' => 'نابریالیتوب د :count کارمندانو لپاره ثبت شو',
+    'error_occurred_while_creating_violations' => 'د نابریالیتوبونو په جوړولو کې ستونزه راغله',
 
     'addon_receipt' => 'د اضافې رسید',
     'payment_receipt' => 'د تادیې رسید',
@@ -1780,6 +1785,8 @@ return [
     'light' => 'روښانه حالت',
     'dark' => 'تیاره حالت',
     'system' => 'سیستم حالت',
+    'theme_changed_successfully' => 'تمه په بریالیتوب سره بدله شوه',
+    'invalid_theme_selected' => 'ناسمه تمه غوره شوې ده',
     'confirm_delete' => 'آیا تاسو ډاډه یاست چې غواړئ دا توکي حذف کړئ؟',
     'delete_warning_message' => 'دا عمل بیرته راګرځیدونکی نه دی. دا به دا توکي د تل لپاره حذف کړي.',
     'yes_delete' => 'هو، حذف یې کړه!',
@@ -1855,6 +1862,7 @@ return [
     'enter_valid_confiscation_amount' => 'د ضبط شوې برخې لپاره سمه اندازه باید وليکل شي',
     'item_selling_price' => 'د توکي د پلورنې قیمت',
     'handled_by' => 'لخوا',
+    'search_orders_placeholder' => 'د ID، نوم، تلیفون یا بریښنالیک په واسطه لټون',
     'form_code' => 'د فورم کوډ',
     'confiscated_amount' => 'ضبط شوې اندازه',
     "for_warehouse_sale" => "د زيرمتون پلورل"

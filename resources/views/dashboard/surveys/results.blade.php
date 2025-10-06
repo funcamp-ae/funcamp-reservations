@@ -129,6 +129,13 @@
                                         <div class="menu-item px-3">
                                             <a href="{{route('surveys.answer', $response->id)}}" class="menu-link px-3">@lang('dashboard.view_answers')</a>
                                         </div>
+                                        <div class="menu-item px-3">
+                                            <a href="#" class="menu-link px-3 text-danger delete-response" 
+                                               data-id="{{ $response->id }}"
+                                               data-url="{{ route('survey-responses.destroy', $response->id) }}">
+                                                @lang('dashboard.delete')
+                                            </a>
+                                        </div>
                                     </div>
                                 </td>
                                 <!--end::Actions-->
@@ -149,5 +156,84 @@
     <!--end::Container-->
 </div>
 <!--end::Post-->
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle delete button click
+        $(document).on('click', '.delete-response', function(e) {
+            e.preventDefault();
+            
+            const responseId = $(this).data('id');
+            const deleteUrl = $(this).data('url');
+            
+            Swal.fire({
+                title: "{{ __('dashboard.confirm_delete') }}",
+                text: "{{ __('dashboard.delete_warning_message') }}",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: "{{ __('dashboard.yes_delete') }}",
+                cancelButtonText: "{{ __('dashboard.cancel') }}",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading indicator
+                    Swal.fire({
+                        title: "{{ __('dashboard.processing') }}",
+                        text: "{{ __('dashboard.please_wait') }}",
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Send delete request
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                // Show success message
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '{{ __("dashboard.success") }}',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    // Reload the page to see changes
+                                    window.location.reload();
+                                });
+                            } else {
+                                // Show error message
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: '{{ __("dashboard.error") }}',
+                                    text: response.message || '{{ __("dashboard.error_occurred") }}'
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            let errorMessage = '{{ __("dashboard.error_occurred") }}';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+                            
+                            Swal.fire({
+                                icon: 'error',
+                                title: '{{ __("dashboard.error") }}',
+                                text: errorMessage
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+@endpush
 
 @endsection

@@ -38,7 +38,7 @@
             <th class="text-center fw-bolder">{{ __('dashboard.price') }}</th>
 
             <th class="text-center fw-bolder">{{ __('dashboard.source') }}</th>
-
+            <th class="">{{ __('dashboard.handled_by') }}</th>
 
             <th class="text-center fw-bolder">{{ __('dashboard.orders') }}</th>
 
@@ -195,11 +195,15 @@
                     @elseif($transaction->expense && $transaction->reservation_expenses)
                         {{ __('dashboard.' . $transaction->source) }} - {{ __('dashboard.' . $transaction->reservation_expenses) }}
                     @else
-                        {{ __('dashboard.' . $transaction->source) }}
-                    @endif
+                        @if($transaction->expense)
+                            {{ __('dashboard.' . $transaction->source) }} - {{ $transaction->expense->notes }}
+                        @else
+                            {{ __('dashboard.' . $transaction->source) }}
+                        @endif
                     @endif
 
                 </td>
+                <td>{{ $transaction->handledBy?->name?? '-' }}</td>
 
             <!-- <td>{{ $transaction->description }}</td> -->
 

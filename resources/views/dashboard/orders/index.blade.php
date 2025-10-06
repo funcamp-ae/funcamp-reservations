@@ -34,10 +34,18 @@
                     </button>
                     <!--QR Scanner:End-->
                     @endcan
+
                 </div>
                 <!--end::Card title-->
                 <!--begin::Card toolbar-->
                 <div class="card-toolbar">
+                    <!-- Search Input -->
+                    <div class="d-flex align-items-center position-relative me-5">
+                        <i class="fas fa-search position-absolute ms-4"></i>
+                        <input type="text" id="orderSearchInput" class="form-control form-control-solid w-250px ps-12" 
+                            placeholder="@lang('dashboard.search_orders_placeholder')">
+                    </div>
+                    
                     <!--begin::Add customer-->
                     @can('bookings.create')
                     <a href="{{ route('orders.create')}}"
@@ -93,7 +101,7 @@
                         <tbody class="fw-bold ">
                             @foreach ($orders as $order)
                             <!--begin::Table row-->
-                            <tr data-id="{{$order->id}}">
+                            <tr data-id="{{$order->id}}" data-phone="{{ $order->customer->phone ?? '' }}" data-email="{{ $order->customer->email ?? '' }}">
                                 <td>{{ $orders->firstItem() + $loop->index }}</td>
                                 <td>
                                     @can('bookings.edit')
@@ -343,6 +351,57 @@
 
 @push('js')
 <!-- Include the QR scanning library -->
+<style>
+    .highlight {
+        background-color: #fff3cd;
+        padding: 2px 4px;
+        border-radius: 3px;
+    }
+    #orderSearchInput {
+        min-width: 300px;
+    }
+</style>
+
+<script>
+    // Search functionality
+    $(document).on('keyup', '#orderSearchInput', function() {
+        var searchText = $(this).val().toLowerCase();
+        
+        $('tbody tr').each(function() {
+            var $row = $(this);
+            var orderId = $row.find('td:eq(1)').text().toLowerCase();
+            var customerName = $row.find('td:eq(2)').text().toLowerCase();
+            var phone = $row.data('phone') ? $row.data('phone').toString().toLowerCase() : '';
+            var email = $row.data('email') ? $row.data('email').toLowerCase() : '';
+            
+            if (orderId.includes(searchText) || 
+                customerName.includes(searchText) || 
+                phone.includes(searchText) || 
+                email.includes(searchText)) {
+                $row.show();
+                
+                // Highlight matching text
+                if (searchText) {
+                    $row.find('td').each(function() {
+                        var text = $(this).text();
+                        var regex = new RegExp('(' + searchText + ')', 'gi');
+                        $(this).html(text.replace(regex, '<span class="highlight">$1</span>'));
+                    });
+                }
+            } else {
+                $row.hide();
+            }
+        });
+        
+        // Remove highlights when search is cleared
+        if (!searchText) {
+            $('.highlight').each(function() {
+                $(this).replaceWith($(this).text());
+            });
+        }
+    });
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
 <script>

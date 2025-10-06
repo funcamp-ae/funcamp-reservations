@@ -62,7 +62,7 @@
                                 @endif
                                 @if(Gate::allows('equipment.edit'))
                                 <a href="{{ route('equipment-directories.edit', $directory) }}"
-                                   class="btn btn-sm btn-primary" title="@lang('dashboard.edit')">
+                                   class="btn btn-sm btn-secondary" title="@lang('dashboard.edit')">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 @endif

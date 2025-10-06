@@ -35,9 +35,10 @@ class ViolationController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'violation_type_id' => 'required|exists:violation_types,id',
-            'employee_id' => 'required|exists:users,id',
+            'employee_ids' => 'required|array|min:1',
+            'employee_ids.*' => 'exists:users,id',
             'violation_date' => 'required|date',
             'violation_time' => 'required',
             'violation_place' => 'required|string|max:255',
@@ -48,27 +49,51 @@ class ViolationController extends Controller
             'photo' => 'nullable|image|max:2048'
         ]);
 
+        // Handle photo upload
         $photoPath = null;
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('violations/photos');
         }
 
-        Violation::create([
-            'violation_type_id' => $request->violation_type_id,
-            'employee_id' => $request->employee_id,
-            'violation_date' => $request->violation_date,
-            'violation_time' => $request->violation_time,
-            'violation_place' => $request->violation_place,
-            'photo_path' => $photoPath,
-            'created_by' => auth()->id(),
-            'employee_justification' => $request->employee_justification,
-            'action_taken' => $request->action_taken,
-            'deduction_amount' => $request->action_taken === 'deduction' ? $request->deduction_amount : null,
-            'notes' => $request->notes
-        ]);
+        // Start database transaction
+        \DB::beginTransaction();
 
-        return redirect()->route('violations.index')
-            ->with('success', 'Violation recorded successfully');
+        try {
+            $createdCount = 0;
+            
+            foreach ($validated['employee_ids'] as $employeeId) {
+                Violation::create([
+                    'violation_type_id' => $validated['violation_type_id'],
+                    'employee_id' => $employeeId,
+                    'violation_date' => $validated['violation_date'],
+                    'violation_time' => $validated['violation_time'],
+                    'violation_place' => $validated['violation_place'],
+                    'photo_path' => $photoPath,
+                    'created_by' => auth()->id(),
+                    'employee_justification' => $validated['employee_justification'],
+                    'action_taken' => $validated['action_taken'],
+                    'deduction_amount' => $validated['action_taken'] === 'deduction' ? $validated['deduction_amount'] : null,
+                    'notes' => $validated['notes']
+                ]);
+                $createdCount++;
+            }
+
+            \DB::commit();
+
+            $message = $createdCount > 1 
+                ? __('dashboard.violation_recorded_for_employees', ['count' => $createdCount])
+                : __('dashboard.violation_recorded_successfully');
+
+            return redirect()->route('violations.index')
+                ->with('success', $message);
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Error creating violations: ' . $e->getMessage());
+            
+            return back()->withInput()
+                ->with('error', __('dashboard.error_occurred_while_creating_violations'));
+        }
     }
 
     public function show(Violation $violation)
