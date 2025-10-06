@@ -345,152 +345,112 @@
 <!-- Include the QR scanning library -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-                const scannerModal = document.getElementById('qrScannerModal');
-                const video = document.getElementById('qr-video');
-                const startScanBtn = document.getElementById('start-scan-btn');
-                const stopScanBtn = document.getElementById('stop-scan-btn');
-                const resultContainer = document.getElementById('qr-result');
-                let scanning = false;
-                let stream = null;
+document.addEventListener('DOMContentLoaded', function() {
+    const scannerModal = document.getElementById('qrScannerModal');
+    const video = document.getElementById('qr-video');
+    const startScanBtn = document.getElementById('start-scan-btn');
+    const stopScanBtn = document.getElementById('stop-scan-btn');
+    const resultContainer = document.getElementById('qr-result');
+    let scanning = false;
+    let stream = null;
 
-                // Function to start scanning
-                function startScanning() {
-                    resultContainer.classList.add('d-none');
-                    startScanBtn.classList.add('d-none');
-                    stopScanBtn.classList.remove('d-none');
+    // Function to start scanning
+    function startScanning() {
+        resultContainer.classList.add('d-none');
+        startScanBtn.classList.add('d-none');
+        stopScanBtn.classList.remove('d-none');
 
-                    navigator.mediaDevices.getUserMedia({
-                            video: {
-                                facingMode: "environment"
-                            }
-                        })
-                        .then(function(s) {
-                            stream = s;
-                            video.srcObject = stream;
-                            video.setAttribute("playsinline", true);
-                            video.play();
-                            scanning = true;
-                            requestAnimationFrame(tick);
-                        })
-                        .catch(function(err) {
-                            console.error("Error accessing camera: ", err);
-                            alert("@lang('dashboard.camera_access_error')");
-                            resetScanner();
-                        });
+        navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: "environment"
                 }
+            })
+            .then(function(s) {
+                stream = s;
+                video.srcObject = stream;
+                video.setAttribute("playsinline", true);
+                video.play();
+                scanning = true;
+                requestAnimationFrame(tick);
+            })
+            .catch(function(err) {
+                console.error("Error accessing camera: ", err);
+                alert("@lang('dashboard.camera_access_error')");
+                resetScanner();
+            });
+    }
 
-                // Function to stop scanning
-                function stopScanning() {
-                    scanning = false;
-                    if (stream) {
-                        stream.getTracks().forEach(track => track.stop());
-                        stream = null;
-                    }
-                    resetScanner();
+    // Function to stop scanning
+    function stopScanning() {
+        scanning = false;
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        resetScanner();
+    }
+
+    // Function to reset scanner UI
+    function resetScanner() {
+        startScanBtn.classList.remove('d-none');
+        stopScanBtn.classList.add('d-none');
+        video.srcObject = null;
+    }
+
+    // Function to process each video frame
+    function tick() {
+        if (!scanning) return;
+
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                inversionAttempts: "dontInvert",
+            });
+
+            if (code) {
+                // QR code detected!
+                stopScanning();
+                resultContainer.textContent = "@lang('dashboard.qr_detected_redirecting')";
+                resultContainer.classList.remove('d-none');
+
+                // Check if the URL is a valid order edit URL
+                if (code.data.includes('orders.edit')) {
+                    setTimeout(() => {
+                        window.location.href = code.data;
+                    }, 1500);
+                } else {
+                    resultContainer.textContent = "@lang('dashboard.invalid_qr_code')";
+                    resultContainer.classList.remove('alert-info');
+                    resultContainer.classList.add('alert-warning');
+                    
+                    // Show the start button again after a delay
+                    setTimeout(() => {
+                        resetScanner();
+                    }, 3000);
                 }
+            }
+        }
 
-                // Function to reset scanner UI
-                function resetScanner() {
-                    startScanBtn.classList.remove('d-none');
-                    stopScanBtn.classList.add('d-none');
-                    video.srcObject = null;
-                }
+        if (scanning) {
+            requestAnimationFrame(tick);
+        }
+    }
 
-                // Function to process each video frame
-                function tick() {
-                    if (!scanning) return;
+    // Event listeners
+    startScanBtn.addEventListener('click', startScanning);
+    stopScanBtn.addEventListener('click', stopScanning);
 
-                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                        const canvas = document.createElement('canvas');
-                        const context = canvas.getContext('2d');
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                        const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                            inversionAttempts: "dontInvert",
-                        });
-
-              if (code) {
-                            // QR code detected!
-                            stopScanning();
-                            resultContainer.textContent = "@lang('dashboard.qr_detected_redirecting')";
-                            resultContainer.classList.remove('d-none');
-
-                            // Check if the URL is a valid order edit URL
-                            // if (code.data.includes('orders.edit')) {
-                            setTimeout(() => {
-                                window.location.href = code.data;
-                            }, 1500);
-                            {
-                                {
-                                     
-                                } else {
-                                     
-                                }
-                            } {
-                                {
-                                     resultContainer.textContent = "@lang('dashboard.invalid_qr_code')";
-                                     
-                                }
-                            } {
-                                {
-                                     resultContainer.classList.remove('alert-info');
-                                     
-                                }
-                            } {
-                                {
-                                     resultContainer.classList.add('alert-warning');
-                                     
-                                }
-                            }
-
-                            {
-                                {
-                                      // Show the start button again after a delay }}
-                                    {
-                                        {
-                                             setTimeout(() => {
-                                                     
-                                                }
-                                            } {
-                                                {
-                                                     resetScanner();
-                                                     
-                                                }
-                                            } {
-                                                {
-                                                     
-                                                }, 3000);
-                                             
-                                        }
-                                    } {
-                                        {
-                                             
-                                        } 
-                                    }
-                                }
-                            }
-                        }
-
-                        if (scanning) {
-                            requestAnimationFrame(tick);
-                        }
-                    }
-
-                    // Event listeners
-                    startScanBtn.addEventListener('click', startScanning);
-                    stopScanBtn.addEventListener('click', stopScanning);
-
-                    // Reset scanner when modal is closed
-                    scannerModal.addEventListener('hidden.bs.modal', function() {
-                        stopScanning();
-                    });
-                });
-</script>
+    // Reset scanner when modal is closed
+    scannerModal.addEventListener('hidden.bs.modal', function() {
+        stopScanning();
+    });
+});
 
 <!-- Fix delete functionality -->
 <script>
