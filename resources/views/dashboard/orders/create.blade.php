@@ -889,9 +889,7 @@
                     // First, select the services
                     $('#service_id').val(payload.service_ids.map(String));
                     payload.service_ids.map(String).forEach(function(id){
-                        console.log(id);
                         const $option = $(`#service_id option[value="${id}"]`);
-                        console.log($option);
                         $option.prop('selected', true);
                         $('#service_id').trigger('change');
                     });
@@ -901,9 +899,7 @@
                  recalcPrice();  
                 // If a specific price was provided, use it after setting the services
                 if (payload.price) {
-                    console.log('Overriding with provided price:', payload.price);
                     const formattedPrice = parseFloat(payload.price).toFixed(2);
-                    console.log('Formatted price:', formattedPrice);
                     $('input[name="price"]').val(formattedPrice);
                 }
 
@@ -955,12 +951,18 @@
 
                 const isEdit = @json(isset($order));
                 if (!hasPrefill || isEdit) return;
-
+                let params = new URLSearchParams(window.location.search);
+                let service_ids = [] ; 
+                for (const [key , value ] of params.entries()) {
+                    if (key.startsWith('service_ids[')) {
+                        service_ids.push(value);
+                    }
+                }
                 // Create payload object from URL parameters
                 const payload = {
                     rf_id: url.searchParams.get('rf_id') || '',
                     people_count: url.searchParams.get('people_count') || '',
-                    service_ids: url.searchParams.get('service_ids') ? url.searchParams.get('service_ids').split(',').map(Number) : [],
+                    service_ids: service_ids,
                     date: url.searchParams.get('date') || '',
                     time_from: url.searchParams.get('time_from') || '',
                     time_to: url.searchParams.get('time_to') || '',
@@ -972,7 +974,7 @@
                         phone: url.searchParams.get('customer_phone') || ''
                     }
                 };
-
+                console.log(payload.service_ids)
                 // If we have an rf_id, fetch the customer data first
                 if (url.searchParams.has('rf_id') && "{{ Route::has('orders.customers.check') ? '1' : '0' }}" === "1") {
                     $.ajax({

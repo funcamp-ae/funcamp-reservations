@@ -63,7 +63,7 @@
                         <!--begin::Table head-->
                         <thead>
                             <!--begin::Table row-->
-                            <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0">
+                            <tr class="text-center fw-bolder fs-6 text-uppercase gs-0">
                                 <th class="fw-bolder">@lang('dashboard.sequence')</th>
                                 <th class="fw-bolder">@lang('dashboard.reservation_number')</th>
                                 <th class="fw-bolder">@lang('dashboard.customer')</th>
@@ -90,7 +90,7 @@
                         <!--end::Table head-->
 
                         <!--begin::Table body-->
-                        <tbody class="fw-bold text-gray-600">
+                        <tbody class="fw-bold ">
                             @foreach ($orders as $order)
                             <!--begin::Table row-->
                             <tr data-id="{{$order->id}}">
@@ -110,7 +110,7 @@
                                         <div class="ms-5">
                                             @can('bookings.show')
                                             <a href="{{ route('orders.show', $order->id) }}"
-                                                class="text-gray-800 text-hover-primary fs-5 fw-bolder mb-1">
+                                                class="text-hover-primary fs-5 fw-bolder mb-1">
                                                 {{$order->customer->name}}
                                             </a>
                                             @else
@@ -215,7 +215,7 @@
                                 <!--begin::Rate Link-->
                                 <td>
                                     <a href="{{route('surveys.public', $order->id)}}" target="_blank"
-                                        class="text-gray-800 text-hover-primary fs-5 fw-bolder mb-1">
+                                        class=" text-hover-primary fs-5 fw-bolder mb-1">
                                         Click Rate <i class="fa fa-link"></i>
                                     </a>
                                 </td>

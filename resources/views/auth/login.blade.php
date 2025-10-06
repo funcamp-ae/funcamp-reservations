@@ -19,7 +19,7 @@
                         </span>
                     @endif
                     <div class="fv-row mb-10">
-                        <label class="form-label fs-6 fw-bolder text-dark">البريد الالكتروني</label>
+                        <label class="form-label fs-6 fw-bolder">البريد الالكتروني</label>
                         <input class="form-control form-control-lg form-control-solid" type="email" name="email" autocomplete="off" />
                     </div>
                    
@@ -31,7 +31,7 @@
                     @endif
                     <div class="fv-row mb-10">
                         <div class="d-flex flex-stack mb-2">
-                            <label class="form-label fw-bolder text-dark fs-6 mb-0">كلمة المرور</label>
+                            <label class="form-label fw-bolder  fs-6 mb-0">كلمة المرور</label>
                         </div>
                         <input class="form-control form-control-lg form-control-solid" type="password" name="password" autocomplete="off" />
                     </div>

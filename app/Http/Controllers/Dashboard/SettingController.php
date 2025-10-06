@@ -8,6 +8,7 @@ use App\Models\SMS;
 use App\Requests\dashboard\UpdateSettingRequest;
 use App\Services\SettingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use App;
 use Intervention\Image\Facades\Image;
 
@@ -92,14 +93,31 @@ class SettingController extends Controller
                 session() -> forget( 'lang' );
 
             session() -> put( 'lang', $lang );
+            
 
-        } else {
-            if ( session() -> has( 'lang' ) )
+        }else if ($lang == 'registrationforms-ar' || $lang == 'registrationforms-en') {
+            if ( session() -> has( 'registrationforms-lang' ) ){
+                session() -> forget( 'registrationforms-lang' );
+            }
+            session() -> put( 'registrationforms-lang', $lang );
+        }
+        else {
+        if ( session() -> has( 'lang' ) )
                 session() -> forget( 'lang' );
 
             session() -> put( 'lang', 'ar' );
         }
         return back();
+    }
+
+    public function switchTheme(Request $request, $theme)
+    {
+        if (in_array($theme, ['light', 'dark', 'system'])) {
+            Session::put('theme', $theme);
+            return back()->with('success', __('Theme changed successfully'));
+        }
+        
+        return back()->with('error', __('Invalid theme selected'));
     }
 
 }

@@ -1,6 +1,5 @@
 <?php
 
-
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -96,6 +95,9 @@ Route::get('set-lang/{lang}', [
     'as' => 'set-lang',
     'title' => 'dashboard.set_lang'
 ]);
+Route::get('/theme/switch/{theme}', [SettingController::class, 'switchTheme'])
+    ->name('theme.switch')
+    ->middleware('web');
 Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'namespace' => 'Dashboard'], function () {
 
 

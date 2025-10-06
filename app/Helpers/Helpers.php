@@ -252,7 +252,7 @@ function getStatusBadgeColor($status)
         'approved' => 'primary',
         'completed' => 'success',
         'canceled' => 'danger',
-        'delayed' => 'dark',
+        'delayed' => 'info',
         'pending_and_show_price' => 'info',
         'pending_and_Initial_reservation' => 'info',
     ];

@@ -13,7 +13,7 @@
             <!--begin::Page title-->
             <div data-kt-swapper="true" data-kt-swapper-mode="prepend" data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}" class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
                 <!--begin::Title-->
-                <h1 class="d-flex text-dark fw-bolder fs-3 align-items-center my-1"></h1>
+                <h1 class="d-flex  fw-bolder fs-3 align-items-center my-1"></h1>
                 <!--end::Title-->
             </div>
             <!--end::Page title-->
@@ -52,8 +52,8 @@
                     <a href="{{route('customers.index') }}">
                         <div class="card h-100">
                             <div class="card-body text-center">
-                                <h3 class="fs-4 fw-bold text-gray-800">{{ __('dashboard.total_customers') }}</h3>
-                                <h5 class="fs-2x fw-bolder text-primary">{{ number_format($totalCustomersCount) }}</h5>
+                                <h3 class="fs-4 fw-bold">{{ __('dashboard.total_customers') }}</h3>
+                                <h5 class="fs-2x fw-bolder">{{ number_format($totalCustomersCount) }}</h5>
                             </div>
                         </div>
                     </a>
@@ -66,8 +66,8 @@
                         <a href="{{ route('orders.index') }}">
                             <div class="card h-100">
                                 <div class="card-body text-center">
-                                    <h3 class="fs-4 fw-bold text-gray-800">{{ __('dashboard.total_orders') }}</h3>
-                                    <h5 class="fs-2x fw-bolder text-primary">{{ number_format($totalOrdersCount) }}</h5>
+                                    <h3 class="fs-4 fw-bold ">{{ __('dashboard.total_orders') }}</h3>
+                                    <h5 class="fs-2x fw-bolder ">{{ number_format($totalOrdersCount) }}</h5>
                                 </div>
                             </div>
                         </a>
@@ -79,7 +79,7 @@
                         <a href="{{ route('orders.index', ['status' => $status]) }}">
                             <div class="card h-100">
                                 <div class="card-body text-center">
-                                    <h3 class="fs-4 fw-bold text-gray-800">{{ __('dashboard.order_status.' . $status) }}</h3>
+                                    <h3 class="fs-4 fw-bold ">{{ __('dashboard.order_status.' . $status) }}</h3>
                                     @if(isset($ordersCountByStatus[$status]))
                                     <h5 class="fs-2x fw-bolder {{ getStatusBadgeColor($status) ? 'text-' . getStatusBadgeColor($status) : '' }}">{{ number_format($ordersCountByStatus[$status]) ?? "0" }}</h5>
                                     @endif
@@ -102,7 +102,7 @@
                         <div class="card-header pt-7">
                             <!--begin::Title-->
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder text-gray-800"> @lang('dashboard.upcoming_orders')</span>
+                                <span class="card-label fw-bolder "> @lang('dashboard.upcoming_orders')</span>
                             </h3>
                             <!--end::Title-->
                             <!--begin::Toolbar-->
@@ -121,7 +121,7 @@
                                 <table class="table table-hover table-row-bordered gy-5">
                                     <!--begin::Table head-->
                                     <thead>
-                                        <tr class="fw-bold fs-6 text-gray-800 border-bottom border-gray-200">
+                                        <tr class="fw-bold fs-6  border-bottom border-gray-200">
                                             <th class="min-w-50px">#</th>
                                             <th>@lang('dashboard.order_id')</th>
                                             <th>@lang('dashboard.customer_name')</th>
@@ -137,7 +137,7 @@
                                             <tr>
                                                 <td>{{ $key + 1 }}</td>
                                                 <td>
-                                                    <a href="{{ route('orders.show', $order->id) }}" class="text-primary">
+                                                    <a href="{{ route('orders.show', $order->id) }}" >
                                                         #{{ $order->id }}
                                                     </a>
                                                 </td>
@@ -178,7 +178,7 @@
                         <!--begin::Card header-->
                         <div class="card-header pt-7">
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder text-gray-800">@lang('dashboard.latest_paid_funds')</span>
+                                <span class="card-label fw-bolder ">@lang('dashboard.latest_paid_funds')</span>
                             </h3>
                             <div class="card-toolbar">
                                 <a href="{{ route('payments.index') }}" class="btn btn-sm btn-light">
@@ -233,12 +233,12 @@
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>
-                                                    <span class="text-dark fw-bold d-block">{{ $date }}</span>
+                                                    <span class="fw-bold d-block">{{ $date }}</span>
                                                     <span class="text-muted">{{ $time }}</span>
                                                 </td>
                                                 <td>
                                                     @if($reservationId)
-                                                        <a href="{{ route('orders.show', $reservationId) }}" class="text-primary fw-bold">
+                                                        <a href="{{ route('orders.show', $reservationId) }}" class="fw-bold">
                                                             #{{ $reservationId }}
                                                         </a>
                                                     @else
@@ -247,7 +247,7 @@
                                                 </td>
                                                 <td class="text-nowrap">{{ number_format($payment->amount, 2) }} {{ __('dashboard.currency') }}</td>
                                                 <td>
-                                                    <a href="{{ $link }}" class="text-primary fw-bold">
+                                                    <a href="{{ $link }}" class=" fw-bold">
                                                         <div class="d-flex flex-column">
                                                             <span class="text-muted fs-8">{{ __('dashboard.' . $payment->source) }}</span>
                                                             <!-- check if there translation -->
@@ -296,7 +296,7 @@
                     <div class="card card-flush">
                         <div class="card-header pt-7">
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder text-gray-800">@lang('dashboard.latest_survey_responses')</span>
+                                <span class="card-label fw-bolder">@lang('dashboard.latest_survey_responses')</span>
                             </h3>
                         </div>
                         <div class="card-body pt-4">
@@ -321,23 +321,23 @@
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>
-                                                    <span class="text-dark fw-bold d-block">{{ $date }}</span>
+                                                    <span class="fw-bold d-block">{{ $date }}</span>
                                                     <span class="text-muted">{{ $time }}</span>
                                                 </td>
                                                 <td>
                                                     @if($response->reservation_id)
-                                                        <a href="{{ route('orders.show', $response->reservation_id) }}" class="text-primary fw-bold">
+                                                        <a href="{{ route('orders.show', $response->reservation_id) }}" class=" fw-bold">
                                                             #{{ $response->reservation_id }}
                                                         </a>
                                                     @endif
                                                 </td>
                                                 <td>
                                                     @if($response->order && $response->order->customer)
-                                                        <span class="text-dark fw-bold">{{ $response->order->customer->name ?? '' }}</span>
+                                                        <span class="fw-bold">{{ $response->order->customer->name ?? '' }}</span>
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <a href="{{ route('surveys.answer', $response->id) }}" class="text-primary fw-bold">
+                                                    <a href="{{ route('surveys.answer', $response->id) }}" class=" fw-bold">
                                                         {{ $response->survey->title ?? '' }}
                                                     </a>
                                                 </td>
@@ -363,7 +363,7 @@
                     <div class="card card-flush">
                         <div class="card-header pt-7">
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder text-gray-800">@lang('dashboard.low_stock_items')</span>
+                                <span class="card-label fw-bolder">@lang('dashboard.low_stock_items')</span>
                             </h3>
                         </div>
                         <div class="card-body pt-4">
@@ -383,7 +383,7 @@
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>
                                                     <a href="{{ route('dashboard.stock.report', $stock->id) }}">
-                                                        <span class="text-dark fw-bold">{{ $stock->name ?? 'N/A' }}</span>
+                                                        <span class=" fw-bold">{{ $stock->name ?? 'N/A' }}</span>
                                                     </a>
                                                 </td>
                                                 <td>
@@ -420,7 +420,7 @@
                     <div class="card card-flush">
                         <div class="card-header pt-7">
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder text-gray-800">@lang('dashboard.recent_expenses')</span>
+                                <span class="card-label fw-bolder   ">@lang('dashboard.recent_expenses')</span>
                             </h3>
                         </div>
                         <div class="card-body pt-4">
@@ -447,14 +447,14 @@
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>
-                                                    <span class="text-dark fw-bold d-block">{{ $date }}</span>
+                                                    <span class="fw-bold d-block">{{ $date }}</span>
                                                     <span class="text-muted">{{ $time }}</span>
                                                 </td>
                                                 <td class="text-end">
                                                     <span class="text-danger fw-bold">- {{ number_format($expense->amount, 2) }} </span>
                                                 </td>
                                                 <td>
-                                                    <span class="text-dark fw-bold">{{ __("dashboard.".$expense->source ?? '') }}</span>
+                                                    <span class="fw-bold">{{ __("dashboard.".$expense->source ?? '') }}</span>
                                                     <!-- check if translation available -->
                                                     @php
                                                         $statement = "dashboard.".$expense->expense?->statement != __('dashboard.'.$expense->expense?->statement) ? __('dashboard.'.$expense->expense?->statement) : $expense->expense?->statement;
@@ -495,7 +495,7 @@
                     <div class="card card-flush">
                         <div class="card-header pt-7">
                             <h3 class="card-title align-items-start flex-column">
-                                <span class="card-label fw-bolder text-gray-800">@lang('dashboard.recent_add_funds')</span>
+                                <span class="card-label fw-bolder">@lang('dashboard.recent_add_funds')</span>
                             </h3>
                         </div>
                         <div class="card-body pt-4">
@@ -521,14 +521,14 @@
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>
-                                                    <span class="text-dark fw-bold d-block">{{ $date }}</span>
+                                                    <span class=" fw-bold d-block">{{ $date }}</span>
                                                     <span class="text-muted">{{ $time }}</span>
                                                 </td>
                                                 <td class="text-end">
                                                     <span class="text-success fw-bold">+ {{ number_format($fund->amount, 2) }} </span>
                                                 </td>
                                                 <td>
-                                                    <span class="text-dark fw-bold">{{ __('dashboard.'.$fund->source) ?? '' }}</span>
+                                                    <span class="fw-bold">{{ __('dashboard.'.$fund->source) ?? '' }}</span>
                                                 </td>
                                                 <td>
                                                     <span class="badge badge-light-success">
