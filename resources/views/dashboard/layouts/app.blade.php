@@ -674,7 +674,7 @@
 	</script>
 	<script src="{{asset('dashboard/assets/js/jquery.js')}}"></script>
 	<script src="{{asset('dashboard/assets/js/popper.js')}}"></script>
-	<!-- <script src="{{asset('dashboard/assets/js/bootstrap.js')}}"></script> -->
+    <script src="{{asset('dashboard/assets/js/bootstrap.js')}}"></script> 
 	<!--begin::Global Javascript Bundle(used by all pages)-->
 	<script src="{{asset('dashboard/assets/plugins/global/plugins.bundle.js')}}"></script>
 	<script src="{{asset('dashboard/assets/js/scripts.bundle.js')}}"></script>
