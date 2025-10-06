@@ -104,7 +104,7 @@
                             </div>
 
                             <input type="file" name="image_before_receiving[]" class="media-input d-none"
-                                accept="image/*" capture="environment" multiple>
+                                accept="image/*" multiple>
                             <input type="hidden" name="remove_photo" value="0" class="remove-flag">
                         </div>
                     </div>
@@ -191,12 +191,12 @@
             </div>
         </form>
         <!-- Lightbox Modal -->
-<div id="photo-lightbox" class="lightbox d-none">
-  <span class="close">&times;</span>
-  <img class="lightbox-img" alt="photo">
-  <button class="nav prev"></button>
-  <button class="nav next"></button>
-</div>
+        <div id="photo-lightbox" class="lightbox d-none">
+            <span class="close">&times;</span>
+            <img class="lightbox-img" alt="photo">
+            <button class="nav prev"></button>
+            <button class="nav next"></button>
+        </div>
 
     </div>
 @endsection
@@ -206,215 +206,274 @@
 
 
 @push('css')
-<link href="https://unpkg.com/filepond/dist/filepond.min.css" rel="stylesheet">
-<style>
-.media-upload-container {
-  border: 1px dashed #ddd;
-  border-radius: 4px;
-  padding: 10px;
-  background: #f9f9f9;
-}
+    <link href="https://unpkg.com/filepond/dist/filepond.min.css" rel="stylesheet">
+    <style>
+        .media-upload-container {
+            border: 1px dashed #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background: #f9f9f9;
+        }
 
-.remove-media { width: 100%; }
+        .remove-media {
+            width: 100%;
+        }
 
-.preview-audio-container audio,
-.preview-video-container video {
-  max-width: 100%;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.2);
-}
+        .preview-audio-container audio,
+        .preview-video-container video {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+        }
 
-/* PHOTO SLIDER */
-.photo-slider {
-  position: relative;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,.06);
-}
-.photo-slider .slider-viewport {
-  height: 220px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #111 !important;
-}
-.photo-slider .slider-img {
-  max-width: 100%;
-  max-height: 100%;
-  display: block;
-  object-fit: contain;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-.photo-slider .slider-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(0,0,0,.45);
-  color: #fff;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-.photo-slider .slider-nav:hover { background: rgba(0,0,0,.55); }
-.photo-slider .prev { left: 8px; }
-.photo-slider .next { right: 8px; }
-.photo-slider .slider-dots {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px;
-  background: #fff;
-}
-.photo-slider .slider-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #cfcfcf;
-  cursor: pointer;
-}
-.photo-slider .slider-dot.active { background: #333; }
+        /* PHOTO SLIDER */
+        .photo-slider {
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
+        }
 
-/* VIDEO SLIDER */
-.video-slider {
-  position: relative;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,.06);
-}
-.video-slider .slider-viewport {
-  height: 220px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #000;
-}
-.video-slider .slider-video {
-  width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  background: #000;
-}
-.video-slider .slider-nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(0,0,0,.45);
-  color: #fff;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-.video-slider .slider-nav:hover { background: rgba(0,0,0,.55); }
-.video-slider .prev { left: 8px; }
-.video-slider .next { right: 8px; }
-.video-slider .slider-dots {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px;
-  background: #fff;
-}
-.video-slider .slider-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #cfcfcf;
-  cursor: pointer;
-}
-.video-slider .slider-dot.active { background: #333; }
+        .photo-slider .slider-viewport {
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #111 !important;
+        }
 
-/* AUDIO STYLE */
-.preview-audio-list audio {
-  display: block;
-  width: 100%;
-  margin-top: .25rem;
-}
+        .photo-slider .slider-img {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            object-fit: contain;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
 
-/* LIGHTBOX */
-.lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-.lightbox.d-none { display: none; }
-.lightbox img {
-  max-width: 90%;
-  max-height: 90%;
-  object-fit: contain;
-}
-.lightbox .close {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 36px;
-  color: #fff;
-  cursor: pointer;
-}
-.lightbox .nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 48px;
-  color: #fff;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-/* Lightbox افتراضي LTR */
-.lightbox .nav.prev { left: 20px; right: auto; }
-.lightbox .nav.next { right: 20px; left: auto; }
+        .photo-slider .slider-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, .45);
+            color: #fff;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .photo-slider .slider-nav:hover {
+            background: rgba(0, 0, 0, .55);
+        }
+
+        .photo-slider .prev {
+            left: 8px;
+        }
+
+        .photo-slider .next {
+            right: 8px;
+        }
+
+        .photo-slider .slider-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px;
+            background: #fff;
+        }
+
+        .photo-slider .slider-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cfcfcf;
+            cursor: pointer;
+        }
+
+        .photo-slider .slider-dot.active {
+            background: #333;
+        }
+
+        /* VIDEO SLIDER */
+        .video-slider {
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
+        }
+
+        .video-slider .slider-viewport {
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+
+        .video-slider .slider-video {
+            width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .video-slider .slider-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, .45);
+            color: #fff;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .video-slider .slider-nav:hover {
+            background: rgba(0, 0, 0, .55);
+        }
+
+        .video-slider .prev {
+            left: 8px;
+        }
+
+        .video-slider .next {
+            right: 8px;
+        }
+
+        .video-slider .slider-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px;
+            background: #fff;
+        }
+
+        .video-slider .slider-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cfcfcf;
+            cursor: pointer;
+        }
+
+        .video-slider .slider-dot.active {
+            background: #333;
+        }
+
+        /* AUDIO STYLE */
+        .preview-audio-list audio {
+            display: block;
+            width: 100%;
+            margin-top: .25rem;
+        }
+
+        /* LIGHTBOX */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .lightbox.d-none {
+            display: none;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .lightbox .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 36px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .lightbox .nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 48px;
+            color: #fff;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Lightbox افتراضي LTR */
+        .lightbox .nav.prev {
+            left: 20px;
+            right: auto;
+        }
+
+        .lightbox .nav.next {
+            right: 20px;
+            left: auto;
+        }
 
 
-/* RTL fix */
-[dir="rtl"] .lightbox .nav.prev { left: 20px; left: auto; }
-[dir="rtl"] .lightbox .nav.next { right: 20px; right: auto; }
+        /* RTL fix */
+        [dir="rtl"] .lightbox .nav.prev {
+            left: 20px;
+            left: auto;
+        }
+
+        [dir="rtl"] .lightbox .nav.next {
+            right: 20px;
+            right: auto;
+        }
 
 
 
-/* ✅ RTL FIX: عكس الأسهم */
-[dir="rtl"] .photo-slider .prev,
-[dir="rtl"] .video-slider .prev,
-[dir="rtl"] .lightbox .nav.prev {
-  right: 8px;
-  left: auto;
-  transform: translateY(-50%) scaleX(-1); /* قلب السهم أفقياً */
-}
-[dir="rtl"] .photo-slider .next,
-[dir="rtl"] .video-slider .next,
-[dir="rtl"] .lightbox .nav.next {
-  left: 8px;
-  right: auto;
-  transform: translateY(-50%) scaleX(-1);
-}
+        /* ✅ RTL FIX: عكس الأسهم */
+        [dir="rtl"] .photo-slider .prev,
+        [dir="rtl"] .video-slider .prev,
+        [dir="rtl"] .lightbox .nav.prev {
+            right: 8px;
+            left: auto;
+            transform: translateY(-50%) scaleX(-1);
+            /* قلب السهم أفقياً */
+        }
 
-/* Style nav buttons unified */
-.photo-slider .slider-nav,
-.video-slider .slider-nav {
-  font-size: 20px;
-  font-weight: bold;
-}
-</style>
+        [dir="rtl"] .photo-slider .next,
+        [dir="rtl"] .video-slider .next,
+        [dir="rtl"] .lightbox .nav.next {
+            left: 8px;
+            right: auto;
+            transform: translateY(-50%) scaleX(-1);
+        }
+
+        /* Style nav buttons unified */
+        .photo-slider .slider-nav,
+        .video-slider .slider-nav {
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
 @endpush
 
 
@@ -462,217 +521,374 @@
                 const t = (type || '').split(';')[0].trim();
                 return t || 'video/webm';
             }
-// ================== PHOTO =================//
-(function initPhoto() {
-    const box = document.querySelector('[data-type="photo"]');
-    if (!box) return;
 
-    const input = box.querySelector('.media-input');
-    const previewSingle = box.querySelector('.preview-image-container');
-    const captureBtn = box.querySelector('.capture-media');
-    const uploadBtn = box.querySelector('.upload-media');
-    const removeFlag = box.querySelector('.remove-flag');
-    const actionsWrap = box.querySelector('.d-grid, .btn-group');
 
-    // سلايدر الصور
-    const sliderWrap = document.createElement('div');
-    sliderWrap.className = 'photo-slider mb-2 d-none';
-    sliderWrap.innerHTML = `
+
+
+
+
+
+
+
+
+
+
+
+            // ================== PHOTO =================//
+            (function initPhoto() {
+                const box = document.querySelector('[data-type="photo"]');
+                if (!box) return;
+
+                const input = box.querySelector('.media-input'); // مخزن الملفات للـ form فقط
+                const previewSingle = box.querySelector('.preview-image-container');
+                const captureBtn = box.querySelector('.capture-media');
+                const uploadBtn = box.querySelector('.upload-media');
+                const removeFlag = box.querySelector('.remove-flag');
+                const actionsWrap = box.querySelector('.d-grid, .btn-group');
+
+                // ---------- سلايدر ----------
+                const sliderWrap = document.createElement('div');
+                sliderWrap.className = 'photo-slider mb-2 d-none';
+                sliderWrap.innerHTML = `
         <div class="slider-viewport">
-          <img class="slider-img" alt="photo">
+            <img class="slider-img" alt="photo">
         </div>
         <button type="button" class="slider-nav prev" aria-label="Prev">‹</button>
         <button type="button" class="slider-nav next" aria-label="Next">›</button>
         <div class="slider-dots"></div>
     `;
-    if (actionsWrap) box.insertBefore(sliderWrap, actionsWrap);
-    else box.appendChild(sliderWrap);
+                if (actionsWrap) box.insertBefore(sliderWrap, actionsWrap);
+                else box.appendChild(sliderWrap);
 
-    const viewport = sliderWrap.querySelector('.slider-viewport');
-    const imgEl = sliderWrap.querySelector('.slider-img');
-    const prevBtn = sliderWrap.querySelector('.prev');
-    const nextBtn = sliderWrap.querySelector('.next');
-    const dotsBox = sliderWrap.querySelector('.slider-dots');
+                const viewport = sliderWrap.querySelector('.slider-viewport');
+                const imgEl = sliderWrap.querySelector('.slider-img');
+                const prevBtn = sliderWrap.querySelector('.prev');
+                const nextBtn = sliderWrap.querySelector('.next');
+                const dotsBox = sliderWrap.querySelector('.slider-dots');
 
-    const isRTL = document.documentElement.dir === 'rtl' || getComputedStyle(document.body).direction === 'rtl';
-    prevBtn.innerHTML = isRTL ? '›' : '‹';
-    nextBtn.innerHTML = isRTL ? '‹' : '›';
+                const isRTL = document.documentElement.dir === 'rtl' || getComputedStyle(document.body)
+                    .direction === 'rtl';
+                prevBtn.innerHTML = isRTL ? '›' : '‹';
+                nextBtn.innerHTML = isRTL ? '‹' : '›';
 
-    // 📌 Lightbox (عرض الصور بحجم كبير)
-    const lightbox = document.createElement('div');
-    lightbox.className = 'lightbox d-none';
-    lightbox.innerHTML = `
+                // ---------- Lightbox ----------
+                const lightbox = document.createElement('div');
+                lightbox.className = 'lightbox d-none';
+                lightbox.innerHTML = `
         <span class="close">&times;</span>
         <img class="lightbox-img" alt="photo">
         <button class="nav prev">‹</button>
         <button class="nav next">›</button>
     `;
-    document.body.appendChild(lightbox);
-    const lightImg = lightbox.querySelector('.lightbox-img');
-    const closeBtn = lightbox.querySelector('.close');
-    const lbPrev = lightbox.querySelector('.nav.prev');
-    const lbNext = lightbox.querySelector('.nav.next');
-
-    function openLightbox() {
-        if (!photos.length) return;
-        lightbox.classList.remove('d-none');
-        renderLightbox();
-    }
-    function closeLightbox() { lightbox.classList.add('d-none'); }
-    function renderLightbox() { if (photos.length) lightImg.src = photos[current]; }
-
-    closeBtn.addEventListener('click', closeLightbox);
-    lbPrev.addEventListener('click', () => { current = (current - 1 + photos.length) % photos.length; renderLightbox(); });
-    lbNext.addEventListener('click', () => { current = (current + 1) % photos.length; renderLightbox(); });
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') closeLightbox();
-        if (e.key === 'ArrowLeft') lbPrev.click();
-        if (e.key === 'ArrowRight') lbNext.click();
-    });
-
-    // 📌 ضغط الصور
-    function compressImage(file, quality = 0.7, maxWidth = 1280, maxHeight = 1280) {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-                let { width, height } = img;
-                if (width > maxWidth || height > maxHeight) {
-                    const scale = Math.min(maxWidth / width, maxHeight / height);
-                    width = Math.round(width * scale);
-                    height = Math.round(height * scale);
+                document.body.appendChild(lightbox);
+                const lightImg = lightbox.querySelector('.lightbox-img');
+                const closeBtn = lightbox.querySelector('.close');
+                const lbPrev = lightbox.querySelector('.nav.prev');
+                const lbNext = lightbox.querySelector('.nav.next');
+                if (isRTL) {
+                    lbPrev.style.transform = 'scaleX(-1)';
+                    lbNext.style.transform = 'scaleX(-1)';
                 }
-                const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-                canvas.toBlob(blob => {
-                    if (!blob) return reject("Compression failed");
-                    const compressed = new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
-                    resolve(compressed);
-                }, 'image/jpeg', quality);
-            };
-            img.onerror = reject;
-            img.src = URL.createObjectURL(file);
-        });
-    }
 
-    // بيانات أولية
-    let photos = [];
-    try {
-        const initial = box.dataset.photos ? JSON.parse(box.dataset.photos) : [];
-        if (Array.isArray(initial) && initial.length) {
-            photos = initial;
-            if (previewSingle) { previewSingle.style.display = 'none'; previewSingle.innerHTML = ''; }
-        }
-    } catch (_) {}
-    let current = 0;
+                function openLightbox() {
+                    if (!photos.length) return;
+                    lightbox.classList.remove('d-none');
+                    lightImg.src = photos[current];
+                }
 
-    function renderDots() {
-        dotsBox.innerHTML = '';
-        photos.forEach((_, i) => {
-            const d = document.createElement('div');
-            d.className = 'slider-dot' + (i === current ? ' active' : '');
-            d.addEventListener('click', () => { current = i; render(); });
-            dotsBox.appendChild(d);
-        });
-    }
-    function render() {
-        if (!photos.length) { sliderWrap.classList.add('d-none'); return; }
-        sliderWrap.classList.remove('d-none');
-        imgEl.src = photos[current];
-        renderDots();
-    }
-    function addPhotoToSlider(url) { photos.push(url); current = photos.length - 1; if (removeFlag) removeFlag.value = '0'; render(); }
-    function goPrev() { if (photos.length) { current = (current - 1 + photos.length) % photos.length; render(); } }
-    function goNext() { if (photos.length) { current = (current + 1) % photos.length; render(); } }
-
-    prevBtn.addEventListener('click', goPrev);
-    nextBtn.addEventListener('click', goNext);
-    imgEl.addEventListener('click', openLightbox);
-
-    // سحب بالإصبع
-    let startX = 0;
-    viewport.addEventListener('touchstart', e => startX = e.changedTouches[0].clientX, { passive: true });
-    viewport.addEventListener('touchend', e => {
-        const dx = e.changedTouches[0].clientX - startX;
-        if (Math.abs(dx) > 40) {
-            if (isRTL) { if (dx < 0) goPrev(); else goNext(); }
-            else { if (dx < 0) goNext(); else goPrev(); }
-        }
-    }, { passive: true });
-
-    // رفع ملفات
-    uploadBtn?.addEventListener('click', () => input?.click());
-    input?.addEventListener('change', async e => {
-        const files = Array.from(e.target.files || []);
-        for (const f of files) {
-            try {
-                const compressed = await compressImage(f, 0.7);
-                addPhotoToSlider(URL.createObjectURL(compressed));
-                const dt = new DataTransfer();
-                (input.files ? Array.from(input.files).forEach(ff => dt.items.add(ff)) : 0);
-                dt.items.add(compressed);
-                input.files = dt.files;
-            } catch {
-                addPhotoToSlider(URL.createObjectURL(f));
-            }
-        }
-        if (removeFlag) removeFlag.value = '0';
-    });
-
-    // التقاط بالكاميرا (ديسكتوب)
-    const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-    captureBtn?.addEventListener('click', () => {
-        if (isMobile) { input?.click(); return; }
-        (async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                const overlay = document.createElement('div');
-                overlay.style.cssText = 'position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:2;';
-                const v = document.createElement('video');
-                v.autoplay = v.muted = true; v.playsInline = true;
-                v.srcObject = stream; v.style.cssText = 'width:100%;height:100%;object-fit:contain;';
-                const snapBtn = document.createElement('button');
-                snapBtn.type = 'button'; snapBtn.className = 'btn btn-sm btn-success';
-                snapBtn.innerHTML = '<i class="bi bi-camera"></i> Snap';
-                Object.assign(snapBtn.style, { position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)' });
-                overlay.appendChild(v); overlay.appendChild(snapBtn);
-                viewport.appendChild(overlay);
-                sliderWrap.classList.remove('d-none');
-
-                snapBtn.addEventListener('click', async () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = v.videoWidth || 640;
-                    canvas.height = v.videoHeight || 480;
-                    canvas.getContext('2d').drawImage(v, 0, 0);
-                    stream.getTracks().forEach(t => t.stop());
-                    canvas.toBlob(async blob => {
-                        if (!blob) { overlay.remove(); return; }
-                        let file = new File([blob], 'photo_' + Date.now() + '.jpg', { type: 'image/jpeg' });
-                        try { file = await compressImage(file, 0.7); } catch(_) {}
-                        const dt = new DataTransfer();
-                        (input.files ? Array.from(input.files).forEach(ff => dt.items.add(ff)) : 0);
-                        dt.items.add(file);
-                        input.files = dt.files;
-                        addPhotoToSlider(URL.createObjectURL(file));
-                        overlay.remove();
-                    }, 'image/jpeg', 0.9);
+                function closeLightbox() {
+                    lightbox.classList.add('d-none');
+                }
+                closeBtn.addEventListener('click', closeLightbox);
+                lbPrev.addEventListener('click', () => {
+                    current = (current - 1 + photos.length) % photos.length;
+                    lightImg.src = photos[current];
                 });
-            } catch (err) { alert('Camera error: ' + (err?.message || err)); }
-        })();
-    });
+                lbNext.addEventListener('click', () => {
+                    current = (current + 1) % photos.length;
+                    lightImg.src = photos[current];
+                });
+                document.addEventListener('keydown', e => {
+                    if (e.key === 'Escape') closeLightbox();
+                    if (e.key === 'ArrowLeft') lbPrev.click();
+                    if (e.key === 'ArrowRight') lbNext.click();
+                });
 
-    // حذف الكل
-    box.querySelector('.remove-media')?.addEventListener('click', () => {
-        photos = []; current = 0; render();
-        if (input) input.value = '';
-        if (removeFlag) removeFlag.value = '1';
-        if (previewSingle) previewSingle.style.display = 'none';
-    });
+                // ---------- ضغط الصور ----------
+                function compressImage(file, quality = 0.7, maxW = 1280, maxH = 1280) {
+                    return new Promise((resolve, reject) => {
+                        const img = new Image();
+                        const url = URL.createObjectURL(file);
+                        img.onload = () => {
+                            let {
+                                width,
+                                height
+                            } = img;
+                            if (width > maxW || height > maxH) {
+                                const s = Math.min(maxW / width, maxH / height);
+                                width = Math.round(width * s);
+                                height = Math.round(height * s);
+                            }
+                            const canvas = document.createElement('canvas');
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            canvas.toBlob(b => {
+                                URL.revokeObjectURL(url);
+                                if (!b) return reject('Compression failed');
+                                const name = (file.name || 'photo').replace(/\.[^.]+$/,
+                                    '') + '.jpg';
+                                resolve(new File([b], name, {
+                                    type: 'image/jpeg'
+                                }));
+                            }, 'image/jpeg', quality);
+                        };
+                        img.onerror = () => {
+                            URL.revokeObjectURL(url);
+                            reject('Decode failed');
+                        };
+                        img.src = url;
+                    });
+                }
 
-    render();
-})();
+                // ---------- حالة الملفات لمنع التكرار ومزامنة input ----------
+                const fileKey = f => `${f.name}__${f.size}__${f.lastModified || 0}__${f.type}`;
+                let photoFilesState = [];
+
+                function syncInputFromState() {
+                    const dt = new DataTransfer();
+                    photoFilesState.forEach(f => dt.items.add(f));
+                    input.files = dt.files;
+                }
+
+                function addFileUnique(finalFile) {
+                    const k = fileKey(finalFile);
+                    if (photoFilesState.some(f => fileKey(f) === k)) return false; // موجود مسبقاً
+                    photoFilesState.push(finalFile);
+                    syncInputFromState();
+                    return true;
+                }
+
+                function resetState() {
+                    photoFilesState = [];
+                    syncInputFromState();
+                }
+
+                // ---------- صور أولية من السيرفر (عرض فقط) ----------
+                let photos = [];
+                try {
+                    const initial = box.dataset.photos ? JSON.parse(box.dataset.photos) : [];
+                    if (Array.isArray(initial) && initial.length) {
+                        photos = initial.slice();
+                        if (previewSingle) {
+                            previewSingle.style.display = 'none';
+                            previewSingle.innerHTML = '';
+                        }
+                    }
+                } catch (_) {}
+                let current = 0;
+
+                function renderDots() {
+                    dotsBox.innerHTML = '';
+                    photos.forEach((_, i) => {
+                        const d = document.createElement('div');
+                        d.className = 'slider-dot' + (i === current ? ' active' : '');
+                        d.addEventListener('click', () => {
+                            current = i;
+                            render();
+                        });
+                        dotsBox.appendChild(d);
+                    });
+                }
+
+                function render() {
+                    if (!photos.length) {
+                        sliderWrap.classList.add('d-none');
+                        return;
+                    }
+                    sliderWrap.classList.remove('d-none');
+                    imgEl.src = photos[current];
+                    renderDots();
+                }
+
+                function addPhotoToSlider(url) {
+                    photos.push(url);
+                    current = photos.length - 1;
+                    render();
+                }
+
+                function goPrev() {
+                    if (photos.length) {
+                        current = (current - 1 + photos.length) % photos.length;
+                        render();
+                    }
+                }
+
+                function goNext() {
+                    if (photos.length) {
+                        current = (current + 1) % photos.length;
+                        render();
+                    }
+                }
+
+                prevBtn.addEventListener('click', goPrev);
+                nextBtn.addEventListener('click', goNext);
+                imgEl.addEventListener('click', openLightbox);
+
+                // سحب إصبع (موبايل)
+                let startX = 0;
+                viewport.addEventListener('touchstart', e => startX = e.changedTouches[0].clientX, {
+                    passive: true
+                });
+                viewport.addEventListener('touchend', e => {
+                    const dx = e.changedTouches[0].clientX - startX;
+                    if (Math.abs(dx) > 40) {
+                        if (isRTL) {
+                            if (dx < 0) goPrev();
+                            else goNext();
+                        } else {
+                            if (dx < 0) goNext();
+                            else goPrev();
+                        }
+                    }
+                }, {
+                    passive: true
+                });
+
+                // ---------- فتح المعرض باستعمال input مؤقّت ----------
+                function openGalleryPicker() {
+                    const picker = document.createElement('input');
+                    picker.type = 'file';
+                    picker.accept = 'image/*';
+                    picker.multiple = true;
+
+                    picker.addEventListener('change', async () => {
+                        const files = Array.from(picker.files || []);
+                        for (const f of files) {
+                            let finalFile = f;
+                            try {
+                                finalFile = await compressImage(f, 0.7);
+                            } catch {
+                                /* HEIC أو فشل → نخليه */ }
+                            // نضيف للـ state بدون تكرار، ونرسم المعاينة
+                            const added = addFileUnique(finalFile);
+                            if (added) addPhotoToSlider(URL.createObjectURL(finalFile));
+                        }
+                        if (removeFlag) removeFlag.value = '0';
+                        picker.value = ''; // نفرغ المؤقّت فقط
+                    });
+
+                    picker.click();
+                }
+
+                // زر الرفع → المعرض
+                uploadBtn?.addEventListener('click', openGalleryPicker);
+
+                // ---------- زر الالتقاط ----------
+                const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+                captureBtn?.addEventListener('click', () => {
+                    // على الهاتف: أيضاً نفتح المعرض (وفي iOS يبان خيار "التقاط صورة")
+                    if (isMobile) {
+                        openGalleryPicker();
+                        return;
+                    }
+
+                    // ديسكتوب: كاميرا ويب + Snap
+                    (async () => {
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({
+                                video: {
+                                    facingMode: {
+                                        ideal: 'environment'
+                                    },
+                                    width: {
+                                        ideal: 1280
+                                    },
+                                    height: {
+                                        ideal: 720
+                                    },
+                                    aspectRatio: {
+                                        ideal: 16 / 9
+                                    }
+                                },
+                                audio: false
+                            });
+
+                            const overlay = document.createElement('div');
+                            overlay.style.cssText =
+                                'position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:2;';
+                            const v = document.createElement('video');
+                            v.autoplay = v.muted = true;
+                            v.playsInline = true;
+                            v.srcObject = stream;
+                            v.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+                            const snapBtn = document.createElement('button');
+                            snapBtn.type = 'button';
+                            snapBtn.className = 'btn btn-sm btn-success';
+                            snapBtn.innerHTML = '<i class="bi bi-camera"></i> Snap';
+                            Object.assign(snapBtn.style, {
+                                position: 'absolute',
+                                bottom: '10px',
+                                left: '50%',
+                                transform: 'translateX(-50%)'
+                            });
+
+                            overlay.appendChild(v);
+                            overlay.appendChild(snapBtn);
+                            viewport.appendChild(overlay);
+                            sliderWrap.classList.remove('d-none');
+
+                            snapBtn.addEventListener('click', async () => {
+                                const canvas = document.createElement('canvas');
+                                canvas.width = v.videoWidth || 640;
+                                canvas.height = v.videoHeight || 480;
+                                canvas.getContext('2d').drawImage(v, 0, 0);
+                                try {
+                                    stream.getTracks().forEach(t => t.stop());
+                                } catch {}
+
+                                canvas.toBlob(async blob => {
+                                    if (!blob) {
+                                        overlay.remove();
+                                        return;
+                                    }
+                                    let file = new File([blob],
+                                        'photo_' + Date.now() +
+                                        '.jpg', {
+                                            type: 'image/jpeg'
+                                        });
+                                    try {
+                                        file = await compressImage(file,
+                                            0.7);
+                                    } catch {}
+                                    const added = addFileUnique(file);
+                                    if (added) addPhotoToSlider(URL
+                                        .createObjectURL(file));
+                                    if (removeFlag) removeFlag.value =
+                                        '0';
+                                    overlay.remove();
+                                }, 'image/jpeg', 0.95);
+                            });
+                        } catch (err) {
+                            alert('Camera error: ' + (err?.message || err));
+                        }
+                    })();
+                });
+
+                // ---------- حذف الكل ----------
+                box.querySelector('.remove-media')?.addEventListener('click', () => {
+                    photos = [];
+                    current = 0;
+                    render();
+                    resetState();
+                    if (removeFlag) removeFlag.value = '1';
+                    if (previewSingle) previewSingle.style.display = 'none';
+                });
+
+                render();
+            })();
+
 
 
 
@@ -699,7 +915,7 @@
                         chunks = [],
                         stream = null;
                     const player = document.querySelector(
-                    '#video-slider .slider-video'); // نفس البلاصة تاع العرض
+                        '#video-slider .slider-video'); // نفس البلاصة تاع العرض
 
                     btn.addEventListener('click', async () => {
                         if (recorder && recorder.state === 'recording') {
@@ -712,17 +928,21 @@
                             stream = await navigator.mediaDevices.getUserMedia({
                                 video: {
                                     facingMode: {
-                                        ideal: "user"
+                                        ideal: "environment"
                                     },
                                     width: {
                                         ideal: 1280
                                     },
                                     height: {
                                         ideal: 720
-                                    }
+                                    },
+                                    aspectRatio: {
+                                        ideal: 16 / 9
+                                    } // يخلي الكاميرا تحاول ترجع صورة عريضة
                                 },
                                 audio: true
                             });
+
 
                             // ✅ نضمن ظهور السلايدر حتى لو ماكانش فيه فيديوهات
                             if (sliderRoot) sliderRoot.classList.remove('d-none');
@@ -773,7 +993,7 @@
                             recorder.start();
                             btn.className = 'btn btn-sm btn-danger w-100';
                             btn.innerHTML =
-                            '<i class="bi bi-stop"></i> {{ __('dashboard.stop') }}';
+                                '<i class="bi bi-stop"></i> {{ __('dashboard.stop') }}';
                         } catch (e) {
                             alert("Camera error: " + e.message);
                         }
@@ -931,6 +1151,8 @@
                     maxFileSize: '500MB',
                     instantUpload: true,
                     allowRevert: true,
+                    labelIdle: '{{ __('dashboard.upload') }}',
+
                     server: {
                         process: (fieldName, file, metadata, load, error, progress, abort) => {
                             let cancelled = false,
@@ -959,13 +1181,13 @@
                                             })
                                         });
                                     if (!createRes.ok) throw new Error(
-                                    'createMultipart failed');
+                                        'createMultipart failed');
                                     const createJson = await createRes.json();
                                     uploadId = createJson.uploadId;
                                     key = createJson.key;
                                     document.getElementById('video_upload_id').value = uploadId;
                                     document.getElementById('video_note_direct_key').value =
-                                    key;
+                                        key;
 
                                     const totalParts = Math.ceil(file.size / CHUNK_SIZE);
                                     for (let partNumber = 1; partNumber <=
@@ -1106,20 +1328,11 @@
 
 
         // ================== AUDIO (متعدد) ==================
-        function addFileToInputMultiple(input, file) {
-            if (!input) return;
-            const dt = new DataTransfer();
-            if (input.files && input.files.length) {
-                Array.from(input.files).forEach(f => dt.items.add(f));
-            }
-            dt.items.add(file);
-            input.files = dt.files;
-        }
         (function initAudio() {
             const box = document.querySelector('[data-type="audio"]');
             if (!box) return;
 
-            const input = box.querySelector('.media-input'); // name="voice_notes[]"
+            const input = box.querySelector('.media-input');
             const previewBox = box.querySelector('.preview-audio-container');
             const list = box.querySelector('.preview-audio-list') || (() => {
                 const d = document.createElement('div');
@@ -1133,18 +1346,21 @@
 
             let recorder = null,
                 chunks = [],
-                indicator = null;
+                indicator = null,
+                stream = null;
+            let fallbackRecorder = null; // polyfill wav
 
-            // زر الرفع → يفتح input
+            // زر الرفع → input
             uploadBtn?.addEventListener('click', () => input?.click());
 
             // زر التسجيل
             captureBtn?.addEventListener('click', async () => {
-                // لو راه يسجّل، نوقف ونحفظ
-                if (recorder && recorder.state === 'recording') {
-                    recorder.stop();
+                // إذا يسجّل حالياً → وقف
+                if ((recorder && recorder.state === 'recording') || fallbackRecorder) {
+                    if (recorder) recorder.stop();
+                    if (fallbackRecorder) fallbackRecorder.stop();
                     captureBtn.className = 'btn btn-sm btn-primary';
-                    captureBtn.innerHTML = '<i class="bi bi-mic"></i> {{ __('dashboard.record') }}';
+                    captureBtn.innerHTML = '<i class="bi bi-mic"></i> تسجيل';
                     if (indicator) {
                         indicator.remove();
                         indicator = null;
@@ -1153,48 +1369,47 @@
                 }
 
                 try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
+                    stream = await navigator.mediaDevices.getUserMedia({
                         audio: true
                     });
                     chunks = [];
-                    recorder = new MediaRecorder(stream);
 
-                    recorder.ondataavailable = (e) => {
-                        if (e.data.size > 0) chunks.push(e.data);
-                    };
+                    // ✅ اختيار صيغة مدعومة
+                    let mimeType = 'audio/webm';
+                    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4';
+                    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/aac';
 
-                    recorder.onstop = () => {
-                        // نوقف الميك
-                        try {
-                            stream.getTracks().forEach(t => t.stop());
-                        } catch (_) {}
-                        // نكون ملف
-                        const blob = new Blob(chunks, {
-                            type: 'audio/webm'
-                        });
-                        const file = new File([blob], 'audio_' + Date.now() + '.webm', {
-                            type: 'audio/webm'
+                    if (window.MediaRecorder && MediaRecorder.isTypeSupported(mimeType)) {
+                        // 🎤 استعمال MediaRecorder
+                        recorder = new MediaRecorder(stream, {
+                            mimeType
                         });
 
-                        // نضيفو للـ input (متعدد)
-                        addFileToInputMultiple(input, file);
+                        recorder.ondataavailable = (e) => {
+                            if (e.data.size > 0) chunks.push(e.data);
+                        };
+                        recorder.onstop = () => {
+                            try {
+                                stream.getTracks().forEach(t => t.stop());
+                            } catch (_) {}
+                            const blob = new Blob(chunks, {
+                                type: mimeType
+                            });
+                            const ext = mimeType.includes('mp4') ? '.m4a' : mimeType.includes('aac') ?
+                                '.aac' : '.webm';
+                            saveFile(blob, ext, mimeType);
+                        };
 
-                        // نعرض معاينة جديدة (ما نستبدلش القديمة)
-                        const audio = document.createElement('audio');
-                        audio.controls = true;
-                        audio.className = 'w-100 mb-2';
-                        audio.src = URL.createObjectURL(file);
-                        list.appendChild(audio);
+                        recorder.start();
+                    } else {
+                        // 🚨 fallback → wav polyfill
+                        fallbackRecorder = startWavRecorder(stream, saveFile);
+                    }
 
-                        previewBox.style.display = 'block';
-                        removeFlag.value = '0';
-                    };
-
-                    recorder.start();
                     captureBtn.className = 'btn btn-sm btn-danger';
-                    captureBtn.innerHTML = '<i class="bi bi-stop"></i> {{ __('dashboard.stop') }}';
+                    captureBtn.innerHTML = '<i class="bi bi-stop"></i> إيقاف';
 
-                    // مؤشر تسجيل
+                    // مؤشر
                     previewBox.style.display = 'block';
                     indicator = document.createElement('div');
                     indicator.className = 'text-danger mt-2 small';
@@ -1206,25 +1421,101 @@
                 }
             });
 
-            // لما يختار ملفات يدويًا (واحد أو أكثر)
-            input?.addEventListener('change', (e) => {
-                const files = Array.from(e.target.files || []);
-                if (!files.length) return;
-
-                // نعرضهم كلهم (من غير تبديل)
-                files.forEach(f => {
-                    const a = document.createElement('audio');
-                    a.controls = true;
-                    a.className = 'w-100 mb-2';
-                    a.src = URL.createObjectURL(f);
-                    list.appendChild(a);
+            // 📌 حفظ الملف + معاينة
+            function saveFile(blob, ext, type) {
+                const file = new File([blob], 'audio_' + Date.now() + ext, {
+                    type
                 });
+
+                // إضافة للـ input
+                const dt = new DataTransfer();
+                if (input.files) Array.from(input.files).forEach(f => dt.items.add(f));
+                dt.items.add(file);
+                input.files = dt.files;
+
+                // معاينة
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                audio.className = 'w-100 mb-2';
+                audio.src = URL.createObjectURL(file);
+                list.appendChild(audio);
 
                 previewBox.style.display = 'block';
                 removeFlag.value = '0';
-            });
+            }
 
-            // زر الحذف (ينظّف الكل)
+            // 📌 Polyfill: تسجيل wav باستعمال AudioContext
+            function startWavRecorder(stream, callback) {
+                const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                const source = audioCtx.createMediaStreamSource(stream);
+                const processor = audioCtx.createScriptProcessor(4096, 1, 1);
+
+                let buffer = [];
+                processor.onaudioprocess = (e) => {
+                    buffer.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+                };
+
+                source.connect(processor);
+                processor.connect(audioCtx.destination);
+
+                return {
+                    stop: () => {
+                        source.disconnect();
+                        processor.disconnect();
+                        audioCtx.close();
+
+                        // تحويل PCM → WAV
+                        const wavBlob = encodeWav(buffer, audioCtx.sampleRate);
+                        callback(wavBlob, '.wav', 'audio/wav');
+                        fallbackRecorder = null;
+                    }
+                };
+            }
+
+            // 📌 دالة تحويل PCM → WAV
+            function encodeWav(chunks, sampleRate) {
+                const length = chunks.reduce((acc, cur) => acc + cur.length, 0);
+                const buffer = new Float32Array(length);
+                let offset = 0;
+                chunks.forEach(cur => {
+                    buffer.set(cur, offset);
+                    offset += cur.length;
+                });
+
+                const wavBuffer = new ArrayBuffer(44 + buffer.length * 2);
+                const view = new DataView(wavBuffer);
+
+                function writeString(view, offset, string) {
+                    for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+                }
+
+                // Header WAV
+                writeString(view, 0, 'RIFF');
+                view.setUint32(4, 36 + buffer.length * 2, true);
+                writeString(view, 8, 'WAVE');
+                writeString(view, 12, 'fmt ');
+                view.setUint32(16, 16, true);
+                view.setUint16(20, 1, true);
+                view.setUint16(22, 1, true);
+                view.setUint32(24, sampleRate, true);
+                view.setUint32(28, sampleRate * 2, true);
+                view.setUint16(32, 2, true);
+                view.setUint16(34, 16, true);
+                writeString(view, 36, 'data');
+                view.setUint32(40, buffer.length * 2, true);
+
+                let index = 44;
+                for (let i = 0; i < buffer.length; i++, index += 2) {
+                    const s = Math.max(-1, Math.min(1, buffer[i]));
+                    view.setInt16(index, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+                }
+
+                return new Blob([view], {
+                    type: 'audio/wav'
+                });
+            }
+
+            // زر حذف الكل
             box.querySelector('.remove-media')?.addEventListener('click', () => {
                 previewBox.style.display = 'none';
                 list.innerHTML = '';

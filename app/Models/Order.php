@@ -356,8 +356,17 @@ class Order extends Model
     }
 
     // App\Models\Order.php
-public function signinPhotos()  { return $this->hasMany(\App\Models\PreLoginImage::class, 'order_id'); }
-public function signoutPhotos() { return $this->hasMany(\App\Models\PreLogoutImage::class, 'order_id'); }
+public function signinPhotos()
+{
+    return $this->hasMany(\App\Models\PreLoginImage::class, 'order_id')
+                ->orderBy('id', 'desc');
+}
+
+public function signoutPhotos()
+{
+    return $this->hasMany(\App\Models\PreLogoutImage::class, 'order_id')
+                ->orderBy('id', 'desc');
+}
 
 public function signinVideos() {
     return $this->hasMany(PreLoginVideo::class);
