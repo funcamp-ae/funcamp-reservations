@@ -77,8 +77,8 @@
             --bs-body-color: #3f4254;
             --bs-border-color: #e4e6ef;
             --bs-card-bg: #ffffff;
+            --bs-card-color: black; 
 			--bs-table-header : #ce6316ce ;
-            --bs-card-color: #3f4254;
             --bs-modal-bg: #ffffff;
             --bs-modal-color: #3f4254;
             --bs-table-bg: #f9f9f9;
@@ -96,7 +96,7 @@
             --bs-border-color: #323248;
 	    --bs-table-header :#bb8322;
             --bs-card-bg: #323248;
-            --bs-card-color: black; 
+            --bs-card-color: white; 
 	    --bs-header-color : white;
             --bs-modal-bg: #323248;
             --bs-modal-color: #e1e1f0;
