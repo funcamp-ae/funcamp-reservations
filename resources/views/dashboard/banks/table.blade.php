@@ -201,6 +201,7 @@
                             {{ __('dashboard.' . $transaction->source) }}
                         @endif
                     @endif
+                    @endif
 
                 </td>
                 <td>{{ $transaction->handledBy?->name?? '-' }}</td>
