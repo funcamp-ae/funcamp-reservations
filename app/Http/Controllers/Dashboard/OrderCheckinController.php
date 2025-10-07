@@ -102,7 +102,7 @@ class OrderCheckinController extends Controller
         $order = Order::findOrFail($id);
 
         $request->validate([
-            'delivery_time'            => 'required|regex:/^\d{2}:\d{2}(:\d{2})?$/',
+            'delivery_time'            => 'nullable|regex:/^\d{2}:\d{2}(:\d{2})?$/',
             'delivery_time_notes'      => 'nullable|string',
             'image_after_delivery'     => 'nullable|array',
             'image_after_delivery.*'   => 'file|mimes:jpg,jpeg,png,gif,webp|max:20480',
