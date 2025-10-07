@@ -12,21 +12,35 @@ class PreLoginImage extends Model
     use HasFactory;
 
     protected $guarded = [];
-
-    // نضيف URL كمُلحَق (accessor) من غير ما نفسد قيمة image الخام
     protected $appends = ['image_url'];
 
-    // خزّن المسار الخام على ديسك hetzner
+    /**
+     * Setter: نخزن الصورة في مجلد فيه رقم الأوردر
+     */
     public function setImageAttribute($value)
     {
         if ($value instanceof UploadedFile) {
-            $this->attributes['image'] = $value->store('uploads/signin/photos', 'hetzner');
+            $orderId = $this->order_id ?? 'unknown';
+            $path = "uploads/signin/photos/order_{$orderId}";
+            $this->attributes['image'] = $value->store($path, 'hetzner');
+        } else {
+            $this->attributes['image'] = $value;
         }
     }
 
-    // عطيني URL للعرض
+    /**
+     * Getter: يرجع رابط العرض
+     */
     public function getImageUrlAttribute()
     {
         return $this->image ? Storage::disk('hetzner')->url($this->image) : null;
+    }
+
+    /**
+     * العلاقة مع Order
+     */
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
     }
 }

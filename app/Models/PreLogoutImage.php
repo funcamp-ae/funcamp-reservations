@@ -17,7 +17,15 @@ class PreLogoutImage extends Model
     public function setImageAttribute($value)
     {
         if ($value instanceof UploadedFile) {
-            $this->attributes['image'] = $value->store('uploads/signout/images', 'hetzner');
+            // جيب رقم الأوردر
+            $orderId = $this->order_id ?? 'unknown';
+
+            // مسار التخزين فيه رقم الأوردر
+            $path = "uploads/signout/images/order_{$orderId}";
+
+            $this->attributes['image'] = $value->store($path, 'hetzner');
+        } else {
+            $this->attributes['image'] = $value;
         }
     }
 

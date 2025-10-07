@@ -34,6 +34,7 @@ class OrderCheckinController extends Controller
     public function updatesignin(Request $request, $id)
     {
         $order = Order::findOrFail($id);
+//dd($request->file('voice_notes'));
 
         $request->validate([
             'time_of_receipt'          => 'required|regex:/^\d{2}:\d{2}(:\d{2})?$/',
@@ -41,7 +42,13 @@ class OrderCheckinController extends Controller
             'image_before_receiving'   => 'nullable|array',
             'image_before_receiving.*' => 'file|mimes:jpg,jpeg,png,gif,webp|max:20480',
             'voice_notes'              => 'nullable|array',
-            'voice_notes.*'            => 'file|mimes:mp3,wav,ogg,webm,aac,m4a|max:51200',
+            'voice_notes.*'            => 'file|max:51200|
+                                            mimes:mp3,wav,ogg,webm,aac,m4a,mp4|
+                                            mimetypes:audio/mpeg,audio/wav,audio/ogg,
+                                                    audio/webm,video/webm,
+                                                    audio/aac,audio/x-m4a,
+                                                    audio/mp4,video/mp4,
+                                                    audio/caf',
             'signin_videos'            => 'nullable|array',
             'signin_videos.*'          => 'string',
             'remove_photo'             => 'nullable|in:0,1',
@@ -54,30 +61,33 @@ class OrderCheckinController extends Controller
             $order->time_of_receipt_notes = $request->input('time_of_receipt_notes');
 
             // 🖼 الصور
-            if ($request->input('remove_photo') == '1') {
+            if ($request->hasFile('image_before_receiving')) {
                 $this->deleteSigninPhotos($order);
-            } elseif ($request->hasFile('image_before_receiving')) {
                 foreach ($request->file('image_before_receiving') as $file) {
                     PreLoginImage::create(['order_id' => $order->id, 'image' => $file]);
                 }
+            } elseif ($request->input('remove_photo') == '1') {
+                $this->deleteSigninPhotos($order);
             }
 
             // 🎵 الأصوات
             if ($request->input('remove_audio') == '1') {
                 $this->deleteSigninAudios($order);
             } elseif ($request->hasFile('voice_notes')) {
+                $this->deleteSigninAudios($order);
                 foreach ($request->file('voice_notes') as $file) {
                     PreLoginAudio::create(['order_id' => $order->id, 'audio' => $file]);
                 }
             }
 
             // 🎬 الفيديوهات
-            if ($request->input('remove_video') == '1') {
+            if ($request->filled('signin_videos')) {
                 $this->deleteSigninVideos($order);
-            } elseif ($request->filled('signin_videos')) {
                 foreach ($request->input('signin_videos') as $key) {
                     PreLoginVideo::create(['order_id' => $order->id, 'video' => $key]);
                 }
+            } elseif ($request->input('remove_video') == '1') {
+                $this->deleteSigninVideos($order);
             }
 
             $order->save();
@@ -97,7 +107,13 @@ class OrderCheckinController extends Controller
             'image_after_delivery'     => 'nullable|array',
             'image_after_delivery.*'   => 'file|mimes:jpg,jpeg,png,gif,webp|max:20480',
             'voice_notes_logout'       => 'nullable|array',
-            'voice_notes_logout.*'     => 'file|mimes:mp3,wav,ogg,webm,aac,m4a|max:51200',
+            'voice_notes_logout.*'     => 'file|max:51200|
+                                            mimes:mp3,wav,ogg,webm,aac,m4a,mp4|
+                                            mimetypes:audio/mpeg,audio/wav,audio/ogg,
+                                                    audio/webm,video/webm,
+                                                    audio/aac,audio/x-m4a,
+                                                    audio/mp4,video/mp4,
+                                                    audio/caf',
             'signout_videos'           => 'nullable|array',
             'signout_videos.*'         => 'string',
             'remove_photo_logout'      => 'nullable|in:0,1',
@@ -110,30 +126,33 @@ class OrderCheckinController extends Controller
             $order->delivery_time_notes = $request->input('delivery_time_notes');
 
             // 🖼 الصور
-            if ($request->input('remove_photo_logout') == '1') {
+            if ($request->hasFile('image_after_delivery')) {
                 $this->deleteSignoutPhotos($order);
-            } elseif ($request->hasFile('image_after_delivery')) {
                 foreach ($request->file('image_after_delivery') as $file) {
                     PreLogoutImage::create(['order_id' => $order->id, 'image' => $file]);
                 }
+            } elseif ($request->input('remove_photo_logout') == '1') {
+                $this->deleteSignoutPhotos($order);
             }
 
             // 🎵 الأصوات
             if ($request->input('remove_audio_logout') == '1') {
                 $this->deleteSignoutAudios($order);
             } elseif ($request->hasFile('voice_notes_logout')) {
+                $this->deleteSignoutAudios($order);
                 foreach ($request->file('voice_notes_logout') as $file) {
                     PreLogoutAudio::create(['order_id' => $order->id, 'audio' => $file]);
                 }
             }
 
             // 🎬 الفيديوهات
-            if ($request->input('remove_video_logout') == '1') {
+            if ($request->filled('signout_videos')) {
                 $this->deleteSignoutVideos($order);
-            } elseif ($request->filled('signout_videos')) {
                 foreach ($request->input('signout_videos') as $key) {
                     PreLogoutVideo::create(['order_id' => $order->id, 'video' => $key]);
                 }
+            } elseif ($request->input('remove_video_logout') == '1') {
+                $this->deleteSignoutVideos($order);
             }
 
             $order->save();

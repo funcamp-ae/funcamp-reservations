@@ -18,7 +18,13 @@ class PreLogoutVideo extends Model
     public function setVideoAttribute($value)
     {
         if ($value instanceof UploadedFile) {
-            $this->attributes['video'] = $value->store('uploads/signout/videos', 'hetzner');
+            // جيب رقم الأوردر المرتبط
+            $orderId = $this->order_id ?? 'unknown';
+
+            // مسار التخزين مع رقم الأوردر
+            $path = "uploads/signout/videos/order_{$orderId}";
+
+            $this->attributes['video'] = $value->store($path, 'hetzner');
         } elseif (is_string($value)) {
             $this->attributes['video'] = $value; // نخزن الـ key مباشرة
         }

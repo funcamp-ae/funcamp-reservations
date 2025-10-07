@@ -475,6 +475,13 @@
             font-size: 20px;
             font-weight: bold;
         }
+
+
+
+
+
+
+
     </style>
 @endpush
 
@@ -497,11 +504,23 @@
             const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
             const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
-            const ACCEPTED_VIDEOS = [
-                'video/mp4', 'video/webm', 'video/avi', 'video/quicktime', 'video/x-matroska',
-                'video/x-flv', 'video/3gpp', 'video/mpeg', 'video/mpg', 'video/x-ms-wmv', 'video/3gpp2',
-                'video/x-m4v'
-            ];
+        const ACCEPTED_VIDEOS = [
+    'video/mp4',
+    'video/quicktime',   // 🎯 خاص بـ iPhone/iPad (MOV)
+    'video/hevc',        // لو كان مصور HEVC
+    'video/webm',
+    'video/avi',
+    'video/x-matroska',
+    'video/x-flv',
+    'video/3gpp',
+    'video/3gpp2',
+    'video/mpeg',
+    'video/mpg',
+    'video/x-ms-wmv',
+    'video/x-m4v'
+];
+
+
 
             // ===== Helpers =====
             function addFileToInputMultiple(input, file) {
@@ -1344,206 +1363,223 @@
                     document.getElementById('remove_video_flag').value = '1';
                 });
 
+
             }
         });
 
 
 
+
+
+
+
+
+
+
+
+
+
+
         // ================== AUDIO (متعدد) ==================
         (function initAudio() {
-            const box = document.querySelector('[data-type="audio"]');
-            if (!box) return;
+    const box = document.querySelector('[data-type="audio"]');
+    if (!box) return;
 
-            const input = box.querySelector('.media-input');
-            const previewBox = box.querySelector('.preview-audio-container');
-            const list = box.querySelector('.preview-audio-list') || (() => {
-                const d = document.createElement('div');
-                d.className = 'preview-audio-list';
-                previewBox?.insertBefore(d, previewBox.firstChild);
-                return d;
-            })();
-            const captureBtn = box.querySelector('.capture-media');
-            const uploadBtn = box.querySelector('.upload-media');
-            const removeFlag = box.querySelector('.remove-flag');
+    const input = box.querySelector('.media-input');
+    const previewBox = box.querySelector('.preview-audio-container');
+    const list = box.querySelector('.preview-audio-list') || (() => {
+        const d = document.createElement('div');
+        d.className = 'preview-audio-list';
+        previewBox?.insertBefore(d, previewBox.firstChild);
+        return d;
+    })();
+    const captureBtn = box.querySelector('.capture-media');
+    const uploadBtn = box.querySelector('.upload-media');
+    const removeFlag = box.querySelector('.remove-flag');
 
-            let recorder = null,
-                chunks = [],
-                indicator = null,
-                stream = null;
-            let fallbackRecorder = null; // polyfill wav
+    let recorder = null,
+        chunks = [],
+        indicator = null,
+        stream = null;
+    let fallbackRecorder = null; // polyfill wav
 
-            // زر الرفع → input
-            uploadBtn?.addEventListener('click', () => input?.click());
+    // زر الرفع → input
+    uploadBtn?.addEventListener('click', () => input?.click());
 
-            // زر التسجيل
-            captureBtn?.addEventListener('click', async () => {
-                // إذا يسجّل حالياً → وقف
-                if ((recorder && recorder.state === 'recording') || fallbackRecorder) {
-                    if (recorder) recorder.stop();
-                    if (fallbackRecorder) fallbackRecorder.stop();
-                    captureBtn.className = 'btn btn-sm btn-primary';
-                    captureBtn.innerHTML = '<i class="bi bi-mic"></i> تسجيل';
-                    if (indicator) {
-                        indicator.remove();
-                        indicator = null;
-                    }
-                    return;
-                }
+    // 📂 عرض الصوت المختار من الجهاز
+    input?.addEventListener('change', () => {
+        if (!input.files?.length) return;
 
-                try {
-                    stream = await navigator.mediaDevices.getUserMedia({
-                        audio: true
-                    });
-                    chunks = [];
+        list.innerHTML = ''; // مسح أي معاينة قديمة
+        Array.from(input.files).forEach(file => {
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.className = 'w-100 mb-2';
+            audio.src = URL.createObjectURL(file);
+            list.appendChild(audio);
+        });
 
-                    // ✅ اختيار صيغة مدعومة
-                    let mimeType = 'audio/webm';
-                    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4';
-                    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/aac';
+        previewBox.style.display = 'block';
+        removeFlag.value = '0';
+    });
 
-                    if (window.MediaRecorder && MediaRecorder.isTypeSupported(mimeType)) {
-                        // 🎤 استعمال MediaRecorder
-                        recorder = new MediaRecorder(stream, {
-                            mimeType
-                        });
-
-                        recorder.ondataavailable = (e) => {
-                            if (e.data.size > 0) chunks.push(e.data);
-                        };
-                        recorder.onstop = () => {
-                            try {
-                                stream.getTracks().forEach(t => t.stop());
-                            } catch (_) {}
-                            const blob = new Blob(chunks, {
-                                type: mimeType
-                            });
-                            const ext = mimeType.includes('mp4') ? '.m4a' : mimeType.includes('aac') ?
-                                '.aac' : '.webm';
-                            saveFile(blob, ext, mimeType);
-                        };
-
-                        recorder.start();
-                    } else {
-                        // 🚨 fallback → wav polyfill
-                        fallbackRecorder = startWavRecorder(stream, saveFile);
-                    }
-
-                    captureBtn.className = 'btn btn-sm btn-danger';
-                    captureBtn.innerHTML = '<i class="bi bi-stop"></i> إيقاف';
-
-                    // مؤشر
-                    previewBox.style.display = 'block';
-                    indicator = document.createElement('div');
-                    indicator.className = 'text-danger mt-2 small';
-                    indicator.innerText = '🔴 Recording...';
-                    list.appendChild(indicator);
-
-                } catch (e) {
-                    alert("Mic error: " + (e?.message || e));
-                }
-            });
-
-            // 📌 حفظ الملف + معاينة
-            function saveFile(blob, ext, type) {
-                const file = new File([blob], 'audio_' + Date.now() + ext, {
-                    type
-                });
-
-                // إضافة للـ input
-                const dt = new DataTransfer();
-                if (input.files) Array.from(input.files).forEach(f => dt.items.add(f));
-                dt.items.add(file);
-                input.files = dt.files;
-
-                // معاينة
-                const audio = document.createElement('audio');
-                audio.controls = true;
-                audio.className = 'w-100 mb-2';
-                audio.src = URL.createObjectURL(file);
-                list.appendChild(audio);
-
-                previewBox.style.display = 'block';
-                removeFlag.value = '0';
+    // زر التسجيل
+    captureBtn?.addEventListener('click', async () => {
+        // إذا يسجّل حالياً → وقف
+        if ((recorder && recorder.state === 'recording') || fallbackRecorder) {
+            if (recorder) recorder.stop();
+            if (fallbackRecorder) fallbackRecorder.stop();
+            captureBtn.className = 'btn btn-sm btn-primary';
+            captureBtn.innerHTML = '<i class="bi bi-mic"></i> تسجيل';
+            if (indicator) {
+                indicator.remove();
+                indicator = null;
             }
+            return;
+        }
 
-            // 📌 Polyfill: تسجيل wav باستعمال AudioContext
-            function startWavRecorder(stream, callback) {
-                const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-                const source = audioCtx.createMediaStreamSource(stream);
-                const processor = audioCtx.createScriptProcessor(4096, 1, 1);
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            chunks = [];
 
-                let buffer = [];
-                processor.onaudioprocess = (e) => {
-                    buffer.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+            // ✅ اختيار صيغة مدعومة
+            let mimeType = 'audio/webm';
+            if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4';
+            if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/aac';
+
+            if (window.MediaRecorder && MediaRecorder.isTypeSupported(mimeType)) {
+                // 🎤 استعمال MediaRecorder
+                recorder = new MediaRecorder(stream, { mimeType });
+
+                recorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) chunks.push(e.data);
+                };
+                recorder.onstop = () => {
+                    try { stream.getTracks().forEach(t => t.stop()); } catch (_) {}
+                    const blob = new Blob(chunks, { type: mimeType });
+                    const ext = mimeType.includes('mp4') ? '.m4a' : mimeType.includes('aac') ? '.aac' : '.webm';
+                    saveFile(blob, ext, mimeType);
                 };
 
-                source.connect(processor);
-                processor.connect(audioCtx.destination);
-
-                return {
-                    stop: () => {
-                        source.disconnect();
-                        processor.disconnect();
-                        audioCtx.close();
-
-                        // تحويل PCM → WAV
-                        const wavBlob = encodeWav(buffer, audioCtx.sampleRate);
-                        callback(wavBlob, '.wav', 'audio/wav');
-                        fallbackRecorder = null;
-                    }
-                };
+                recorder.start();
+            } else {
+                // 🚨 fallback → wav polyfill
+                fallbackRecorder = startWavRecorder(stream, saveFile);
             }
 
-            // 📌 دالة تحويل PCM → WAV
-            function encodeWav(chunks, sampleRate) {
-                const length = chunks.reduce((acc, cur) => acc + cur.length, 0);
-                const buffer = new Float32Array(length);
-                let offset = 0;
-                chunks.forEach(cur => {
-                    buffer.set(cur, offset);
-                    offset += cur.length;
-                });
+            captureBtn.className = 'btn btn-sm btn-danger';
+            captureBtn.innerHTML = '<i class="bi bi-stop"></i> إيقاف';
 
-                const wavBuffer = new ArrayBuffer(44 + buffer.length * 2);
-                const view = new DataView(wavBuffer);
+            // مؤشر
+            previewBox.style.display = 'block';
+            indicator = document.createElement('div');
+            indicator.className = 'text-danger mt-2 small';
+            indicator.innerText = '🔴 Recording...';
+            list.appendChild(indicator);
 
-                function writeString(view, offset, string) {
-                    for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
-                }
+        } catch (e) {
+            alert("Mic error: " + (e?.message || e));
+        }
+    });
 
-                // Header WAV
-                writeString(view, 0, 'RIFF');
-                view.setUint32(4, 36 + buffer.length * 2, true);
-                writeString(view, 8, 'WAVE');
-                writeString(view, 12, 'fmt ');
-                view.setUint32(16, 16, true);
-                view.setUint16(20, 1, true);
-                view.setUint16(22, 1, true);
-                view.setUint32(24, sampleRate, true);
-                view.setUint32(28, sampleRate * 2, true);
-                view.setUint16(32, 2, true);
-                view.setUint16(34, 16, true);
-                writeString(view, 36, 'data');
-                view.setUint32(40, buffer.length * 2, true);
+    // 📌 حفظ الملف + معاينة
+    function saveFile(blob, ext, type) {
+        const file = new File([blob], 'audio_' + Date.now() + ext, { type });
 
-                let index = 44;
-                for (let i = 0; i < buffer.length; i++, index += 2) {
-                    const s = Math.max(-1, Math.min(1, buffer[i]));
-                    view.setInt16(index, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
-                }
+        // إضافة للـ input
+        const dt = new DataTransfer();
+        if (input.files) Array.from(input.files).forEach(f => dt.items.add(f));
+        dt.items.add(file);
+        input.files = dt.files;
 
-                return new Blob([view], {
-                    type: 'audio/wav'
-                });
+        // معاينة
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.className = 'w-100 mb-2';
+        audio.src = URL.createObjectURL(file);
+        list.appendChild(audio);
+
+        previewBox.style.display = 'block';
+        removeFlag.value = '0';
+    }
+
+    // 📌 Polyfill: تسجيل wav باستعمال AudioContext
+    function startWavRecorder(stream, callback) {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaStreamSource(stream);
+        const processor = audioCtx.createScriptProcessor(4096, 1, 1);
+
+        let buffer = [];
+        processor.onaudioprocess = (e) => {
+            buffer.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+        };
+
+        source.connect(processor);
+        processor.connect(audioCtx.destination);
+
+        return {
+            stop: () => {
+                source.disconnect();
+                processor.disconnect();
+                audioCtx.close();
+
+                // تحويل PCM → WAV
+                const wavBlob = encodeWav(buffer, audioCtx.sampleRate);
+                callback(wavBlob, '.wav', 'audio/wav');
+                fallbackRecorder = null;
             }
+        };
+    }
 
-            // زر حذف الكل
-            box.querySelector('.remove-media')?.addEventListener('click', () => {
-                previewBox.style.display = 'none';
-                list.innerHTML = '';
-                if (input) input.value = '';
-                removeFlag.value = '1';
-            });
-        })();
+    // 📌 دالة تحويل PCM → WAV
+    function encodeWav(chunks, sampleRate) {
+        const length = chunks.reduce((acc, cur) => acc + cur.length, 0);
+        const buffer = new Float32Array(length);
+        let offset = 0;
+        chunks.forEach(cur => {
+            buffer.set(cur, offset);
+            offset += cur.length;
+        });
+
+        const wavBuffer = new ArrayBuffer(44 + buffer.length * 2);
+        const view = new DataView(wavBuffer);
+
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+        }
+
+        // Header WAV
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + buffer.length * 2, true);
+        writeString(view, 8, 'WAVE');
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, 1, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * 2, true);
+        view.setUint16(32, 2, true);
+        view.setUint16(34, 16, true);
+        writeString(view, 36, 'data');
+        view.setUint32(40, buffer.length * 2, true);
+
+        let index = 44;
+        for (let i = 0; i < buffer.length; i++, index += 2) {
+            const s = Math.max(-1, Math.min(1, buffer[i]));
+            view.setInt16(index, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+        }
+
+        return new Blob([view], { type: 'audio/wav' });
+    }
+
+    // زر حذف الكل
+    box.querySelector('.remove-media')?.addEventListener('click', () => {
+        previewBox.style.display = 'none';
+        list.innerHTML = '';
+        if (input) input.value = '';
+        removeFlag.value = '1';
+    });
+})();
+
     </script>
 @endpush

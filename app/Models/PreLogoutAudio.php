@@ -9,17 +9,22 @@ use Illuminate\Http\UploadedFile;
 class PreLogoutAudio extends Model
 {
     protected $table = 'pre_logout_audios'; // جدول خاص بالخروج
-
-    protected $guarded = []; // يسمح بتعبئة كل الأعمدة
+    protected $guarded = [];
     protected $appends = ['audio_url'];
 
     /**
-     * Setter: نخزن الملف في التخزين إذا كان UploadedFile
+     * Setter: نخزن الملف في مجلد فيه رقم الأوردر
      */
     public function setAudioAttribute($value)
     {
         if ($value instanceof UploadedFile) {
-            $this->attributes['audio'] = $value->store('uploads/signout/audios', 'hetzner');
+            // رقم الأوردر المرتبط
+            $orderId = $this->order_id ?? 'unknown';
+
+            // مسار التخزين فيه orderId
+            $path = "uploads/signout/audios/order_{$orderId}";
+
+            $this->attributes['audio'] = $value->store($path, 'hetzner');
         } else {
             $this->attributes['audio'] = $value;
         }
@@ -34,7 +39,7 @@ class PreLogoutAudio extends Model
     }
 
     /**
-     * علاقة مع Order
+     * العلاقة مع Order
      */
     public function order()
     {

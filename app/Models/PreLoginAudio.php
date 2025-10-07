@@ -8,10 +8,8 @@ use Illuminate\Http\UploadedFile;
 
 class PreLoginAudio extends Model
 {
-
-        protected $table = 'pre_login_audios'; // <<< هنا نزيدو
-
-    protected $guarded = []; // يسمح بتعبئة كل الأعمدة
+    protected $table = 'pre_login_audios';
+    protected $guarded = [];
     protected $appends = ['audio_url'];
 
     /**
@@ -20,7 +18,14 @@ class PreLoginAudio extends Model
     public function setAudioAttribute($value)
     {
         if ($value instanceof UploadedFile) {
-            $this->attributes['audio'] = $value->store('uploads/signin/audios', 'hetzner');
+            // جيب رقم الأوردر المرتبط
+            $orderId = $this->order_id ?? 'unknown';
+
+            // نبني المسار فيه رقم الأوردر
+            $path = "uploads/signin/audios/order_{$orderId}";
+
+            // نخزن الملف في المسار
+            $this->attributes['audio'] = $value->store($path, 'hetzner');
         } else {
             $this->attributes['audio'] = $value;
         }
