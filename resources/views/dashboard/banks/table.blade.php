@@ -198,7 +198,7 @@
                         @if($transaction->expense)
                             {{ __('dashboard.' . $transaction->source) }} - {{ $transaction->expense->notes }}
                        notes }}
-                       @elseif($transaction->generalPayment‎())
+                       @elseif(isset($transaction->generalPayment()))
                             {{ __('dashboard.' . $transaction->source) }} - {{ $transaction->generalPayment‎->notes }} 
                        @else
                             {{ __('dashboard.' . $transaction->source) }}
