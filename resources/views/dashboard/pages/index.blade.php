@@ -12,7 +12,7 @@
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
-                <table id="kt_ecommerce_category_table" class="table table-striped align-middle">
+                <table id="kt_ecommerce_category_table" class="table align-middle">
                     <thead>
                         <tr>
                             <th data-kt-ecommerce-category-filter="category_name">@lang('dashboard.name')</th>
@@ -34,13 +34,13 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="badge {{ $page->is_authenticated ? 'bg-success' : 'bg-secondary' }}">
+                                    <span class="badge {{ $page->is_authenticated ? 'bg-success' : 'btn btn-sm btn-light' }}">
                                         {{ $page->is_authenticated ? __('dashboard.yes') : __('dashboard.no') }}
                                     </span>
                                 </td>
-                                <td>
+                                <td class = " d-flex flex-nowrap border-0 gap-2 py-10">
                                     @can('pages.edit')
-                                    <a href="{{ route('pages.edit', $page) }}" class="btn btn-sm btn-light-primary">@lang('dashboard.edit')</a>
+                                    <a href="{{ route('pages.edit', $page) }}" class="btn btn-sm btn-secondary">@lang('dashboard.edit')</a>
                                     @endcan
                                     @can('pages.destroy')
                                     <button type="button" class="btn btn-sm btn-light-danger" data-kt-ecommerce-category-filter="delete_row" data-id="{{ $page->id }}" data-url="{{ route('pages.destroy', $page) }}">@lang('dashboard.delete')</button>

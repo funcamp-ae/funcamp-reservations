@@ -68,21 +68,21 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <span class="text-dark fw-bolder text-h6 d-block fs-6">{{ $index + 1 }}</span>
+                                        <span class=" fw-bolder text-h6 d-block fs-6">{{ $index + 1 }}</span>
                                     </td>
                                     <td>
-                                        <span class="text-dark fw-bolder text-h6 d-block fs-6">
+                                        <span class=" fw-bolder text-h6 d-block fs-6">
                                             {{ $paymentLink->order_id ?? __('dashboard.not_specified') }}
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="text-dark fw-bolder text-h6 d-block fs-6">
+                                        <span class=" fw-bolder text-h6 d-block fs-6">
                                             {{ $paymentLink->customer->name ?? __('dashboard.not_specified') }}
                                         </span>
                                     </td>
 
                                     <td>
-                                        <span class="text-dark fw-bolder text-h6 d-block fs-6">
+                                        <span class=" fw-bolder text-h6 d-block fs-6">
                                             {{ number_format($paymentLink->amount, 2) }}
                                         </span>
                                     </td>
@@ -155,12 +155,12 @@
                                     </td>
 
                                     <td>
-                                        <span class="text-dark fw-bolder text-h6 d-block fs-6">
+                                        <span class=" fw-bolder text-h6 d-block fs-6">
                                             {{ $paymentLink->created_at->format('Y-m-d') }}
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="text-dark fw-bolder text-h6 d-block fs-6">
+                                        <span class=" fw-bolder text-h6 d-block fs-6">
                                             {{ $paymentLink->created_at->format('h:i A') }}
                                         </span>
                                     </td>
@@ -168,7 +168,7 @@
                                         {!! $paymentLink->status_badge !!}
                                     </td>
                                     <td>
-                                        <span class="text-dark fw-bolder text-h6 d-block fs-6">
+                                        <span class=" fw-bolder text-h6 d-block fs-6">
                                             {{ $paymentLink->handledBy->name ?? '-' }}
                                         </span>
                                     </td>
@@ -787,8 +787,7 @@
                 const paymentUrl = button.getAttribute('data-payment-url');
 
                 // Confirm before sending
-                if (!confirm('{{ __('
-                        dashboard.confirm_resend_whatsapp ') }} ' + customerName + '?')) {
+                if (!confirm('{{ __("dashboard.confirm_resend_whatsapp") }} ' + customerName + '?')) {
                     return;
                 }
 
@@ -936,7 +935,6 @@
         user-select: all !important;
         cursor: text;
         padding: 2px 4px;
-        background-color: #f8f9fa;
         border-radius: 3px;
     }
 

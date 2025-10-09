@@ -17,7 +17,7 @@
         </div>
         <div class="card-body pt-0 table-responsive">
             <table class="table align-middle table-row-dashed fs-6 gy-5">
-                <thead class="text-gray-400 fw-bolder">
+                <thead class="   fw-bolder">
                 <tr>
                     <th>@lang('dashboard.name')</th>
                     <th>@lang('dashboard.description')</th>

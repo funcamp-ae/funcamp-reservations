@@ -55,7 +55,7 @@
 
         <div class="col-md-12">
             <div class="table-responsive">
-                <table class="table table-bordered table-striped">
+                <table class="table table-bordered ">
                     <thead class="thead-light">
                         <tr>
                             <th>{{ __('dashboard.service_site') }}</th>

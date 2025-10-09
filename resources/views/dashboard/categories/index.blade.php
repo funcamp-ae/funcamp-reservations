@@ -49,7 +49,7 @@
                     <!--begin::Table head-->
                     <thead>
                         <!--begin::Table row-->
-                        <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                        <tr class="text-start    fw-bolder fs-7 text-uppercase gs-0">
                             <th class="w-10px pe-2">
                                 <div class="form-check form-check-sm form-check-custom form-check-solid me-3" >
                                     <input class="form-check-input" id="checkedAll"  type="checkbox" data-kt-check="true" data-kt-check-target="#kt_ecommerce_category_table .form-check-input" value="1" />
@@ -63,7 +63,7 @@
                     </thead>
                     <!--end::Table head-->
                     <!--begin::Table body-->
-                    <tbody class="fw-bold text-gray-600">
+                    <tbody class="fw-bold   ">
                         @foreach ($categories as $category)
                             <!--begin::Table row-->
                             <tr data-id="{{$category->id}}">
@@ -84,7 +84,7 @@
                                         <!--end::Thumbnail-->
                                         <div class="ms-5">
                                             <!--begin::Title-->
-                                            <a href="{{ route('categories.edit', $category->id) }}" class="text-gray-800 text-hover-primary fs-5 fw-bolder mb-1" data-kt-ecommerce-category-filter="category_name">{{$category->name}}</a>
+                                            <a href="{{ route('categories.edit', $category->id) }}" class="   text-hover-primary fs-5 fw-bolder mb-1" data-kt-ecommerce-category-filter="category_name">{{$category->name}}</a>
                                             <!--end::Title-->
                                             <!--begin::Description-->
                                             <div class="text-muted fs-7 fw-bolder">{{$category->desc}}</div>

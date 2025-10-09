@@ -146,7 +146,7 @@
                     <!--begin::Table head-->
                     <thead>
                         <!--begin::Table row-->
-                        <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+                        <tr class="text-center    fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                             <th class="w-10px pe-2 text-center">
                                 <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
                                     <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_ecommerce_category_table .form-check-input" value="1" />
@@ -163,7 +163,7 @@
                     </thead>
                     <!--end::Table head-->
                     <!--begin::Table body-->
-                    <tbody class="fw-bold text-gray-600">
+                    <tbody class="fw-bold   
                         @foreach ($users as $user)
                             <!--begin::Table row-->
                             <tr data-id="{{$user->id}}">
@@ -184,7 +184,7 @@
                                         <!--end::Thumbnail-->
                                         <div class="ms-5">
                                             <!--begin::Title-->
-                                            <a href="{{ route('users.edit', $user->id) }}" class="text-gray-800 text-hover-primary fs-5 fw-bolder mb-1" data-kt-ecommerce-category-filter="category_name">{{$user->name}}</a>
+                                            <a href="{{ route('users.edit', $user->id) }}" class="   text-hover-primary fs-5 fw-bolder mb-1" data-kt-ecommerce-category-filter="category_name">{{$user->name}}</a>
                                             <!--end::Title-->
                                         </div>
                                     </div>
@@ -192,7 +192,7 @@
                                 {{-- <td>
                                     <!--begin::Badges-->
                                     <div class="d-flex align-items-center">
-                                        <a href="{{ route('user-orders', $user->id) }}" class="text-gray-800 text-hover-primary">@lang('dashboard.show_orders_of') {{$user->name }}</a>
+                                        <a href="{{ route('user-orders', $user->id) }}" class="   text-hover-primary">@lang('dashboard.show_orders_of') {{$user->name }}</a>
                                     </div>
                                     <!--end::Badges-->
                                 </td> --}}

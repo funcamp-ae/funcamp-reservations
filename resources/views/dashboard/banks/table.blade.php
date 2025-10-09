@@ -1,6 +1,6 @@
 <!--begin::Table-->
 <div class="table-responsive">
-<table class="table align-middle table-row-dashed table-hover table-striped fs-6 gy-5" id="kt_ecommerce_category_table">
+<table class="table align-middle table-row-dashed table-hover fs-6 gy-5" id="kt_ecommerce_category_table">
 
     <!--begin::Table head-->
 
@@ -61,7 +61,7 @@
 
     <!--begin::Table body-->
 
-    <tbody class="fw-bold text-gray-600">
+    <tbody class="fw-bold   ">
 
         @foreach ($transactions as $transaction)
 
@@ -197,9 +197,8 @@
                     @else
                         @if($transaction->expense)
                             {{ __('dashboard.' . $transaction->source) }} - {{ $transaction->expense->notes }}
-                       notes }}
-                       @elseif(isset($transaction->generalPayment()))
-                            {{ __('dashboard.' . $transaction->source) }} - {{ $transaction->generalPayment‎->notes }} 
+                       @elseif($transaction->source  == "add_funds_page")
+                        {{ __('dashboard.' . $transaction->source) }} - {{ $transaction->description }}
                        @else
                             {{ __('dashboard.' . $transaction->source) }}
                         @endif
@@ -311,7 +310,7 @@
         vertical-align: middle;
     }
     #kt_ecommerce_category_table tbody tr:hover {
-        background-color: #f8fafc;
+        /* background-color: #f8fafc; */
     }
     /* Improve checkbox alignment */
     #kt_ecommerce_category_table .form-check-input {

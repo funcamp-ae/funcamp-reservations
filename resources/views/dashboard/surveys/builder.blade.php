@@ -24,7 +24,7 @@
             right: 0;
             width: 280px;
             height: 100vh;
-            background: white;
+            background: var(--bs-card-bg);
             box-shadow: -2px 0 10px rgba(0,0,0,0.1);
             transform: translateX(100%);
             transition: transform 0.3s ease;
@@ -56,7 +56,6 @@
 
         /* Desktop sidebar */
         .desktop-sidebar {
-            background: white;
             height: 100vh;
             overflow-y: auto;
             border-left: 1px solid #e5e7eb;
@@ -105,8 +104,6 @@
             border-radius: 0.5rem;
             padding: 0.75rem;
             text-align: center;
-            border: 2px solid #e5e7eb;
-            background: white;
         }
 
         .sidebar-field:hover {
@@ -127,12 +124,10 @@
 
         .form-field:hover {
             border-color: #9ca3af;
-            background-color: #f9fafb;
         }
 
         .form-field.selected {
             border-color: #2563eb;
-            background-color: #eff6ff;
         }
 
         .field-actions {
@@ -166,7 +161,6 @@
         }
 
         .properties-panel {
-            background-color: white;
             border-radius: 0.5rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             overflow-y: auto;
@@ -286,10 +280,7 @@
 
         /* Mobile header adjustments */
         .mobile-header {
-            position: sticky;
-            top: 0;
             z-index: 100;
-            background: white;
             border-bottom: 1px solid #e5e7eb;
         }
 
@@ -457,7 +448,7 @@
     <!-- Mobile Header -->
     <div class="mobile-header d-md-none">
         <div class="container-fluid p-2">
-            <div class="bg-white rounded shadow-sm p-3 d-flex justify-content-between align-items-center">
+            <div class="rounded shadow-sm p-3 d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center flex-grow-1">
                     <span class="unsaved-indicator me-2" title="{{ __('dashboard.unsaved_changes') }}"></span>
                     <input type="text" class="form-control border-0 fw-bold" id="surveyTitleMobile" value="{{ __('dashboard.new_survey') }}" placeholder="{{ __('dashboard.survey_title') }}">
@@ -478,55 +469,55 @@
         <div class="col-xl-1 col-lg-2 desktop-sidebar">
             <div class="field-types-column">
                 <div class="sidebar-field" data-type="text" title="{{ __('dashboard.text_field') }}">
-                    <i class="mdi mdi-format-size mdi-24px text-primary"></i>
+                    <i class="mdi mdi-format-size mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.text_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="textarea" title="{{ __('dashboard.textarea_field') }}">
-                    <i class="mdi mdi-format-align-left mdi-24px text-primary"></i>
+                    <i class="mdi mdi-format-align-left mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.textarea_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="select" title="{{ __('dashboard.dropdown_field') }}">
-                    <i class="mdi mdi-chevron-down mdi-24px text-primary"></i>
+                    <i class="mdi mdi-chevron-down mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.dropdown_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="radio" title="{{ __('dashboard.radio_field') }}">
-                    <i class="mdi mdi-circle-outline mdi-24px text-primary"></i>
+                    <i class="mdi mdi-circle-outline mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.radio_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="checkbox" title="{{ __('dashboard.checkbox_field') }}">
-                    <i class="mdi mdi-checkbox-outline mdi-24px text-primary"></i>
+                    <i class="mdi mdi-checkbox-outline mdi-24px "></i>
                     <div class="field-type-label">{{ __('dashboard.checkbox_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="date" title="{{ __('dashboard.date_field') }}">
-                    <i class="mdi mdi-calendar mdi-24px text-primary"></i>
+                    <i class="mdi mdi-calendar mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.date_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="datetime" title="{{ __('dashboard.time_field') }}">
-                    <i class="mdi mdi-clock mdi-24px text-primary"></i>
+                    <i class="mdi mdi-clock mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.time_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="number" title="{{ __('dashboard.number_field') }}">
-                    <i class="mdi mdi-pound mdi-24px text-primary"></i>
+                    <i class="mdi mdi-pound mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.number_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="email" title="{{ __('dashboard.email_field') }}">
-                    <i class="mdi mdi-email mdi-24px text-primary"></i>
+                    <i class="mdi mdi-email mdi-24px "></i>
                     <div class="field-type-label">{{ __('dashboard.email_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="tel" title="{{ __('dashboard.phone_field') }}">
-                    <i class="mdi mdi-phone mdi-24px text-primary"></i>
+                    <i class="mdi mdi-phone mdi-24px "></i>
                     <div class="field-type-label">{{ __('dashboard.phone_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="url" title="{{ __('dashboard.url_field') }}">
-                    <i class="mdi mdi-link mdi-24px text-primary"></i>
+                    <i class="mdi mdi-link mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.url_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="stars" title="{{ __('dashboard.stars_field') }}">
-                    <i class="mdi mdi-star mdi-24px text-primary"></i>
+                    <i class="mdi mdi-star mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.stars_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="rating" title="{{ __('dashboard.rating_field') }}">
-                    <i class="mdi mdi-thumb-up mdi-24px text-primary"></i>
+                    <i class="mdi mdi-thumb-up mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.rating_field') }}</div>
                 </div>
             </div>
@@ -535,61 +526,61 @@
         <div class="mobile-sidebar" id="mobileSidebar">
             <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
                 <h5 class="mb-0">{{ __('dashboard.add_question') }}</h5>
-                <button class="btn btn-sm btn-light" id="closeMobileSidebar">
+                <button class="btn btn-sm " id="closeMobileSidebar">
                     <i class="mdi mdi-close"></i>
                 </button>
             </div>
             <div class="field-types-grid">
                 <div class="sidebar-field" data-type="text" title="{{ __('dashboard.text_field') }}">
-                    <i class="mdi mdi-format-size mdi-24px text-primary"></i>
+                    <i class="mdi mdi-format-size mdi-24px "></i>
                     <div class="field-type-label">{{ __('dashboard.text_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="textarea" title="{{ __('dashboard.textarea_field') }}">
-                    <i class="mdi mdi-format-align-left mdi-24px text-primary"></i>
+                    <i class="mdi mdi-format-align-left mdi-24px   "></i>
                     <div class="field-type-label">{{ __('dashboard.textarea_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="select" title="{{ __('dashboard.dropdown_field') }}">
-                    <i class="mdi mdi-chevron-down mdi-24px text-primary"></i>
+                    <i class="mdi mdi-chevron-down mdi-24px "></i>
                     <div class="field-type-label">{{ __('dashboard.dropdown_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="radio" title="{{ __('dashboard.radio_field') }}">
-                    <i class="mdi mdi-circle-outline mdi-24px text-primary"></i>
+                    <i class="mdi mdi-circle-outline mdi-24px "></i>
                     <div class="field-type-label">{{ __('dashboard.radio_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="checkbox" title="{{ __('dashboard.checkbox_field') }}">
-                    <i class="mdi mdi-checkbox-outline mdi-24px text-primary"></i>
+                    <i class="mdi mdi-checkbox-outline mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.checkbox_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="date" title="{{ __('dashboard.date_field') }}">
-                    <i class="mdi mdi-calendar mdi-24px text-primary"></i>
+                    <i class="mdi mdi-calendar mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.date_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="datetime" title="{{ __('dashboard.time_field') }}">
-                    <i class="mdi mdi-clock mdi-24px text-primary"></i>
+                    <i class="mdi mdi-clock mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.time_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="number" title="{{ __('dashboard.number_field') }}">
-                    <i class="mdi mdi-pound mdi-24px text-primary"></i>
+                    <i class="mdi mdi-pound mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.number_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="email" title="{{ __('dashboard.email_field') }}">
-                    <i class="mdi mdi-email mdi-24px text-primary"></i>
+                    <i class="mdi mdi-email mdi-24px"></i>
                     <div class="field-type-label">{{ __('dashboard.email_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="tel" title="{{ __('dashboard.phone_field') }}">
-                    <i class="mdi mdi-phone mdi-24px text-primary"></i>
+                    <i class="mdi mdi-phone mdi-24px   "></i>
                     <div class="field-type-label">{{ __('dashboard.phone_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="url" title="{{ __('dashboard.url_field') }}">
-                    <i class="mdi mdi-link mdi-24px text-primary"></i>
+                    <i class="mdi mdi-link mdi-24px   "></i>
                     <div class="field-type-label">{{ __('dashboard.url_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="stars" title="{{ __('dashboard.stars_field') }}">
-                    <i class="mdi mdi-star mdi-24px text-primary"></i>
+                    <i class="mdi mdi-star mdi-24px   "></i>
                     <div class="field-type-label">{{ __('dashboard.stars_field') }}</div>
                 </div>
                 <div class="sidebar-field" data-type="rating" title="{{ __('dashboard.rating_field') }}">
-                    <i class="mdi mdi-thumb-up mdi-24px text-primary"></i>
+                    <i class="mdi mdi-thumb-up mdi-24px   "></i>
                     <div class="field-type-label">{{ __('dashboard.rating_field') }}</div>
                 </div>
             </div>
@@ -598,7 +589,7 @@
         <div class="col-xl-8 col-lg-7 col-md-12">
             <!-- Desktop Header -->
             <div class="d-none d-md-block p-3">
-                <div class="bg-white rounded shadow-sm mb-4 p-3 d-flex justify-content-between align-items-center">
+                <div class="rounded shadow-sm mb-4 p-3 d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center flex-grow-1">
                         <span class="unsaved-indicator me-2" title="{{ __('dashboard.unsaved_changes') }}"></span>
                         <input type="text" class="form-control form-control-lg border-0 fw-bold" id="surveyTitle" value="{{ __('dashboard.new_survey') }}">
@@ -619,23 +610,23 @@
             </div>
             <div class="content-area" style="height: 80vh;overflow-y: auto;">
                 <div class="p-2 p-md-3">
-                    <div class="bg-white rounded shadow-sm p-3 p-md-4" style="min-height: 50vh;">
+                    <div class="rounded shadow-sm p-3 p-md-4" style="min-height: 50vh;">
                         <div id="formFields" class="sortable-container">
                             <!-- Existing fields will be rendered here by JavaScript -->
                             @if(isset($survey) && isset($survey['fields']) && count($survey['fields']) > 0)
                                 @foreach($survey['fields'] as $question)
                                     <div dir="rtl" class="form-field {{ $question['settings']['width'] ?? 'col-12' }}" id="field_{{ $question['id'] }}" data-field-id="field_{{ $question['id'] }}">
                                         <div class="field-actions">
-                                            <button class="btn btn-sm btn-light me-1 duplicate-field" title="نسخ">
+                                            <button class="btn btn-sm me-1 duplicate-field" title="نسخ">
                                                 <i class="mdi mdi-content-copy"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-light me-1 move-up" title="تحريك للأعلى">
+                                            <button class="btn btn-sm me-1 move-up" title="تحريك للأعلى">
                                                 <i class="mdi mdi-arrow-up"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-light me-1 move-down" title="تحريك للأسفل">
+                                            <button class="btn btn-sm me-1 move-down" title="تحريك للأسفل">
                                                 <i class="mdi mdi-arrow-down"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-light delete-field" title="حذف">
+                                            <button class="btn btn-sm delete-field" title="حذف">
                                                 <i class="mdi mdi-delete text-danger"></i>
                                             </button>
                                         </div>
@@ -719,7 +710,7 @@
                         <div id="optionsEditor" class="mb-3" style="display: none;">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label class="form-label">{{ __('dashboard.options') }}</label>
-                                <button class="btn btn-sm btn-link text-primary p-0" id="addOptionBtn">
+                                <button class="btn btn-sm btn-link    p-0" id="addOptionBtn">
                                     <i class="mdi mdi-plus me-1"></i> {{ __('dashboard.add_option') }}
                                 </button>
                             </div>
@@ -750,7 +741,7 @@
     <div class="p-3 border-bottom">
         <div class="d-flex justify-content-between align-items-center">
             <h5 class="mb-0">{{ __('dashboard.question_properties') }}</h5>
-            <button class="btn btn-sm btn-light" id="closeMobileProperties">
+            <button class="btn btn-sm" id="closeMobileProperties">
                 <i class="mdi mdi-close"></i>
             </button>
         </div>
@@ -810,7 +801,7 @@
         <div id="optionsEditorMobile" class="mb-3" style="display: none;">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <label class="form-label">{{ __('dashboard.options') }}</label>
-                <button class="btn btn-sm btn-link text-primary p-0" id="addOptionBtnMobile">
+                <button class="btn btn-sm btn-link    p-0" id="addOptionBtnMobile">
                     <i class="mdi mdi-plus me-1"></i> {{ __('dashboard.add_option') }}
                 </button>
             </div>
@@ -1026,16 +1017,16 @@
             let fieldHtml = `
                 <div dir="rtl" class="form-field ${fieldData.width}" id="${fieldData.id}" data-field-id="${fieldData.id}">
                     <div class="field-actions">
-                        <button class="btn btn-sm btn-light me-1 duplicate-field" title="${translations.duplicate}">
+                        <button class="btn btn-sm me-1 duplicate-field" title="${translations.duplicate}">
                             <i class="mdi mdi-content-copy"></i>
                         </button>
-                        <button class="btn btn-sm btn-light me-1 move-up" title="${translations.move_up}">
+                        <button class="btn btn-sm me-1 move-up" title="${translations.move_up}">
                             <i class="mdi mdi-arrow-up"></i>
                         </button>
-                        <button class="btn btn-sm btn-light me-1 move-down" title="${translations.move_down}">
+                        <button class="btn btn-sm me-1 move-down" title="${translations.move_down}">
                             <i class="mdi mdi-arrow-down"></i>
                         </button>
-                        <button class="btn btn-sm btn-light delete-field" title="${translations.delete}">
+                        <button class="btn btn-sm delete-field" title="${translations.delete}">
                             <i class="mdi mdi-delete text-danger"></i>
                         </button>
                     </div>

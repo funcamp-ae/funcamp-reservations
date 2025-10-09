@@ -118,7 +118,7 @@
                                 <!--begin::Table head-->
                                 <thead>
                                     <!--begin::Table row-->
-                                    <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                                    <tr class="text-start    fw-bolder fs-7 text-uppercase gs-0">
                                         <th class="w-10px pe-2 sorting_disabled" rowspan="1" colspan="1"
                                             aria-label="" style="width: 29.25px;">
                                             <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
@@ -158,7 +158,7 @@
                                 </thead>
                                 <!--end::Table head-->
                                 <!--begin::Table body-->
-                                <tbody class="fw-bold text-gray-600">
+                                <tbody class="fw-bold   ">
 
                                     @foreach ($orders as $order)
                                         <tr class="{{ $loop->iteration % 2 == 0 ? 'even' : 'odd' }}">
@@ -172,7 +172,7 @@
                                             <!--begin::Order ID=-->
                                             <td data-kt-ecommerce-order-filter="order_id">
                                                 <a href="{{ route('orders.show', $order->id) }}"
-                                                    class="text-gray-800 text-hover-primary fw-bolder">{{ $order->order_num }}</a>
+                                                    class="   text-hover-primary fw-bolder">{{ $order->order_num }}</a>
                                             </td>
                                             <!--end::Order ID=-->
                                             <!--begin::Customer=-->
@@ -189,7 +189,7 @@
                                                     <div class="ms-5">
                                                         <!--begin::Title-->
                                                         <a href="../../demo1/dist/apps/user-management/users/view.html"
-                                                            class="text-gray-800 text-hover-primary fs-5 fw-bolder">{{ $order->user->name }}</a>
+                                                            class="   text-hover-primary fs-5 fw-bolder">{{ $order->user->name }}</a>
                                                         <!--end::Title-->
                                                     </div>
                                                 </div>

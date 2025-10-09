@@ -43,7 +43,7 @@
                         <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_task_type_table">
                         <!--begin::Table head-->
                         <thead>
-                        <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+                        <tr class="text-center    fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                             <th class="min-w-100px fw-bolder">@lang('dashboard.task_type_name')</th>
                             <th class="min-w-150px fw-bolder">@lang('dashboard.task_type_description')</th>
                             <th class="min-w-100px fw-bolder">@lang('dashboard.task_type_status')</th>
@@ -55,11 +55,11 @@
                         </thead>
                         <!--end::Table head-->
                         <!--begin::Table body-->
-                        <tbody class="fw-bold text-gray-600">
+                        <tbody class="fw-bold   ">
                         @foreach ($taskTypes as $taskType)
                             <tr>
                                 <td>
-                                    <a href="{{ route('task-types.show', $taskType->id) }}" class="text-gray-800 text-hover-primary mb-1">{{ $taskType->name }}</a>
+                                    <a href="{{ route('task-types.show', $taskType->id) }}" class="   text-hover-primary mb-1">{{ $taskType->name }}</a>
                                 </td>
                                 <td>{{ Str::limit($taskType->description, 50) }}</td>
                                 <td>

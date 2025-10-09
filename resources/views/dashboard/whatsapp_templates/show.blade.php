@@ -21,11 +21,11 @@
         <div class="card-body">
             <div class="row mb-7">
                 <div class="col-md-6">
-                    <div class="fw-semibold text-gray-800 fs-6 mb-2">@lang('dashboard.template_name'):</div>
+                    <div class="fw-semibold    fs-6 mb-2">@lang('dashboard.template_name'):</div>
                     <div class="text-muted fs-6">{{ $template->name }}</div>
                 </div>
                 <div class="col-md-6">
-                    <div class="fw-semibold text-gray-800 fs-6 mb-2">@lang('dashboard.template_type'):</div>
+                    <div class="fw-semibold    fs-6 mb-2">@lang('dashboard.template_type'):</div>
                     <span class="badge badge-light-info">
                         {{ \App\Models\WhatsappMessageTemplate::getTypes()[$template->type] ?? $template->type }}
                     </span>
@@ -34,14 +34,14 @@
 
             @if($template->description)
                 <div class="mb-7">
-                    <div class="fw-semibold text-gray-800 fs-6 mb-2">@lang('dashboard.description'):</div>
+                    <div class="fw-semibold   >@lang('dashboard.description'):</div>
                     <div class="text-muted fs-6">{{ $template->description }}</div>
                 </div>
             @endif
 
             <div class="row mb-7">
                 <div class="col-md-6">
-                    <div class="fw-semibold text-gray-800 fs-6 mb-2">@lang('dashboard.status'):</div>
+                    <div class="fw-semibold    fs-6 mb-2">@lang('dashboard.status'):</div>
                     @if($template->is_active)
                         <span class="badge badge-light-success">@lang('dashboard.active')</span>
                     @else
@@ -49,7 +49,7 @@
                     @endif
                 </div>
                 <div class="col-md-6">
-                    <div class="fw-semibold text-gray-800 fs-6 mb-2">@lang('dashboard.created_at'):</div>
+                    <div class="fw-semibold    fs-6 mb-2">@lang('dashboard.created_at'):</div>
                     <div class="text-muted fs-6">{{ $template->created_at->format('Y-m-d H:i') }}</div>
                 </div>
             </div>

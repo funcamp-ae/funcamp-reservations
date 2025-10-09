@@ -25,13 +25,13 @@
                 <div class="col-md-6">
                     <div class="mb-4">
                         <label class="form-label fw-bold">@lang('dashboard.title')</label>
-                        <p class="text-gray-800">{{ $manualWhatsappSend->title }}</p>
+                        <p class="  ">{{ $manualWhatsappSend->title }}</p>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-4">
                         <label class="form-label fw-bold">@lang('dashboard.template')</label>
-                        <p class="text-gray-800">{{ $manualWhatsappSend->template ? $manualWhatsappSend->template->name : ''}}</p>
+                        <p class="  ">{{ $manualWhatsappSend->template ? $manualWhatsappSend->template->name : ''}}</p>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -47,19 +47,19 @@
                 <div class="col-md-6">
                     <div class="mb-4">
                         <label class="form-label fw-bold">@lang('dashboard.created_by')</label>
-                        <p class="text-gray-800">{{ $manualWhatsappSend->creator ? $manualWhatsappSend->creator->name : ''}}</p>
+                        <p class="  ">{{ $manualWhatsappSend->creator ? $manualWhatsappSend->creator->name : ''}}</p>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-4">
                         <label class="form-label fw-bold">@lang('dashboard.created_at')</label>
-                        <p class="text-gray-800">{{ $manualWhatsappSend->created_at ? $manualWhatsappSend->created_at->format('Y-m-d H:i:s') : '' }}</p>
+                        <p class="  ">{{ $manualWhatsappSend->created_at ? $manualWhatsappSend->created_at->format('Y-m-d H:i:s') : '' }}</p>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-4">
                         <label class="form-label fw-bold">@lang('dashboard.updated_at')</label>
-                        <p class="text-gray-800">{{ $manualWhatsappSend->updated_at ? $manualWhatsappSend->updated_at->format('Y-m-d H:i:s') : '' }}</p>
+                        <p class="  ">{{ $manualWhatsappSend->updated_at ? $manualWhatsappSend->updated_at->format('Y-m-d H:i:s') : '' }}</p>
                     </div>
                 </div>
             </div>

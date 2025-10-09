@@ -156,7 +156,7 @@
                                     <div class="pt-1">
                                         <!--begin::Item-->
                                         <div class="d-flex align-items-center mb-7">
-                                            <span class="fw-bold fs-5 text-gray-700 flex-grow-1">Up to 10 Active Users</span>
+                                            <span class="fw-bold fs-5    flex-grow-1">Up to 10 Active Users</span>
                                             <!--begin::Svg Icon | path: icons/duotune/general/gen043.svg-->
                                             <span class="svg-icon svg-icon-1 svg-icon-success">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -282,7 +282,7 @@
                                 <!--end::Name-->
                                 <!--begin::Info-->
                                 <div class="d-flex flex-wrap fw-bold fs-6 mb-4 pe-2">
-                                    <a href="#" class="d-flex align-items-center text-gray-400 text-hover-primary me-5 mb-2">
+                                    <a href="#" class="d-flex align-items-center    text-hover-primary me-5 mb-2">
                                     <!--begin::Svg Icon | path: icons/duotune/communication/com006.svg-->
                                     
                                     <!--begin::Svg Icon | path: icons/duotune/communication/com011.svg-->
@@ -328,7 +328,7 @@
                                         </div>
                                         <!--end::Number-->
                                         <!--begin::Label-->
-                                        <div class="fw-bold fs-6 text-gray-400">Earnings</div>
+                                        <div class="fw-bold fs-6   ">Earnings</div>
                                         <!--end::Label-->
                                     </div>
                                     <!--end::Stat-->
@@ -348,7 +348,7 @@
                                         </div>
                                         <!--end::Number-->
                                         <!--begin::Label-->
-                                        <div class="fw-bold fs-6 text-gray-400">@lang('dashboard.orders')</div>
+                                        <div class="fw-bold fs-6   ">@lang('dashboard.orders')</div>
                                         <!--end::Label-->
                                     </div>
                                     <!--end::Stat-->
@@ -788,7 +788,7 @@
                                 <!--begin::Content-->
                                 <div class="fw-bold">
                                     <h4 class="text-gray-900 fw-bolder">You Are Deactivating Your Account</h4>
-                                    <div class="fs-6 text-gray-700">For extra security, this requires you to confirm your email or phone number when you reset yousignr password.
+                                    <div class="fs-6   ">For extra security, this requires you to confirm your email or phone number when you reset yousignr password.
                                     <br>
                                     <a class="fw-bolder" href="#">Learn more</a></div>
                                 </div>

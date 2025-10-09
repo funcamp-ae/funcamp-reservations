@@ -68,7 +68,7 @@
                 @endif
 
                 <!-- Main Container with Light Grey Border -->
-                <div class="border border-light-secondary rounded p-4 bg-light">
+                <div class="border border-light-secondary rounded p-4">
 
                     <!-- First Row: Amount Input -->
                     <div class="row mb-4">

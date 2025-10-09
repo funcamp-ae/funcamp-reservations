@@ -69,7 +69,7 @@
                     <!--begin::Table head-->
                     <thead>
                         <!--begin::Table row-->
-                        <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                        <tr class="text-start    fw-bolder fs-7 text-uppercase gs-0">
                             <th class="">@lang('dashboard.serial_number')</th>
                             <th class="">@lang('dashboard.order_number')</th>
                             <th class="">@lang('dashboard.customer_name')</th>
@@ -82,7 +82,7 @@
                     <!--end::Table head-->
 
                     <!--begin::Table body-->
-                    <tbody class="fw-bold text-gray-600">
+                    <tbody class="fw-bold   ">
                         @foreach ($responses as $response)
                             <!--begin::Table row-->
                             <tr data-id="{{$response->id}}">
@@ -93,7 +93,7 @@
                                 <td>
                                     <div class="d-flex">
                                         <div class="ms-5">
-                                            <a href="{{ $response->order && $response->order->customer ? url('customers/' . $response->order->customer->id . '/edit') : '#' }}" class="text-gray-800 text-hover-primary fs-5 fw-bolder mb-1">
+                                            <a href="{{ $response->order && $response->order->customer ? url('customers/' . $response->order->customer->id . '/edit') : '#' }}" class="   text-hover-primary fs-5 fw-bolder mb-1">
                                                 {{ $response->order? ($response->order->customer ? $response->order->customer->name : __('dashboard.not_available')) : __('dashboard.not_available') }}
                                             </a>
                                         </div>

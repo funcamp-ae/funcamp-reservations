@@ -14,7 +14,6 @@
                 </ul>
             </div>
         @endif
-        @include('dashboard.stocks.nav')
 
         <!--begin::Basic info-->
         <div class="card mb-5 mb-xl-10">

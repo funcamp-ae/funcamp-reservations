@@ -213,10 +213,7 @@
 @push('css')
     <style>
         .media-upload-container {
-            border: 1px dashed #ddd;
-            border-radius: 4px;
             padding: 15px;
-            background-color: #f9f9f9;
         }
 
         input[type=number]::-webkit-outer-spin-button,

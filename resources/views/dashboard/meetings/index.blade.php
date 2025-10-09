@@ -23,7 +23,7 @@
         <div class="card-body pt-0">
             <div class="table-responsive">
                 <table class="table align-middle  table-row-dashed fs-6 gy-5">
-                    <thead class="text-gray-400 fw-bolder">
+                    <thead class="   fw-bolder">
                     <tr>
                         <th>@lang('dashboard.meeting_number')</th>
                         <th>@lang('dashboard.date')</th>
@@ -43,7 +43,7 @@
                             <td>{{ $meeting->meeting_number }}</td>
                             <td>{{ $meeting->date->format('Y-m-d') }}</td>
                             <td>{{ $meeting->start_time }} - {{ $meeting->end_time }}</td>
-                            <td>{{ $meeting->location->name }}</td>
+                            <td>{{ $meeting->location?->name }}</td>
                             <td>{{ $meeting->attendees->count() }}</td>
                             <td>{{ $meeting->topics->count() }}</td>
                             <td>{{ $meeting->creator->name }}</td>

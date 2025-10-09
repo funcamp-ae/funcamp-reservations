@@ -43,7 +43,7 @@
                             <form action="{{ route('notice-types.destroy', $type->id) }}" method="POST" style="display: inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('@lang('dashboard.confirm_delete')')">>
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('@lang('dashboard.confirm_delete')')">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>

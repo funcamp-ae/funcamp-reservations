@@ -32,7 +32,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="table-responsive">
-                <table id="kt_ecommerce_category_table" class="table table-striped">
+                <table id="kt_ecommerce_category_table" class="table">
                     <thead>
                         <tr>
                             <th>{{ __('dashboard.note_name') }}</th>

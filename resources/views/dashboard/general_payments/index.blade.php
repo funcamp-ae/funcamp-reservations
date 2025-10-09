@@ -89,7 +89,7 @@
                 <!--begin::Table-->
                 <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_category_table">
                     <thead>
-                        <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+                        <tr class="text-center    fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                             <th class="text-nowrap fw-bolder">{{ __('dashboard.orders') }}</th>
                             <th class="text-nowrap fw-bolder">{{ __('dashboard.Insurance') }}</th>
                             <th class="text-nowrap fw-bolder">{{ __('dashboard.addons') }}</th>
@@ -100,7 +100,7 @@
                         </tr>
                     </thead>
 
-                    <tbody class="fw-semibold text-gray-700">
+                    <tbody class="fw-semibold   ">
                     @forelse ($orderSummaries as $summary)
 
                         <tr data-order-id="{{ $summary->order->id }}">

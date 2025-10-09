@@ -23,7 +23,7 @@
                 <div class="mb-10">
                     <div class="row g-5">
                         <div class="col-md-12">
-                            <label class="form-label required">@lang('dashboard.employees')</label>
+                            <label class="form-label required">@lang('dashboard.employee')</label>
                             <select name="employee_ids[]" class="form-select form-select-solid select2-multiple" multiple="multiple" required>
                                 @foreach($employees as $employee)
                                     <option value="{{ $employee->id }}" {{ is_array(old('employee_ids')) && in_array($employee->id, old('employee_ids')) ? 'selected' : '' }}>
@@ -122,12 +122,13 @@
 
                 <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary">
+                    @lang('dashboard.save')
                     </button>
                 </div>
             </form>
         </div>
     </div>
-@endpush('scripts')
+@push('scripts')
     <script>
         $(document).ready(function() {
             // Initialize Select2
@@ -200,10 +201,7 @@
 @push('css')
     <style>
         .media-upload-container {
-            border: 1px dashed #ddd;
-            border-radius: 4px;
             padding: 15px;
-            background-color: #f9f9f9;
         }
 
         input[type=number]::-webkit-outer-spin-button,

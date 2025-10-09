@@ -10,11 +10,11 @@
     <div id="kt_content_container" class="container-xxl">
         <!--begin::Category-->
         <div class="card card-flush">
-           
-            
-          
-               
-           
+
+
+
+
+
                     <!--begin::Category-->
          <div class="card card-flush mt-10">
             <!--begin::Card header-->
@@ -45,22 +45,22 @@
                         <i class="fa fa-plus"></i>
                     </a>
                     <!--end::Add customer-->
-                    @endcan 
-                    
+                    @endcan
+
                 </div>
                 <!--end::Card toolbar-->
             </div>
-           
+
             <!--end::Card header-->
             <!--begin::Card body-->
             <div class="card-body pt-0">
-          
+
                 <!--begin::Table-->
                 <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_category_table">
                     <!--begin::Table head-->
                     <thead>
                         <!--begin::Table row-->
-                        <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+                        <tr class="text-center    fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                             <th class="w-10px pe-2 text-center">
                                 <div class="form-check form-check-sm form-check-custom form-check-solid me-3" >
                                     <input class="form-check-input" id="checkedAll"  type="checkbox" data-kt-check="true" data-kt-check-target="#kt_ecommerce_category_table .form-check-input" value="1" />
@@ -77,7 +77,7 @@
                     </thead>
                     <!--end::Table head-->
                     <!--begin::Table body-->
-                    <tbody class="fw-bold text-gray-600">
+                    <tbody class="fw-bold
                         @foreach ($expenseItems as $item)
                             <!--begin::Table row-->
                             <tr data-id="{{$item->id}}">
@@ -98,7 +98,7 @@
                                 <td>{{$item->description}} </td>
                                 <td>{{ $item->created_at->format('Y-m-d') }}</td>
                                 <td>{{ $item->created_at->format('h:i A') }}</td>
-                           
+
                                 <!--begin::Action=-->
                                 <td class="text-end">
                                     <a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">@lang('dashboard.actions')
@@ -116,19 +116,19 @@
                                         <div class="menu-item px-3">
                                             <a href="{{route('expense-items.show', $item->id)}}" class="menu-link px-3">@lang('dashboard.show')</a>
                                         </div>
-                                        @endcan 
+                                        @endcan
                                         @can('expense-items.edit')
                                         <div class="menu-item px-3">
                                             <a href="{{route('expense-items.edit', $item->id)}}" class="menu-link px-3">@lang('dashboard.edit')</a>
                                         </div>
-                                        @endcan 
+                                        @endcan
                                         <!--end::Menu item-->
                                         <!--begin::Menu item-->
                                         @can('expense-items.destroy')
                                         <div class="menu-item px-3">
                                             <a href="#" class="menu-link px-3" data-kt-ecommerce-category-filter="delete_row" data-url="{{route('expense-items.destroy', $item->id)}}" data-id="{{$item->id}}">@lang('dashboard.delete')</a>
                                         </div>
-                                        @endcan 
+                                        @endcan
                                         <!--end::Menu item-->
                                     </div>
                                     <!--end::Menu-->
@@ -153,17 +153,16 @@
     <!--end::Container-->
 </div>
 <!--end::Post-->
-					
+
 @endsection
 @push('css')
 <style>
     .total-price-h {
         padding: 20px;
-    background: #fffcfc;
     width: 30%;
     text-align: center;
     border-radius: 5%;
     border: 1px solid #000;
     }
 </style>
-@endpush 
+@endpush

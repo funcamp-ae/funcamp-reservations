@@ -35,7 +35,7 @@
                                 <div class="card-text  rounded p-3">{{ $currentMonthExpenses }}</div>
                             </div>
                         </div>
-                        <hr style="height:20px;background:#dbe4e9">
+                        <hr style="height:20px;">
 
 
                         @include('dashboard.expenses.table')
@@ -76,4 +76,4 @@
             text-align: right;
         }
     </style>
-@endpush    
+@endpush

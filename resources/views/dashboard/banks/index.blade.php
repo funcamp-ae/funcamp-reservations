@@ -56,7 +56,7 @@
                     <!--begin::Table head-->
                     <thead>
                         <!--begin::Table row-->
-                        <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+                        <tr class="text-center  fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                             <th class="w-10px pe-2 text-center">
                                 <div class="form-check form-check-sm form-check-custom form-check-solid me-3" >
                                     <input class="form-check-input" id="checkedAll"  type="checkbox" data-kt-check="true" data-kt-check-target="#kt_ecommerce_category_table .form-check-input" value="1" />
@@ -71,7 +71,7 @@
                     </thead>
                     <!--end::Table head-->
                     <!--begin::Table body-->
-                    <tbody class="fw-bold text-gray-600">
+                    <tbody class="fw-bold ">
                         @foreach ($banks as $bank)
                             <!--begin::Table row-->
                             <tr data-id="{{$bank->id}}">
@@ -87,7 +87,7 @@
                                     <div class="d-flex">
                                         <div class="ms-5">
                                             <!--begin::Title-->
-                                            <a href="{{ route('bank-accounts.show', $bank->id) }}" class="text-gray-800 text-hover-primary fs-5 fw-bolder mb-1" data-kt-ecommerce-category-filter="category_name">
+                                            <a href="{{ route('bank-accounts.show', $bank->id) }}" class="text-hover-primary fs-5 fw-bolder mb-1" data-kt-ecommerce-category-filter="category_name">
                                                 @if($bank->account_number) {{$bank->account_number   }} <br> @endif 
                                                 <small>{{$bank->name }}</small>
                                             </a>
@@ -99,7 +99,7 @@
                                 <td>{{$bank->notes}}</td>
                                 <!--begin::Action=-->
                                 <td class="text-end">
-                                    <a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                    <a href="#" class="btn btn-sm" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                     @lang('dashboard.actions')
                                     <!--begin::Svg Icon | path: icons/duotune/arrows/arr072.svg-->
                                     <span class="svg-icon svg-icon-5 m-0">

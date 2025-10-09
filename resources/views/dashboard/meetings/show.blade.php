@@ -60,7 +60,7 @@
 
             <!-- Attendees Section -->
             <div class="mb-7">
-                <h4 class="text-gray-800 mb-4">
+                <h4 class="   mb-4">
                     <i class="fas fa-users text-primary me-2"></i>
                     @lang('dashboard.attendees')
                 </h4>
@@ -82,7 +82,7 @@
 
             <!-- Topics Section -->
             <div class="mb-4">
-                <h4 class="text-gray-800 mb-4">
+                <h4 class="   mb-4">
                     <i class="fas fa-list-ul text-primary me-2"></i>
                     @lang('dashboard.topics')
                 </h4>
@@ -91,7 +91,7 @@
                     <div class="card card-bordered mb-5">
                         <div class="card-header bg-light">
                             <div class="card-title">
-                                <h5 class="fw-bold text-gray-800">{{ $topic->topic }}</h5>
+                                <h5 class="fw-bold   ">{{ $topic->topic }}</h5>
                             </div>
                             @if($topic->assigned_to)
                                 <div class="card-toolbar">

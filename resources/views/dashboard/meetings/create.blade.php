@@ -25,7 +25,7 @@
 
                 <!-- Basic Information Section -->
                 <div class="mb-10">
-                    <h4 class="text-gray-800 mb-5">
+                    <h4 class="   mb-5">
                         <i class="fas fa-info-circle text-primary me-2"></i>
                         @lang('dashboard.basic_information')
                     </h4>
@@ -70,7 +70,7 @@
 
                 <!-- Attendees Section -->
                 <div class="mb-10">
-                    <h4 class="text-gray-800 mb-5 required">
+                    <h4 class="   mb-5 required">
                         <i class="fas fa-users text-primary me-2"></i>
                         @lang('dashboard.attendees')
                     </h4>
@@ -96,7 +96,7 @@
 
                 <!-- Topics Section -->
                 <div class="mb-10">
-                    <h4 class="text-gray-800 mb-5">
+                    <h4 class="   mb-5">
                         <i class="fas fa-list-ul text-primary me-2"></i>
                         @lang('dashboard.topics')
                     </h4>

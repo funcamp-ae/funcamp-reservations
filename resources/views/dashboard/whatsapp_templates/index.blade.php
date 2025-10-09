@@ -48,7 +48,7 @@
 
             <table class="table align-middle table-row-dashed fs-6 gy-5">
                 <thead>
-                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                    <tr class="text-start fw-bold fs-7 text-uppercase gs-0">
                         <th class="min-w-125px">@lang('dashboard.name')</th>
                         <th class="min-w-125px">@lang('dashboard.type')</th>
                         <th class="min-w-125px">@lang('dashboard.template_status')</th>
@@ -56,12 +56,12 @@
                         <th class="text-end min-w-70px">@lang('dashboard.actions')</th>
                     </tr>
                 </thead>
-                <tbody class="fw-semibold text-gray-600">
+                <tbody class="fw-semibold">
                     @forelse($templates as $template)
                     <tr>
                         <td>
                             <div class="d-flex flex-column">
-                                <span class="text-gray-800 fw-bold">{{ $template->name }}</span>
+                                <span class=" fw-bold">{{ $template->name }}</span>
                                 @if($template->description)
                                 <span class="text-muted fs-7">{{ Str::limit($template->description, 50) }}</span>
                                 @endif

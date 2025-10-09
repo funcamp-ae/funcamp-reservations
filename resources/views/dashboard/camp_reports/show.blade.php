@@ -95,7 +95,7 @@
                                             <div class="audio-list">
                                                 @foreach($audioUrls as $url)
                                                     <div class="mb-2">
-                                                        <audio controls style="width:100%; border-radius:6px; background:#f9f9f9;">
+                                                        <audio controls style="width:100%; border-radius:6px;">
                                                             <source src="{{ $url }}" type="audio/mpeg">
                                                         </audio>
                                                     </div>
@@ -138,7 +138,6 @@
             border: 1px dashed #ddd;
             border-radius: 4px;
             padding: 8px;
-            background: #f9f9f9;
             overflow: hidden;
         }
         .media-slider .slider-viewport {
@@ -180,7 +179,6 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #cfcfcf;
             cursor: pointer;
         }
         .media-slider .slider-dot.active {

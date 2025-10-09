@@ -33,7 +33,7 @@
 
 
 
-    <hr style="background:#fff">
+    <hr>
 
 
 

@@ -255,7 +255,6 @@
             border: 1px dashed #ddd;
             border-radius: 4px;
             padding: 10px;
-            background: #f9f9f9
         }
 
         .preview-audio-list audio {
@@ -271,7 +270,6 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             overflow: hidden;
-            background: #fff;
             box-shadow: 0 2px 6px rgba(0, 0, 0, .06)
         }
 
@@ -337,7 +335,6 @@
             justify-content: center;
             gap: 6px;
             padding: 8px;
-            background: #fff
         }
 
         .photo-slider .slider-dot,
@@ -345,7 +342,6 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #cfcfcf
         }
 
         .photo-slider .slider-dot.active,

@@ -198,7 +198,6 @@
 
     /* Ensure submit button section stays visible above editors */
     .card-body .form-group:last-child {
-        margin-top: 0.75rem;
         position: relative;
         z-index: 5;
     }

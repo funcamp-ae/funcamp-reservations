@@ -154,7 +154,7 @@
                     <!--begin::Table head-->
                     <thead>
                         <!--begin::Table row-->
-                        <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                        <tr class="text-start    fw-bolder fs-7 text-uppercase gs-0">
                             <th class="w-10px pe-2">
                                 <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
                                     <input class="form-check-input" id="checkedAll" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_ecommerce_category_table .form-check-input" value="1" />
@@ -175,7 +175,7 @@
                     </thead>
                     <!--end::Table head-->
                     <!--begin::Table body-->
-                    <tbody class="fw-bold text-gray-600">
+                    <tbody class="fw-bold   ">
                         @if(isset($recentPayments))
                             @foreach ($recentPayments as $payment)
                                 <!--begin::Table row-->
@@ -190,7 +190,7 @@
                                     <td>
                                         <div class="d-flex">
                                             <div class="ms-5">
-                                                <a href="#" data-kt-ecommerce-category-filter="search" class="text-gray-800 text-hover-primary fs-5 fw-bolder mb-1">{{ number_format($payment->price ?? $payment->amount, 2) }}</a>
+                                                <a href="#" data-kt-ecommerce-category-filter="search" class="   text-hover-primary fs-5 fw-bolder mb-1">{{ number_format($payment->price ?? $payment->amount, 2) }}</a>
                                             </div>
                                         </div>
                                     </td>
@@ -228,7 +228,7 @@
                                     </td>
                                     <!--begin::Description-->
                                     <td data-kt-ecommerce-category-filter="category_name">
-                                        {{ $payment->description ?? $payment->notes ?? '-' }} - {{ $payment->notes ?? '-' }}
+                                        {{ $payment->description ?? $payment->notes ?? '-' }}
                                     </td>
                                     <!--begin::Date-->
                                     <td>{{ \Carbon\Carbon::parse($payment->date)->format('Y-m-d') }}</td>
@@ -236,7 +236,7 @@
                                     <td>{{ \Carbon\Carbon::parse($payment->date)->format('h:i A') }}</td>
                                     <!--begin::Actions-->
                                     <td class="text-end">
-                                        <a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                        <a href="#" class="btn btn-sm btn-secondary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
                                         {{ __('dashboard.actions') }}
                                         <!--begin::Svg Icon | path: icons/duotune/arrows/arr072.svg-->
                                         <span class="svg-icon svg-icon-5 m-0">

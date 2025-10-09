@@ -80,10 +80,10 @@
                                 <!--begin::Item-->
                                 <div class="d-flex align-items-center mb-8">
                                     <!--begin::Title-->
-                                    <span class="fs-6 fw-bolder text-gray-800 flex-grow-1">@lang('dashboard.task_type_name'):</span>
+                                    <span class="fs-6 fw-bolder    flex-grow-1">@lang('dashboard.task_type_name'):</span>
                                     <!--end::Title-->
                                     <!--begin::Value-->
-                                    <span class="fs-6 text-gray-600">{{ $taskType->name }}</span>
+                                    <span class="fs-6   ">{{ $taskType->name }}</span>
                                     <!--end::Value-->
                                 </div>
                                 <!--end::Item-->
@@ -91,7 +91,7 @@
                                 <!--begin::Item-->
                                 <div class="d-flex align-items-center mb-8">
                                     <!--begin::Title-->
-                                    <span class="fs-6 fw-bolder text-gray-800 flex-grow-1">@lang('dashboard.task_type_status'):</span>
+                                    <span class="fs-6 fw-bolder    flex-grow-1">@lang('dashboard.task_type_status'):</span>
                                     <!--end::Title-->
                                     <!--begin::Value-->
                                     <span class="badge badge-light-{{ $taskType->status == 'active' ? 'success' : 'danger' }}">
@@ -104,10 +104,10 @@
                                 <!--begin::Item-->
                                 <div class="d-flex align-items-start mb-8">
                                     <!--begin::Title-->
-                                    <span class="fs-6 fw-bolder text-gray-800 flex-grow-1">@lang('dashboard.task_type_description'):</span>
+                                    <span class="fs-6 fw-bolder    flex-grow-1">@lang('dashboard.task_type_description'):</span>
                                     <!--end::Title-->
                                     <!--begin::Value-->
-                                    <span class="fs-6 text-gray-600 text-end" style="max-width: 300px;">
+                                    <span class="fs-6    text-end" style="max-width: 300px;">
                                         {{ $taskType->description ?: __('dashboard.no_description') }}
                                     </span>
                                     <!--end::Value-->
@@ -117,10 +117,10 @@
                                 <!--begin::Item-->
                                 <div class="d-flex align-items-center mb-8">
                                     <!--begin::Title-->
-                                    <span class="fs-6 fw-bolder text-gray-800 flex-grow-1">@lang('dashboard.created_at'):</span>
+                                    <span class="fs-6 fw-bolder    flex-grow-1">@lang('dashboard.created_at'):</span>
                                     <!--end::Title-->
                                     <!--begin::Value-->
-                                    <span class="fs-6 text-gray-600">{{ $taskType->created_at->format('Y-m-d H:i') }}</span>
+                                    <span class="fs-6   ">{{ $taskType->created_at->format('Y-m-d H:i') }}</span>
                                     <!--end::Value-->
                                 </div>
                                 <!--end::Item-->
@@ -128,10 +128,10 @@
                                 <!--begin::Item-->
                                 <div class="d-flex align-items-center">
                                     <!--begin::Title-->
-                                    <span class="fs-6 fw-bolder text-gray-800 flex-grow-1">@lang('dashboard.updated_at'):</span>
+                                    <span class="fs-6 fw-bolder    flex-grow-1">@lang('dashboard.updated_at'):</span>
                                     <!--end::Title-->
                                     <!--begin::Value-->
-                                    <span class="fs-6 text-gray-600">{{ $taskType->updated_at->format('Y-m-d H:i') }}</span>
+                                    <span class="fs-6   ">{{ $taskType->updated_at->format('Y-m-d H:i') }}</span>
                                     <!--end::Value-->
                                 </div>
                                 <!--end::Item-->
@@ -162,7 +162,7 @@
                                     <div class="table-responsive">
                                         <table class="table table-row-dashed gy-5">
                                             <thead>
-                                                <tr class="fw-bolder fs-6 text-gray-800">
+                                                <tr class="fw-bolder fs-6   ">
                                                     <th>@lang('dashboard.title')</th>
                                                     <th>@lang('dashboard.assigned_to')</th>
                                                     <th>@lang('dashboard.task_status')</th>
@@ -172,7 +172,7 @@
                                                 @foreach($taskType->tasks->take(10) as $task)
                                                     <tr>
                                                         <td>
-                                                            <a href="{{ route('tasks.edit', $task->id) }}" class="text-gray-800 text-hover-primary">
+                                                            <a href="{{ route('tasks.edit', $task->id) }}" class="   text-hover-primary">
                                                                 {{ Str::limit($task->title, 30) }}
                                                             </a>
                                                         </td>
@@ -201,7 +201,7 @@
                                                 <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM7.5 3.5a.5.5 0 0 1 1 0v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 7.293V3.5z"/>
                                             </svg>
                                         </div>
-                                        <h5 class="text-gray-600 mb-0">@lang('dashboard.no_tasks_found')</h5>
+                                        <h5 class="   mb-0">@lang('dashboard.no_tasks_found')</h5>
                                         <span class="text-gray-500">@lang('dashboard.no_tasks_associated_with_this_type')</span>
                                     </div>
                                     <!--end::Empty state-->

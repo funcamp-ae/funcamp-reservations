@@ -31,7 +31,7 @@
                         <div class="table-responsive">
                             <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_category_table">
                                 <thead>
-                                    <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+                                    <tr class="text-center    fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                                         <th class="min-w-120px fw-bolder">{{ __('dashboard.form_code') }}</th>
                                         <th class="min-w-180px fw-bolder">{{ __('dashboard.mobile_phone') }}</th>
                                         <th class="min-w-200px fw-bolder">{{ __('dashboard.full_name') }}</th>
@@ -42,7 +42,7 @@
                                         <th class="text-end min-w-180px fw-bolder">{{ __('dashboard.actions') }}</th>
                                     </tr>
                                 </thead>
-                                <tbody class="fw-bold text-gray-600" id="rfTableBody">
+                                <tbody class="fw-bold   
                                     @forelse ($registration_forms as $rf)
                                         @php
                                             $slotToTimes = [
@@ -92,7 +92,7 @@
                                         @endphp
 
                                         <tr data-id="{{ $rf->id }}">
-                                            <td><span class="text-gray-800 text-hover-primary fw-bold">{{ $rf->request_code }}</span></td>
+                                            <td><span class="   text-hover-primary fw-bold">{{ $rf->request_code }}</span></td>
                                             <td><i class="bi bi-telephone me-1"></i>{{ $rf->mobile_phone ?? '—' }}</td>
                                             <td>
                                                 <div class="d-flex align-items-center">
@@ -101,7 +101,7 @@
                                                                 class="bi bi-person text-primary"></i></span>
                                                     </div>
                                                     <div>
-                                                        <div class="text-gray-800 fw-bolder">{{ $rf->full_name ?: '—' }}</div>
+                                                        <div class="   fw-bolder">{{ $rf->full_name ?: '—' }}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -224,7 +224,7 @@
                         tbody.innerHTML = '';
                         Object.entries(obj).forEach(([k, v]) => {
                             const tr = document.createElement('tr');
-                            tr.innerHTML = `<th class="fw-bolder text-gray-700" style="width: 40%">${k}</th><td>${v ?? '—'}</td>`;
+                            tr.innerHTML = `<th class="fw-bolder   dth: 40%">${k}</th><td>${v ?? '—'}</td>`;
                             tbody.appendChild(tr);
                         });
                         detailsModal.show();

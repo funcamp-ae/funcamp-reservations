@@ -10,11 +10,6 @@
 
 @section('content')
 <div class="container">
-    <!-- Table Scroll Arrows -->
-    <div class="d-flex justify-content-end mb-2">
-        <button type="button" class="btn btn-light mr-2 scroll-left-btn" title="Scroll Left"><i class="fa fa-arrow-left"></i></button>
-        <button type="button" class="btn btn-light scroll-right-btn" title="Scroll Right"><i class="fa fa-arrow-right"></i></button>
-    </div>
 @push('css')
     <style>
         .select2-container--default .select2-selection--single {

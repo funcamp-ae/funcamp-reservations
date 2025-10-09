@@ -54,7 +54,7 @@
                                     <div class="pt-1">
                                         <!--begin::Item-->
                                         <div class="d-flex align-items-center mb-7">
-                                            <span class="fw-bold fs-5 text-gray-700 flex-grow-1">Up to 10 Active Users</span>
+                                            <span class="fw-bold fs-5    flex-grow-1">Up to 10 Active Users</span>
                                             <!--begin::Svg Icon | path: icons/duotune/general/gen043.svg-->
                                             <span class="svg-icon svg-icon-1 svg-icon-success">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -180,7 +180,7 @@
                                 <!--end::Name-->
                                 <!--begin::Info-->
                                 <div class="d-flex flex-wrap fw-bold fs-6 mb-4 pe-2">
-                                    <a href="#" class="d-flex align-items-center text-gray-400 text-hover-primary me-5 mb-2">
+                                    <a href="#" class="d-flex align-items-center    text-hover-primary me-5 mb-2">
                                     <!--begin::Svg Icon | path: icons/duotune/communication/com006.svg-->
                                     
                                     <!--begin::Svg Icon | path: icons/duotune/communication/com011.svg-->
@@ -226,7 +226,7 @@
                                         </div>
                                         <!--end::Number-->
                                         <!--begin::Label-->
-                                        <div class="fw-bold fs-6 text-gray-400">Earnings</div>
+                                        <div class="fw-bold fs-6   ">Earnings</div>
                                         <!--end::Label-->
                                     </div>
                                     <!--end::Stat-->
@@ -246,7 +246,7 @@
                                         </div>
                                         <!--end::Number-->
                                         <!--begin::Label-->
-                                        <div class="fw-bold fs-6 text-gray-400">@lang('dashboard.orders')</div>
+                                        <div class="fw-bold fs-6   ">@lang('dashboard.orders')</div>
                                         <!--end::Label-->
                                     </div>
                                     <!--end::Stat-->
@@ -308,7 +308,7 @@
                         <!--begin::Card body-->
                         <div class="card-body d-flex justify-content-center text-center flex-column p-8">
                             <!--begin::Name-->
-                            <a href="{{$user->identity_image}}" class="text-gray-800 text-hover-primary d-flex flex-column">
+                            <a href="{{$user->identity_image}}" class="   text-hover-primary d-flex flex-column">
                                 <!--begin::Image-->
                                 <div class="symbol symbol-75px mb-5">
                                     <img src="{{$user->identity_image}}" alt="">
@@ -332,7 +332,7 @@
                         <!--begin::Card body-->
                         <div class="card-body d-flex justify-content-center text-center flex-column p-8">
                             <!--begin::Name-->
-                            <a href="{{$user->car_image}}" class="text-gray-800 text-hover-primary d-flex flex-column">
+                            <a href="{{$user->car_image}}" class="   text-hover-primary d-flex flex-column">
                                 <!--begin::Image-->
                                 <div class="symbol symbol-75px mb-5">
                                     <img src="{{$user->car_image}}" alt="">
@@ -357,7 +357,7 @@
                         <!--begin::Card body-->
                         <div class="card-body d-flex justify-content-center text-center flex-column p-8">
                             <!--begin::Name-->
-                            <a href="{{$user->car_license}}" class="text-gray-800 text-hover-primary d-flex flex-column">
+                            <a href="{{$user->car_license}}" class="   text-hover-primary d-flex flex-column">
                                 <!--begin::Image-->
                                 <div class="symbol symbol-75px mb-5">
                                     <img src="{{$user->car_license}}" alt="">
@@ -382,7 +382,7 @@
                         <!--begin::Card body-->
                         <div class="card-body d-flex justify-content-center text-center flex-column p-8">
                             <!--begin::Name-->
-                            <a href="{{$user->front_car_image}}" class="text-gray-800 text-hover-primary d-flex flex-column">
+                            <a href="{{$user->front_car_image}}" class="   text-hover-primary d-flex flex-column">
                                 <!--begin::Image-->
                                 <div class="symbol symbol-75px mb-5">
                                     <img src="{{$user->front_car_image}}" alt="">
@@ -407,7 +407,7 @@
                         <!--begin::Card body-->
                         <div class="card-body d-flex justify-content-center text-center flex-column p-8">
                             <!--begin::Name-->
-                            <a href="{{$user->back_car_image}}" class="text-gray-800 text-hover-primary d-flex flex-column">
+                            <a href="{{$user->back_car_image}}" class="   text-hover-primary d-flex flex-column">
                                 <!--begin::Image-->
                                 <div class="symbol symbol-75px mb-5">
                                     <img src="{{$user->back_car_image}}" alt="">

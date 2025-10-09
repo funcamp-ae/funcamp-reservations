@@ -24,7 +24,7 @@
         <div class="table-responsive">
             <table class="table align-middle table-row-dashed fs-6 gy-5">
                 <thead>
-                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                    <tr class="text-start fw-bold fs-7 text-uppercase gs-0">
                         <th class="min-w-125px">@lang('dashboard.title')</th>
                         <th class="min-w-125px">@lang('dashboard.template')</th>
                         <th class="min-w-100px">@lang('dashboard.status')</th>
@@ -34,12 +34,12 @@
                         <th class="text-end min-w-70px">@lang('dashboard.actions')</th>
                     </tr>
                 </thead>
-                <tbody class="fw-semibold text-gray-600">
+                <tbody class="fw-semibold">
                     @forelse($sends as $send)
                     <tr>
                         <td>
                             <div class="d-flex flex-column">
-                                <span class="text-gray-800 fw-bold">{{ $send->title }}</span>
+                                <span class="fw-bold">{{ $send->title }}</span>
                                 @if($send->custom_message)
                                 <span class="text-muted fs-7">{{ Str::limit($send->custom_message, 50) }}</span>
                                 @endif
@@ -57,7 +57,7 @@
                         </td>
                         <td>
                             <div class="d-flex flex-column">
-                                <span class="text-gray-800 fw-bold">
+                                <span class="fw-bold">
                                     {{ $send->sent_count }}/{{ $send->total_count }}
                                 </span>
                                 @if($send->total_count > 0)
@@ -70,10 +70,10 @@
                             </div>
                         </td>
                         <td>
-                            <span class="text-gray-800">{{ $send->creator->name }}</span>
+                            <span>{{ $send->creator->name }}</span>
                         </td>
                         <td>
-                            <span class="text-gray-600">{{ $send->created_at->format('Y-m-d H:i') }}</span>
+                            <span>{{ $send->created_at->format('Y-m-d H:i') }}</span>
                         </td>
                         <td class="text-end">
                             @can('manual-whatsapp-sends.show')

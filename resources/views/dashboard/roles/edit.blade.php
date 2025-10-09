@@ -18,7 +18,6 @@
         margin-bottom: 1.5rem !important;
         transition: all 0.3s ease !important;
         box-shadow: 0 4px 15px rgba(139, 69, 19, 0.1) !important;
-        background: white !important;
         overflow: hidden !important;
         position: relative !important;
     }
@@ -52,7 +51,7 @@
         margin: 0 !important;
         max-height: 320px !important;
         overflow-y: auto !important;
-        background: linear-gradient(to bottom, #fefefe 0%, #f9f9f9 100%) !important;
+        background: var(--bs-card-bg);
     }
 
     .permissionCard ul::-webkit-scrollbar {
@@ -131,7 +130,6 @@
     }
 
     .permissions-container {
-        background: linear-gradient(135deg, #faf9f7 0%, #f5f4f2 100%) !important;
         border-radius: 15px !important;
         padding: 2.5rem !important;
         margin-top: 1.5rem !important;
@@ -139,7 +137,6 @@
     }
 
     .permissions-header {
-        background: white !important;
         border-radius: 12px !important;
         padding: 2rem !important;
         margin-bottom: 2.5rem !important;
@@ -187,7 +184,6 @@
 
     .card-header {
         border-bottom: 2px solid var(--light-brown) !important;
-        background: linear-gradient(to right, #fefefe 0%, #faf9f7 100%) !important;
     }
 
     @media (max-width: 768px) {
@@ -248,7 +244,7 @@
                 data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}"
                 class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
                 <!--begin::Title-->
-                <h1 class="d-flex text-dark fw-bolder fs-3 align-items-center my-1">@lang('dashboard.create_title', ['page_title' => __('dashboard.role')])</h1>
+                <h1 class="d-flex  fw-bolder fs-3 align-items-center my-1">@lang('dashboard.create_title', ['page_title' => __('dashboard.role')])</h1>
                 <!--end::Title-->
                 <!--begin::Separator-->
                 <span class="h-20px border-gray-300 border-start mx-4"></span>
@@ -277,7 +273,7 @@
                     </li>
                     <!--end::Item-->
                     <!--begin::Item-->
-                    <li class="breadcrumb-item text-dark">@lang('dashboard.update', ['page_title' => __('dashboard.role')])</li>
+                    <li class="breadcrumb-item ">@lang('dashboard.update', ['page_title' => __('dashboard.role')])</li>
                     <!--end::Item-->
                 </ul>
                 <!--end::Breadcrumb-->

@@ -73,6 +73,7 @@
                             <!--end::Title-->
                         </div>
                         <!--end::Heading-->
+                        <hr>
                         <!--begin::Tab content-->
                         <div class="tab-content">
                             <!--begin::Tab panel-->
@@ -118,7 +119,7 @@
                                     @empty
                                         <div class="text-center py-10">
                                             <i class="fas fa-bell-slash fs-2x mb-4"></i>
-                                            <div class="text-gray-600">@lang('dashboard.no_new_notifications')</div>
+                                            <div class="  ">@lang('dashboard.no_new_notifications')</div>
                                         </div>
                                     @endforelse
                                 @endauth

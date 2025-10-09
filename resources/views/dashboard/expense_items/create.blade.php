@@ -5,8 +5,8 @@
 
 
     <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
-       
-    
+
+
         <!--begin::Post-->
         <div class="post d-flex flex-column-fluid" id="kt_post">
             <!--begin::Container-->
@@ -17,7 +17,7 @@
                 <li class="nav-item">
                     <a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab" href="#product_details"> بيانات البند </a>
                 </li>
-              
+
             <!--end:::Tab item-->
             </ul>
                 <hr>
@@ -29,7 +29,7 @@
                         @csrf
 
                         @if(isset($expenseItem)) @method('PUT') @endif
-                      
+
                         <!--begin::Main column-->
                         <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10">
                             <!--begin::Tab content-->
@@ -39,7 +39,7 @@
                                     <div class="d-flex flex-column gap-7 gap-lg-10">
                                         <!--begin::General options-->
                                         <div class="card card-flush py-4">
-                                            
+
                                             <!--begin::Card body-->
                                             <div class="card-body pt-10 row">
                                                 <!--begin::Input group-->
@@ -49,8 +49,8 @@
                                                         class="form-control mb-2" required  />
                                                 </div>
                                                 <!--end::Input group-->
-                                              
-                                            
+
+
                                                 <!--begin::Input group-->
                                                 <div class="mb-5 fv-row col-md-12">
                                                     <label class=" form-label">ملاحظات</label>
@@ -58,8 +58,8 @@
                                                         class="form-control mb-2" placeholder="" />
                                                 </div>
                                                 <!--end::Input group-->
-                                        
-                                                
+
+
                                             </div>
                                             <!--end::Card header-->
                                         </div>
@@ -67,7 +67,7 @@
                                     </div>
                                 </div>
                                 <!--end::Tab pane-->
-                            
+
                             </div>
                             <!--end::Tab content-->
                             <div class="d-flex justify-content-end">
@@ -75,7 +75,7 @@
                                 <a href="{{ isset($expenseItem) ? route('expense-items.edit',$expenseItem->id) : route('expense-items.create') }}" id="kt_ecommerce_add_product_cancel"
                                     class="btn btn-light me-5">@lang('dashboard.cancel')</a>
                                 <!--end::Button-->
-                               
+
                                 <!--begin::Button-->
                                 <button type="submit" id="kt_ecommerce_add_product_submit" class="btn btn-primary">
                                     <span class="indicator-label">@lang('dashboard.save_changes')</span>
@@ -83,7 +83,7 @@
                                         <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
                                 </button>
                                 <!--end::Button-->
-                          
+
                             </div>
                         </div>
                         <!--end::Main column-->
@@ -93,15 +93,15 @@
 
 
                 </div>
-               
+
             </div>
             </div>
 
-            
+
             <!--end::Container-->
         </div>
 
-         
+
 
         <!--end::Post-->
     </div>
@@ -116,19 +116,19 @@
             margin-bottom:20px !important;
         }
 
-        
-        
+
+
     </style>
-@endpush 
+@endpush
 @push('js')
     <script>
         $("#select2").select2();
 
         $(document).ready(function() {
-        // when load page check the value 
+        // when load page check the value
         toggleSubProductFields();
 
-        // when change type render toggle function 
+        // when change type render toggle function
         $('#type').change(function() {
             toggleSubProductFields();
         });

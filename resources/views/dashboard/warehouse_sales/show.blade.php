@@ -49,7 +49,7 @@
             <div class="card-body pt-0">
                 <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_category_table">
                     <thead>
-                        <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                        <tr class="text-start    fw-bolder fs-7 text-uppercase gs-0">
                             <th>{{ __('dashboard.items') }}</th>
                             <th>{{ __('dashboard.item_selling_price') }}</th>
                             <th>{{ __('dashboard.quantity') }}</th>
@@ -64,7 +64,7 @@
                             <th class="text-end min-w-70px">@lang('dashboard.actions')</th>
                         </tr>
                     </thead>
-                    <tbody class="fw-bold text-gray-600">
+                    <tbody class="fw-bold   ">
                         @foreach ($items as $item)
                         <tr>
                             <td><span class="badge bg-primary">{{ $item?->stock->name }}</span></td>

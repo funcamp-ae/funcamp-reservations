@@ -110,7 +110,7 @@
                             <!--begin::Statistics-->
                             <div class="statistics-info">
                                 <!--begin::Title-->
-                                <h5 class="text-gray-800 fw-bold">@lang('dashboard.total_surveys')</h5>
+                                <h5 class= "fw-bold">@lang('dashboard.total_surveys')</h5>
                                 <!--end::Title-->
                                 <!--begin::Number-->
                                 <div class="fs-2 fw-bolder">1</div>
@@ -148,7 +148,7 @@
                             <!--begin::Statistics-->
                             <div class="statistics-info">
                                 <!--begin::Title-->
-                                <h5 class="text-gray-800 fw-bold">@lang('dashboard.total_answers')</h5>
+                                <h5 class=" fw-bold">@lang('dashboard.total_answers')</h5>
                                 <!--end::Title-->
                                 <!--begin::Number-->
                                 <div class="fs-2 fw-bolder">{{ $totalResponses }}</div>
@@ -336,10 +336,10 @@
                                     @foreach($allQuestionsData as $question)
                                     <tr>
                                         <td>
-                                            <span class="text-gray-800 fw-bold">#{{ $question['id'] }}</span>
+                                            <span class="fw-bold">#{{ $question['id'] }}</span>
                                         </td>
                                         <td>
-                                            <span class="text-gray-800 fw-bold d-block mb-1">{{ $question['title'] }}</span>
+                                            <span class="fw-bold d-block mb-1">{{ $question['title'] }}</span>
                                         </td>
                                         <td>
                                             <span class="badge badge-light-{{ $question['type'] === 'text' ? 'info' : ($question['type'] === 'textarea' ? 'primary' : ($question['type'] === 'radio' ? 'success' : ($question['type'] === 'checkbox' ? 'warning' : 'danger'))) }}">

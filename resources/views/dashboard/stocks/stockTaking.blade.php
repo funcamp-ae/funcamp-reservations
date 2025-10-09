@@ -4,11 +4,6 @@
 
 @section('content')
 <div class="container">
-    <!-- Table Scroll Arrows -->
-    <div class="d-flex justify-content-end mb-2">
-        <button type="button" class="btn btn-light mr-2 scroll-left-btn" title="Scroll Left"><i class="fa fa-arrow-left"></i></button>
-        <button type="button" class="btn btn-light scroll-right-btn" title="Scroll Right"><i class="fa fa-arrow-right"></i></button>
-    </div>
 @push('css')
     <style>
         .active-switch {
@@ -300,7 +295,7 @@
             @if(isset($stockTakingItems) && $stockTakingItems->count()  )
 
 
-                <h2>{{ __('dashboard.stockTakingReport') }}</h2>
+                <h2 class="my-2">{{ __('dashboard.stockTakingReport') }}</h2>
                 <div class="scrollable-table-wrapper">
                     <table class="table table-responsive" id="stock-table">
                         <thead>

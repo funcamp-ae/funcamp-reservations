@@ -131,7 +131,7 @@
 
         <div class="stats mb-4">
             @can('statistics.export')
-            <button class="btn btn-primary col-1 custom-print-btn" onclick="window.print()">
+            <button class="btn btn-primary col-2 custom-print-btn" onclick="window.print()">
                 @lang('dashboard.Print')
             </button>
             @endcan
@@ -141,7 +141,7 @@
             <!--begin::Table head-->
             <thead>
                 <tr class="text-start  fw-bolder fs-7 text-uppercase gs-0">
-                    <th>@lang('dashboard.Employee')</th>
+                    <!-- <th>@lang('dashboard.Employee')</th> -->
                     <th>@lang('dashboard.service')</th>
                     <th>@lang('dashboard.orders')</th>
                     <th>@lang('dashboard.approved')</th>
@@ -161,9 +161,9 @@
             <tbody class="fw-bold ">
                 @foreach ($topServices as $service)
                     <tr data-id="{{ $service->id }}">
-                        <td>
+                        <!-- <td>
                             {{ $service->orders->pluck('user.name')->implode(', ') }}
-                        </td>
+                        </td> -->
                         <td>
                             <div class="d-flex">
                                 <div class="ms-5">

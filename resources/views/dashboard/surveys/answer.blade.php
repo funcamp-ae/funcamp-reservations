@@ -42,18 +42,18 @@
                         <div class="card-body pt-0">
                             <div class="table-responsive">
                                 <table class="table table-row-dashed align-middle gs-0 gy-4">
-                                    <tbody class="fs-6 fw-semibold text-gray-600">
+                                    <tbody class="fs-6 fw-semibold   ">
                                         <tr>
-                                            <td class="text-gray-800">@lang('dashboard.order_number'):</td>
-                                            <td class="fw-bolder text-gray-800">{{ $response->order? $response->order->id : __('dashboard.not_available') }}</td>
+                                            <td class="  ">@lang('dashboard.order_number'):</td>
+                                            <td class="fw-bolder   ">{{ $response->order? $response->order->id : __('dashboard.not_available') }}</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-gray-800">@lang('dashboard.customer_name'):</td>
-                                            <td class="fw-bolder text-gray-800">{{ $response->order? ($response->order->customer ? $response->order->customer->name : __('dashboard.not_available')) : __('dashboard.not_available') }}</td>
+                                            <td class="  ">@lang('dashboard.customer_name'):</td>
+                                            <td class="fw-bolder   ">{{ $response->order? ($response->order->customer ? $response->order->customer->name : __('dashboard.not_available')) : __('dashboard.not_available') }}</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-gray-800">@lang('dashboard.answer_date'):</td>
-                                            <td class="fw-bolder text-gray-800">{{ $response->created_at->format('Y-m-d H:i:s') }}</td>
+                                            <td class="  ">@lang('dashboard.answer_date'):</td>
+                                            <td class="fw-bolder   ">{{ $response->created_at->format('Y-m-d H:i:s') }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

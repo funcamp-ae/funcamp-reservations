@@ -18,7 +18,6 @@
         margin-bottom: 1.5rem !important;
         transition: all 0.3s ease !important;
         box-shadow: 0 4px 15px rgba(139, 69, 19, 0.1) !important;
-        background: white !important;
         overflow: hidden !important;
         position: relative !important;
     }
@@ -52,7 +51,6 @@
         margin: 0 !important;
         max-height: 320px !important;
         overflow-y: auto !important;
-        background: linear-gradient(to bottom, #fefefe 0%, #f9f9f9 100%) !important;
     }
 
     .permissionCard ul::-webkit-scrollbar {

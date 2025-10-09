@@ -4,7 +4,8 @@
 @section('content')
     <div class="card mb-5 mb-xl-10">
         <div class="card-header">
-            <h3 class="card-title">@lang('dashboard.' . (isset($campReport) ? 'edit_camp_report' : 'create_camp_report'))</h3>
+            <h3 class="
+            -title">@lang('dashboard.' . (isset($campReport) ? 'edit_camp_report' : 'create_camp_report'))</h3>
         </div>
 
         <div class="card-body">
@@ -282,7 +283,6 @@
             border: 1px dashed #ddd;
             border-radius: 4px;
             padding: 10px;
-            background: #f9f9f9
         }
 
         .remove-media,
@@ -303,7 +303,6 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             overflow: hidden;
-            background: #fff;
             box-shadow: 0 2px 6px rgba(0, 0, 0, .06)
         }
 
@@ -358,14 +357,12 @@
             justify-content: center;
             gap: 6px;
             padding: 8px;
-            background: #fff
         }
 
         .photo-slider .slider-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #cfcfcf;
             cursor: pointer
         }
 
@@ -379,7 +376,6 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             overflow: hidden;
-            background: #fff;
             box-shadow: 0 2px 6px rgba(0, 0, 0, .06)
         }
 
@@ -432,14 +428,12 @@
             justify-content: center;
             gap: 6px;
             padding: 8px;
-            background: #fff
         }
 
         .video-slider .slider-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #cfcfcf;
             cursor: pointer
         }
 

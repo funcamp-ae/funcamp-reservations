@@ -25,7 +25,7 @@
         <div class="table-responsive">
           <table class="table align-middle table-row-dashed fs-6 gy-5">
             <thead>
-              <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+              <tr class="text-center fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                 <th class="min-w-150px">@lang('dashboard.entity_name')</th>
                 <th class="min-w-150px">@lang('dashboard.contact_person_name')</th>
                 <th class="min-w-150px">@lang('dashboard.primary_phone')</th>
@@ -37,7 +37,7 @@
                 <th class="min-w-100px text-end">@lang('dashboard.actions')</th>
               </tr>
             </thead>
-            <tbody class="fw-bold text-gray-600">
+            <tbody class="fw-bold ">
               @forelse ($contacts as $c)
               <tr>
                 <td>{{ $c->entity_name }}</td>
@@ -103,7 +103,7 @@
                   @endif
                 </td>
                 <td>{{ Str::limit($c->notes, 60) }}</td>
-                <td class="text-end">
+                <td class="d-flex  flex-nowrap border-0 py-10">
             @can('contact-guides.edit')
                   <a href="{{ route('contact-guides.edit', $c->id) }}" class="btn btn-sm btn-light-primary me-1">@lang('dashboard.edit')</a>
                   @endcan

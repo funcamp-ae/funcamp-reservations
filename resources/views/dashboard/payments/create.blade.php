@@ -119,7 +119,7 @@
                     <!--begin::Table head-->
                     <thead>
                         <!--begin::Table row-->
-                        <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+                        <tr class="text-center    fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                             <th class="w-10px pe-2 text-center">
                                 <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
                                     <input class="form-check-input" id="checkedAll" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_account_charges_table .form-check-input" value="1" />
@@ -138,7 +138,7 @@
                     </thead>
                     <!--end::Table head-->
                     <!--begin::Table body-->
-                    <tbody class="fw-bold text-gray-600">
+                    <tbody class="fw-bold   
                         @foreach ($recentAccountCharges as $charge)
                             <!--begin::Table row-->
                             <tr data-id="{{$charge->id}}">
@@ -152,7 +152,7 @@
                                 <td class="text-center fw-bold">
                                     <div class="d-flex justify-content-center">
                                         <div class="">
-                                            <a href="#" data-kt-ecommerce-category-filter="search" class="text-gray-800 text-hover-primary fs-5 fw-bolder mb-1">{{ number_format($charge->price ?? $charge->amount, 2) }}</a>
+                                            <a href="#" data-kt-ecommerce-category-filter="search" class="   text-hover-primary fs-5 fw-bolder mb-1">{{ number_format($charge->price ?? $charge->amount, 2) }}</a>
                                         </div>
                                     </div>
                                 </td>
