@@ -18,12 +18,11 @@ class DailyReportController extends Controller
     {
         $this->authorize('viewAny', DailyReport::class);
 
-        $reports = DailyReport::with('employee')
+        $reports = DailyReport::with(['employee','media'])
             ->filter(request()->only(['employee_id', 'date_from', 'date_to', 'search']))
             ->latest()
             ->get();
 
-//        $employees = User::whereHas('roles', fn($q) => $q->where('name', 'employee'))->get();
         $employees = User::get();
 
         return view('dashboard.daily_reports.index', compact('reports', 'employees'));
@@ -37,83 +36,51 @@ class DailyReportController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title'   => 'required|string|max:255',
             'details' => 'required|string',
-            'notes' => 'nullable|string',
-            'audio_attachment' => 'nullable|file|max:2048',
-            'video_attachment' => 'nullable|file|max:5120',
-            'photo_attachment' => 'nullable|image|max:2048',
+            'notes'   => 'nullable|string',
+
+            'photo_attachments.*' => 'nullable|image|max:5120',
+            'audio_attachments.*' => 'nullable',
+            'video_attachments.*' => 'nullable',
         ]);
 
-        $attachments = ['audio', 'video', 'photo'];
-        foreach ($attachments as $type) {
-            if ($request->hasFile("{$type}_attachment")) {
-                $validated["{$type}_attachment"] = $request->file("{$type}_attachment")
-                    ->store("daily-reports/{$type}s");
-            }
-        }
-
         $validated['employee_id'] = auth()->id();
-
         $report = DailyReport::create($validated);
 
-        $admins = User::where('user_type',1)->get();
+        $this->storeMedia($report, $request);
+
+        $admins = User::where('user_type', 1)->get();
         Notification::send($admins, new NewDailyReportNotification($report));
 
         return redirect()->route('daily-reports.index')
             ->with('success', __('dashboard.report_created'));
     }
 
-    public function show(DailyReport $dailyReport)
-    {
-        return view('dashboard.daily_reports.show', compact('dailyReport'));
-    }
-
     public function edit(DailyReport $dailyReport)
     {
+        $dailyReport->load('media');
         return view('dashboard.daily_reports.create', compact('dailyReport'));
     }
 
     public function update(Request $request, DailyReport $dailyReport)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title'   => 'required|string|max:255',
             'details' => 'required|string',
-            'notes' => 'nullable|string',
-            'audio_attachment' => 'nullable|file|max:2048',
-            'video_attachment' => 'nullable|file|max:5120',
-            'photo_attachment' => 'nullable|image|max:2048',
-            'delete_audio' => 'nullable|boolean',
-            'delete_video' => 'nullable|boolean',
-            'delete_photo' => 'nullable|boolean',
+            'notes'   => 'nullable|string',
+
+            'photo_attachments.*' => 'nullable|image|max:5120',
+            'audio_attachments.*' => 'nullable',
+            'video_attachments.*' => 'nullable',
+            'remove_photo'        => 'nullable|in:0,1',
+            'remove_audio'        => 'nullable|in:0,1',
+            'remove_video'        => 'nullable|in:0,1',
         ]);
 
-        $attachments = ['audio', 'video', 'photo'];
-        foreach ($attachments as $type) {
-            // Handle file deletion if checkbox is checked
-            if ($request->has("delete_{$type}") && $request->input("delete_{$type}")) {
-                if ($dailyReport->{"{$type}_attachment"}) {
-                    Storage::delete($dailyReport->{"{$type}_attachment"});
-                    $validated["{$type}_attachment"] = null; // Set to null in database
-                }
-                continue; // Skip file upload processing if deleting
-            }
-
-            // Handle file upload if new file is provided
-            if ($request->hasFile("{$type}_attachment")) {
-                // Delete old file if exists
-                if ($dailyReport->{"{$type}_attachment"}) {
-                    Storage::delete($dailyReport->{"{$type}_attachment"});
-                }
-                $validated["{$type}_attachment"] = $request->file("{$type}_attachment")
-                    ->store("daily-reports/{$type}s");
-            } else {
-                // Keep existing file if no new file and not deleting
-                unset($validated["{$type}_attachment"]);
-            }
-        }
-
         $dailyReport->update($validated);
+
+        $this->storeMedia($dailyReport, $request);
 
         return redirect()->route('daily-reports.index')
             ->with('success', __('dashboard.report_updated'));
@@ -121,14 +88,10 @@ class DailyReportController extends Controller
 
     public function destroy(DailyReport $dailyReport)
     {
-        // Delete attachments
-        $attachments = ['audio', 'video', 'photo'];
-        foreach ($attachments as $type) {
-            if ($dailyReport->{"{$type}_attachment"}) {
-                Storage::delete($dailyReport->{"{$type}_attachment"});
-            }
+        foreach ($dailyReport->media as $m) {
+            Storage::disk('hetzner')->delete($m->path);
+            $m->delete();
         }
-
         $dailyReport->delete();
 
         return back()->with('success', __('dashboard.report_deleted'));
@@ -136,28 +99,63 @@ class DailyReportController extends Controller
 
     public function exportToPdf()
     {
-        // Get filtered reports (same as index method)
-        $reports = DailyReport::with('employee')
+        $reports = DailyReport::with(['employee','media'])
             ->filter(request()->only(['employee_id', 'date_from', 'date_to', 'search']))
             ->latest()
             ->get();
 
-        // HTML content for PDF
         $html = view('dashboard.daily_reports.pdf', compact('reports'))->render();
 
-        // Initialize mPDF
-        $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'orientation' => 'L' // Landscape for better table display
-        ]);
-
-        // Write HTML content
+        $mpdf = new Mpdf(['mode' => 'utf-8', 'format' => 'A4', 'orientation' => 'L']);
         $mpdf->WriteHTML($html);
 
-        // Output the PDF
         return response($mpdf->Output('daily_reports.pdf', Destination::STRING_RETURN))
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'attachment; filename="daily_reports.pdf"');
     }
+
+    private function storeMedia(DailyReport $report, Request $request)
+    {
+        foreach (['photo' => 'photo_attachments', 'audio' => 'audio_attachments', 'video' => 'video_attachments'] as $type => $field) {
+
+            $removeFlag = $request->input("remove_{$type}", "0");
+
+            // لو ضغط حذف أو رفع ملفات جديدة → نمسح القديم
+            if ($removeFlag == "1" || $request->has($field)) {
+                foreach ($report->media()->where('type', $type)->get() as $m) {
+                    Storage::disk('hetzner')->delete($m->path);
+                    $m->delete();
+                }
+            }
+
+            // رفع جديد
+            if ($request->has($field)) {
+                foreach ($request->$field as $item) {
+                    $path = null;
+
+                    if ($item instanceof \Illuminate\Http\UploadedFile) {
+                        $path = $item->store("daily-reports/{$type}s", 'hetzner');
+                    } elseif (is_string($item)) {
+                        $path = $item;
+                    }
+
+                    if ($path) {
+                        $report->media()->create([
+                            'type' => $type,
+                            'path' => $path,
+                        ]);
+                    }
+                }
+            }
+        }
+    }
+
+    public function show(DailyReport $dailyReport)
+{
+    // نحمّل العلاقة media باش نعرض الصور/الفيديو/الصوت
+    $dailyReport->load(['employee','media']);
+
+    return view('dashboard.daily_reports.show', compact('dailyReport'));
+}
+
 }

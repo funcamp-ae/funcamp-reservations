@@ -70,4 +70,10 @@ class DailyReport extends Model
             $this->video_attachment ||
             $this->photo_attachment;
     }
+
+    public function media()
+{
+    return $this->hasMany(DailyReportMedia::class, 'daily_report_id');
+}
+
 }

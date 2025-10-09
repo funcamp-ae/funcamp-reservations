@@ -95,38 +95,93 @@
                         </tr>
 
                         <!-- Media Modal -->
-                        <div class="modal fade" id="mediaModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">{{ $item->name }} - @lang('dashboard.media')</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+ <!-- Media Modal -->
+<div class="modal fade" id="mediaModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ $item->name }} - @lang('dashboard.media')</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                @if($item->media->count() > 0)
+                    <!-- Nav Tabs -->
+                    <ul class="nav nav-tabs mb-3" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#images-{{ $item->id }}" role="tab">
+                                📷 صور ({{ $item->media->where('file_type', 'image')->count() }})
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#videos-{{ $item->id }}" role="tab">
+                                🎬 فيديوهات ({{ $item->media->where('file_type', 'video')->count() }})
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#audios-{{ $item->id }}" role="tab">
+                                🎵 صوتيات ({{ $item->media->where('file_type', 'audio')->count() }})
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Images -->
+                        <div class="tab-pane fade show active" id="images-{{ $item->id }}" role="tabpanel">
+                            <div class="row g-3">
+                                @forelse($item->media->where('file_type', 'image') as $media)
+                                    <div class="col-md-4">
+                                        <img src="{{ $media->file_url }}" class="img-fluid rounded" alt="">
                                     </div>
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            @foreach($item->media as $media)
-                                                <div class="col-md-4 mb-3">
-                                                    @if($media->file_type === 'image')
-                                                        <img src="{{ $media->file_url }}" class="img-fluid rounded" alt="">
-                                                    @else
-                                                        <video controls class="w-100">
-                                                            <source src="{{ $media->file_url }}" type="video/mp4">
-                                                        </video>
-                                                    @endif
-                                                    <form action="{{ route('equipment-directories.media.destroy', $media) }}"
-                                                          method="POST" class="mt-2 text-center">
-                                                        @csrf @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('@lang('dashboard.confirm_delete')')">
-                                                            <i class="fas fa-trash"></i> @lang('dashboard.delete')
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
+                                @empty
+                                    <p class="text-muted">@lang('dashboard.no_media')</p>
+                                @endforelse
                             </div>
                         </div>
+
+                        <!-- Videos -->
+                        <div class="tab-pane fade" id="videos-{{ $item->id }}" role="tabpanel">
+                            <div class="row g-3">
+                                @forelse($item->media->where('file_type', 'video') as $media)
+                                    <div class="col-md-6">
+                                        <video controls class="w-100 rounded">
+                                            <source src="{{ $media->file_url }}" type="video/mp4">
+                                        </video>
+                                    </div>
+                                @empty
+                                    <p class="text-muted">@lang('dashboard.no_media')</p>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <!-- Audios -->
+                        <div class="tab-pane fade" id="audios-{{ $item->id }}" role="tabpanel">
+                            <div class="row g-3">
+                                @forelse($item->media->where('file_type', 'audio') as $media)
+                                    <div class="col-md-6">
+                                        <audio controls class="w-100">
+                                            <source src="{{ $media->file_url }}">
+                                        </audio>
+                                    </div>
+                                @empty
+                                    <p class="text-muted">@lang('dashboard.no_media')</p>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <p class="text-muted text-center">@lang('dashboard.no_media')</p>
+                @endif
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
                     @endforeach
                     </tbody>
                 </table>

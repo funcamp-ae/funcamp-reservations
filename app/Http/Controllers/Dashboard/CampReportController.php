@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\CampReport;
+use App\Models\CampReportItem;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Mpdf\Mpdf;
 
 class CampReportController extends Controller
@@ -34,35 +36,56 @@ class CampReportController extends Controller
     {
         $this->authorize('create', CampReport::class);
 
+        [$imgMimes, $imgExts, $audMimes, $audExts, $vidMimes, $vidExts] = $this->allowedLists();
+
         $validated = $request->validate([
-            'report_date' => 'required|date',
-            'service_id' => 'nullable|exists:services,id',
-            'camp_name' => 'nullable|string|max:255',
-            'general_notes' => 'nullable|string',
-            'items' => 'nullable|array|min:1',
-            'items.*.item_name' => 'required|string|max:255',
-            'items.*.notes' => 'nullable|string',
-            'items.*.photo' => 'nullable|image|max:2048',
-            'items.*.audio' => 'nullable|file|max:5120',
-            'items.*.video' => 'nullable|file|max:10240',
+            'report_date'            => ['required','date'],
+            'service_id'             => ['nullable', Rule::exists('services','id')],
+            'camp_name'              => ['nullable','string','max:255'],
+            'general_notes'          => ['nullable','string'],
+
+            'items'                  => ['nullable','array','min:1'],
+            'items.*.item_name'      => ['required','string','max:255'],
+            'items.*.notes'          => ['nullable','string'],
+
+            // صور
+            'items.*.photos'         => ['nullable','array'],
+            'items.*.photos.*'       => ['file', $this->mimeOrExtRule($imgMimes, $imgExts)],
+
+            // صوت
+            'items.*.audios'         => ['nullable','array'],
+            'items.*.audios.*'       => ['file', $this->mimeOrExtRule($audMimes, $audExts)],
+
+            // فيديو
+            'items.*.videos'         => ['nullable','array'],
+            'items.*.videos.*'       => ['file', $this->mimeOrExtRule($vidMimes, $vidExts)],
+
+            // مفاتيح الرفع المُجزّأ (FilePond)
+            'items.*.uploaded_videos'    => ['nullable','array'],
+            'items.*.uploaded_videos.*'  => ['string'],
+
+            // فلاق مسح القديم
+            'items.*.remove_photos'  => ['nullable','boolean'],
+            'items.*.remove_audios'  => ['nullable','boolean'],
+            'items.*.remove_videos'  => ['nullable','boolean'],
         ]);
 
         $report = CampReport::create([
-            'report_date' => $validated['report_date'],
-            'service_id' => $validated['service_id'],
-            'camp_name' => $validated['camp_name'],
-            'general_notes' => $validated['general_notes'],
-            'created_by' => auth()->id(),
+            'report_date'   => $validated['report_date'],
+            'service_id'    => $validated['service_id'] ?? null,
+            'camp_name'     => $validated['camp_name'] ?? null,
+            'general_notes' => $validated['general_notes'] ?? null,
+            'created_by'    => auth()->id(),
         ]);
 
         if (!empty($validated['items'])) {
             foreach ($validated['items'] as $itemData) {
+                /** @var \App\Models\CampReportItem $item */
                 $item = $report->items()->create([
                     'item_name' => $itemData['item_name'],
-                    'notes' => $itemData['notes'],
+                    'notes'     => $itemData['notes'] ?? null,
                 ]);
 
-                // Handle file uploads
                 $this->handleItemAttachments($item, $itemData);
             }
         }
@@ -75,6 +98,7 @@ class CampReportController extends Controller
     {
         $this->authorize('view', $campReport);
 
+        $campReport->load(['service','creator','items.media']);
         return view('dashboard.camp_reports.show', compact('campReport'));
     }
 
@@ -83,6 +107,7 @@ class CampReportController extends Controller
         $this->authorize('update', $campReport);
 
         $services = Service::all();
+        $campReport->load(['items.media']);
         return view('dashboard.camp_reports.create', compact('campReport', 'services'));
     }
 
@@ -90,33 +115,47 @@ class CampReportController extends Controller
     {
         $this->authorize('update', $campReport);
 
+        [$imgMimes, $imgExts, $audMimes, $audExts, $vidMimes, $vidExts] = $this->allowedLists();
+
         $validated = $request->validate([
-            'report_date' => 'required|date',
-            'service_id' => 'nullable|exists:services,id',
-            'camp_name' => 'nullable|string|max:255',
-            'general_notes' => 'nullable|string',
-            'items' => 'nullable|array|min:1',
-            'items.*.id' => 'nullable|exists:camp_report_items,id,camp_report_id,'.$campReport->id,
-            'items.*.item_name' => 'required|string|max:255',
-            'items.*.notes' => 'nullable|string',
-            'items.*.photo' => 'nullable|image|max:2048',
-            'items.*.audio' => 'nullable|file|max:5120',
-            'items.*.video' => 'nullable|file|max:10240',
-            'deleted_items' => 'nullable|array',
-            'deleted_items.*' => 'exists:camp_report_items,id,camp_report_id,'.$campReport->id,
-            'items.*.remove_photo' => 'nullable|boolean',
-            'items.*.remove_audio' => 'nullable|boolean',
-            'items.*.remove_video' => 'nullable|boolean',
+            'report_date'            => ['required','date'],
+            'service_id'             => ['nullable', Rule::exists('services','id')],
+            'camp_name'              => ['nullable','string','max:255'],
+            'general_notes'          => ['nullable','string'],
+
+            'items'                  => ['nullable','array','min:1'],
+            'items.*.id'             => ['nullable', Rule::exists('camp_report_items','id')->where('camp_report_id', $campReport->id)],
+            'items.*.item_name'      => ['required','string','max:255'],
+            'items.*.notes'          => ['nullable','string'],
+
+            'items.*.photos'         => ['nullable','array'],
+            'items.*.photos.*'       => ['file', $this->mimeOrExtRule($imgMimes, $imgExts)],
+
+            'items.*.audios'         => ['nullable','array'],
+            'items.*.audios.*'       => ['file', $this->mimeOrExtRule($audMimes, $audExts)],
+
+            'items.*.videos'         => ['nullable','array'],
+            'items.*.videos.*'       => ['file', $this->mimeOrExtRule($vidMimes, $vidExts)],
+
+            'items.*.uploaded_videos'    => ['nullable','array'],
+            'items.*.uploaded_videos.*'  => ['string'],
+
+            'deleted_items'          => ['nullable','array'],
+            'deleted_items.*'        => [Rule::exists('camp_report_items','id')->where('camp_report_id', $campReport->id)],
+
+            'items.*.remove_photos'  => ['nullable','boolean'],
+            'items.*.remove_audios'  => ['nullable','boolean'],
+            'items.*.remove_videos'  => ['nullable','boolean'],
         ]);
 
         $campReport->update([
-            'report_date' => $validated['report_date'],
-            'service_id' => $validated['service_id'],
-            'camp_name' => $validated['camp_name'],
-            'general_notes' => $validated['general_notes'],
+            'report_date'   => $validated['report_date'],
+            'service_id'    => $validated['service_id'] ?? null,
+            'camp_name'     => $validated['camp_name'] ?? null,
+            'general_notes' => $validated['general_notes'] ?? null,
         ]);
 
-        // Delete removed items
+        // حذف العناصر المزالة
         if (!empty($validated['deleted_items'])) {
             $itemsToDelete = $campReport->items()->whereIn('id', $validated['deleted_items'])->get();
             foreach ($itemsToDelete as $item) {
@@ -125,22 +164,21 @@ class CampReportController extends Controller
             }
         }
 
-        // Update or create items
+        // تعديل/إضافة العناصر
         if (!empty($validated['items'])) {
             foreach ($validated['items'] as $itemData) {
-                if (isset($itemData['id'])) {
+                if (!empty($itemData['id'])) {
+                    /** @var \App\Models\CampReportItem $item */
                     $item = $campReport->items()->findOrFail($itemData['id']);
                     $item->update([
                         'item_name' => $itemData['item_name'],
-                        'notes' => $itemData['notes'],
+                        'notes'     => $itemData['notes'] ?? null,
                     ]);
-
-                    // Handle file deletions (if remove_* flag is true)
                     $this->handleItemAttachments($item, $itemData);
                 } else {
                     $item = $campReport->items()->create([
                         'item_name' => $itemData['item_name'],
-                        'notes' => $itemData['notes'],
+                        'notes'     => $itemData['notes'] ?? null,
                     ]);
                     $this->handleItemAttachments($item, $itemData);
                 }
@@ -155,13 +193,15 @@ class CampReportController extends Controller
     {
         $this->authorize('delete', $campReport);
 
+        $campReport->load('items.media');
+
         foreach ($campReport->items as $item) {
             $this->deleteItemAttachments($item);
 
-            // Delete the entire folder for this item
+            // حذف مجلد العنصر من قرص hetzner لو موجود
             $itemFolder = "camp-reports/{$item->id}";
-            if (Storage::exists($itemFolder)) {
-                Storage::deleteDirectory($itemFolder);
+            if (Storage::disk('hetzner')->exists($itemFolder)) {
+                Storage::disk('hetzner')->deleteDirectory($itemFolder);
             }
         }
 
@@ -170,60 +210,115 @@ class CampReportController extends Controller
         return back()->with('success', __('dashboard.report_deleted'));
     }
 
-    protected function handleItemAttachments($item, $itemData)
+    /**
+     * إدارة مرفقات عنصر واحد (إضافة/حذف/استبدال)
+     */
+    protected function handleItemAttachments(CampReportItem $item, array $itemData): void
     {
-        $types = ['photo', 'audio', 'video'];
+        $disk = Storage::disk('hetzner');
 
-        foreach ($types as $type) {
-            // If "remove_{type}" is true, delete the file
-            if (isset($itemData["remove_{$type}"]) && $itemData["remove_{$type}"]) {
-                if ($item->{"{$type}_path"}) {
-                    Storage::delete($item->{"{$type}_path"});
-                    $item->update(["{$type}_path" => null]);
-                }
+        // 1) حذف القديم حسب الفلاق
+        if (!empty($itemData['remove_photos'])) {
+            $this->deleteType($item, 'photo', $disk);
+        }
+        if (!empty($itemData['remove_audios'])) {
+            $this->deleteType($item, 'audio', $disk);
+        }
+        if (!empty($itemData['remove_videos'])) {
+            $this->deleteType($item, 'video', $disk);
+        }
+
+        // 2) رفع جديد (صور -> type=photo)
+        if (!empty($itemData['photos']) && is_array($itemData['photos'])) {
+            foreach ($itemData['photos'] as $file) {
+                $path = $file->store("camp-reports/{$item->id}/images", 'hetzner');
+                $item->media()->create([
+                    'path' => $path,
+                    'type' => 'photo',
+                ]);
             }
-            // Handle new file upload
-            elseif (isset($itemData[$type]) && $itemData[$type]) {
-                // Delete old file if exists
-                if ($item->{"{$type}_path"}) {
-                    Storage::delete($item->{"{$type}_path"});
-                }
+        }
 
-                // Store new file
-                $path = $itemData[$type]->store("camp-reports/{$item->id}/{$type}s");
-                $item->update(["{$type}_path" => $path]);
+        // 3) رفع جديد (صوت)
+        if (!empty($itemData['audios']) && is_array($itemData['audios'])) {
+            foreach ($itemData['audios'] as $file) {
+                $path = $file->store("camp-reports/{$item->id}/audios", 'hetzner');
+                $item->media()->create([
+                    'path' => $path,
+                    'type' => 'audio',
+                ]);
+            }
+        }
+
+        // 4) رفع جديد (فيديو)
+        if (!empty($itemData['videos']) && is_array($itemData['videos'])) {
+            foreach ($itemData['videos'] as $file) {
+                $path = $file->store("camp-reports/{$item->id}/videos", 'hetzner');
+                $item->media()->create([
+                    'path' => $path,
+                    'type' => 'video',
+                ]);
+            }
+        }
+
+        // 5) فيديوهات مرفوعة عبر FilePond (multipart) — حفظ المفتاح كما هو
+        if (!empty($itemData['uploaded_videos']) && is_array($itemData['uploaded_videos'])) {
+            $keys = collect($itemData['uploaded_videos'])->filter()->unique()->values();
+            foreach ($keys as $key) {
+                $item->media()->create([
+                    'path' => $key,
+                    'type' => 'video',
+                ]);
             }
         }
     }
 
-    protected function deleteItemAttachments($item)
+    /**
+     * حذف كل مرفقات عنصر
+     */
+    protected function deleteItemAttachments(CampReportItem $item): void
     {
-        $types = ['photo', 'audio', 'video'];
+        $disk = Storage::disk('hetzner');
 
-        foreach ($types as $type) {
-            if ($item->{"{$type}_path"}) {
-                Storage::delete($item->{"{$type}_path"});
-                $item->update(["{$type}_path" => null]);
+        foreach ($item->media as $media) {
+            try {
+                $disk->delete($media->path);
+            } catch (\Throwable $e) {
+                // الملف قد لا يكون موجودًا — تجاهل
             }
+            $media->delete();
+        }
+    }
+
+    /**
+     * حذف مرفقات نوع معيّن لعنصر
+     */
+    protected function deleteType(CampReportItem $item, string $type, $disk): void
+    {
+        $medias = $item->media()->where('type', $type)->get();
+        foreach ($medias as $m) {
+            try {
+                $disk->delete($m->path);
+            } catch (\Throwable $e) {}
+            $m->delete();
         }
     }
 
     public function exportPdf()
     {
-        $reports = CampReport::with(['service', 'creator', 'items'])
+        $reports = CampReport::with(['service', 'creator', 'items.media'])
             ->latest()
             ->get();
 
-        // Convert images to base64 for PDF embedding
+        // تضمين أول صورة لكل عنصر في الـ PDF إن وُجدت
         foreach ($reports as $report) {
             foreach ($report->items as $item) {
-                if ($item->photo_path && Storage::exists($item->photo_path)) {
+                $img = $item->media->firstWhere('type','photo');
+                if ($img && Storage::disk('hetzner')->exists($img->path)) {
                     try {
-                        // Get the file contents and convert to base64
-                        $imageData = Storage::get($item->photo_path);
+                        $imageData = Storage::disk('hetzner')->get($img->path);
                         $item->photo_base64 = base64_encode($imageData);
-                    } catch (\Exception $e) {
-                        // If image can't be read, skip it
+                    } catch (\Throwable $e) {
                         $item->photo_base64 = null;
                     }
                 }
@@ -233,27 +328,89 @@ class CampReportController extends Controller
         $html = view('dashboard.camp_reports.export', compact('reports'))->render();
 
         $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'orientation' => 'P',
-            'margin_left' => 15,
-            'margin_right' => 15,
-            'margin_top' => 16,
-            'margin_bottom' => 16,
-            'margin_header' => 9,
-            'margin_footer' => 9,
-            // Add RTL support for Arabic
-            'dir' => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
-            // Use fonts that support Arabic characters
-            'default_font' => app()->getLocale() === 'ar' ? 'DejaVuSans' : 'DejaVuSans'
+            'mode'           => 'utf-8',
+            'format'         => 'A4',
+            'orientation'    => 'P',
+            'margin_left'    => 15,
+            'margin_right'   => 15,
+            'margin_top'     => 16,
+            'margin_bottom'  => 16,
+            'margin_header'  => 9,
+            'margin_footer'  => 9,
+            'dir'            => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
+            'default_font'   => 'DejaVuSans',
         ]);
 
-        // Enable image processing
         $mpdf->showImageErrors = true;
-
         $mpdf->WriteHTML($html);
 
         $filename = __('dashboard.camp_reports') . "-" . date('Y-m-d') . ".pdf";
         return $mpdf->Output($filename, 'D');
+    }
+
+    /**
+     * قاعدة تحقق: نقبل الملف إذا كان الـ MIME ضمن المسموح أو الامتداد ضمن المسموح
+     */
+    protected function mimeOrExtRule(array $mimes, array $exts): \Closure
+    {
+        return function ($attribute, $file, $fail) use ($mimes, $exts) {
+            $mime = explode(';', $file->getClientMimeType() ?: $file->getMimeType() ?: '')[0];
+            $ext  = strtolower($file->getClientOriginalExtension());
+
+            $mimeOk = in_array($mime, $mimes, true);
+            $extOk  = in_array($ext,  $exts,  true);
+
+            if (!$mimeOk && !$extOk) {
+                // نعرض قائمة الـ MIME المسموح بها (كمرجع)
+                $fail(__('validation.mimetypes', ['values' => implode(', ', $mimes)]));
+            }
+        };
+    }
+
+    /**
+     * اللوائح المسموح بها (MIME + الامتدادات) لصور/صوت/فيديو
+     */
+    protected function allowedLists(): array
+    {
+        $imgMimes = [
+            'image/jpeg','image/png','image/webp','image/gif',
+            'image/heic','image/heif','image/bmp','image/tiff',
+        ];
+        $imgExts  = ['jpg','jpeg','png','webp','gif','heic','heif','bmp','tif','tiff'];
+
+        $audMimes = [
+            'audio/mpeg','audio/mp3',
+            'audio/wav','audio/x-wav','audio/vnd.wave',
+            'audio/ogg','audio/opus','application/ogg',
+            'audio/webm',
+            'audio/aac','audio/x-aac','audio/aacp',
+            'audio/mp4','audio/mp4a-latm','audio/x-m4a',
+            'audio/3gpp','audio/3gpp2',
+            'audio/amr','audio/x-amr',
+            'audio/aiff','audio/x-aiff','audio/x-caf',
+            'audio/flac',
+            'application/octet-stream', // بعض الأجهزة ترسله في التسجيل
+        ];
+        $audExts  = [
+            'mp3','wav','ogg','opus','webm','aac','m4a','mp4',
+            '3gp','3gpp','amr','aiff','aif','caf','flac',
+        ];
+
+        $vidMimes = [
+            'video/mp4','video/quicktime',
+            'video/webm',
+            'video/x-matroska',
+            'video/x-flv',
+            'video/3gpp','video/3gpp2',
+            'video/avi',
+            'video/mpeg','video/mpg',
+            'video/x-ms-wmv',
+            'video/x-m4v',
+            'video/hevc',
+            'application/octet-stream', // fallback في بعض المتصفحات
+        ];
+        $vidExts  = ['mp4','mov','webm','mkv','flv','3gp','avi','mpeg','mpg','wmv','m4v'];
+
+        return [$imgMimes, $imgExts, $audMimes, $audExts, $vidMimes, $vidExts];
     }
 }

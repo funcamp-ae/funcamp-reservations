@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\Storage; // 👈 مهم
 
 class Task extends Model
 {
@@ -22,7 +23,7 @@ class Task extends Model
         'photo_attachment',
         'video_attachment',
         'audio_attachment',
-        'task_type_id'
+        'task_type_id',
     ];
 
     protected $casts = [
@@ -59,4 +60,57 @@ class Task extends Model
                 ->delete();
         });
     }
+
+    // ============ المرفقات ============
+    public function attachments()
+    {
+        return $this->hasMany(TaskAttachment::class);
+    }
+
+    public function photos()
+    {
+        return $this->attachments()->where('type', 'photo');
+    }
+
+    public function audios()
+    {
+        return $this->attachments()->where('type', 'audio');
+    }
+
+    public function videos()
+    {
+        return $this->attachments()->where('type', 'video');
+    }
+
+    // تضمين الروابط تلقائيًا في toArray()/toJson()
+    protected $appends = ['photos_urls', 'audios_urls', 'videos_urls'];
+
+
+    public function getPhotosUrlsAttribute()
+{
+    return $this->photos   // Collection مُحمّلة مسبقًا
+        ->pluck('path')
+        ->map(fn ($p) => \Illuminate\Support\Facades\Storage::disk('hetzner')->url($p))
+        ->values()
+        ->all();
+}
+
+public function getAudiosUrlsAttribute()
+{
+    return $this->audios
+        ->pluck('path')
+        ->map(fn ($p) => \Illuminate\Support\Facades\Storage::disk('hetzner')->url($p))
+        ->values()
+        ->all();
+}
+
+public function getVideosUrlsAttribute()
+{
+    return $this->videos
+        ->pluck('path')
+        ->map(fn ($p) => \Illuminate\Support\Facades\Storage::disk('hetzner')->url($p))
+        ->values()
+        ->all();
+}
+
 }

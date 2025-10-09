@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class EquipmentDirectoryMedia extends Model
 {
@@ -16,6 +17,6 @@ class EquipmentDirectoryMedia extends Model
 
     public function getFileUrlAttribute(): string
     {
-        return asset('storage/' . $this->file_path);
+        return Storage::disk('hetzner')->url($this->file_path);
     }
 }
