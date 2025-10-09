@@ -73,7 +73,7 @@ class DailyReport extends Model
 
     public function media()
 {
-    return $this->hasMany(DailyReportMedia::class, 'daily_report_id');
+    return $this->hasMany(DailyReportMedia::class, 'daily_report_id')->orderByDesc('id');
 }
 
 }

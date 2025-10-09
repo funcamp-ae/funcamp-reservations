@@ -64,7 +64,7 @@ class Task extends Model
     // ============ المرفقات ============
     public function attachments()
     {
-        return $this->hasMany(TaskAttachment::class);
+        return $this->hasMany(TaskAttachment::class)->orderByDesc('id');
     }
 
     public function photos()

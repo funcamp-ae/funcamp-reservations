@@ -83,12 +83,14 @@
                                                     <button class="slider-nav prev">‹</button>
                                                     <button class="slider-nav next">›</button>
                                                     <div class="slider-dots"></div>
+                                                @else
+                                                    <div class="slider-dots d-none"></div>
                                                 @endif
                                             </div>
                                         </div>
                                     @endif
 
-                                    {{-- صوت (كل ملف تحت الآخر) --}}
+                                    {{-- صوت --}}
                                     @if($audioUrls->count())
                                         <div class="col-md-4 mb-4">
                                             <small class="text-muted d-block">@lang('dashboard.audio_attachment')</small>
@@ -116,6 +118,8 @@
                                                     <button class="slider-nav prev">‹</button>
                                                     <button class="slider-nav next">›</button>
                                                     <div class="slider-dots"></div>
+                                                @else
+                                                    <div class="slider-dots d-none"></div>
                                                 @endif
                                             </div>
                                         </div>
@@ -132,7 +136,6 @@
 
 @push('css')
     <style>
-        /* السلايدر */
         .media-slider {
             position: relative;
             border: 1px dashed #ddd;
@@ -163,7 +166,6 @@
         }
         .media-slider .slider-nav:hover { background: rgba(0, 0, 0, 0.6); }
 
-        /* الاتجاه حسب اللغة */
         [dir="ltr"] .media-slider .slider-nav.prev { left: 8px; }
         [dir="ltr"] .media-slider .slider-nav.next { right: 8px; }
         [dir="rtl"] .media-slider .slider-nav.prev { right: 8px; }
@@ -181,11 +183,8 @@
             border-radius: 50%;
             cursor: pointer;
         }
-        .media-slider .slider-dot.active {
-            background: #333;
-        }
+        .media-slider .slider-dot.active { background: #333; }
 
-        /* الصوت تحت بعض */
         .audio-list {
             display: flex;
             flex-direction: column;
@@ -202,7 +201,6 @@
 
 @push('js')
     <script>
-        // تهيئة السلايدرات (الصور والفيديو فقط)
         document.addEventListener('DOMContentLoaded', function () {
             const isRTL = document.documentElement.getAttribute('dir') === 'rtl';
 
@@ -214,10 +212,7 @@
                 const nextBtn = slider.querySelector('.slider-nav.next');
                 let current = 0;
 
-                if (!urls.length) {
-                    slider.style.display = 'none';
-                    return;
-                }
+                if (!urls.length) return;
 
                 function loadMedia() {
                     const url = urls[current];
@@ -230,26 +225,32 @@
                         mediaEl.appendChild(source);
                         mediaEl.load();
                     }
-                    dotsBox.querySelectorAll('.slider-dot').forEach((dot, idx) => {
-                        dot.classList.toggle('active', idx === current);
-                    });
+
+                    if (dotsBox) {
+                        dotsBox.querySelectorAll('.slider-dot').forEach((dot, idx) => {
+                            dot.classList.toggle('active', idx === current);
+                        });
+                    }
                 }
 
+                // ✅ حتى لو صورة واحدة نعرضها
                 dotsBox.innerHTML = '';
-                urls.forEach((_, idx) => {
-                    const dot = document.createElement('div');
-                    dot.className = 'slider-dot' + (idx === 0 ? ' active' : '');
-                    dot.addEventListener('click', function () {
-                        current = idx;
-                        loadMedia();
+                if (urls.length > 1) {
+                    urls.forEach((_, idx) => {
+                        const dot = document.createElement('div');
+                        dot.className = 'slider-dot' + (idx === 0 ? ' active' : '');
+                        dot.addEventListener('click', function () {
+                            current = idx;
+                            loadMedia();
+                        });
+                        dotsBox.appendChild(dot);
                     });
-                    dotsBox.appendChild(dot);
-                });
+                }
 
                 if (prevBtn) {
                     prevBtn.addEventListener('click', function () {
                         current = isRTL
-                            ? (current + 1) % urls.length  // RTL: السهم الأيسر = التالي
+                            ? (current + 1) % urls.length
                             : (current - 1 + urls.length) % urls.length;
                         loadMedia();
                     });
@@ -258,7 +259,7 @@
                 if (nextBtn) {
                     nextBtn.addEventListener('click', function () {
                         current = isRTL
-                            ? (current - 1 + urls.length) % urls.length // RTL: السهم الأيمن = السابق
+                            ? (current - 1 + urls.length) % urls.length
                             : (current + 1) % urls.length;
                         loadMedia();
                     });

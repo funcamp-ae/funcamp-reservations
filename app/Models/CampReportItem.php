@@ -21,7 +21,7 @@ class CampReportItem extends Model
 
     public function media(): HasMany
     {
-        return $this->hasMany(CampReportItemMedia::class, 'camp_report_item_id');
+        return $this->hasMany(CampReportItemMedia::class, 'camp_report_item_id')->orderByDesc('id');
     }
 
     public function photos(): HasMany  { return $this->media()->where('type', 'photo'); }

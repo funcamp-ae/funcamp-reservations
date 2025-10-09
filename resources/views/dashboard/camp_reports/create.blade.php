@@ -573,6 +573,7 @@
 
             // ====== PHOTO PER BOX ======
             function initPhotoBox(box) {
+
                 const uploadBtn = box.querySelector('.upload-media');
                 const captureBtn = box.querySelector('.capture-media');
                 const removeBtn = box.querySelector('.remove-media-all');
@@ -877,6 +878,59 @@
                     slider.classList.remove('d-none');
                     render();
                 }
+                // ====== LIGHTBOX للصور ======
+(function lightboxInit() {
+    const lb = document.getElementById('photo-lightbox');
+    const lbImg = lb.querySelector('.lightbox-img');
+    const lbClose = lb.querySelector('.close');
+    const lbPrev = lb.querySelector('.nav.prev');
+    const lbNext = lb.querySelector('.nav.next');
+    let lbCurrent = 0;
+
+    function openLightbox(index) {
+        if (!photos.length) return;
+        lbCurrent = index;
+        lb.classList.remove('d-none');
+        lbImg.src = photos[lbCurrent];
+    }
+
+    function showNext() {
+        if (!photos.length) return;
+        lbCurrent = (lbCurrent + 1) % photos.length;
+        lbImg.src = photos[lbCurrent];
+    }
+
+    function showPrev() {
+        if (!photos.length) return;
+        lbCurrent = (lbCurrent - 1 + photos.length) % photos.length;
+        lbImg.src = photos[lbCurrent];
+    }
+
+    imgEl.addEventListener('click', () => openLightbox(current));
+    lbClose.addEventListener('click', () => lb.classList.add('d-none'));
+    lbNext.addEventListener('click', showNext);
+    lbPrev.addEventListener('click', showPrev);
+
+    // ⌨️ الأسهم من لوحة المفاتيح
+    document.addEventListener('keydown', e => {
+        if (lb.classList.contains('d-none')) return;
+        if (e.key === 'Escape') lb.classList.add('d-none');
+        if (e.key === 'ArrowRight') showNext();
+        if (e.key === 'ArrowLeft') showPrev();
+    });
+
+    // 📱 السحب (Swipe)
+    let startX = 0;
+    lb.addEventListener('touchstart', e => startX = e.touches[0].clientX, { passive: true });
+    lb.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - startX;
+        if (Math.abs(dx) > 40) {
+            if (dx > 0) showPrev();
+            else showNext();
+        }
+    }, { passive: true });
+})();
+
             }
 
             // ====== AUDIO PER BOX ======

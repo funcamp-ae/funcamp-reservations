@@ -30,13 +30,13 @@ class EquipmentDirectoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'is_active' => 'boolean',
+            'name'      => ['required', 'string', 'max:255'],
+            'is_active' => ['boolean'],
         ]);
 
         EquipmentDirectory::create([
-            'name' => $request->name,
-            'is_active' => $request->is_active ?? true,
+            'name'       => $request->name,
+            'is_active'  => $request->is_active ?? true,
             'created_by' => auth()->id(),
         ]);
 
@@ -52,12 +52,12 @@ class EquipmentDirectoryController extends Controller
     public function update(Request $request, EquipmentDirectory $equipmentDirectory)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'is_active' => 'boolean',
+            'name'      => ['required', 'string', 'max:255'],
+            'is_active' => ['boolean'],
         ]);
 
         $equipmentDirectory->update([
-            'name' => $request->name,
+            'name'      => $request->name,
             'is_active' => $request->is_active ?? $equipmentDirectory->is_active,
         ]);
 
@@ -89,30 +89,42 @@ class EquipmentDirectoryController extends Controller
 
     public function storeItem(Request $request, EquipmentDirectory $equipmentDirectory)
     {
+        // ✅ فاليديشن منظم على نمط OrderCheckinController
         $request->validate([
-    'type' => 'required|string|max:255',
-    'name' => 'required|string|max:255',
-    'location' => 'required|string|max:255',
-    'quantity' => 'required|integer|min:1',
-    'notes' => 'nullable|string',
-    'is_active' => 'boolean',
+            'type'        => ['required', 'string', 'max:255'],
+            'name'        => ['required', 'string', 'max:255'],
+            'location'    => ['required', 'string', 'max:255'],
+            'quantity'    => ['required', 'integer', 'min:1'],
+            'notes'       => ['nullable', 'string'],
+            'is_active'   => ['boolean'],
 
-    // ✅ فاليديشن نوع الملفات فقط (بلا حجم)
-    'photo_attachments.*' => 'nullable|mimes:jpeg,png,jpg,gif,webp',
-    'audio_attachments.*' => 'nullable|mimetypes:audio/mpeg,audio/wav,audio/ogg',
-    'video_attachments.*' => 'nullable|mimetypes:video/mp4,video/quicktime,video/webm,video/x-matroska',
-]);
+            // 🖼️ الصور
+            'photo_attachments'   => ['nullable', 'array'],
+            'photo_attachments.*' => ['nullable', 'mimes:jpeg,png,jpg,gif,webp'],
 
+            // 🎵 الصوت
+            'audio_attachments'   => ['nullable', 'array'],
+            'audio_attachments.*' => ['nullable', 'mimetypes:audio/mpeg,audio/wav,audio/ogg,audio/webm,audio/aac,audio/x-m4a,audio/mp4'],
+
+            // 🎬 الفيديو
+            'video_attachments'   => ['nullable', 'array'],
+            'video_attachments.*' => ['nullable', 'mimetypes:video/mp4,video/quicktime,video/webm,video/x-matroska,video/x-flv,video/mpeg'],
+
+            // ❌ حقول الحذف
+            'remove_photo'        => ['nullable', 'in:0,1'],
+            'remove_audio'        => ['nullable', 'in:0,1'],
+            'remove_video'        => ['nullable', 'in:0,1'],
+        ]);
 
         $item = EquipmentDirectoryItem::create([
             'directory_id' => $equipmentDirectory->id,
-            'type' => $request->type,
-            'name' => $request->name,
-            'location' => $request->location,
-            'quantity' => $request->quantity,
-            'notes' => $request->notes,
-            'is_active' => $request->is_active ?? true,
-            'created_by' => auth()->id(),
+            'type'         => $request->type,
+            'name'         => $request->name,
+            'location'     => $request->location,
+            'quantity'     => $request->quantity,
+            'notes'        => $request->notes,
+            'is_active'    => $request->is_active ?? true,
+            'created_by'   => auth()->id(),
         ]);
 
         $this->storeMedia($item, $request, $equipmentDirectory);
@@ -123,32 +135,44 @@ class EquipmentDirectoryController extends Controller
 
     public function editItem(EquipmentDirectory $equipmentDirectory, EquipmentDirectoryItem $item)
     {
-        return view('dashboard.equipment_directories.items.create', compact('equipmentDirectory','item'));
+        return view('dashboard.equipment_directories.items.create', compact('equipmentDirectory', 'item'));
     }
 
     public function updateItem(Request $request, EquipmentDirectory $equipmentDirectory, EquipmentDirectoryItem $item)
     {
+        // ✅ نفس الفاليديشن كما في storeItem
         $request->validate([
-    'type' => 'required|string|max:255',
-    'name' => 'required|string|max:255',
-    'location' => 'required|string|max:255',
-    'quantity' => 'required|integer|min:1',
-    'notes' => 'nullable|string',
-    'is_active' => 'boolean',
+            'type'        => ['required', 'string', 'max:255'],
+            'name'        => ['required', 'string', 'max:255'],
+            'location'    => ['required', 'string', 'max:255'],
+            'quantity'    => ['required', 'integer', 'min:1'],
+            'notes'       => ['nullable', 'string'],
+            'is_active'   => ['boolean'],
 
-    // ✅ فاليديشن نوع الملفات فقط (بلا حجم)
-    'photo_attachments.*' => 'nullable|mimes:jpeg,png,jpg,gif,webp',
-    'audio_attachments.*' => 'nullable|mimetypes:audio/mpeg,audio/wav,audio/ogg',
-    'video_attachments.*' => 'nullable|mimetypes:video/mp4,video/quicktime,video/webm,video/x-matroska',
-]);
+            // 🖼️ الصور
+            'photo_attachments'   => ['nullable', 'array'],
+            'photo_attachments.*' => ['nullable', 'mimes:jpeg,png,jpg,gif,webp'],
 
+            // 🎵 الصوت
+            'audio_attachments'   => ['nullable', 'array'],
+            'audio_attachments.*' => ['nullable', 'mimetypes:audio/mpeg,audio/wav,audio/ogg,audio/webm,audio/aac,audio/x-m4a,audio/mp4'],
+
+            // 🎬 الفيديو
+            'video_attachments'   => ['nullable', 'array'],
+            'video_attachments.*' => ['nullable', 'mimetypes:video/mp4,video/quicktime,video/webm,video/x-matroska,video/x-flv,video/mpeg'],
+
+            // ❌ حقول الحذف
+            'remove_photo'        => ['nullable', 'in:0,1'],
+            'remove_audio'        => ['nullable', 'in:0,1'],
+            'remove_video'        => ['nullable', 'in:0,1'],
+        ]);
 
         $item->update([
-            'type' => $request->type,
-            'name' => $request->name,
-            'location' => $request->location,
-            'quantity' => $request->quantity,
-            'notes' => $request->notes,
+            'type'      => $request->type,
+            'name'      => $request->name,
+            'location'  => $request->location,
+            'quantity'  => $request->quantity,
+            'notes'     => $request->notes,
             'is_active' => $request->is_active ?? $item->is_active,
         ]);
 
@@ -221,7 +245,7 @@ class EquipmentDirectoryController extends Controller
     // ====== PRIVATE ======
     private function storeMedia(EquipmentDirectoryItem $item, Request $request, EquipmentDirectory $directory)
     {
-        // ---- PHOTO ----
+        // 🖼️ الصور
         if ($request->boolean('remove_photo')) {
             foreach ($item->media()->where('file_type', 'image')->get() as $m) {
                 Storage::disk('hetzner')->delete($m->file_path);
@@ -238,7 +262,7 @@ class EquipmentDirectoryController extends Controller
             }
         }
 
-        // ---- AUDIO ----
+        // 🎵 الصوت
         if ($request->boolean('remove_audio')) {
             foreach ($item->media()->where('file_type', 'audio')->get() as $m) {
                 Storage::disk('hetzner')->delete($m->file_path);
@@ -255,7 +279,7 @@ class EquipmentDirectoryController extends Controller
             }
         }
 
-        // ---- VIDEO ----
+        // 🎬 الفيديو
         if ($request->boolean('remove_video')) {
             foreach ($item->media()->where('file_type', 'video')->get() as $m) {
                 Storage::disk('hetzner')->delete($m->file_path);
@@ -272,8 +296,8 @@ class EquipmentDirectoryController extends Controller
             }
         }
 
-        // ---- VIDEO (multipart FilePond) ----
-        if ($request->has('uploaded_videos')) {
+        // 🎬 الفيديوهات المرفوعة مسبقًا (FilePond)
+        if ($request->filled('uploaded_videos')) {
             $keys = collect((array) $request->input('uploaded_videos'))
                 ->filter(fn($v) => filled($v))
                 ->unique()
