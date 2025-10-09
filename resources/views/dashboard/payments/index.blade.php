@@ -11,7 +11,7 @@
             <!--begin::Card header-->
             <div class="card-header align-items-center py-5 gap-2 gap-md-5">
                 <div class="title">
-                    <h1 class="text-dark fw-bolder fs-3 mb-0">@lang('dashboard.reservation_revenue')</h1>
+                    <h1 class=" fw-bolder fs-3 mb-0">@lang('dashboard.reservation_revenue')</h1>
                 </div>
                         <!--begin::Card title-->
                 <div class="card-title">

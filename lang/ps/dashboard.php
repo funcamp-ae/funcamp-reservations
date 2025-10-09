@@ -535,7 +535,7 @@ return [
     'profile_details' => 'شخصي ډاټا',
     'deactivate_account' => 'حساب غیر فعال کول',
     'deactivate_desc' => '<h4 class="text-gray-900 fw-bolder">تاسو د حساب فعالیت لغوه کوئ</h4>
-    <div class="fs-6 text-gray-700">د نورو خوندیتوب لپاره، دا ستاسو د بریښنالیک یا تلیفون د شمیرې تایید ته اړتیا لري کله چې د ننوتلو د پټنوم بیاجوړول.',
+    <div class="fs-6 ">د نورو خوندیتوب لپاره، دا ستاسو د بریښنالیک یا تلیفون د شمیرې تایید ته اړتیا لري کله چې د ننوتلو د پټنوم بیاجوړول.',
     'expense_item'     => 'د لګښتونو توکی',
     'confirm_deactivate' => 'زه د حساب غیر فعال کول تایید کوم',
     'expense_date' => 'د لګښت نیټه',
@@ -544,7 +544,7 @@ return [
     'payment_updated_successfully' => 'تادیه بریالیتوب سره بدل شوه',
     'payment_created_successfully' => 'تادیه بریالیتوب سره جوړ شوه',
     'activate_account' => 'حساب فعال کول',
-    'activate_desc' => '<h4 class="text-gray-900 fw-bolder">تاسو حساب فعال کوئ</h4><div class="fs-6 text-gray-700">د حساب خاوند د بریالیتوب سره فعال کیدو وروسته د ننوتلو وړتیا لري',
+    'activate_desc' => '<h4 class="text-gray-900 fw-bolder">تاسو حساب فعال کوئ</h4><div class="fs-6 ">د حساب خاوند د بریالیتوب سره فعال کیدو وروسته د ننوتلو وړتیا لري',
 
     'confirm_activate' => 'زه د حساب فعال کول تایید کوم',
     'activation_status' => 'د حسابونو د دریځ بدلول',
@@ -1866,5 +1866,5 @@ return [
     'form_code' => 'د فورم کوډ',
     'confiscated_amount' => 'ضبط شوې اندازه',
     "for_warehouse_sale" => "د زيرمتون پلورل"
-    
+
 ];

@@ -35,7 +35,7 @@
                 </div>
                 <!--end::Heading-->
                 <!--begin::Plans-->
-                <div class="d-flex flex-column">  
+                <div class="d-flex flex-column">
                     <!--begin::Row-->
                     <div class="row mt-10">
                         <!--begin::Col-->
@@ -46,7 +46,7 @@
                                 <div class="tab-pane fade show active" id="kt_upgrade_plan_startup">
                                     <!--begin::Heading-->
                                     <div class="pb-5">
-                                        <h2 class="fw-bolder text-dark">What’s in Startup Plan?</h2>
+                                        <h2 class="fw-bolder ">What’s in Startup Plan?</h2>
                                         <div class="text-muted fw-bold">Optimal for 10+ team size and new startup</div>
                                     </div>
                                     <!--end::Heading-->
@@ -65,12 +65,12 @@
                                             <!--end::Svg Icon-->
                                         </div>
                                         <!--end::Item-->
-                                      
+
                                     </div>
                                     <!--end::Body-->
                                 </div>
                                 <!--end::Tab Pane-->
-                              
+
                             </div>
                             <!--end::Tab content-->
                         </div>
@@ -112,7 +112,7 @@
     <!--begin::Container-->
     <div id="kt_content_container" class="container-xxl"><div data-kt-swapper="true" data-kt-swapper-mode="prepend" data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}" class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
             <!--begin::Title-->
-            <h1 class="d-flex text-dark fw-bolder fs-3 align-items-center my-1">Account Settings</h1>
+            <h1 class="d-flex  fw-bolder fs-3 align-items-center my-1">Account Settings</h1>
             <!--end::Title-->
             <!--begin::Separator-->
             <span class="h-20px border-gray-300 border-start mx-4"></span>
@@ -138,7 +138,7 @@
                 </li>
                 <!--end::Item-->
                 <!--begin::Item-->
-                <li class="breadcrumb-item text-dark">Settings</li>
+                <li class="breadcrumb-item ">Settings</li>
                 <!--end::Item-->
             </ul>
             <!--end::Breadcrumb-->
@@ -182,7 +182,7 @@
                                 <div class="d-flex flex-wrap fw-bold fs-6 mb-4 pe-2">
                                     <a href="#" class="d-flex align-items-center    text-hover-primary me-5 mb-2">
                                     <!--begin::Svg Icon | path: icons/duotune/communication/com006.svg-->
-                                    
+
                                     <!--begin::Svg Icon | path: icons/duotune/communication/com011.svg-->
                                     <span class="svg-icon svg-icon-4 me-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -197,9 +197,9 @@
                             <!--end::User-->
                             <!--begin::Actions-->
                             <div class="d-flex my-4">
-                                
+
                                 <a href="#" class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#kt_modal_offer_a_deal">@lang('dashboard.send_notification')</a>
-                              
+
                             </div>
                             <!--end::Actions-->
                         </div>
@@ -250,12 +250,12 @@
                                         <!--end::Label-->
                                     </div>
                                     <!--end::Stat-->
-                                  
+
                                 </div>
                                 <!--end::Stats-->
                             </div>
                             <!--end::Wrapper-->
-                           
+
                         </div>
                         <!--end::Stats-->
                     </div>
@@ -264,7 +264,7 @@
                 <!--end::Details-->
                 <!--begin::Navs-->
                 <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder">
-                   
+
                     <!--begin::Nav item-->
                     <li class="nav-item mt-2">
                         <a class="nav-link text-active-primary ms-0 me-10 py-5" href="{{ route('users.edit' , $user->id)}}">Settings</a>
@@ -275,8 +275,8 @@
                         <a class="nav-link text-active-primary ms-0 me-10 py-5 active" href="{{ route('user-attachemts' , $user->id)}}">attachments</a>
                     </li>
                     <!--end::Nav item-->
-                    
-                   
+
+
                     <!--begin::Nav item-->
                     <li class="nav-item mt-2">
                         <a class="nav-link text-active-primary ms-0 me-10 py-5" href="../../demo1/dist/account/logs.html">Logs</a>
@@ -343,7 +343,7 @@
                                 <!--end::Title-->
                             </a>
                             <!--end::Name-->
-                          
+
                         </div>
                         <!--end::Card body-->
                     </div>
@@ -368,7 +368,7 @@
                                 <!--end::Title-->
                             </a>
                             <!--end::Name-->
-                           
+
                         </div>
                         <!--end::Card body-->
                     </div>
@@ -393,7 +393,7 @@
                                 <!--end::Title-->
                             </a>
                             <!--end::Name-->
-                           
+
                         </div>
                         <!--end::Card body-->
                     </div>
@@ -418,7 +418,7 @@
                                 <!--end::Title-->
                             </a>
                             <!--end::Name-->
-                           
+
                         </div>
                         <!--end::Card body-->
                     </div>
@@ -428,11 +428,11 @@
             </div>
         </div>
         <!--end::Basic info-->
-      
-      
-       
+
+
+
     </div>
     <!--end::Container-->
 </div>
-  
+
 @endsection

@@ -26,7 +26,7 @@
                             {{ __('dashboard.form_no') }}:
                             <span class="fw-bold">#{{ $rf->id }}</span>
                             @if($rf->request_code)
-                                <span class="badge bg-light text-dark ms-2">{{ $rf->request_code }}</span>
+                                <span class="badge bg-light  ms-2">{{ $rf->request_code }}</span>
                             @endif
                         </div>
                     </div>

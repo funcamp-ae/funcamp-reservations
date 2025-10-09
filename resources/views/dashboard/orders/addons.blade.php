@@ -61,7 +61,7 @@
 
                     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_category_table">
                         <thead>
-                        <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+                        <tr class="text-center  fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                             <th class="fw-bolder">{{ __('dashboard.addon_type') }}</th>
                             <th class="fw-bolder">{{ __('dashboard.addon_price') }}</th>
                             <th class="fw-bolder">{{ __('dashboard.quantity') }}</th>
@@ -74,7 +74,7 @@
                             <th class="fw-bolder">{{ __('dashboard.actions') }}</th>
                         </tr>
                         </thead>
-                        <tbody class="fw-bold text-gray-600">
+                        <tbody class="fw-bold ">
                         @foreach ($order->addons as $orderAddon)
                             <tr data-id="{{ $orderAddon->id }}">
                                 <td data-kt-ecommerce-category-filter="category_name">{{ $orderAddon->name }}</td>

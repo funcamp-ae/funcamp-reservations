@@ -42,7 +42,7 @@
 					<!--begin::Wrapper-->
 					<div class="pt-lg-10 mb-10">
 						<!--begin::Logo-->
-						<h1 class="fw-bolder fs-2qx text-gray-800 mb-7">Welcome to Metronic</h1>
+						<h1 class="fw-bolder fs-2qx  mb-7">Welcome to Metronic</h1>
 						<!--end::Logo-->
 						<!--begin::Message-->
 						<div class="fw-bold fs-3 text-muted mb-15">Plan your blog post by choosing a topic creating

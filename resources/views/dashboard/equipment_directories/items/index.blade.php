@@ -31,7 +31,7 @@
             <div class="table-responsive">
                 <table class="table align-middle table-row-dashed fs-6 gy-5">
                     <thead>
-                    <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                    <tr class="text-start  fw-bolder fs-7 text-uppercase gs-0">
                         <th>#</th>
                         <th class="min-w-100px">@lang('dashboard.item_type')</th>
                         <th class="min-w-100px">@lang('dashboard.item_name')</th>

@@ -1,4 +1,4 @@
- 
+
 @section('pageTitle' , __('dashboard.stocks'))
 @extends('dashboard.layouts.app')
 @section('content')
@@ -14,7 +14,7 @@
                 <!--begin::Container-->
                 <div class="container">
                     <!--begin::Profile Overview d-flex flex-row -->
-                  
+
                         <!--begin::Aside  flex-row-auto offcanvas-mobile w-300px w-xl-350px -->
                         <div class="" id="kt_profile_aside" style="padding-left: 20px;">
                             <!--begin::Profile Card-->
@@ -27,9 +27,9 @@
                                         <div class="symbol symbol-60 symbol-xxl-100 mr-5 align-self-start align-self-xxl-center">
                                             <a href="{{ asset($stock->image) }}"> <img src="{{ asset($stock->image) }}" style="width:120px;height:120px;"></a>
                                         </div>
-                                        @endif 
+                                        @endif
                                         <div>
-                                            <a href="{{ route('stocks.edit',$stock->id) }}" class="font-weight-bolder font-size-h5 text-dark-75 text-hover-primary">
+                                            <a href="{{ route('stocks.edit',$stock->id) }}" class="font-weight-bolder font-size-h5 -75 text-hover-primary">
                                                 {{$stock->name}} <i class="fa fa-edit"></i>
                                             </a>
                                         </div>
@@ -67,7 +67,7 @@
                         <div class="card card-custom gutter-b" style="width: 100%;">
                             <div class="card-header border-0 pt-5">
                                 <h3 class="card-title align-items-start flex-column">
-                                    <span class="card-label font-weight-bolder text-dark">@lang('dashboard.activities')</span>
+                                    <span class="card-label font-weight-bolder ">@lang('dashboard.activities')</span>
                                 </h3>
                             </div>
                             <div class="card-body pt-2 pb-0 mt-n3">

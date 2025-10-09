@@ -8,7 +8,7 @@
 
         <!--begin::Table row-->
 
-    <tr class="text-start text-dark fw-bolder fs-8 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important; letter-spacing: .3px;">
+    <tr class="text-start  fw-bolder fs-8 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important; letter-spacing: .3px;">
 
             <th class="w-10px pe-2 text-center fw-bolder">
 

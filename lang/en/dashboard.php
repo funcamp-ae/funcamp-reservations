@@ -452,10 +452,10 @@ return [
     'profile_details' => 'Profile Details',
     'deactivate_account' => 'Deactivate Account',
     'deactivate_desc' => "<h4 class='text-gray-900 fw-bolder'>You are deactivating the account</h4>
-<div class='fs-6 text-gray-700'>For additional security, confirmation via email or phone will be required when resetting login password.",
+<div class='fs-6 '>For additional security, confirmation via email or phone will be required when resetting login password.",
     'confirm_deactivate' => 'Confirm Deactivation',
     'activate_account' => 'Activate Account',
-    'activate_desc' => "<h4 class='text-gray-900 fw-bolder'>You are activating the account</h4><div class='fs-6 text-gray-700'>The account owner will be able to log in after successful activation.",
+    'activate_desc' => "<h4 class='text-gray-900 fw-bolder'>You are activating the account</h4><div class='fs-6 '>The account owner will be able to log in after successful activation.",
     'confirm_activate' => 'Confirm Activation',
     'activation_status' => 'Change Account Status',
     'account_status' => 'Account Status',

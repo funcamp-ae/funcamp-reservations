@@ -12,7 +12,7 @@
                      data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}"
                      class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
                     <!--begin::Title-->
-                    <h1 class="d-flex text-dark fw-bolder fs-3 align-items-center my-1">
+                    <h1 class="d-flex  fw-bolder fs-3 align-items-center my-1">
                         {{ isset($taskType) ? __('dashboard.edit_task_type') : __('dashboard.add_task_type') }}
                     </h1>
                     <!--end::Title-->
@@ -42,7 +42,7 @@
                         </li>
                         <!--end::Item-->
                         <!--begin::Item-->
-                        <li class="breadcrumb-item text-dark">
+                        <li class="breadcrumb-item ">
                             {{ isset($taskType) ? __('dashboard.edit_task_type') : __('dashboard.add_task_type') }}
                         </li>
                         <!--end::Item-->
@@ -139,7 +139,7 @@
                                         <select name="status" required aria-label="Select Status"
                                                 class="form-select form-select-solid form-select-lg fw-bold">
                                             <option value="active"
-                                                    @if(isset($taskType) && $taskType->status == 'active') selected 
+                                                    @if(isset($taskType) && $taskType->status == 'active') selected
                                                     @elseif(!isset($taskType)) selected @endif
                                             >@lang('dashboard.active')</option>
                                             <option value="inactive"

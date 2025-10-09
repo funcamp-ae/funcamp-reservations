@@ -53,7 +53,7 @@
         <div class="table-responsive">
           <table class="table align-middle table-row-dashed fs-6 gy-5">
             <thead>
-              <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+              <tr class="text-center  fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                 <th class="min-w-100px fw-bolder">@lang('dashboard.title')</th>
                 <th class="">@lang('dashboard.created_date | created_time')</th>
                 <th class="min-w-100px fw-bolder">@lang('dashboard.assigned_to')</th>
@@ -62,10 +62,10 @@
                 <th class="min-w-100px">@lang('dashboard.task_status')</th>
               </tr>
             </thead>
-            <tbody class="fw-bold text-gray-600">
+            <tbody class="fw-bold ">
               @forelse ($tasks as $task)
               <tr>
-                <td><a class="text-gray-800 text-hover-primary mb-1">{{ $task->title }}</a></td>
+                <td><a class=" text-hover-primary mb-1">{{ $task->title }}</a></td>
                 <td>{{ optional($task->created_at)->format('Y-m-d | h:i A') }}</td>
                 <td>{{ optional($task->assignedUser)->name }}</td>
                 <td>

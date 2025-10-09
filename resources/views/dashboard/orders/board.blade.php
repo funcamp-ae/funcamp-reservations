@@ -78,7 +78,7 @@
                     <td>{{ optional($order->customer)->name }}</td>
                     <td>
                       @if($timeFrom || $timeTo)
-                      <span class="badge bg-light text-dark">{{ $timeFrom }} - {{ $timeTo }}</span>
+                      <span class="badge bg-light ">{{ $timeFrom }} - {{ $timeTo }}</span>
                       @endif
                     </td>
                     <td class="payment-status" data-order-id="{{ $order->id }}">
@@ -182,7 +182,7 @@
                     <td>{{ optional($order->customer)->name }}</td>
                     <td>
                       @if($order->time_from || $order->time_to)
-                      <span class="badge bg-light text-dark">{{ $order->time_from }} - {{ $order->time_to }}</span>
+                      <span class="badge bg-light ">{{ $order->time_from }} - {{ $order->time_to }}</span>
                       @endif
                     </td>
                     <td>

@@ -45,7 +45,7 @@
                         <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_task_table">
                         <!--begin::Table head-->
                         <thead>
-                        <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+                        <tr class="text-center  fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                             <th class="min-w-100px fw-bolder">@lang('dashboard.title')</th>
                             <th class="min-w-100px fw-bolder">@lang('dashboard.task_type')</th>
                             <th class="min-w-100px fw-bolder">@lang('dashboard.assigned_to')</th>
@@ -59,11 +59,11 @@
                         </thead>
                         <!--end::Table head-->
                         <!--begin::Table body-->
-                        <tbody class="fw-bold text-gray-600">
+                        <tbody class="fw-bold ">
                         @foreach ($tasks as $task)
                             <tr>
                                 <td>
-                                    <a class="text-gray-800 text-hover-primary mb-1">{{ $task->title }}</a>
+                                    <a class=" text-hover-primary mb-1">{{ $task->title }}</a>
                                 </td>
                                 <td>
                                     @if($task->taskType)

@@ -129,7 +129,7 @@
     }
 
     .permissions-container {
-        background: linear-gradient(135deg, #faf9f7 0%, #f5f4f2 100%) !important;
+        background: linear-gradient(135deg,) !important;
         border-radius: 15px !important;
         padding: 2.5rem !important;
         margin-top: 1.5rem !important;
@@ -137,7 +137,6 @@
     }
 
     .permissions-header {
-        background: white !important;
         border-radius: 12px !important;
         padding: 2rem !important;
         margin-bottom: 2.5rem !important;
@@ -185,7 +184,7 @@
 
     .card-header {
         border-bottom: 2px solid var(--light-brown) !important;
-        background: linear-gradient(to right, #fefefe 0%, #faf9f7 100%) !important;
+        background: linear-gradient(to right,) !important;
     }
 
     @media (max-width: 768px) {
@@ -246,7 +245,7 @@
                 data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}"
                 class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
                 <!--begin::Title-->
-                <h1 class="d-flex text-dark fw-bolder fs-3 align-items-center my-1">
+                <h1 class="d-flex  fw-bolder fs-3 align-items-center my-1">
                     @lang('dashboard.create_title', ['page_title' => __('dashboard.role')])</h1>
                 <!--end::Title-->
                 <!--begin::Separator-->
@@ -276,7 +275,7 @@
                     </li>
                     <!--end::Item-->
                     <!--begin::Item-->
-                    <li class="breadcrumb-item text-dark">
+                    <li class="breadcrumb-item ">
                         @lang('dashboard.create', ['page_title' => __('dashboard.role')])</li>
                     <!--end::Item-->
                 </ul>
@@ -319,13 +318,13 @@
                                 <div class="d-flex align-items-center">
                                     <i class="fas fa-shield-alt fs-2 text-primary me-3"></i>
                                     <div>
-                                        <h4 class="fw-bolder text-dark mb-1">@lang('dashboard.select_all_permissions')</h4>
+                                        <h4 class="fw-bolder  mb-1">@lang('dashboard.select_all_permissions')</h4>
                                         <p class="text-muted fs-7 mb-0">@lang('dashboard.choose_permissions_for_role')</p>
                                     </div>
                                 </div>
                                 <div class="form-check form-check-solid form-switch">
                                     <input class="form-check-input w-45px h-30px" type="checkbox" id="checkedAll">
-                                    <label class="form-check-label fw-bold text-gray-700" for="checkedAll">@lang('dashboard.select_all')</label>
+                                    <label class="form-check-label fw-bold " for="checkedAll">@lang('dashboard.select_all')</label>
                                 </div>
                             </div>
                         </div>

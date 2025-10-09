@@ -209,7 +209,7 @@ return [
     'has already been served the selected services on this date' => 'أنواع المخيمات محجوزة بالفعل في نفس التاريخ',
     'hours' => 'عدد الساعات',
     'hour_from' => 'من الساعة',
-    'delivery_time' => 'وقت تسجيل الخروج', 
+    'delivery_time' => 'وقت تسجيل الخروج',
     'signin_time' => 'وقت تسجيل الدخول',
     'signout_time' => 'وقت تسجيل الخروج',
     'edit_time_and_media' => 'تعديل الوقت والوسائط',
@@ -535,7 +535,7 @@ return [
     'profile_details' => 'البيانات الشخصية',
     'deactivate_account' => 'تعطيل الحساب',
     'deactivate_desc' => '<h4 class="text-gray-900 fw-bolder">أنت تقوم بإلغاء تنشيط الحساب</h4>
-    <div class="fs-6 text-gray-700">لمزيد من الأمان ، يتطلب ذلك تأكيد بريدك الإلكتروني أو رقم هاتفك عند إعادة تعيين كلمة مرور تسجيل الدخول.',
+    <div class="fs-6 ">لمزيد من الأمان ، يتطلب ذلك تأكيد بريدك الإلكتروني أو رقم هاتفك عند إعادة تعيين كلمة مرور تسجيل الدخول.',
     'expense_item'     => 'بند المصاريف',
     'confirm_deactivate' => 'أؤكد تعطيل الحساب',
     'expense_date' => 'تاريخ المصروف',
@@ -544,7 +544,7 @@ return [
     'payment_updated_successfully' => 'تم تحديث المدفوعه بنجاح',
     'payment_created_successfully' => 'تم إنشاء المدفوعه بنجاح',
     'activate_account' => 'تفعيل الحساب',
-    'activate_desc' => '<h4 class="text-gray-900 fw-bolder">أنت تقوم بتنشيط الحساب</h4><div class="fs-6 text-gray-700"> سيتمكن صاحب الحساب من تسجيل الدخول بعد التفعيل بنجاح',
+    'activate_desc' => '<h4 class="text-gray-900 fw-bolder">أنت تقوم بتنشيط الحساب</h4><div class="fs-6 "> سيتمكن صاحب الحساب من تسجيل الدخول بعد التفعيل بنجاح',
 
     'confirm_activate' => 'أؤكد تفعيل الحساب',
     'activation_status' => 'تغيير حالة الحسابات',
@@ -1868,6 +1868,6 @@ return [
     'payment_deleted_successfully' => 'تم حذف المدفعة بنجاح',
     'form_code' => 'كود الاستمارة',
     'confiscated_amount' => 'المبلغ المصادر',
-    
+
 ];
 

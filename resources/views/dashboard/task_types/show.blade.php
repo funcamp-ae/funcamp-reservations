@@ -12,7 +12,7 @@
                      data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}"
                      class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
                     <!--begin::Title-->
-                    <h1 class="d-flex text-dark fw-bolder fs-3 align-items-center my-1">
+                    <h1 class="d-flex  fw-bolder fs-3 align-items-center my-1">
                         @lang('dashboard.task_type'): {{ $taskType->name }}
                     </h1>
                     <!--end::Title-->
@@ -42,7 +42,7 @@
                         </li>
                         <!--end::Item-->
                         <!--begin::Item-->
-                        <li class="breadcrumb-item text-dark">{{ $taskType->name }}</li>
+                        <li class="breadcrumb-item ">{{ $taskType->name }}</li>
                         <!--end::Item-->
                     </ul>
                     <!--end::Breadcrumb-->
@@ -70,7 +70,7 @@
                             <div class="card-header border-0 pt-7">
                                 <!--begin::Title-->
                                 <h3 class="card-title align-items-start flex-column">
-                                    <span class="card-label fw-bolder text-dark">@lang('dashboard.task_type') @lang('dashboard.details')</span>
+                                    <span class="card-label fw-bolder ">@lang('dashboard.task_type') @lang('dashboard.details')</span>
                                 </h3>
                                 <!--end::Title-->
                             </div>
@@ -150,7 +150,7 @@
                             <div class="card-header border-0 pt-7">
                                 <!--begin::Title-->
                                 <h3 class="card-title align-items-start flex-column">
-                                    <span class="card-label fw-bolder text-dark">@lang('dashboard.tasks') ({{ $taskType->tasks->count() }})</span>
+                                    <span class="card-label fw-bolder ">@lang('dashboard.tasks') ({{ $taskType->tasks->count() }})</span>
                                 </h3>
                                 <!--end::Title-->
                             </div>
@@ -197,12 +197,12 @@
                                     <!--begin::Empty state-->
                                     <div class="text-center py-10">
                                         <div class="mb-5">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="text-gray-400" viewBox="0 0 16 16">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="" viewBox="0 0 16 16">
                                                 <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM7.5 3.5a.5.5 0 0 1 1 0v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 7.293V3.5z"/>
                                             </svg>
                                         </div>
                                         <h5 class="   mb-0">@lang('dashboard.no_tasks_found')</h5>
-                                        <span class="text-gray-500">@lang('dashboard.no_tasks_associated_with_this_type')</span>
+                                        <span class="">@lang('dashboard.no_tasks_associated_with_this_type')</span>
                                     </div>
                                     <!--end::Empty state-->
                                 @endif

@@ -83,8 +83,8 @@
 
                                 @if ($order->confiscation_description)
                                 <div class="mb-2">
-                                    <span class="fw-semibold text-gray-800">{{ __('dashboard.confiscation_description') }}:</span>
-                                    <span class="text-gray-700">{{ $order->confiscation_description }}</span>
+                                    <span class="fw-semibold ">{{ __('dashboard.confiscation_description') }}:</span>
+                                    <span class="">{{ $order->confiscation_description }}</span>
                                 </div>
                                 @endif
 
@@ -92,7 +92,7 @@
                                 <div class="mb-2">
                                     <span class="fw-bold text-danger">{{ __('dashboard.insurance_confiscated_full') }}</span>
                                     @if($order->partial_confiscation_amount)
-                                    <span class="text-gray-700">- {{ number_format($order->insuranceFromTransaction(), 2) }} AED</span>
+                                    <span class="">- {{ number_format($order->insuranceFromTransaction(), 2) }} AED</span>
                                     @endif
                                 </div>
                                 @endif
@@ -102,7 +102,7 @@
                                     <span class="fw-bold text-warning">{{ __('dashboard.insurance_confiscated_partial') }}</span>
                                     <br>
                                     @if($order->insuranceFromTransaction())
-                                    <span class="text-gray-700">{{ __('dashboard.remaining_insurance') }}: </span>
+                                    <span class="">{{ __('dashboard.remaining_insurance') }}: </span>
                                     <span class="fw-bold text-success">{{ number_format($order->verifiedInsuranceAmount() - ($order->partial_confiscation_amount ??$order->insuranceFromTransaction), 2) }} AED</span>
                                     @endif
                                 </div>

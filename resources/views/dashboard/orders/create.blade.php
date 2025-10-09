@@ -177,8 +177,8 @@
                                     <textarea id="internalNoteField" name="notes" class="form-control d-none form-control-lg form-control-solid" placeholder="@lang('dashboard.notes')">{{ isset($order) ? $order->notes : old('notes', request('notes')) }}</textarea>
                                 </div>
                             </div>
-                            @php 
-                            
+                            @php
+
                             $date = old('date', request('date'));
                             if (isset($scheduledDate)) {
                                 $date = $scheduledDate;
@@ -883,7 +883,7 @@
 
             function fillFormFromPayload(payload){
                 $('#rf_id').val(payload.rf_id || '');
-                $('input[name="people_count"]').val(payload.people_count || '');                
+                $('input[name="people_count"]').val(payload.people_count || '');
                 // Always calculate the price from the selected services
                 if (payload.service_ids && payload.service_ids.length > 0) {
                     // First, select the services
@@ -894,9 +894,9 @@
                         $('#service_id').trigger('change');
                     });
                 }
-                
+
                 // Always recalculate the price to ensure it's in the correct format
-                 recalcPrice();  
+                 recalcPrice();
                 // If a specific price was provided, use it after setting the services
                 if (payload.price) {
                     const formattedPrice = parseFloat(payload.price).toFixed(2);
@@ -904,12 +904,12 @@
                 }
 
                 if (payload.date) $('input[name="date"]').val(payload.date);
-                
+
                 // Format time values to HH:MM format
                 if (payload.time_from) {
                     $('input[name="time_from"]').val(payload.time_from);
                 }
-                
+
                 if (payload.time_to) {
                     $('input[name="time_to"]').val(payload.time_to);
                 }
@@ -952,7 +952,7 @@
                 const isEdit = @json(isset($order));
                 if (!hasPrefill || isEdit) return;
                 let params = new URLSearchParams(window.location.search);
-                let service_ids = [] ; 
+                let service_ids = [] ;
                 for (const [key , value ] of params.entries()) {
                     if (key.startsWith('service_ids[')) {
                         service_ids.push(value);
@@ -989,7 +989,7 @@
                         }
                         // Fill the form with the payload
                         fillFormFromPayload(payload);
-                        
+
                         // Show success message
                         if (window.Swal) {
                             const rfId = url.searchParams.get('rf_id');
@@ -1007,7 +1007,7 @@
                     }).fail(function() {
                         // If the AJAX call fails, still try to fill the form with what we have
                         fillFormFromPayload(payload);
-                        
+
                         // Show success message for direct URL parameters
                         if (window.Swal) {
                             Swal.fire({
@@ -1023,7 +1023,7 @@
                 } else {
                     // No rf_id, just fill the form with the URL parameters
                     fillFormFromPayload(payload);
-                    
+
                     // Show success message for direct URL parameters
                     if (window.Swal) {
                         Swar.fire({
@@ -1475,7 +1475,7 @@
 
                         const $badge = $('<span class="d-inline-flex align-items-center gap-2">');
                         $badge.html(`
-                            <span class="badge bg-secondary text-dark px-2 py-1 d-inline-flex align-items-center gap-2">
+                            <span class="badge bg-secondary  px-2 py-1 d-inline-flex align-items-center gap-2">
                                 <span class="note-name">${escapeHtml(name)}</span>
                                 <span class="internal-note-actions d-inline-flex align-items-center">
                                     <button type="button" class="btn-edit-internal p-0 border-0" title="{{ __('dashboard.edit') }}">

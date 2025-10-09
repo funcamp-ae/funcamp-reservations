@@ -56,7 +56,7 @@
                             <!--end::Input-->
                         </div>
                         <!--end::Input group-->
-                       
+
                         <!--begin::Input group-->
                         <div class="fv-row mb-15">
                             <!--begin::Label-->
@@ -137,7 +137,7 @@
                 </div>
                 <!--end::Heading-->
                 <!--begin::Plans-->
-                <div class="d-flex flex-column">  
+                <div class="d-flex flex-column">
                     <!--begin::Row-->
                     <div class="row mt-10">
                         <!--begin::Col-->
@@ -148,7 +148,7 @@
                                 <div class="tab-pane fade show active" id="kt_upgrade_plan_startup">
                                     <!--begin::Heading-->
                                     <div class="pb-5">
-                                        <h2 class="fw-bolder text-dark">What’s in Startup Plan?</h2>
+                                        <h2 class="fw-bolder ">What’s in Startup Plan?</h2>
                                         <div class="text-muted fw-bold">Optimal for 10+ team size and new startup</div>
                                     </div>
                                     <!--end::Heading-->
@@ -167,12 +167,12 @@
                                             <!--end::Svg Icon-->
                                         </div>
                                         <!--end::Item-->
-                                      
+
                                     </div>
                                     <!--end::Body-->
                                 </div>
                                 <!--end::Tab Pane-->
-                              
+
                             </div>
                             <!--end::Tab content-->
                         </div>
@@ -214,7 +214,7 @@
     <!--begin::Container-->
     <div id="kt_content_container" class="container-xxl"><div data-kt-swapper="true" data-kt-swapper-mode="prepend" data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}" class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
             <!--begin::Title-->
-            <h1 class="d-flex text-dark fw-bolder fs-3 align-items-center my-1">Account Settings</h1>
+            <h1 class="d-flex  fw-bolder fs-3 align-items-center my-1">Account Settings</h1>
             <!--end::Title-->
             <!--begin::Separator-->
             <span class="h-20px border-gray-300 border-start mx-4"></span>
@@ -240,7 +240,7 @@
                 </li>
                 <!--end::Item-->
                 <!--begin::Item-->
-                <li class="breadcrumb-item text-dark">Settings</li>
+                <li class="breadcrumb-item ">Settings</li>
                 <!--end::Item-->
             </ul>
             <!--end::Breadcrumb-->
@@ -284,7 +284,7 @@
                                 <div class="d-flex flex-wrap fw-bold fs-6 mb-4 pe-2">
                                     <a href="#" class="d-flex align-items-center    text-hover-primary me-5 mb-2">
                                     <!--begin::Svg Icon | path: icons/duotune/communication/com006.svg-->
-                                    
+
                                     <!--begin::Svg Icon | path: icons/duotune/communication/com011.svg-->
                                     <span class="svg-icon svg-icon-4 me-1">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -352,12 +352,12 @@
                                         <!--end::Label-->
                                     </div>
                                     <!--end::Stat-->
-                                  
+
                                 </div>
                                 <!--end::Stats-->
                             </div>
                             <!--end::Wrapper-->
-                           
+
                         </div>
                         <!--end::Stats-->
                     </div>
@@ -366,7 +366,7 @@
                 <!--end::Details-->
                 <!--begin::Navs-->
                 <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bolder">
-                   
+
 
                     <!--begin::Nav item-->
                     <li class="nav-item mt-2">
@@ -378,8 +378,8 @@
                         <a class="nav-link text-active-primary ms-0 me-10 py-5 " href="{{ route('user-attachemts' , $user->id)}}">attachments</a>
                     </li>
                     <!--end::Nav item-->
-                  
-                   
+
+
                     <!--begin::Nav item-->
                     <li class="nav-item mt-2">
                         <a class="nav-link text-active-primary ms-0 me-10 py-5" href="../../demo1/dist/account/logs.html">Logs</a>
@@ -523,11 +523,11 @@
                             <div class="col-lg-8 fv-row fv-plugins-icon-container">
                                 <select name="country" aria-label="Select a Country" data-control="select2" data-placeholder="Select a country..." class="form-select form-select-solid form-select-lg fw-bold select2-hidden-accessible" data-select2-id="select2-data-10-05ls" tabindex="-1" aria-hidden="true">
                                     <option value="" data-select2-id="select2-data-12-wa4o">Select a Country...</option>
-                                  
+
                                     <option data-kt-flag="flags/egypt.svg" value="EG">Egypt</option>
-                                  
+
                                     <option data-kt-flag="flags/uzbekistan.svg" value="UZ">Uzbekistan</option>
-                                   
+
                                 </select>
                             <div class="fv-plugins-message-container invalid-feedback"></div></div>
                             <!--end::Col-->
@@ -543,11 +543,11 @@
                                 <!--begin::Input-->
                                 <select name="language" aria-label="Select a Language" data-control="select2" data-placeholder="Select a language..." class="form-select form-select-solid form-select-lg select2-hidden-accessible" data-select2-id="select2-data-13-aw3u" tabindex="-1" aria-hidden="true">
                                     <option value="" data-select2-id="select2-data-15-q5j0">Select a Language...</option>
-                                 
+
                                     <option data-kt-flag="flags/united-kingdom.svg" value="en">English</option>
-                                    
+
                                     <option data-kt-flag="flags/argentina.svg" value="ar">العربية - Arabic</option>
-                                   
+
                                 </select>
                                 <!--end::Input-->
                                 <!--begin::Hint-->
@@ -557,7 +557,7 @@
                             <!--end::Col-->
                         </div>
                         <!--end::Input group-->
-                       
+
                         <!--begin::Input group-->
                         <div class="row mb-6">
                             <!--begin::Label-->
@@ -569,7 +569,7 @@
                                     <option value="" data-select2-id="select2-data-21-t9jb">Select a currency..</option>
                                     <option data-kt-flag="flags/united-states.svg" value="USD">
                                     USD&nbsp;-&nbsp;USA dollar</option>
-                                   
+
                                 </select>
                             </div>
                             <!--end::Col-->
@@ -631,8 +631,8 @@
             <!--end::Content-->
         </div>
         <!--end::Basic info-->
-      
-      
+
+
         <!--begin::Notifications-->
         <div class="card mb-5 mb-xl-10">
             <!--begin::Card header-->
@@ -816,11 +816,11 @@
             <!--end::Content-->
         </div>
         <!--end::Deactivate Account-->
-      
+
     </div>
     <!--end::Container-->
 </div>
-  
+
 
 
 

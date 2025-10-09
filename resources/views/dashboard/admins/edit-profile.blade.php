@@ -15,7 +15,7 @@
                 data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}"
                 class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
                 <!--begin::Title-->
-                <h1 class="d-flex text-dark fw-bolder fs-3 align-items-center my-1">@lang('dashboard.update_title', ['page_title' => __('dashboard.admin')])</h1>
+                <h1 class="d-flex fw-bolder fs-3 align-items-center my-1">@lang('dashboard.update_title', ['page_title' => __('dashboard.admin')])</h1>
                 <!--end::Title-->
                 <!--begin::Separator-->
                 <span class="h-20px border-gray-300 border-start mx-4"></span>
@@ -44,7 +44,7 @@
                     </li>
                     <!--end::Item-->
                     <!--begin::Item-->
-                    <li class="breadcrumb-item text-dark">@lang('dashboard.update', ['page_title' => __('dashboard.admin')])</li>
+                    <li class="breadcrumb-item ">@lang('dashboard.update', ['page_title' => __('dashboard.admin')])</li>
                     <!--end::Item-->
                 </ul>
                 <!--end::Breadcrumb-->
@@ -76,7 +76,7 @@
                 <div id="kt_account_settings_profile_details" class="collapse show">
                     <!--begin::Form-->
                     <!--begin::Form-->
-                    <form id="kt_ecommerce_add_product_form" method="POST" action="{{ route('update-profile')}}" class="form fv-plugins-bootstrap5 fv-plugins-framework store" 
+                    <form id="kt_ecommerce_add_product_form" method="POST" action="{{ route('update-profile')}}" class="form fv-plugins-bootstrap5 fv-plugins-framework store"
                         data-kt-redirect="{{route('admins.index')}}" novalidate="novalidate" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
@@ -228,7 +228,7 @@
                             </div>
                             <!--end::Input group-->
 
-                          
+
                         </div>
                         <!--end::Basic info-->
 
@@ -260,7 +260,7 @@
 
     <script src="{{ asset('dashboard/custom/js/intlTelInput.js') }}"></script>
 
- 
+
 
     <script>
         $('#kt_ecommerce_add_product_form').validate({
@@ -269,7 +269,7 @@
                 name: {
                     required: true,
                 },
-              
+
                 email: {
                     required: true,
                     email: true

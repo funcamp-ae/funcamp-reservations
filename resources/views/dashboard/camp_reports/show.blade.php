@@ -41,7 +41,7 @@
             @if($campReport->general_notes)
                 <div class="mb-4">
                     <p class="fw-bold text-primary">@lang('dashboard.general_notes'):</p>
-                    <span class="text-dark">{!! nl2br(e($campReport->general_notes)) !!}</span>
+                    <span class="">{!! nl2br(e($campReport->general_notes)) !!}</span>
                 </div>
             @endif
 

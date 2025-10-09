@@ -14,7 +14,7 @@
                     data-kt-swapper-parent="{default: '#kt_content_container', 'lg': '#kt_toolbar_container'}"
                     class="page-title d-flex align-items-center flex-wrap me-3 mb-5 mb-lg-0">
                     <!--begin::Title-->
-                    <h1 class="d-flex text-dark fw-bolder fs-3 align-items-center my-1">@lang('dashboard.create_title', ['page_title' => __('dashboard.initial_page')])</h1>
+                    <h1 class="d-flex  fw-bolder fs-3 align-items-center my-1">@lang('dashboard.create_title', ['page_title' => __('dashboard.initial_page')])</h1>
                     <!--end::Title-->
                     <!--begin::Separator-->
                     <span class="h-20px border-gray-300 border-start mx-4"></span>
@@ -42,13 +42,13 @@
                         </li>
                         <!--end::Item-->
                         <!--begin::Item-->
-                        <li class="breadcrumb-item text-dark">@lang('dashboard.create_title', ['page_title' => __('dashboard.initial_page')])</li>
+                        <li class="breadcrumb-item ">@lang('dashboard.create_title', ['page_title' => __('dashboard.initial_page')])</li>
                         <!--end::Item-->
                     </ul>
                     <!--end::Breadcrumb-->
                 </div>
                 <!--end::Page title-->
-      
+
             </div>
             <!--end::Container-->
         </div>
@@ -190,7 +190,7 @@
                                         <!--end::Card header-->
                                         <!--begin::Card body-->
                                         <div class="card-body pt-0">
-                                           
+
                                             <!--begin::Input group-->
                                             <div>
                                                 <!--begin::Label-->
@@ -307,10 +307,10 @@
     <!--end::Content-->
 @section('scripts')
 <script>
-    
+
     $('#kt_ecommerce_add_product_form').validate({
         rules: {
-          
+
           image : {
               required : true
           },
@@ -330,7 +330,7 @@
 
         },
 
-       
+
 
     })
 

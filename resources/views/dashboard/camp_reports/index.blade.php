@@ -27,7 +27,7 @@
         <div class="card-body pt-0 table-responsive">
             <table class="table align-middle table-row-dashed fs-6 gy-5">
                 <thead>
-                <tr class="text-center text-gray-400 fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+                <tr class="text-center  fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                     <th class="fw-bolder">@lang('dashboard.report_date')</th>
                     <th class="fw-bolder">@lang('dashboard.service')</th>
                     <th class="fw-bolder">@lang('dashboard.camp_name')</th>
