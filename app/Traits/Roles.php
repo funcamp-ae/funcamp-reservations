@@ -302,7 +302,7 @@ trait Roles
                                 <input type="checkbox" name="permissions[]" data-parent="' . $parent_class . '" value="' . $permissionName . '" id="' . $permissionName . '" class="childs ' . $parent_class . '" ' . $isSelected . '>
                                 <label for="' . $permissionName . '" dir="ltr"></label>
                                     </div>
-                            <label class="title_lable" for="' . $permissionName . '">' . $title . '</label>
+                            <label for="' . $permissionName . '">' . $title . '</label>
                                 </div>
                             </li>';
             }
