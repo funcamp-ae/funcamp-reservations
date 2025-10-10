@@ -58,7 +58,7 @@
             @csrf
             @method('PUT')
 
-            <div class="card-header align-items-center py-5 gap-2 gap-md-5">
+            <div class=" py-5 ">
                            <!-- customer information -->
                            <div class="pt-5 px-9 gap-2 gap-md-5">
                     <div class="row g-3 small">
