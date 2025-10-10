@@ -60,7 +60,10 @@ class WhatsAppService
      * URL: https://app.hypersender.com/api/whatsapp/v1/:instance/send-file
      * Based on: https://docs.hypersender.com/docs/whatsapp/wa-send-file
      */
-        // Validate file exists and is readable
+    public function sendFile($phoneNumber, $filePath, $caption = null)
+    {
+        try {
+            // Validate file exists and is readable
             if (!file_exists($filePath) || !is_readable($filePath)) {
                 Log::error('WhatsApp file not found or not readable', [
                     'phone' => $phoneNumber,
