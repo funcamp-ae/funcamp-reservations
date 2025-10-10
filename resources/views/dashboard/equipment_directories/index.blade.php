@@ -90,3 +90,33 @@
         </div>
     </div>
 @endsection
+
+@push('css')
+<style>
+    /* تأكد أن أي ديكور فوق الصف ما يبلع اللمسة */
+.table-row-dashed tbody tr::before,
+.table-row-dashed tbody tr::after {
+  pointer-events: none !important;
+}
+
+/* خلّي الأزرار فوق أي طبقة داخل الجدول المستجيب */
+.table-responsive .table a.btn,
+.table-responsive .table button.btn {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  -webkit-transform: translateZ(0); /* إصلاح طبقات iOS */
+  touch-action: manipulation;       /* يقلل مشاكل double-tap */
+}
+
+/* كبر مساحة اللمس شوية (اختياري بس مفيد على الآيباد) */
+.table .btn.btn-sm {
+  min-width: 40px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+</style>
+@endpush
