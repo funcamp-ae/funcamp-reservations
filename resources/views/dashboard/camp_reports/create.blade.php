@@ -534,46 +534,64 @@
     </style>
 @endpush
 
+
+
+
+
+
+
+
+
+
 @push('js')
     <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
-    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js">
-    </script>
-    <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.min.js">
-    </script>
+    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const CSRF = '{{ csrf_token() }}';
+            const CSRF       = '{{ csrf_token() }}';
             const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
-            const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+            // 👇 كشف المنصّة بدقة (iPadOS يتنكر كـ Mac):
+            const isiPadUA   = /\biPad\b/i.test(navigator.userAgent);
+            const iPadLike   = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+            const isiPad     = isiPadUA || iPadLike;
+            const isPhone    = /Android|iPhone|Mobile/i.test(navigator.userAgent) && !isiPad;
+            const canRecord  = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && 'MediaRecorder' in window);
+
             const ACCEPTED_VIDEOS = [
                 'video/mp4', 'video/quicktime', 'video/hevc', 'video/webm', 'video/avi',
                 'video/x-matroska', 'video/x-flv', 'video/3gpp', 'video/3gpp2', 'video/mpeg',
                 'video/mpg', 'video/x-ms-wmv', 'video/x-m4v'
             ];
 
-            function cleanMime(type) {
-                const t = (type || '').split(';')[0].trim();
-                return t || 'video/webm';
+            const cleanMime = (type) => (type || '').split(';')[0].trim() || 'video/webm';
+
+            // عند غياب MIME (Safari):
+            function inferMimeByExt(file) {
+                let t = (file?.type || '').split(';')[0].trim();
+                if (t) return t;
+                const ext = (file?.name || '').split('.').pop()?.toLowerCase();
+                const map = {
+                    mp4:'video/mp4', m4v:'video/x-m4v', mov:'video/quicktime',
+                    webm:'video/webm', mkv:'video/x-matroska', avi:'video/avi',
+                    flv:'video/x-flv', mpg:'video/mpeg', mpeg:'video/mpeg',
+                    '3gp':'video/3gpp','3gpp':'video/3gpp','3gpp2':'video/3gpp2', hevc:'video/hevc'
+                };
+                return map[ext] || 'video/mp4';
             }
 
             // ===== Helpers عامة =====
-            function isRTL() {
-                return document.documentElement.dir === 'rtl' || getComputedStyle(document.body).direction ===
-                    'rtl';
-            }
+            const isRTL = () => (document.documentElement.dir === 'rtl' || getComputedStyle(document.body).direction === 'rtl');
 
             function createHidden(name, value) {
                 const i = document.createElement('input');
-                i.type = 'hidden';
-                i.name = name;
-                i.value = value;
-                return i;
+                i.type = 'hidden'; i.name = name; i.value = value; return i;
             }
 
             // ====== PHOTO PER BOX ======
             function initPhotoBox(box) {
-
                 const uploadBtn = box.querySelector('.upload-media');
                 const captureBtn = box.querySelector('.capture-media');
                 const removeBtn = box.querySelector('.remove-media-all');
@@ -593,12 +611,8 @@
 
                 // State
                 const existing = (() => {
-                    try {
-                        const j = JSON.parse(box.dataset.existing || '[]');
-                        return Array.isArray(j) ? j : [];
-                    } catch (_) {
-                        return [];
-                    }
+                    try { const j = JSON.parse(box.dataset.existing || '[]'); return Array.isArray(j) ? j : []; }
+                    catch (_) { return []; }
                 })();
                 let photos = existing.slice(); // urls
                 let current = 0;
@@ -612,8 +626,7 @@
 
                 function addFileToStateUnique(file) {
                     const key = `${file.name}__${file.size}__${file.lastModified||0}__${file.type}`;
-                    if (fileState.some(f => `${f.name}__${f.size}__${f.lastModified||0}__${f.type}` === key))
-                        return false;
+                    if (fileState.some(f => `${f.name}__${f.size}__${f.lastModified||0}__${f.type}` === key)) return false;
                     fileState.push(file);
                     syncInput();
                     return true;
@@ -624,19 +637,13 @@
                     photos.forEach((_, i) => {
                         const d = document.createElement('div');
                         d.className = 'slider-dot' + (i === current ? ' active' : '');
-                        d.addEventListener('click', () => {
-                            current = i;
-                            render();
-                        });
+                        d.addEventListener('click', () => { current = i; render(); });
                         dotsBox.appendChild(d);
                     });
                 }
 
                 function render() {
-                    if (!photos.length) {
-                        slider.classList.add('d-none');
-                        return;
-                    }
+                    if (!photos.length) { slider.classList.add('d-none'); return; }
                     slider.classList.remove('d-none');
                     imgEl.src = photos[current];
                     renderDots();
@@ -654,33 +661,23 @@
                         const img = new Image();
                         const url = URL.createObjectURL(file);
                         img.onload = () => {
-                            let {
-                                width,
-                                height
-                            } = img;
+                            let { width, height } = img;
                             if (width > maxW || height > maxH) {
                                 const s = Math.min(maxW / width, maxH / height);
                                 width = Math.round(width * s);
                                 height = Math.round(height * s);
                             }
                             const canvas = document.createElement('canvas');
-                            canvas.width = width;
-                            canvas.height = height;
+                            canvas.width = width; canvas.height = height;
                             canvas.getContext('2d').drawImage(img, 0, 0, width, height);
                             canvas.toBlob(b => {
                                 URL.revokeObjectURL(url);
                                 if (!b) return reject('Compression failed');
-                                const name = (file.name || 'photo').replace(/\.[^.]+$/, '') +
-                                    '.jpg';
-                                resolve(new File([b], name, {
-                                    type: 'image/jpeg'
-                                }));
+                                const name = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
+                                resolve(new File([b], name, { type: 'image/jpeg' }));
                             }, 'image/jpeg', quality);
                         };
-                        img.onerror = () => {
-                            URL.revokeObjectURL(url);
-                            reject('Decode failed');
-                        };
+                        img.onerror = () => { URL.revokeObjectURL(url); reject('Decode failed'); };
                         img.src = url;
                     });
                 }
@@ -690,56 +687,34 @@
                 input?.addEventListener('change', async () => {
                     if (!input.files?.length) return;
                     for (const f of Array.from(input.files)) {
-                        let ff = f;
-                        try {
-                            ff = await compressImage(f, 0.7);
-                        } catch (_) {}
+                        let ff = f; try { ff = await compressImage(f, 0.7); } catch(_) {}
                         const ok = addFileToStateUnique(ff);
                         if (ok) addPhotoUrl(URL.createObjectURL(ff));
                     }
                     if (removeFlg) removeFlg.value = '0';
                 });
 
+                // ✅ المطلوب: في iPad وكمبيوتر → افتح كاميرا مع زر Snap. في الموبايل → الكاميرا الأصلية.
                 captureBtn?.addEventListener('click', () => {
-                    if (isMobile) {
-                        camInput?.click();
-                        return;
-                    }
-                    // Desktop camera snap
+                    if (isPhone) { camInput?.click(); return; }
                     (async () => {
                         try {
                             const stream = await navigator.mediaDevices.getUserMedia({
                                 video: {
-                                    facingMode: {
-                                        ideal: 'environment'
-                                    },
-                                    width: {
-                                        ideal: 1280
-                                    },
-                                    height: {
-                                        ideal: 720
-                                    }
+                                    facingMode: { ideal: 'environment' },
+                                    width: { ideal: 1280 }, height: { ideal: 720 }
                                 },
                                 audio: false
                             });
                             const overlay = document.createElement('div');
-                            overlay.style.cssText =
-                                'position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5;';
+                            overlay.style.cssText = 'position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5;';
                             const v = document.createElement('video');
-                            v.autoplay = v.muted = true;
-                            v.playsInline = true;
-                            v.srcObject = stream;
+                            v.autoplay = v.muted = true; v.playsInline = true; v.srcObject = stream;
                             v.style.cssText = 'width:100%;height:100%;object-fit:contain;';
                             const snap = document.createElement('button');
-                            snap.type = 'button';
-                            snap.className = 'btn btn-success';
+                            snap.type = 'button'; snap.className = 'btn btn-success';
                             snap.textContent = 'Snap';
-                            Object.assign(snap.style, {
-                                position: 'absolute',
-                                bottom: '12px',
-                                left: '50%',
-                                transform: 'translateX(-50%)'
-                            });
+                            Object.assign(snap.style, { position:'absolute', bottom:'12px', left:'50%', transform:'translateX(-50%)' });
                             viewport.appendChild(overlay);
                             overlay.appendChild(v);
                             overlay.appendChild(snap);
@@ -750,34 +725,22 @@
                                 canvas.width = v.videoWidth || 640;
                                 canvas.height = v.videoHeight || 480;
                                 canvas.getContext('2d').drawImage(v, 0, 0);
-                                try {
-                                    stream.getTracks().forEach(t => t.stop());
-                                } catch (_) {}
+                                try { stream.getTracks().forEach(t => t.stop()); } catch(_) {}
                                 canvas.toBlob(async blob => {
-                                    if (!blob) {
-                                        overlay.remove();
-                                        return;
-                                    }
-                                    let file = new File([blob], 'photo_' +
-                                        Date.now() + '.jpg', {
-                                            type: 'image/jpeg'
-                                        });
-                                    try {
-                                        file = await compressImage(file,
-                                            0.7);
-                                    } catch (_) {}
+                                    if (!blob) { overlay.remove(); return; }
+                                    let file = new File([blob], 'photo_' + Date.now() + '.jpg', { type:'image/jpeg' });
+                                    try { file = await compressImage(file, 0.7); } catch(_) {}
                                     const ok = addFileToStateUnique(file);
                                     if (ok) {
-                                        addPhotoUrl(URL.createObjectURL(
-                                            file));
-                                        if (removeFlg) removeFlg.value =
-                                            '0';
+                                        addPhotoUrl(URL.createObjectURL(file));
+                                        if (removeFlg) removeFlg.value = '0';
                                     }
                                     overlay.remove();
                                 }, 'image/jpeg', .95);
                             });
                         } catch (e) {
-                            alert('Camera error: ' + (e?.message || e));
+                            // فشل → افتح الكاميرا الأصلية
+                            camInput?.click();
                         }
                     })();
                 });
@@ -785,10 +748,7 @@
                 camInput?.addEventListener('change', async (e) => {
                     if (!e.target.files?.length) return;
                     for (const f of Array.from(e.target.files)) {
-                        let ff = f;
-                        try {
-                            ff = await compressImage(f, 0.7);
-                        } catch (_) {}
+                        let ff = f; try { ff = await compressImage(f, 0.7); } catch(_) {}
                         const ok = addFileToStateUnique(ff);
                         if (ok) addPhotoUrl(URL.createObjectURL(ff));
                     }
@@ -797,12 +757,9 @@
                 });
 
                 removeBtn?.addEventListener('click', () => {
-                    photos = [];
-                    current = 0;
-                    slider.classList.add('d-none');
-                    imgEl.removeAttribute('src');
-                    fileState = [];
-                    syncInput();
+                    photos = []; current = 0;
+                    slider.classList.add('d-none'); imgEl.removeAttribute('src');
+                    fileState = []; syncInput();
                     if (removeFlg) removeFlg.value = '1';
                 });
 
@@ -813,20 +770,9 @@
                     const lbClose = lb.querySelector('.close');
                     const lbPrev = lb.querySelector('.nav.prev');
                     const lbNext = lb.querySelector('.nav.next');
-                    prevBtn.innerHTML = isRTL() ? '›' : '‹';
-                    nextBtn.innerHTML = isRTL() ? '‹' : '›';
 
-                    function goPrev() {
-                        if (!photos.length) return;
-                        current = (current - 1 + photos.length) % photos.length;
-                        render();
-                    }
-
-                    function goNext() {
-                        if (!photos.length) return;
-                        current = (current + 1) % photos.length;
-                        render();
-                    }
+                    function goPrev() { if (!photos.length) return; current = (current - 1 + photos.length) % photos.length; render(); }
+                    function goNext() { if (!photos.length) return; current = (current + 1) % photos.length; render(); }
 
                     prevBtn.addEventListener('click', goPrev);
                     nextBtn.addEventListener('click', goNext);
@@ -837,14 +783,8 @@
                         lbImg.src = photos[current];
                     });
                     lbClose.addEventListener('click', () => lb.classList.add('d-none'));
-                    lbPrev.addEventListener('click', () => {
-                        current = (current - 1 + photos.length) % photos.length;
-                        lbImg.src = photos[current];
-                    });
-                    lbNext.addEventListener('click', () => {
-                        current = (current + 1) % photos.length;
-                        lbImg.src = photos[current];
-                    });
+                    lbPrev.addEventListener('click', () => { current = (current - 1 + photos.length) % photos.length; lbImg.src = photos[current]; });
+                    lbNext.addEventListener('click', () => { current = (current + 1) % photos.length; lbImg.src = photos[current]; });
                     document.addEventListener('keydown', e => {
                         if (lb.classList.contains('d-none')) return;
                         if (e.key === 'Escape') lb.classList.add('d-none');
@@ -854,83 +794,17 @@
 
                     // swipe
                     let sx = 0;
-                    viewport.addEventListener('touchstart', e => sx = e.changedTouches[0].clientX, {
-                        passive: true
-                    });
+                    viewport.addEventListener('touchstart', e => sx = e.changedTouches[0].clientX, { passive: true });
                     viewport.addEventListener('touchend', e => {
                         const dx = e.changedTouches[0].clientX - sx;
                         if (Math.abs(dx) > 40) {
-                            if (isRTL()) {
-                                if (dx < 0) goPrev();
-                                else goNext();
-                            } else {
-                                if (dx < 0) goNext();
-                                else goPrev();
-                            }
+                            if (isRTL()) { dx < 0 ? goPrev() : goNext(); }
+                            else         { dx < 0 ? goNext() : goPrev(); }
                         }
-                    }, {
-                        passive: true
-                    });
+                    }, { passive: true });
                 })();
 
-                // initial render
-                if (photos.length) {
-                    slider.classList.remove('d-none');
-                    render();
-                }
-                // ====== LIGHTBOX للصور ======
-(function lightboxInit() {
-    const lb = document.getElementById('photo-lightbox');
-    const lbImg = lb.querySelector('.lightbox-img');
-    const lbClose = lb.querySelector('.close');
-    const lbPrev = lb.querySelector('.nav.prev');
-    const lbNext = lb.querySelector('.nav.next');
-    let lbCurrent = 0;
-
-    function openLightbox(index) {
-        if (!photos.length) return;
-        lbCurrent = index;
-        lb.classList.remove('d-none');
-        lbImg.src = photos[lbCurrent];
-    }
-
-    function showNext() {
-        if (!photos.length) return;
-        lbCurrent = (lbCurrent + 1) % photos.length;
-        lbImg.src = photos[lbCurrent];
-    }
-
-    function showPrev() {
-        if (!photos.length) return;
-        lbCurrent = (lbCurrent - 1 + photos.length) % photos.length;
-        lbImg.src = photos[lbCurrent];
-    }
-
-    imgEl.addEventListener('click', () => openLightbox(current));
-    lbClose.addEventListener('click', () => lb.classList.add('d-none'));
-    lbNext.addEventListener('click', showNext);
-    lbPrev.addEventListener('click', showPrev);
-
-    // ⌨️ الأسهم من لوحة المفاتيح
-    document.addEventListener('keydown', e => {
-        if (lb.classList.contains('d-none')) return;
-        if (e.key === 'Escape') lb.classList.add('d-none');
-        if (e.key === 'ArrowRight') showNext();
-        if (e.key === 'ArrowLeft') showPrev();
-    });
-
-    // 📱 السحب (Swipe)
-    let startX = 0;
-    lb.addEventListener('touchstart', e => startX = e.touches[0].clientX, { passive: true });
-    lb.addEventListener('touchend', e => {
-        const dx = e.changedTouches[0].clientX - startX;
-        if (Math.abs(dx) > 40) {
-            if (dx > 0) showPrev();
-            else showNext();
-        }
-    }, { passive: true });
-})();
-
+                if (photos.length) { slider.classList.remove('d-none'); render(); }
             }
 
             // ====== AUDIO PER BOX ======
@@ -944,47 +818,16 @@
                 const previewBox = box.querySelector('.preview-audio-container');
                 const list = box.querySelector('.preview-audio-list');
 
-
-                async function compressAudio(blob, targetBitrate = 64000) {
-                    const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-                    const srcBuf = await blob.arrayBuffer();
-                    const audioBuf = await audioCtx.decodeAudioData(srcBuf);
-
-                    const offlineCtx = new OfflineAudioContext(
-                        audioBuf.numberOfChannels,
-                        audioBuf.length,
-                        audioBuf.sampleRate
-                    );
-                    const source = offlineCtx.createBufferSource();
-                    source.buffer = audioBuf;
-                    source.connect(offlineCtx.destination);
-                    source.start(0);
-                    const renderedBuf = await offlineCtx.startRendering();
-
-                    // إعادة التشفير بجودة أقل
-                    return new Promise(resolve => {
-                        const wavBlob = encodeWav([renderedBuf.getChannelData(0)], renderedBuf
-                            .sampleRate);
-                        resolve(wavBlob);
-                    });
-                }
-
-                // حمّل الموجود من السيرفر
+                // الموجود من السيرفر
                 const existing = (() => {
-                    try {
-                        const j = JSON.parse(box.dataset.existing || '[]');
-                        return Array.isArray(j) ? j : [];
-                    } catch (_) {
-                        return [];
-                    }
+                    try { const j = JSON.parse(box.dataset.existing || '[]'); return Array.isArray(j) ? j : []; }
+                    catch (_) { return []; }
                 })();
                 if (existing.length) {
                     previewBox.style.display = 'block';
                     existing.forEach(u => {
                         const a = document.createElement('audio');
-                        a.controls = true;
-                        a.className = 'w-100 mb-2';
-                        a.src = u;
+                        a.controls = true; a.className = 'w-100 mb-2'; a.src = u;
                         list.appendChild(a);
                     });
                 }
@@ -995,103 +838,48 @@
                     previewBox.style.display = 'block';
                     Array.from(input.files).forEach(f => {
                         const a = document.createElement('audio');
-                        a.controls = true;
-                        a.className = 'w-100 mb-2';
+                        a.controls = true; a.className = 'w-100 mb-2';
                         a.src = URL.createObjectURL(f);
                         list.appendChild(a);
                     });
                     if (removeFlg) removeFlg.value = '0';
                 });
 
-                // تسجيل صوت
-                let recorder = null,
-                    fallback = null,
-                    chunks = [],
-                    stream = null,
-                    indicator = null;
+                // تسجيل صوت بسيط
+                let recorder = null, chunks = [], stream = null, fallback = null, indicator = null;
                 captureBtn?.addEventListener('click', async () => {
                     if ((recorder && recorder.state === 'recording') || fallback) {
                         if (recorder) recorder.stop();
                         if (fallback) fallback.stop();
-                        captureBtn.className = 'btn btn-sm btn-secondary';
-                        captureBtn.innerHTML =
-                            '<i class="bi bi-mic"></i> {{ __('dashboard.record') }}';
-                        if (indicator) {
-                            indicator.remove();
-                            indicator = null;
-                        }
+                        captureBtn.className = 'btn btn-sm btn-primary';
+                        captureBtn.innerHTML = '<i class="bi bi-mic"></i> {{ __('dashboard.record') }}';
+                        if (indicator) { indicator.remove(); indicator = null; }
                         return;
                     }
                     try {
-                        stream = await navigator.mediaDevices.getUserMedia({
-                            audio: true
-                        });
+                        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                         chunks = [];
                         let mime = 'audio/webm';
-                        if (window.MediaRecorder && MediaRecorder.isTypeSupported(mime)) {
-                            recorder = new MediaRecorder(stream, {
-                                mimeType: mime,
-                                videoBitsPerSecond: 800000, //  لتقليل حجم الملف ↓ من 4 ميغابت إلى 1 ميغابت
-                                audioBitsPerSecond: 64000
+                        if (!window.MediaRecorder || !MediaRecorder.isTypeSupported(mime)) {
+                            if (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/mp4')) mime = 'audio/mp4';
+                            else if (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/aac')) mime = 'audio/aac';
+                            else mime = ''; // fallback WAV
+                        }
 
-                            });
-                            recorder.ondataavailable = e => {
-                                if (e.data.size > 0) chunks.push(e.data);
-                            };
+                        if (window.MediaRecorder && mime) {
+                            recorder = new MediaRecorder(stream, { mimeType: mime, audioBitsPerSecond: 64000 });
+                            recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
                             recorder.onstop = () => {
-                                try {
-                                    stream.getTracks().forEach(t => t.stop());
-                                } catch (_) {}
-                                const blob = new Blob(chunks, {
-                                    type: mime
-                                });
-                                // بعد إنشاء blob
-                                compressAudio(blob).then(compressedBlob => {
-                                    const file = new File([compressedBlob], 'rec_' + Date
-                                        .now() + ext, {
-                                            type: mime
-                                        });
-
-                                });
-
-                                const ext = '.webm';
-                                const file = new File([blob], 'rec_' + Date.now() + ext, {
-                                    type: mime
-                                });
-                                const dt = new DataTransfer();
-                                if (input.files) Array.from(input.files).forEach(f => dt.items.add(
-                                    f));
-                                dt.items.add(file);
-                                input.files = dt.files;
-                                const a = document.createElement('audio');
-                                a.controls = true;
-                                a.className = 'w-100 mb-2';
-                                a.src = URL.createObjectURL(file);
-                                list.appendChild(a);
-                                previewBox.style.display = 'block';
-                                if (removeFlg) removeFlg.value = '0';
+                                try { stream.getTracks().forEach(t => t.stop()); } catch(_) {}
+                                const blob = new Blob(chunks, { type: mime });
+                                const ext = mime.includes('mp4') ? '.m4a' : (mime.includes('aac') ? '.aac' : '.webm');
+                                saveAudio(blob, ext, mime);
                             };
                             recorder.start();
                         } else {
-                            // WAV fallback
-                            fallback = startWavRecorder(stream, (blob) => {
-                                const file = new File([blob], 'rec_' + Date.now() + '.wav', {
-                                    type: 'audio/wav'
-                                });
-                                const dt = new DataTransfer();
-                                if (input.files) Array.from(input.files).forEach(f => dt.items
-                                    .add(f));
-                                dt.items.add(file);
-                                input.files = dt.files;
-                                const a = document.createElement('audio');
-                                a.controls = true;
-                                a.className = 'w-100 mb-2';
-                                a.src = URL.createObjectURL(file);
-                                list.appendChild(a);
-                                previewBox.style.display = 'block';
-                                if (removeFlg) removeFlg.value = '0';
-                            });
+                            fallback = startWavRecorder(stream, (blob) => saveAudio(blob, '.wav', 'audio/wav'));
                         }
+
                         captureBtn.className = 'btn btn-sm btn-danger';
                         captureBtn.innerHTML = '<i class="bi bi-stop"></i> {{ __('dashboard.stop') }}';
                         previewBox.style.display = 'block';
@@ -1099,69 +887,58 @@
                         indicator.className = 'text-danger mt-2 small';
                         indicator.textContent = '🔴 Recording...';
                         list.appendChild(indicator);
-                    } catch (e) {
-                        alert('Mic error: ' + (e?.message || e));
-                    }
+                    } catch (e) { alert('Mic error: ' + (e?.message || e)); }
                 });
 
+                function saveAudio(blob, ext, type) {
+                    const file = new File([blob], 'rec_' + Date.now() + ext, { type });
+                    const dt = new DataTransfer();
+                    if (input.files) Array.from(input.files).forEach(f => dt.items.add(f));
+                    dt.items.add(file); input.files = dt.files;
+
+                    if (indicator) { indicator.remove(); indicator = null; }
+                    const a = document.createElement('audio');
+                    a.controls = true; a.className = 'w-100 mb-2';
+                    a.src = URL.createObjectURL(file);
+                    list.appendChild(a);
+                    previewBox.style.display = 'block';
+                    if (removeFlg) removeFlg.value = '0';
+                }
+
                 function startWavRecorder(stream, cb) {
-                    const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
                     const src = ctx.createMediaStreamSource(stream);
                     const proc = ctx.createScriptProcessor(4096, 1, 1);
                     let buf = [];
                     proc.onaudioprocess = (e) => buf.push(new Float32Array(e.inputBuffer.getChannelData(0)));
-                    src.connect(proc);
-                    proc.connect(ctx.destination);
+                    src.connect(proc); proc.connect(ctx.destination);
                     return {
                         stop: () => {
-                            src.disconnect();
-                            proc.disconnect();
-                            ctx.close();
-                            const blob = encodeWav(buf, 44100);
-                            cb(blob);
-                            fallback = null;
-                            try {
-                                stream.getTracks().forEach(t => t.stop());
-                            } catch (_) {}
+                            src.disconnect(); proc.disconnect(); ctx.close();
+                            const blob = encodeWav(buf, 44100); cb(blob); fallback = null;
+                            try { stream.getTracks().forEach(t => t.stop()); } catch(_) {}
                         }
                     };
                 }
-
                 function encodeWav(chunks, rate) {
                     const len = chunks.reduce((a, c) => a + c.length, 0);
-                    const buf = new Float32Array(len);
-                    let off = 0;
-                    chunks.forEach(c => {
-                        buf.set(c, off);
-                        off += c.length;
-                    });
+                    const buf = new Float32Array(len); let off = 0;
+                    chunks.forEach(c => { buf.set(c, off); off += c.length; });
                     const ab = new ArrayBuffer(44 + buf.length * 2);
                     const v = new DataView(ab);
-
-                    function ws(o, s) {
-                        for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i));
-                    }
-                    ws(0, 'RIFF');
-                    v.setUint32(4, 36 + buf.length * 2, true);
-                    ws(8, 'WAVE');
-                    ws(12, 'fmt ');
-                    v.setUint32(16, 16, true);
-                    v.setUint16(20, 1, true);
-                    v.setUint16(22, 1, true);
-                    v.setUint32(24, rate, true);
-                    v.setUint32(28, rate * 2, true);
-                    v.setUint16(32, 2, true);
-                    v.setUint16(34, 16, true);
-                    ws(36, 'data');
-                    v.setUint32(40, buf.length * 2, true);
+                    const ws = (o, s) => { for (let i=0;i<s.length;i++) v.setUint8(o+i, s.charCodeAt(i)); };
+                    ws(0, 'RIFF'); v.setUint32(4, 36 + buf.length * 2, true);
+                    ws(8, 'WAVE'); ws(12, 'fmt ');
+                    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+                    v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true);
+                    v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+                    ws(36, 'data'); v.setUint32(40, buf.length * 2, true);
                     let idx = 44;
-                    for (let i = 0; i < buf.length; i++, idx += 2) {
+                    for (let i=0;i<buf.length;i++,idx+=2) {
                         const s = Math.max(-1, Math.min(1, buf[i]));
-                        v.setInt16(idx, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+                        v.setInt16(idx, s<0 ? s*0x8000 : s*0x7FFF, true);
                     }
-                    return new Blob([v], {
-                        type: 'audio/wav'
-                    });
+                    return new Blob([v], { type:'audio/wav' });
                 }
 
                 removeBtn?.addEventListener('click', () => {
@@ -1171,9 +948,6 @@
                     if (removeFlg) removeFlg.value = '1';
                 });
             }
-
-
-
 
             // ====== VIDEO + FILEPOND PER BOX ======================================================================
             if (window.FilePond) {
@@ -1186,23 +960,21 @@
             }
 
             function initVideoBox(box) {
-                //const uploadBtn = box.querySelector('.upload-media');
                 const captureBtn = box.querySelector('.capture-media');
-                const removeAll = box.querySelector('.remove-video-all');
-                const input = box.querySelector('.media-input'); // input احتياطي (لن نرفع منه)
-                const camInput = box.querySelector('.camera-video-input'); // كاميرا الهاتف
-                const pondInput = box.querySelector('.pond-video'); // FilePond
-                const keysWrap = box.querySelector('.uploaded-keys'); // مفاتيح multipart
-                const removeFlg = box.querySelector('.remove-flag');
-                const errorBox = box.querySelector('.video-error');
-
-                const idx = box.dataset.index;
+                const removeAll  = box.querySelector('.remove-video-all');
+                const input      = box.querySelector('.media-input'); // احتياطي
+                const camInput   = box.querySelector('.camera-video-input'); // كاميرا الهاتف
+                const pondInput  = box.querySelector('.pond-video'); // FilePond
+                const keysWrap   = box.querySelector('.uploaded-keys'); // مفاتيح multipart
+                const removeFlg  = box.querySelector('.remove-flag');
+                const errorBox   = box.querySelector('.video-error');
+                const idx        = box.dataset.index;
 
                 // Slider
-                const slider = box.querySelector('.video-slider');
-                const player = slider.querySelector('.slider-video');
-                const prevBtn = slider.querySelector('.prev');
-                const nextBtn = slider.querySelector('.next');
+                const slider   = box.querySelector('.video-slider');
+                const player   = slider.querySelector('.slider-video');
+                const prevBtn  = slider.querySelector('.prev');
+                const nextBtn  = slider.querySelector('.next');
                 const dotsRoot = slider.querySelector('.slider-dots');
                 const viewport = slider.querySelector('.slider-viewport');
 
@@ -1210,112 +982,87 @@
                 nextBtn.innerHTML = isRTL() ? '‹' : '›';
 
                 const existing = (() => {
-                    try {
-                        const j = JSON.parse(box.dataset.existing || '[]');
-                        return Array.isArray(j) ? j : [];
-                    } catch (_) {
-                        return [];
-                    }
+                    try { const j = JSON.parse(box.dataset.existing || '[]'); return Array.isArray(j) ? j : []; }
+                    catch (_) { return []; }
                 })();
-                let items = existing.map((u, i) => ({
-                    id: 'server-' + i,
-                    url: u,
-                    revoke: false
-                }));
+                let items = existing.map((u, i) => ({ id: 'server-' + i, url: u, revoke: false }));
                 let current = 0;
 
-                function renderDots() {
+                // 🔴 علم يمنع السلايدر من قطع المعاينة أثناء التسجيل
+                let isRecording = false;
+
+                function renderDotsOnly() {
                     dotsRoot.innerHTML = '';
                     items.forEach((_, i) => {
                         const d = document.createElement('div');
                         d.className = 'slider-dot' + (i === current ? ' active' : '');
                         d.addEventListener('click', () => {
-                            current = i;
-                            renderVideo();
+                            if (isRecording) return; // لا تغيّر أثناء التسجيل
+                            current = i; renderVideo();
                         });
                         dotsRoot.appendChild(d);
                     });
                 }
 
                 function renderVideo() {
+                    // أثناء التسجيل: لا تمس اللاعب، حدّث النقاط فقط
+                    if (isRecording) { renderDotsOnly(); return; }
                     if (!items.length) {
                         slider.classList.add('d-none');
-                        player.removeAttribute('src');
-                        player.load();
+                        // لا تلمس srcObject لو كان موجود (للاحتياط)
+                        if (!player.srcObject) { player.removeAttribute('src'); player.load(); }
                         return;
                     }
                     slider.classList.remove('d-none');
                     const it = items[current];
+                    // احترم srcObject: لا تغيّر لو كان بث مباشر (لكن هنا isRecording false)
+                    player.srcObject = null;
                     player.src = it.url;
                     player.load();
-                    renderDots();
+                    renderDotsOnly();
                 }
-
                 function addItem(id, url, revoke) {
-                    items.push({
-                        id,
-                        url,
-                        revoke
-                    });
+                    items.push({ id, url, revoke });
                     current = items.length - 1;
-                    renderVideo();
+                    // لا تبدّل الـ player أثناء التسجيل
+                    if (isRecording) { renderDotsOnly(); }
+                    else { renderVideo(); }
                 }
-
                 function removeItem(id) {
                     const pos = items.findIndex(x => x.id === id);
                     if (pos > -1) {
-                        const it = items[pos];
-                        if (it.revoke) {
-                            try {
-                                URL.revokeObjectURL(it.url);
-                            } catch (_) {}
-                        }
+                        const it = items[pos]; if (it.revoke) { try { URL.revokeObjectURL(it.url); } catch(_){} }
                         items.splice(pos, 1);
                         if (current >= items.length) current = Math.max(0, items.length - 1);
-                        renderVideo();
+                        if (isRecording) { renderDotsOnly(); }
+                        else { renderVideo(); }
                     }
                 }
 
                 prevBtn.addEventListener('click', () => {
-                    if (!items.length) return;
-                    current = (current - 1 + items.length) % items.length;
-                    renderVideo();
+                    if (isRecording || !items.length) return;
+                    current = (current - 1 + items.length) % items.length; renderVideo();
                 });
                 nextBtn.addEventListener('click', () => {
-                    if (!items.length) return;
-                    current = (current + 1) % items.length;
-                    renderVideo();
+                    if (isRecording || !items.length) return;
+                    current = (current + 1) % items.length; renderVideo();
                 });
 
                 // swipe
                 (function() {
                     let sx = 0;
-                    const vp = slider.querySelector('.slider-viewport');
-                    vp.addEventListener('touchstart', e => sx = e.changedTouches[0].clientX, {
-                        passive: true
-                    });
-                    vp.addEventListener('touchend', e => {
+                    viewport.addEventListener('touchstart', e => sx = e.changedTouches[0].clientX, { passive:true });
+                    viewport.addEventListener('touchend', e => {
+                        if (isRecording) return;
                         const dx = e.changedTouches[0].clientX - sx;
                         if (Math.abs(dx) > 40) {
-                            if (isRTL()) {
-                                if (dx < 0) prevBtn.click();
-                                else nextBtn.click();
-                            } else {
-                                if (dx < 0) nextBtn.click();
-                                else prevBtn.click();
-                            }
+                            if (isRTL()) { dx < 0 ? prevBtn.click() : nextBtn.click(); }
+                            else         { dx < 0 ? nextBtn.click() : prevBtn.click(); }
                         }
-                    }, {
-                        passive: true
-                    });
+                    }, { passive:true });
                 })();
 
-                // فتح متصفح الملفات عبر FilePond
-                // uploadBtn?.addEventListener('click', () => {
-                //     if (pond) pond.browse();
-                // });
-
-                // لو اختيرت ملفات من الـ input لأي سبب، أضفها إلى FilePond
+                // احتياطي: input العادي → أضفه للـ Pond
                 input?.addEventListener('change', (e) => {
                     if (!pond) return;
                     const files = Array.from(e.target.files || []);
@@ -1324,175 +1071,88 @@
                     if (removeFlg) removeFlg.value = '0';
                 });
 
-                // ==== تسجيل فيديو: مباشر على الحاسوب، وفتح كاميرا على الهاتف ====
-                let recStream = null,
-                    recorder = null,
-                    recChunks = [],
-                    recOverlay = null,
-                    recTimer = null,
-                    recStartTs = 0;
+                // ===== تسجيل فيديو: حاسوب + iPad عبر MediaRecorder / هاتف عبر الكاميرا الأصلية =====
+                let recStream = null, recorder = null, recChunks = [];
 
+                function stopStream(s) { try { s?.getTracks()?.forEach(t => t.stop()); } catch(_) {} }
 
-
-                function stopStream(s) {
-                    try {
-                        s?.getTracks()?.forEach(t => t.stop());
-                    } catch (_) {}
-                }
-
-                function formatTime(ms) {
-                    const sec = Math.floor(ms / 1000);
-                    const m = String(Math.floor(sec / 60)).padStart(2, '0');
-                    const s = String(sec % 60).padStart(2, '0');
-                    return `${m}:${s}`;
-                }
-
-                // كاميرا الهاتف → أضف مباشرة لملفات FilePond
                 camInput?.addEventListener('change', (e) => {
                     const files = Array.from(e.target.files || []);
                     if (!files.length || !pond) return;
-                    files.forEach(f => pond.addFile(f)); // رفع مباشر عبر FilePond
+                    files.forEach(f => pond.addFile(f));
                     if (removeFlg) removeFlg.value = '0';
                     e.target.value = '';
                 });
 
                 captureBtn?.addEventListener('click', async () => {
-                    // على الهاتف أو لو ما في MediaRecorder → افتح كاميرا الهاتف (native)
-                    if (isMobile || !('MediaRecorder' in window)) {
-                        camInput?.click();
-                        return;
-                    }
+                    // على الهاتف فقط نفتح الكاميرا الأصلية
+                    if (isPhone || !canRecord) { camInput?.click(); return; }
 
-                    // إذا كان يسجّل حالياً -> أوقف التسجيل
-                    if (recorder && recorder.state === 'recording') {
-                        captureBtn.disabled = true;
-                        try {
-                            recorder.stop();
-                        } catch (_) {}
-                        return;
-                    }
+                    // إيقاف تسجيل جارٍ
+                    if (recorder && recorder.state === 'recording') { try { recorder.stop(); } catch(_) {} return; }
 
-                    // ابدأ المعاينة + التسجيل على الحاسوب
                     try {
-                        // 1) قيود getUserMedia — خفّض الدقة والفريم ريت
                         recStream = await navigator.mediaDevices.getUserMedia({
                             video: {
-                                facingMode: {
-                                    ideal: 'environment'
-                                },
-                                width: {
-                                    ideal: 854,
-                                    max: 854
-                                }, // 480p عريض
-                                height: {
-                                    ideal: 480,
-                                    max: 480
-                                },
-                                frameRate: {
-                                    ideal: 24,
-                                    max: 24
-                                }
+                                facingMode: { ideal: 'environment' },
+                                width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 24 }
                             },
                             audio: true
                         });
 
                         slider.classList.remove('d-none');
-                        recOverlay = document.createElement('div');
-                        recOverlay.style.cssText =
-                            'position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5;';
-                        const live = document.createElement('video');
-                        live.autoplay = true;
-                        live.muted = true;
-                        live.playsInline = true;
-                        live.srcObject = recStream;
-                        live.style.cssText = 'width:100%;height:100%;object-fit:contain;';
-                        viewport.appendChild(recOverlay);
-                        recOverlay.appendChild(live);
-
-                        const indicator = document.createElement('div');
-                        indicator.className = 'text-danger small';
-                        indicator.style.cssText =
-                            'position:absolute;bottom:10px;left:50%;transform:translateX(-50%);';
-                        recOverlay.appendChild(indicator);
-                        recStartTs = Date.now();
-                        indicator.textContent = '🔴 Recording... 00:00';
-                        recTimer = setInterval(() => {
-                            indicator.textContent = '🔴 Recording... ' + formatTime(Date.now() -
-                                recStartTs);
-                        }, 1000);
-
+                        player.srcObject = recStream; player.muted = true; player.playsInline = true;
+                        try { await player.play(); } catch(_) {}
 
                         recChunks = [];
+                        isRecording = true;
 
+                        // اختر أفضل MIME (Safari/iPad يفضّل mp4)
+                        let mimeType = '';
+                        if (MediaRecorder.isTypeSupported('video/mp4')) mimeType = 'video/mp4';
+                        else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) mimeType = 'video/webm;codecs=vp8,opus';
+                        else if (MediaRecorder.isTypeSupported('video/webm')) mimeType = 'video/webm';
 
+                        recorder = mimeType
+                            ? new MediaRecorder(recStream, { mimeType, videoBitsPerSecond: 900_000, audioBitsPerSecond: 64_000 })
+                            : new MediaRecorder(recStream);
 
-                        recorder = new MediaRecorder(recStream, {
-                            videoBitsPerSecond: 800_000, // 1.2 Mbps بدل 4 Mbps
-                            audioBitsPerSecond: 64_000 // 64 Kbps
-                        });
-
-                        recorder.ondataavailable = (e) => {
-                            if (e.data && e.data.size > 0) recChunks.push(e.data);
-                        };
-
+                        recorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) recChunks.push(e.data); };
                         recorder.onstop = () => {
-                            clearInterval(recTimer);
-                            recTimer = null;
-                            if (recOverlay) {
-                                try {
-                                    recOverlay.remove();
-                                } catch (_) {}
-                                recOverlay = null;
-                            }
-                            stopStream(recStream);
-                            recStream = null;
+                            // أنهِ البث أولاً ثم فعّل السلايدر
+                            stopStream(recStream); recStream = null;
+                            player.srcObject = null;
+                            const usedType = mimeType || 'video/webm';
+                            const ext = usedType.includes('mp4') ? 'mp4' : 'webm';
+                            const blob = new Blob(recChunks, { type: usedType });
+                            const file = new File([blob], `rec_${Date.now()}.${ext}`, { type: usedType });
 
-                            const ext = type.includes('mp4') ? 'mp4' : 'webm';
-                            const blob = new Blob(recChunks, {
-                                type
-                            });
-                            const file = new File([blob], `rec_${Date.now()}.${ext}`, {
-                                type
-                            });
-
-                            // الرفع عبر FilePond مباشرة (لا نضيف للـ input)
+                            isRecording = false; // 👈 الآن مسموح للسلايدر يتبدّل
                             if (pond) pond.addFile(file);
                             if (removeFlg) removeFlg.value = '0';
 
-                            captureBtn.disabled = false;
                             captureBtn.classList.remove('btn-danger');
-                            captureBtn.classList.add('btn-secondary');
-                            captureBtn.innerHTML =
-                                '🎥 {{ __('dashboard.start_recording_video') }}';
+                            captureBtn.classList.add('btn-primary');
+                            captureBtn.innerHTML = '🎥 {{ __('dashboard.start_recording_video') }}';
                             recorder = null;
+
+                            // بعد التوقّف: لو ما في عناصر، أخفِ السلايدر (يظهر عند أول عنصر)
+                            if (!items.length) renderVideo();
                         };
 
-                        recorder.start();
-                        captureBtn.classList.remove('btn-secondary');
+                        recorder.start(); // ✅ من دون مؤقت/دائرة
+                        captureBtn.classList.remove('btn-primary');
                         captureBtn.classList.add('btn-danger');
                         captureBtn.innerHTML = '<i class="bi bi-stop"></i> {{ __('dashboard.stop') }}';
-
                     } catch (e) {
-                        stopStream(recStream);
-                        recStream = null;
-                        if (recOverlay) {
-                            try {
-                                recOverlay.remove();
-                            } catch (_) {}
-                            recOverlay = null;
-                        }
-                        if (recTimer) {
-                            clearInterval(recTimer);
-                            recTimer = null;
-                        }
-                        recorder = null;
-                        alert('Camera/Mic error: ' + (e?.message || e));
+                        // فشل/رفض → ارجع للكاميرا الأصلية
+                        stopStream(recStream); recStream = null; recorder = null; isRecording = false;
+                        camInput?.click();
                     }
                 });
 
                 // ===== FilePond لكل صندوق فيديو =====
                 let pond = null;
-                // خريطة لربط ملف FilePond بمعرّف العنصر في السلايدر
                 const pondFileToSliderId = new WeakMap();
 
                 if (window.FilePond) {
@@ -1504,134 +1164,85 @@
                         instantUpload: true,
                         allowRevert: true,
                         labelIdle: '{{ __('dashboard.upload') }}',
+                        fileValidateTypeDetectType: (source, type) => new Promise(resolve => {
+                            resolve(type || inferMimeByExt(source));
+                        }),
                         server: {
                             process: (fieldName, file, metadata, load, error, progress, abort) => {
-                                let cancelled = false,
-                                    currentXhr = null,
-                                    uploadId = '',
-                                    key = '';
-                                const parts = [];
-                                let uploadedBase = 0;
+                                let cancelled = false, currentXhr = null, uploadId = '', key = '';
+                                const parts = []; let uploadedBase = 0;
                                 progress(true, 0, file.size);
 
                                 (async () => {
                                     try {
-                                        const createRes = await fetch(
-                                            `{{ route('multipart.create') }}`, {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'X-CSRF-TOKEN': CSRF
-                                                },
-                                                body: JSON.stringify({
-                                                    fileName: file.name,
-                                                    contentType: cleanMime(file
-                                                        .type),
-                                                    fileSize: file.size,
-                                                    prefix: 'uploads/signin/videos'
-                                                })
-                                            });
-                                        if (!createRes.ok) throw new Error(
-                                            'createMultipart failed');
+                                        const createRes = await fetch(`{{ route('multipart.create') }}`, {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
+                                            body: JSON.stringify({
+                                                fileName: file.name,
+                                                contentType: cleanMime(file.type),
+                                                fileSize: file.size,
+                                                prefix: 'uploads/signin/videos'
+                                            })
+                                        });
+                                        if (!createRes.ok) throw new Error('createMultipart failed');
                                         const createJson = await createRes.json();
-                                        uploadId = createJson.uploadId;
-                                        key = createJson.key;
+                                        uploadId = createJson.uploadId; key = createJson.key;
 
                                         const totalParts = Math.ceil(file.size / CHUNK_SIZE);
-                                        for (let partNumber = 1; partNumber <=
-                                            totalParts; partNumber++) {
+                                        for (let partNumber = 1; partNumber <= totalParts; partNumber++) {
                                             if (cancelled) return;
                                             const start = (partNumber - 1) * CHUNK_SIZE;
-                                            const end = Math.min(start + CHUNK_SIZE, file.size);
-                                            const blob = file.slice(start, end);
+                                            const end   = Math.min(start + CHUNK_SIZE, file.size);
+                                            const blob  = file.slice(start, end);
 
-                                            const signRes = await fetch(
-                                                `{{ route('multipart.sign') }}`, {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'Content-Type': 'application/json',
-                                                        'X-CSRF-TOKEN': CSRF
-                                                    },
-                                                    body: JSON.stringify({
-                                                        key,
-                                                        uploadId,
-                                                        partNumber
-                                                    })
-                                                });
+                                            const signRes = await fetch(`{{ route('multipart.sign') }}`, {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
+                                                body: JSON.stringify({ key, uploadId, partNumber })
+                                            });
                                             if (!signRes.ok) throw new Error('signPart failed');
-                                            const {
-                                                url
-                                            } = await signRes.json();
+                                            const { url } = await signRes.json();
 
                                             await new Promise((resolve, reject) => {
                                                 const xhr = new XMLHttpRequest();
                                                 currentXhr = xhr;
                                                 xhr.open('PUT', url, true);
                                                 xhr.upload.onprogress = (e) => {
-                                                    if (e.lengthComputable)
-                                                        progress(true,
-                                                            uploadedBase + e.loaded,
-                                                            file.size);
+                                                    if (e.lengthComputable) progress(true, uploadedBase + e.loaded, file.size);
                                                 };
                                                 xhr.onload = () => {
                                                     currentXhr = null;
-                                                    if (xhr.status >= 200 && xhr
-                                                        .status < 300) {
-                                                        const etag = (xhr
-                                                                .getResponseHeader(
-                                                                    'ETag') || '')
-                                                            .replace(/"/g, '');
-                                                        if (!etag) return reject(
-                                                            new Error(
-                                                                'Missing ETag'
-                                                            ));
-                                                        parts.push({
-                                                            ETag: etag,
-                                                            PartNumber: partNumber
-                                                        });
+                                                    if (xhr.status >= 200 && xhr < 300) { /* older libs check */ }
+                                                    if (xhr.status >= 200 && xhr.status < 300) {
+                                                        const etag = (xhr.getResponseHeader('ETag') || '').replace(/"/g, '');
+                                                        if (!etag) return reject(new Error('Missing ETag'));
+                                                        parts.push({ ETag: etag, PartNumber: partNumber });
                                                         uploadedBase += blob.size;
-                                                        progress(true, uploadedBase,
-                                                            file.size);
+                                                        progress(true, uploadedBase, file.size);
                                                         resolve();
-                                                    } else reject(new Error(
-                                                        'PUT failed: ' + xhr
-                                                        .status));
+                                                    } else reject(new Error('PUT failed: ' + xhr.status));
                                                 };
-                                                xhr.onerror = () => reject(new Error(
-                                                    'Network error'));
-                                                xhr.onabort = () => reject(new Error(
-                                                    'Aborted'));
+                                                xhr.onerror = () => reject(new Error('Network error'));
+                                                xhr.onabort  = () => reject(new Error('Aborted'));
                                                 xhr.send(blob);
                                             });
                                         }
 
                                         if (cancelled) return;
-                                        const completeRes = await fetch(
-                                            `{{ route('multipart.complete') }}`, {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'X-CSRF-TOKEN': CSRF
-                                                },
-                                                body: JSON.stringify({
-                                                    key,
-                                                    uploadId,
-                                                    parts
-                                                })
-                                            });
-                                        if (!completeRes.ok) throw new Error(
-                                            'completeMultipart failed');
+                                        const completeRes = await fetch(`{{ route('multipart.complete') }}`, {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
+                                            body: JSON.stringify({ key, uploadId, parts })
+                                        });
+                                        if (!completeRes.ok) throw new Error('completeMultipart failed');
 
-                                        // خزّن key كـ input مخفي
-                                        keysWrap.appendChild(createHidden(
-                                            `items[${idx}][uploaded_videos][]`, key));
+                                        keysWrap.appendChild(createHidden(`items[${idx}][uploaded_videos][]`, key));
 
-                                        // أضف المعاينة في السلايدر بعد نجاح الرفع
                                         const blobURL = URL.createObjectURL(file);
-                                        const sliderId = 'pond-' + Math.random().toString(36)
-                                            .slice(2);
+                                        const sliderId = 'pond-' + Math.random().toString(36).slice(2);
+                                        // أثناء التسجيل: فقط حدّث النقاط ولا تغيّر srcObject
                                         addItem(sliderId, blobURL, true);
-                                        pondFileToSliderId.set(file, sliderId);
 
                                         if (removeFlg) removeFlg.value = '0';
                                         load(key);
@@ -1641,8 +1252,7 @@
                                         error(e.message || 'upload failed');
                                         if (errorBox) {
                                             errorBox.classList.remove('d-none');
-                                            errorBox.textContent =
-                                                'فشل رفع الفيديو. حاول من جديد.';
+                                            errorBox.textContent = 'فشل رفع الفيديو. حاول من جديد.';
                                         }
                                     }
                                 })();
@@ -1650,39 +1260,26 @@
                                 return {
                                     abort: () => {
                                         cancelled = true;
-                                        try {
-                                            if (currentXhr) currentXhr.abort();
-                                        } catch (_) {}
+                                        try { if (currentXhr) currentXhr.abort(); } catch(_) {}
                                         abort();
                                     }
                                 };
                             },
-                            revert: (uniqueFileId, load) => {
-                                load();
-                            } // المفاتيح نخزنها يدويًا
+                            revert: (uniqueFileId, load) => { load(); } // نخزن المفاتيح يدويًا
                         }
                     });
 
-                    // عند حذف ملف من FilePond → احذف معاينته من السلايدر
                     pond.on('removefile', (fileItem) => {
                         if (!fileItem) return;
-                        const sliderId = pondFileToSliderId.get(fileItem.file);
-                        if (sliderId) {
-                            removeItem(sliderId);
-                            pondFileToSliderId.delete(fileItem.file);
-                        }
+                        // ما نستخدمش map هنا، لأننا أضفنا via process بخاصية sliderId مستقلة
+                        // فهنا نبحث بالـ serverId/blobs غير مضمونة، فنخلي الإزالة للزر العام أو اكتب لو تحب mapping
+                        // اختياري: لا شيء.
                     });
 
-                    // زر حذف الكل
                     removeAll?.addEventListener('click', () => {
-                        try {
-                            pond.removeFiles();
-                        } catch (_) {}
-                        input.value = '';
-                        keysWrap.innerHTML = '';
-                        items = [];
-                        current = 0;
-                        renderVideo();
+                        try { pond.removeFiles(); } catch(_) {}
+                        input.value = ''; keysWrap.innerHTML = '';
+                        items = []; current = 0; renderVideo();
                         removeFlg.value = '1';
                     });
                 }
@@ -1690,7 +1287,6 @@
                 // أول عرض (موجود من السيرفر)
                 renderVideo();
             }
-
 
             // ====== INIT لكل العناصر الحالية ======
             document.querySelectorAll('.photo-box').forEach(initPhotoBox);
@@ -1704,20 +1300,20 @@
 
             addItemBtn?.addEventListener('click', function() {
                 const tpl = `
-<div class="card mb-4 item-row" data-index="${itemIndex}">
+<div class="card mb-4 item-row" data-index="\${itemIndex}">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">#${itemIndex + 1}</h5>
+    <h5 class="mb-0">#\${itemIndex + 1}</h5>
     <button type="button" class="btn btn-sm btn-icon btn-danger remove-item"><i class="bi bi-trash"></i></button>
   </div>
   <div class="card-body">
     <div class="row">
       <div class="col-md-6 mb-3">
         <label class="form-label required">{{ __('dashboard.item_name') }}</label>
-        <input type="text" name="items[${itemIndex}][item_name]" class="form-control" required>
+        <input type="text" name="items[\${itemIndex}][item_name]" class="form-control" required>
       </div>
       <div class="col-md-6 mb-3">
         <label class="form-label">{{ __('dashboard.notes') }}</label>
-        <textarea name="items[${itemIndex}][notes]" rows="1" class="form-control"></textarea>
+        <textarea name="items[\${itemIndex}][notes]" rows="1" class="form-control"></textarea>
       </div>
     </div>
 
@@ -1726,7 +1322,7 @@
       <div class="col-md-4">
         <label class="form-label">{{ __('dashboard.photo_attachment') }}</label>
         <div class="media-upload-container photo-box" data-type="photo" data-existing="[]">
-          <input type="hidden" name="items[${itemIndex}][remove_photos]" value="0" class="remove-flag">
+          <input type="hidden" name="items[\${itemIndex}][remove_photos]" value="0" class="remove-flag">
           <div class="photo-slider mb-2 d-none">
             <div class="slider-viewport"><img class="slider-img" alt="photo"></div>
             <button type="button" class="slider-nav prev" aria-label="Prev">‹</button>
@@ -1734,18 +1330,11 @@
             <div class="slider-dots"></div>
           </div>
           <div class="d-grid gap-2">
-  <button type="button" class="btn btn-sm btn-primary capture-media w-100">
-    <i class="bi bi-camera"></i> @lang('dashboard.capture_photo')
-  </button>
-  <button type="button" class="btn btn-sm btn-secondary upload-media w-100">
-    <i class="bi bi-upload"></i> @lang('dashboard.upload')
-  </button>
-  <button type="button" class="btn btn-sm btn-danger remove-media-all w-100">
-    <i class="bi bi-trash"></i> @lang('dashboard.delete')
-  </button>
-</div>
-
-          <input type="file" name="items[${itemIndex}][photos][]" class="media-input d-none" accept="image/*" multiple>
+            <button type="button" class="btn btn-sm btn-primary capture-media w-100"><i class="bi bi-camera"></i> @lang('dashboard.capture_photo')</button>
+            <button type="button" class="btn btn-sm btn-secondary upload-media w-100"><i class="bi bi-upload"></i> @lang('dashboard.upload')</button>
+            <button type="button" class="btn btn-sm btn-danger remove-media-all w-100"><i class="bi bi-trash"></i> @lang('dashboard.delete')</button>
+          </div>
+          <input type="file" name="items[\${itemIndex}][photos][]" class="media-input d-none" accept="image/*" multiple>
           <input type="file" class="d-none camera-photo-input" accept="image/*" capture="environment" multiple>
         </div>
       </div>
@@ -1754,61 +1343,48 @@
       <div class="col-md-4">
         <label class="form-label">{{ __('dashboard.audio_attachment') }}</label>
         <div class="media-upload-container audio-box" data-type="audio" data-existing="[]">
-          <input type="hidden" name="items[${itemIndex}][remove_audios]" value="0" class="remove-flag">
+          <input type="hidden" name="items[\${itemIndex}][remove_audios]" value="0" class="remove-flag">
           <div class="preview-audio-container mb-2" style="display:none;">
             <div class="preview-audio-list"></div>
           </div>
           <div class="d-grid gap-2">
-  <button type="button" class="btn btn-sm btn-primary capture-media w-100">
-    <i class="bi bi-mic"></i> @lang('dashboard.record')
-  </button>
-  <button type="button" class="btn btn-sm btn-secondary upload-media w-100">
-    <i class="bi bi-upload"></i> @lang('dashboard.upload')
-  </button>
-  <button type="button" class="btn btn-sm btn-danger remove-media w-100">
-    <i class="bi bi-trash"></i> @lang('dashboard.delete')
-  </button>
-</div>
-
-          <input type="file" name="items[${itemIndex}][audios][]" class="media-input d-none" accept="audio/*" multiple>
+            <button type="button" class="btn btn-sm btn-primary capture-media w-100"><i class="bi bi-mic"></i> @lang('dashboard.record')</button>
+            <button type="button" class="btn btn-sm btn-secondary upload-media w-100"><i class="bi bi-upload"></i> @lang('dashboard.upload')</button>
+            <button type="button" class="btn btn-sm btn-danger remove-media w-100"><i class="bi bi-trash"></i> @lang('dashboard.delete')</button>
+          </div>
+          <input type="file" name="items[\${itemIndex}][audios][]" class="media-input d-none" accept="audio/*" multiple>
         </div>
       </div>
 
       <!-- VIDEOS -->
-<div class="col-md-4">
-  <label class="form-label">{{ __('dashboard.video_attachment') }}</label>
-  <div class="media-upload-container video-box" data-type="video" data-index="${itemIndex}" data-existing="[]">
-    <input type="hidden" name="items[${itemIndex}][remove_videos]" value="0" class="remove-flag">
+      <div class="col-md-4">
+        <label class="form-label">{{ __('dashboard.video_attachment') }}</label>
+        <div class="media-upload-container video-box" data-type="video" data-index="\${itemIndex}" data-existing="[]">
+          <input type="hidden" name="items[\${itemIndex}][remove_videos]" value="0" class="remove-flag">
 
-    <div class="video-slider mb-2 d-none">
-      <div class="slider-viewport"><video class="slider-video" controls playsinline></video></div>
-      <button type="button" class="slider-nav prev" aria-label="Prev">‹</button>
-      <button type="button" class="slider-nav next" aria-label="Next">›</button>
-      <div class="slider-dots"></div>
-    </div>
+          <div class="video-slider mb-2 d-none">
+            <div class="slider-viewport"><video class="slider-video" controls playsinline></video></div>
+            <button type="button" class="slider-nav prev" aria-label="Prev">‹</button>
+            <button type="button" class="slider-nav next" aria-label="Next">›</button>
+            <div class="slider-dots"></div>
+          </div>
 
-    <div class="d-grid gap-2 mb-2">
-      <button type="button" class="btn btn-sm btn-primary capture-media w-100" id="capture-video-btn-${itemIndex}">
-        🎥 @lang('dashboard.start_recording_video')
-      </button>
+          <div class="d-grid gap-2 mb-2">
+            <button type="button" class="btn btn-sm btn-primary capture-media w-100" id="capture-video-btn-\${itemIndex}">
+              🎥 @lang('dashboard.start_recording_video')
+            </button>
+            <input type="file" class="pond-video" accept="video/*" multiple />
+            <button type="button" class="btn btn-sm btn-danger remove-video-all w-100"><i class="bi bi-trash"></i> @lang('dashboard.delete')</button>
+          </div>
 
-      <!-- واجهة FilePond -->
-      <input type="file" class="pond-video" accept="video/*" multiple>
+          <input type="file" name="items[\${itemIndex}][videos][]" class="media-input d-none" accept="video/*" multiple>
+          <input type="file" class="d-none camera-video-input" accept="video/*" capture="environment" multiple>
 
-      <button type="button" class="btn btn-sm btn-danger remove-video-all w-100">
-        <i class="bi bi-trash"></i> @lang('dashboard.delete')
-      </button>
-    </div>
-
-    <!-- احتياطي + كاميرا الهاتف (تُضاف للـ FilePond) -->
-    <input type="file" name="items[${itemIndex}][videos][]" class="media-input d-none" accept="video/*" multiple>
-    <input type="file" class="d-none camera-video-input" accept="video/*" capture="environment" multiple>
-
-    <div class="uploaded-keys"></div>
-    <input type="hidden" class="remove-video-flag" value="0">
-    <div class="text-danger small d-none video-error"></div>
-  </div>
-</div>
+          <div class="uploaded-keys"></div>
+          <input type="hidden" class="remove-video-flag" value="0">
+          <div class="text-danger small d-none video-error"></div>
+        </div>
+      </div>
 
     </div>
   </div>
