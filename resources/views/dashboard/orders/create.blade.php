@@ -320,36 +320,38 @@
                                 </div>
                             @endif
 
-                            <div class="d-flex justify-content-end gap-2">
-                                @if(isset($order))
-                                    @can('bookings.send-email')
-                                    <!--begin::Email Button-->
-                                    <button type="button" id="send-email-btn" class="btn btn-secondary d-flex align-items-center gap-2">
-                                        <img src="{{ asset('imgs/gmail.png') }}" alt="Email Icon" width="20" height="20">
-                                        <span class="indicator-label">@lang('dashboard.send_email')</span>
+                            <div class="table-responsive overflow-x-auto">
+                                <div class="d-flex justify-content-end gap-2" style="min-width: max-content;">
+                                    @if(isset($order))
+                                        @can('bookings.send-email')
+                                        <!--begin::Email Button-->
+                                        <button type="button" id="send-email-btn" class="btn btn-secondary d-flex align-items-center gap-2">
+                                            <img src="{{ asset('imgs/gmail.png') }}" alt="Email Icon" width="20" height="20">
+                                            <span class="indicator-label">@lang('dashboard.send_email')</span>
+                                        </button>
+                                        <!--end::Email Button-->
+                                        @endcan
+                                        @can('bookings.send-whatsapp')
+                                        <!--begin::WhatsApp Button-->
+                                        <button type="button" id="send-whatsapp-btn" class="btn btn-success d-flex align-items-center gap-2 ms-2">
+                                            <img src="{{ asset('images/whatsapp.png') }}" alt="WhatsApp Icon" width="20" height="20">
+                                            <span class="indicator-label">@lang('dashboard.send_whatsapp')</span>
+                                        </button>
+                                        <!--end::WhatsApp Button-->
+                                        @endcan
+                                    @endif
+                                    <!--begin::Additional Notes Button-->
+                                    <button type="button" id="additional-notes-btn" class="btn btn-secondary">
+                                        <span class="indicator-label">@lang('dashboard.additional_notes')</span>
                                     </button>
-                                    <!--end::Email Button-->
-                                    @endcan
-                                    @can('bookings.send-whatsapp')
-                                    <!--begin::WhatsApp Button-->
-                                    <button type="button" id="send-whatsapp-btn" class="btn btn-success d-flex align-items-center gap-2 ms-2">
-                                        <img src="{{ asset('images/whatsapp.png') }}" alt="WhatsApp Icon" width="20" height="20">
-                                        <span class="indicator-label">@lang('dashboard.send_whatsapp')</span>
+                                    <!--end::Additional Notes Button-->
+                                    <button type="submit" id="kt_ecommerce_add_product_submit" class="btn btn-primary">
+                                        <span class="indicator-label">@lang('dashboard.save_changes')</span>
+                                        <span class="indicator-progress">@lang('dashboard.please_wait')
+                                          <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                        </span>
                                     </button>
-                                    <!--end::WhatsApp Button-->
-                                    @endcan
-                                @endif
-                                <!--begin::Additional Notes Button-->
-                                <button type="button" id="additional-notes-btn" class="btn btn-secondary">
-                                    <span class="indicator-label">@lang('dashboard.additional_notes')</span>
-                                </button>
-                                <!--end::Additional Notes Button-->
-                                <button type="submit" id="kt_ecommerce_add_product_submit" class="btn btn-primary">
-                                    <span class="indicator-label">@lang('dashboard.save_changes')</span>
-                                    <span class="indicator-progress">@lang('dashboard.please_wait')
-                                      <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                                    </span>
-                                </button>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -1479,10 +1481,10 @@
                                 <span class="note-name">${escapeHtml(name)}</span>
                                 <span class="internal-note-actions d-inline-flex align-items-center">
                                     <button type="button" class="btn-edit-internal p-0 border-0" title="{{ __('dashboard.edit') }}">
-                                        <span class="btn btn-sm btn-light"><i class="fas fa-edit"></i></span>
+                                        <span class="btn btn-light"><i class="fas fa-edit"></i></span>
                                     </button>
                                     <button type="button" class="btn-remove-internal p-0 border-0" title="{{ __('dashboard.remove') }}">
-                                        <span class="btn btn-sm btn-danger"><i class="fas fa-times"></i></span>
+                                        <span class="btn btn-danger"><i class="fas fa-times"></i></span>
                                     </button>
                                 </span>
                             </span>
