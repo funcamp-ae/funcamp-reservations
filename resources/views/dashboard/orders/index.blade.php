@@ -381,24 +381,24 @@
                 $row.show();
                 
                 // Highlight matching text
-                if (searchText) {
-                    $row.find('td').each(function() {
-                        var text = $(this).text();
-                        var regex = new RegExp('(' + searchText + ')', 'gi');
-                        $(this).html(text.replace(regex, '<span class="highlight">$1</span>'));
-                    });
-                }
+         //       if (searchText) {
+         //           $row.find('td').each(function() {
+        //                var text = $(this).text();
+        //                var regex = new RegExp('(' + searchText + ')', 'gi');
+        //                $(this).html(text.replace(regex, '<span class="highlight">$1</span>'));
+         //           });
+           //     }
             } else {
                 $row.hide();
             }
         });
         
         // Remove highlights when search is cleared
-        if (!searchText) {
-            $('.highlight').each(function() {
-                $(this).replaceWith($(this).text());
-            });
-        }
+        //if (!searchText) {
+            //$('.highlight').each(function() {
+               // $(this).replaceWith($(this).text());
+            //});
+      //  }
     });
 </script>
 
