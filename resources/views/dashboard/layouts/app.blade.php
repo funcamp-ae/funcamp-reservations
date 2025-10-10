@@ -38,6 +38,7 @@
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
 	<link href="{{asset('dashboard/custom/css/main.css')}}" rel="stylesheet" />
 
+
 	@if(app()->getLocale() == "en")
 	<!--EN-->
 	<!--begin::Page Vendor Stylesheets(used by this page)-->
@@ -187,7 +188,7 @@
 a.btn-primary{
 	 color: white !important;
 	}
-	a.btn-light , a.btn-light-primary , .fc-day-today a {
+	a.btn-light , a.btn-light-primary , .fc-day-today a  , .bg-light , .bg-secondary{
 	 color: black !important;
 	}
     .alert.alert-warning a {
@@ -985,6 +986,39 @@ a.btn-primary{
 		});
 	});
 	</script>
+
+
+	<!--begin::Bootstrap (includes Echo and Pusher)-->
+	@vite(['resources/js/bootstrap.js'])
+	<!--end::Bootstrap-->
+
+	<!--begin::Chat Configuration-->
+	<script>
+		// Chat system configuration
+		window.currentUserId = {{ auth()->id() ?? 'null' }};
+		
+		// Chat translations
+		window.chatTranslations = {
+			no_chats_yet: "{{ __('dashboard.no_chats_yet') }}",
+			no_users_found: "{{ __('dashboard.no_users_found') }}",
+			no_messages_yet: "{{ __('dashboard.no_messages_yet') }}",
+			start_conversation: "{{ __('dashboard.start_conversation') }}",
+			online: "{{ __('dashboard.online') }}",
+			members: "{{ __('dashboard.members') }}",
+			yesterday: "{{ __('dashboard.yesterday') }}",
+			unknown_user: "{{ __('dashboard.unknown_user') }}",
+			group_name_required: "{{ __('dashboard.group_name_required') }}",
+			select_members_required: "{{ __('dashboard.select_members_required') }}"
+		};
+	</script>
+	<!--end::Chat Configuration-->
+	
+	<script src="{{ asset('js/chat.js') }}"></script>
+	<!--end::Pusher and Echo-->
+
+	<!--begin::Chat Sidebar-->
+	@include('dashboard.components.chat-sidebar')
+	<!--end::Chat Sidebar-->
 </body>
 <!--end::Body-->
 

@@ -1721,6 +1721,21 @@ Route::group(['middleware' => ['auth']], function () {
         ->name('tasks.updateStatus');
 });
 
+// Chat API routes
+Route::group(['middleware' => ['auth'], 'prefix' => 'api/chat'], function () {
+    Route::get('/', [App\Http\Controllers\ChatController::class, 'index']);
+    Route::post('/', [App\Http\Controllers\ChatController::class, 'store']);
+    Route::get('/users', [App\Http\Controllers\ChatController::class, 'getUsers']);
+    Route::post('/private', [App\Http\Controllers\ChatController::class, 'createPrivateChat']);
+    Route::get('/unread-count', [App\Http\Controllers\ChatController::class, 'getUnreadCount']);
+    Route::get('/unread-messages', [App\Http\Controllers\ChatController::class, 'getUnreadMessages']);
+    
+    Route::get('/{chat}', [App\Http\Controllers\ChatController::class, 'show']);
+    Route::post('/{chat}/messages', [App\Http\Controllers\ChatController::class, 'sendMessage']);
+    Route::post('/{chat}/mark-read', [App\Http\Controllers\ChatController::class, 'markAsRead']);
+    Route::delete('/{chat}/leave', [App\Http\Controllers\ChatController::class, 'leaveChat']);
+});
+
 Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])
     ->name('notifications.read')->middleware(['auth']);
 

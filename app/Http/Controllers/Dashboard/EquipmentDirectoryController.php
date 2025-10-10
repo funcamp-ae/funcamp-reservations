@@ -89,7 +89,8 @@ class EquipmentDirectoryController extends Controller
 
     public function storeItem(Request $request, EquipmentDirectory $equipmentDirectory)
     {
-        // ✅ فاليديشن منظم على نمط OrderCheckinController
+
+        // ✅ فاليديشن على نفس ستايل OrderCheckinController
         $request->validate([
             'type'        => ['required', 'string', 'max:255'],
             'name'        => ['required', 'string', 'max:255'],
@@ -98,17 +99,34 @@ class EquipmentDirectoryController extends Controller
             'notes'       => ['nullable', 'string'],
             'is_active'   => ['boolean'],
 
-            // 🖼️ الصور
+            // 🖼️ الصور (20MB) — نفس النمط
             'photo_attachments'   => ['nullable', 'array'],
-            'photo_attachments.*' => ['nullable', 'mimes:jpeg,png,jpg,gif,webp'],
+            'photo_attachments.*' => 'file|mimes:jpg,jpeg,png,gif,webp',
 
-            // 🎵 الصوت
+            // 🎵 الصوت (50MB) — نفس النمط بالضبط
             'audio_attachments'   => ['nullable', 'array'],
-            'audio_attachments.*' => ['nullable', 'mimetypes:audio/mpeg,audio/wav,audio/ogg,audio/webm,audio/aac,audio/x-m4a,audio/mp4'],
+            'audio_attachments.*' => 'file|
+                                       mimes:mp3,wav,ogg,webm,aac,m4a,mp4|
+                                       mimetypes:audio/mpeg,audio/mp3,
+                                                 audio/wav,audio/x-wav,audio/vnd.wave,
+                                                 audio/ogg,application/ogg,
+                                                 audio/webm,video/webm,
+                                                 audio/aac,audio/x-aac,
+                                                 audio/mp4,audio/x-m4a,audio/m4a,
+                                                 audio/opus,
+                                                 audio/3gpp,audio/3gpp2,audio/amr,
+                                                 application/octet-stream',
 
-            // 🎬 الفيديو
+            // 🎬 مفاتيح الفيديو (FilePond/S3) — نفس فكرة الصفحات الأخرى
+            'uploaded_videos'   => ['nullable', 'array'],
+            'uploaded_videos.*' => ['nullable', 'string'],
+
+            // (اختياري) دعم رفع ملفات فيديو مباشرةً لو تستعملوه في بعض النماذج
             'video_attachments'   => ['nullable', 'array'],
-            'video_attachments.*' => ['nullable', 'mimetypes:video/mp4,video/quicktime,video/webm,video/x-matroska,video/x-flv,video/mpeg'],
+            'video_attachments.*' => ['nullable','string'],
+
+
+
 
             // ❌ حقول الحذف
             'remove_photo'        => ['nullable', 'in:0,1'],
@@ -140,7 +158,7 @@ class EquipmentDirectoryController extends Controller
 
     public function updateItem(Request $request, EquipmentDirectory $equipmentDirectory, EquipmentDirectoryItem $item)
     {
-        // ✅ نفس الفاليديشن كما في storeItem
+        // ✅ نفس الفاليديشن كما في storeItem (نفس ستايل OrderCheckinController)
         $request->validate([
             'type'        => ['required', 'string', 'max:255'],
             'name'        => ['required', 'string', 'max:255'],
@@ -151,15 +169,29 @@ class EquipmentDirectoryController extends Controller
 
             // 🖼️ الصور
             'photo_attachments'   => ['nullable', 'array'],
-            'photo_attachments.*' => ['nullable', 'mimes:jpeg,png,jpg,gif,webp'],
+            'photo_attachments.*' => 'file|mimes:jpg,jpeg,png,gif,webp',
 
             // 🎵 الصوت
             'audio_attachments'   => ['nullable', 'array'],
-            'audio_attachments.*' => ['nullable', 'mimetypes:audio/mpeg,audio/wav,audio/ogg,audio/webm,audio/aac,audio/x-m4a,audio/mp4'],
+            'audio_attachments.*' => 'file|
+                                       mimes:mp3,wav,ogg,webm,aac,m4a,mp4|
+                                       mimetypes:audio/mpeg,audio/mp3,
+                                                 audio/wav,audio/x-wav,audio/vnd.wave,
+                                                 audio/ogg,application/ogg,
+                                                 audio/webm,video/webm,
+                                                 audio/aac,audio/x-aac,
+                                                 audio/mp4,audio/x-m4a,audio/m4a,
+                                                 audio/opus,
+                                                 audio/3gpp,audio/3gpp2,audio/amr,
+                                                 application/octet-stream',
 
-            // 🎬 الفيديو
+            // 🎬 مفاتيح فيديو جاهزة
+            'uploaded_videos'   => ['nullable', 'array'],
+            'uploaded_videos.*' => ['nullable', 'string'],
+
+            // (اختياري) فيديو ملفات مباشرةً
             'video_attachments'   => ['nullable', 'array'],
-            'video_attachments.*' => ['nullable', 'mimetypes:video/mp4,video/quicktime,video/webm,video/x-matroska,video/x-flv,video/mpeg'],
+            'video_attachments.*' => ['nullable','string'],
 
             // ❌ حقول الحذف
             'remove_photo'        => ['nullable', 'in:0,1'],
@@ -189,6 +221,7 @@ class EquipmentDirectoryController extends Controller
         }
 
         foreach ($item->media as $media) {
+            // إن كانت على نفس مخزن hetzner هذي تكفي
             Storage::disk('hetzner')->delete($media->file_path);
             $media->delete();
         }
@@ -279,7 +312,7 @@ class EquipmentDirectoryController extends Controller
             }
         }
 
-        // 🎬 الفيديو
+        // 🎬 الفيديو (ملفات مباشرةً - إن وُجدت)
         if ($request->boolean('remove_video')) {
             foreach ($item->media()->where('file_type', 'video')->get() as $m) {
                 Storage::disk('hetzner')->delete($m->file_path);
@@ -296,7 +329,7 @@ class EquipmentDirectoryController extends Controller
             }
         }
 
-        // 🎬 الفيديوهات المرفوعة مسبقًا (FilePond)
+        // 🎬 الفيديوهات المرفوعة مسبقًا (FilePond/S3) كمفاتيح
         if ($request->filled('uploaded_videos')) {
             $keys = collect((array) $request->input('uploaded_videos'))
                 ->filter(fn($v) => filled($v))

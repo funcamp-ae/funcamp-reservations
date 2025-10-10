@@ -41,7 +41,4 @@ Route::group([
         Route::get('home', [HomeController::class, 'index']);
     });
 
-    Route::group(['middleware' => ['auth:sanctum']], function () {
-        // API routes go here
-    });
 });
