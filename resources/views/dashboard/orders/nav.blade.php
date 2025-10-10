@@ -134,4 +134,3 @@
     @endif
     <!--end:::Tab item-->
 </ul>
-<hr>
