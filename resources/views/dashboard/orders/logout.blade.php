@@ -49,7 +49,7 @@
             enctype="multipart/form-data">
             @csrf
             @method('PUT')
-          <div class=" py-5 ">
+          <div class=" pb-5 ">
                            <!-- customer information -->
                            <div class="pt-5 px-9 gap-2 gap-md-5">
                     <div class="row g-3 small">
