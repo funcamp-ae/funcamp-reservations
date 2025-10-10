@@ -60,10 +60,60 @@ class WhatsAppService
      * URL: https://app.hypersender.com/api/whatsapp/v1/:instance/send-file
      * Based on: https://docs.hypersender.com/docs/whatsapp/wa-send-file
      */
-    public function sendFile($phoneNumber, $filePath, $caption = null)
-    {
-        try {
+        // Validate file exists and is readable
+            if (!file_exists($filePath) || !is_readable($filePath)) {
+                Log::error('WhatsApp file not found or not readable', [
+                    'phone' => $phoneNumber,
+                    'file_path' => $filePath,
+                    'file_exists' => file_exists($filePath),
+                    'is_readable' => is_readable($filePath)
+                ]);
+                return false;
+            }
+
+            // Check file size (5MB limit for WhatsApp)
+            $fileSize = filesize($filePath);
+            $maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            
+            if ($fileSize > $maxSize) {
+                Log::error('WhatsApp file too large', [
+                    'phone' => $phoneNumber,
+                    'file_path' => $filePath,
+                    'file_size' => $fileSize,
+                    'max_size' => $maxSize
+                ]);
+                return false;
+            }
+
+            // Get file info for validation
+            $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_file($fileInfo, $filePath);
+            finfo_close($fileInfo);
+
+            // Allowed MIME types for WhatsApp
+            $allowedTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'text/csv',
+                'text/plain'
+            ];
+
+            if (!in_array($mimeType, $allowedTypes)) {
+                Log::error('WhatsApp file type not allowed', [
+                    'phone' => $phoneNumber,
+                    'file_path' => $filePath,
+                    'mime_type' => $mimeType,
+                    'allowed_types' => $allowedTypes
+                ]);
+                return false;
+            }
+
+            // Make the API request
             $response = Http::withToken($this->token)
+                ->timeout(30) // 30 seconds timeout
                 ->withHeaders([
                     'Accept' => 'application/json',
                 ])
@@ -73,22 +123,36 @@ class WhatsAppService
                     'caption' => $caption
                 ]);
 
-            Log::info('WhatsApp file sent', [
+            $responseData = $response->json();
+            $success = $response->successful();
+
+            // Log the attempt with detailed information
+            Log::info('WhatsApp file send attempt', [
                 'phone' => $phoneNumber,
                 'chat_id' => $this->formatPhoneNumber($phoneNumber),
                 'file' => $filePath,
+                'file_size' => $fileSize,
+                'mime_type' => $mimeType,
                 'status_code' => $response->status(),
-                'response_body' => $response->body(),
-                'response_json' => $response->json(),
-                'headers' => $response->headers()
+                'response' => $responseData,
+                'success' => $success
             ]);
 
-            return $response->successful();
+            if (!$success) {
+                Log::error('WhatsApp API error response', [
+                    'status' => $response->status(),
+                    'response' => $responseData,
+                    'headers' => $response->headers()
+                ]);
+            }
+
+            return $success;
         } catch (\Exception $e) {
             Log::error('WhatsApp file send failed', [
                 'phone' => $phoneNumber,
-                'file' => $filePath,
-                'error' => $e->getMessage()
+                'file' => $filePath ?? null,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             return false;
         }
