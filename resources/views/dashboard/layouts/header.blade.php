@@ -143,9 +143,9 @@
                 <!--end::Notifications-->
                 
                 <!--begin::Chat-->
-                <div class="d-flex align-items-center ms-1 ms-lg-3">
+                <!-- <div class="d-flex align-items-center ms-1 ms-lg-3"> -->
                     <!--begin::Menu-wrapper-->
-                    <button type="button" 
+                    <!-- <button type="button" 
                             class="btn btn-icon btn-active-light-primary position-relative w-30px h-30px w-md-40px h-md-40px" 
                             data-bs-toggle="modal" 
                             data-bs-target="#chatModal"
@@ -155,7 +155,7 @@
                             0
                         </span>
                     </button>
-                </div>
+                </div> -->
                 <!--end::Chat-->
 
                 <!--begin::Theme switcher-->
