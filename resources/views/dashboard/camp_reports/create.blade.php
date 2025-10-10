@@ -531,6 +531,52 @@
             font-size: 20px;
             font-weight: bold
         }
+        /* === تحسين ظهور نقاط السلايدر (صور + فيديو) === */
+.photo-slider .slider-dots,
+.video-slider .slider-dots {
+  position: absolute;         /* نخليها فوق المحتوى */
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;                    /* مسافة أوضح بين النقاط */
+  padding: 0;                  /* نلغي البادينغ حتى تقرّب من المحتوى */
+  pointer-events: none;        /* ما تمنع الضغط على الفيديو/الصورة */
+}
+
+.photo-slider .slider-dot,
+.video-slider .slider-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  /* لون واضح فوق الخلفية الداكنة */
+  background: rgba(255, 255, 255, 0.35);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.25);  /* هالة خفيفة */
+  transform: scale(1);
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+  pointer-events: auto;        /* نخليها قابلة للنقر رغم أن الحاوية معطلة */
+  cursor: pointer;
+}
+
+.photo-slider .slider-dot:hover,
+.video-slider .slider-dot:hover,
+.photo-slider .slider-dot:focus-visible,
+.video-slider .slider-dot:focus-visible {
+  background: #ffffff;
+  border-color: #ffffff;
+  transform: scale(1.15);
+  outline: none;
+}
+
+.photo-slider .slider-dot.active,
+.video-slider .slider-dot.active {
+  background: #ffffff;
+  border-color: #ffffff;
+  transform: scale(1.25);
+}
+
     </style>
 @endpush
 

@@ -228,6 +228,42 @@
 [dir="rtl"] .img-lightbox .lightbox-nav.prev{ right:24px; }
 [dir="rtl"] .img-lightbox .lightbox-nav.next{ left:24px; }
 .img-lightbox .lightbox-nav:hover{ background:rgba(255,255,255,.25); }
+@push('css')
+<style>
+/* === تحسين ظهور نقاط السلايدر (صور + فيديو) === */
+.media-slider { position: relative; }
+
+.media-slider .slider-dots{
+  position: absolute;
+  bottom: 10px;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 0;
+  pointer-events: none; /* ما تمنع التفاعل مع الفيديو/الصورة */
+}
+
+.media-slider .slider-dot{
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  border: 2px solid rgba(255,255,255,0.9);
+  box-shadow: 0 0 0 2px rgba(0,0,0,.25);
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  pointer-events: auto; /* قابلة للنقر */
+  cursor: pointer;
+}
+
+.media-slider .slider-dot:hover,
+.media-slider .slider-dot:focus-visible{
+  background: #fff; border-color:#fff; transform: scale(1.15); outline: none;
+}
+
+.media-slider .slider-dot.active{
+  background: #fff; border-color:#fff; transform: scale(1.25);
+}
+</style>
+@endpush
 
     </style>
 @endpush

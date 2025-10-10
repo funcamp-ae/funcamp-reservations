@@ -409,6 +409,54 @@
             filter: brightness(.95);
             color: #fff
         }
+
+/* نقاط السلايدر واضحة فوق المعاينة */
+.photo-slider .slider-dots,
+.video-slider .slider-dots{
+  position: absolute;
+  bottom: 10px;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 0;
+  pointer-events: none;
+}
+
+.photo-slider .slider-dot,
+.video-slider .slider-dot{
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(255,255,255,.35);
+  border: 2px solid rgba(255,255,255,.9);
+  box-shadow: 0 0 0 2px rgba(0,0,0,.25);
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.photo-slider .slider-dot:hover,
+.video-slider .slider-dot:hover,
+.photo-slider .slider-dot:focus-visible,
+.video-slider .slider-dot:focus-visible{
+  background: #fff; border-color:#fff; transform: scale(1.15); outline: none;
+}
+.photo-slider .slider-dot.active,
+.video-slider .slider-dot.active{
+  background: #fff; border-color:#fff; transform: scale(1.25);
+}
+
+/* اتجاه الأسهم RTL/LTR */
+[dir="ltr"] .photo-slider .prev,
+[dir="ltr"] .video-slider .prev{ left: 8px }
+[dir="ltr"] .photo-slider .next,
+[dir="ltr"] .video-slider .next{ right: 8px }
+[dir="rtl"] .photo-slider .prev,
+[dir="rtl"] .video-slider .prev{ right: 8px }
+[dir="rtl"] .photo-slider .next,
+[dir="rtl"] .video-slider .next{ left: 8px }
+
+/* زر بني موحّد للالتقاط/التسجيل (موجود عندك) */
+.btn-brown{ background:#8B5E3C; color:#fff; border-color:#8B5E3C }
+.btn-brown:hover{ filter:brightness(.95); color:#fff }
     </style>
 @endpush
 
