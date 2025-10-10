@@ -143,7 +143,7 @@
                                                             <i class="bi bi-upload"></i> @lang('dashboard.upload')
                                                         </button>
                                                         <button type="button"
-                                                            class="btn btn-sm btn-outline-danger remove-media-all w-100">
+                                                            class="btn btn-sm btn-danger remove-media-all w-100">
                                                             <i class="bi bi-trash"></i> @lang('dashboard.delete')
                                                         </button>
                                                     </div>
@@ -180,7 +180,7 @@
                                                             <i class="bi bi-upload"></i> @lang('dashboard.upload')
                                                         </button>
                                                         <button type="button"
-                                                            class="btn btn-sm btn-outline-danger remove-media w-100">
+                                                            class="btn btn-sm btn-danger remove-media w-100">
                                                             <i class="bi bi-trash"></i> @lang('dashboard.delete')
                                                         </button>
                                                     </div>
@@ -226,7 +226,7 @@
                                                             multiple />
 
                                                         <button type="button"
-                                                            class="btn btn-sm btn-outline-danger remove-video-all w-100">
+                                                            class="btn btn-sm btn-danger remove-video-all w-100">
                                                             <i class="bi bi-trash"></i> @lang('dashboard.delete')
                                                         </button>
                                                     </div>
@@ -1332,14 +1332,7 @@
                     recTimer = null,
                     recStartTs = 0;
 
-                function bestVideoMime() {
-                    const cands = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
-                    for (const m of cands) {
-                        if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(
-                                m)) return m;
-                    }
-                    return 'video/webm';
-                }
+
 
                 function stopStream(s) {
                     try {
@@ -1428,19 +1421,12 @@
                                 recStartTs);
                         }, 1000);
 
-                        const mime = (function choose() {
-                            const cands = ['video/webm;codecs=vp8,opus', 'video/webm'];
-                            for (const m of cands) {
-                                if (window.MediaRecorder?.isTypeSupported?.(m)) return m;
-                            }
-                            return 'video/webm';
-                        })();
+
                         recChunks = [];
 
 
 
                         recorder = new MediaRecorder(recStream, {
-                            mimeType: mime,
                             videoBitsPerSecond: 800_000, // 1.2 Mbps بدل 4 Mbps
                             audioBitsPerSecond: 64_000 // 64 Kbps
                         });
@@ -1461,7 +1447,6 @@
                             stopStream(recStream);
                             recStream = null;
 
-                            const type = recorder.mimeType || mime || 'video/webm';
                             const ext = type.includes('mp4') ? 'mp4' : 'webm';
                             const blob = new Blob(recChunks, {
                                 type
@@ -1755,7 +1740,7 @@
   <button type="button" class="btn btn-sm btn-secondary upload-media w-100">
     <i class="bi bi-upload"></i> @lang('dashboard.upload')
   </button>
-  <button type="button" class="btn btn-sm btn-outline-danger remove-media-all w-100">
+  <button type="button" class="btn btn-sm btn-danger remove-media-all w-100">
     <i class="bi bi-trash"></i> @lang('dashboard.delete')
   </button>
 </div>
@@ -1780,7 +1765,7 @@
   <button type="button" class="btn btn-sm btn-secondary upload-media w-100">
     <i class="bi bi-upload"></i> @lang('dashboard.upload')
   </button>
-  <button type="button" class="btn btn-sm btn-outline-danger remove-media w-100">
+  <button type="button" class="btn btn-sm btn-danger remove-media w-100">
     <i class="bi bi-trash"></i> @lang('dashboard.delete')
   </button>
 </div>
@@ -1810,7 +1795,7 @@
       <!-- واجهة FilePond -->
       <input type="file" class="pond-video" accept="video/*" multiple>
 
-      <button type="button" class="btn btn-sm btn-outline-danger remove-video-all w-100">
+      <button type="button" class="btn btn-sm btn-danger remove-video-all w-100">
         <i class="bi bi-trash"></i> @lang('dashboard.delete')
       </button>
     </div>

@@ -108,7 +108,7 @@
                                     <button type="button" class="btn btn-sm btn-secondary upload-media">
                                         <i class="bi bi-upload"></i> @lang('dashboard.upload')
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger remove-media">
+                                    <button type="button" class="btn btn-sm btn-danger remove-media">
                                         <i class="bi bi-trash"></i> @lang('dashboard.delete')
                                     </button>
                                 </div>
@@ -138,7 +138,7 @@
                                     <button type="button" class="btn btn-sm btn-secondary upload-media">
                                         <i class="bi bi-upload"></i> @lang('dashboard.upload')
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger remove-media">
+                                    <button type="button" class="btn btn-sm btn-danger remove-media">
                                         <i class="bi bi-trash"></i> @lang('dashboard.delete')
                                     </button>
                                 </div>
@@ -169,7 +169,7 @@
                                 {{-- FilePond input --}}
 <input type="file" class="pond-video" id="pond-video" accept="video/*" multiple name="uploaded_videos[]" />
 
-                                <button type="button" class="btn btn-sm btn-outline-danger remove-video-all">
+                                <button type="button" class="btn btn-sm btn-danger remove-video-all">
                                     <i class="bi bi-trash"></i> @lang('dashboard.delete')
                                 </button>
                             </div>

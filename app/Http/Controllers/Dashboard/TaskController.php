@@ -120,7 +120,7 @@ class TaskController extends Controller
             }
         });
 
-        return redirect()->route('tasks.show', $task)->with('success', 'تم إنشاء المهمة بنجاح.');
+        return redirect()->route('tasks.index', $task)->with('success', 'تم إنشاء المهمة بنجاح.');
     }
 
     public function update(Request $request, Task $task)

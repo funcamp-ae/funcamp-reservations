@@ -144,7 +144,7 @@
                                         <button type="button" class="btn btn-sm btn-secondary upload-media w-100">
                                             <i class="bi bi-upload"></i> @lang('dashboard.upload')
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger remove-media-all w-100">
+                                        <button type="button" class="btn btn-sm btn-danger remove-media-all w-100">
                                             <i class="bi bi-trash"></i> @lang('dashboard.delete')
                                         </button>
                                     </div>
@@ -173,7 +173,7 @@
                                         <button type="button" class="btn btn-sm btn-secondary upload-media w-100">
                                             <i class="bi bi-upload"></i> @lang('dashboard.upload')
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger remove-media w-100">
+                                        <button type="button" class="btn btn-sm btn-danger remove-media w-100">
                                             <i class="bi bi-trash"></i> @lang('dashboard.delete')
                                         </button>
                                     </div>
@@ -206,7 +206,7 @@
                                         <input type="file" class="pond-video" accept="video/*" multiple />
 
                                         <button type="button"
-                                            class="btn btn-sm btn-outline-danger remove-video-all w-100">
+                                            class="btn btn-sm btn-danger remove-video-all w-100">
                                             <i class="bi bi-trash"></i> @lang('dashboard.delete')
                                         </button>
                                     </div>
@@ -411,6 +411,8 @@
         }
     </style>
 @endpush
+
+
 
 
 
@@ -1174,14 +1176,7 @@
                     recTimer = null,
                     recStart = 0;
 
-                function bestMime() {
-                    const c = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
-                    for (const m of c) {
-                        if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(
-                                m)) return m;
-                    }
-                    return 'video/webm';
-                }
+
 
                 function stopStream(s) {
                     try {
@@ -1245,14 +1240,12 @@
                         recTimer = setInterval(() => ind.textContent = '🔴 Recording... ' + fmt(Date
                             .now() - recStart), 1000);
 
-                        const mime = bestMime();
                         chunks = [];
                         // 2) إعداد الـ MediaRecorder ببتريت متوسط
                         const V_BPS = 800_000; // فيديو ~800 kbps
                         const A_BPS = 64_000; // صوت ~64 kbps
 
                         recorder = new MediaRecorder(recStream, {
-                            mimeType: mime,
                             bitsPerSecond: V_BPS + A_BPS,
                             videoBitsPerSecond: V_BPS,
                             audioBitsPerSecond: A_BPS
