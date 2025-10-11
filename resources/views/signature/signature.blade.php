@@ -262,7 +262,7 @@
                                             </div>
                                             <div class="col-md-4 text-center">
                                                 <div class="fw-semibold text-muted">{{ __('dashboard.phone')}}</div>
-                                                <div class="fw-bold">{{ $order->customer->phone }}</div>
+                                                <div class="fw-bold " dir="ltr">{{ $order->customer->phone }}</div>
                                             </div>
                                         </div>
                                     </div>

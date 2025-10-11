@@ -21,7 +21,7 @@
                         </div>
                         <div class="col-md-3 text-center">
                             <div class="fw-semibold text-muted">{{ __('dashboard.customer_name') }}</div>
-                            <div class="fw-bold">{{ $order->customer->name }}</div>
+                            <div class="fw-bold " dir="ltr">{{ $order->customer->name }}</div>
                         </div>
                     </div>
                 </div>

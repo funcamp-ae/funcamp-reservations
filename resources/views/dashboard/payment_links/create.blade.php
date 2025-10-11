@@ -60,7 +60,7 @@
                     @if($selectedOrder->customer->phone)
                     <div class="row mt-2">
                         <div class="col-md-6">
-                            <strong>{{ __('dashboard.phone') }}:</strong> {{ $selectedOrder->customer->phone }}
+                            <strong dir="ltr">{{ __('dashboard.phone') }}:</strong> {{ $selectedOrder->customer->phone }}
                         </div>
                     </div>
                     @endif

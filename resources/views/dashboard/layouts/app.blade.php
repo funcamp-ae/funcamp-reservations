@@ -75,7 +75,7 @@
 	i used this because i have tried to use dark mode with bootstrap 5,3 but the current is approxamitly is 5,1 
 	so i tried to change this but there are some modal written in old way and it will not work  
 */
-       @if(session('theme', 'light') == "light")
+@if(session('theme', 'light') == "light")
   	:root {
             --bs-body-bg: #f5f8fa;
             --bs-body-color: #3f4254;
@@ -132,14 +132,14 @@
             background-color: var(--bs-header-bg) !important;
             border-color: var(--bs-border-color) !important;
         }
-        h1 , h2 , h3 , h4 , h5 {
-            color: var(--bs-card-color);
+        h1 , h2 , h3 , h4 , h5 , .swal2-cancel {
+            color: var(--bs-card-color) !important;
 		}
 		
         /* Cards and Modals */
-        .card, .modal-content, .dropdown-menu, .menu {
+        .card, .modal-content, .swal2-popup , .dropdown-menu, .menu {
             background-color: var(--bs-card-bg);
-            color: var(--bs-card-color);
+            color: var(--bs-card-color) !important;
             border-color: var(--bs-border-color);
             box-shadow: var(--bs-box-shadow) !important;
         }
