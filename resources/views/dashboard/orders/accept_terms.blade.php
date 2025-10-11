@@ -54,12 +54,14 @@
                                 @lang('dashboard.Customer_Signature')
                             </label>
 
-                            <div class="col-lg-8 d-flex flex-column gap-3 mb-2 bg-light">
+                            <div class="col-lg-8 d-flex flex-column gap-3 mb-2">
                                 @if(isset($order->signature_path))
+                                <div class="col-lg-8 d-flex flex-column gap-3 mb-2 bg-light">
                                     <div class="text-success fw-bold">
                                         {{ $order?->signature }}
                                     </div>
                                     <img src="{{ asset('storage/' . $order->signature_path) }}" alt="Signature" style="max-height:80px;">
+                                </div>
                                 @else
                                         <div class="input-group">
                                             <input type="text"
