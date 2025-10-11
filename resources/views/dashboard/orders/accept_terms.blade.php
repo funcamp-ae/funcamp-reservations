@@ -59,7 +59,7 @@
                                     <div class="text-success fw-bold">
                                         {{ $order?->signature }}
                                     </div>
-                                    <img src="{{ Storage::url($order->signature_path) }}" alt="Signature" style="max-height:80px;">
+                                    <img src="{{ asset('storage/' . $order->signature_path) }}" alt="Signature" style="max-height:80px;">
                                 @else
                                         <div class="input-group">
                                             <input type="text"
