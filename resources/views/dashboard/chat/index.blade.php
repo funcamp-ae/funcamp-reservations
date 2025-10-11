@@ -165,7 +165,11 @@ class ChatSystem {
         this.loadChats();
         this.setupGlobalChatListener();
     }
-
+  Echo.private(`chat.${this.currentChatId}`)    
+            .listen('.message.sent', (e) => {  // Changed from NewChatMessage to message.sent
+                console.log('New message received:', e);
+                this.handleNewMessage(e);
+            });
 setupGlobalChatListener() {
     if (typeof Echo !== 'undefined') {
         // The channel name will be automatically converted to private-user.{userId} by Laravel Echo
