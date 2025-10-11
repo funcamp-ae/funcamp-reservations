@@ -65,7 +65,7 @@ class Order extends Model
         "partial_confiscation_amount",
         // أعمدة الخروج
         'video_note_logout',
-        'voice_note_logout'
+        'voice_note_logout',
         "signature_path"
     ];
 
