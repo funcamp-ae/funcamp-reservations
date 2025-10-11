@@ -52,8 +52,7 @@ class OrderSignatureController extends Controller
             'signature_path'=> $path,
             'signature' => now()
         ]);
-        dd($path);
-        // return redirect()->back()->with('success' , __('dashboard.success'));
+        return redirect()->back()->with('success' , __('dashboard.success'));
     }
 
     public function destroy(Order $order)
