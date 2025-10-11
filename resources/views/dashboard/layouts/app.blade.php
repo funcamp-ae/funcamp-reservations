@@ -132,7 +132,7 @@
             background-color: var(--bs-header-bg) !important;
             border-color: var(--bs-border-color) !important;
         }
-        h1 , h2 , h3 , h4 , h5 , .swal2-cancel {
+        h1 , h2 , h3 , h4 , h5 , h6, .swal2-cancel {
             color: var(--bs-card-color) !important;
 		}
 		
@@ -1017,7 +1017,7 @@ a.btn-primary{
 	<!--end::Pusher and Echo-->
 
 	<!--begin::Chat Sidebar-->
-	@include('dashboard.components.chat-sidebar')
+	<!-- Chat is now a dedicated page at /chat -->
 	<!--end::Chat Sidebar-->
 </body>
 <!--end::Body-->

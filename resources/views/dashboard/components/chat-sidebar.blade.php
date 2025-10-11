@@ -1,158 +1,80 @@
-<!-- Chat Modal -->
-<div class="modal fade" id="chatModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content border-0">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title d-flex align-items-center">
-                    <i class="fas fa-comments text-primary me-2"></i>
-                    <span id="chat-modal-title">@lang('dashboard.chat')</span>
-                    <span class="badge bg-primary ms-2" id="unread-count">0</span>
-                </h5>
-                <div class="d-flex align-items-center">
-                    <button type="button" 
-                            class="btn btn-link text-muted me-2 toggle-fullscreen" 
-                            data-bs-toggle="tooltip" 
-                            title="Toggle Fullscreen"
-                            data-fullscreen="false">
-                        <i class="fas fa-expand"></i>
-                    </button>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-            </div>
-            <div class="modal-body p-0">
-                <div class="row g-0" style="min-height: 70vh;">
-                    <!-- Chat Sidebar -->
-                    <div class="col-md-4 border-end" id="chat-sidebar">
-                        <!-- Search and New Chat -->
-                        <div class="p-3 border-bottom">
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
-                                <input type="text" class="form-control" placeholder="@lang('dashboard.search_chats')" id="chat-search">
-                                <button class="btn btn-primary btn-sm" id="new-chat-btn" title="New Chat">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Chat Type Tabs -->
-                        <ul class="nav nav-tabs nav-tabs-line border-bottom" id="chatTypeTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" 
-                                        id="private-tab" 
-                                        data-bs-toggle="tab" 
-                                        data-bs-target="#private-chats" 
-                                        type="button"
-                                        role="tab"
-                                        aria-controls="private-chats"
-                                        aria-selected="true">
-                                    <i class="fas fa-user-friends me-1"></i> Private
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" 
-                                        id="group-tab" 
-                                        data-bs-toggle="tab" 
-                                        data-bs-target="#group-chats" 
-                                        type="button"
-                                        role="tab"
-                                        aria-controls="group-chats"
-                                        aria-selected="false">
-                                    <i class="fas fa-users me-1"></i> Groups
-                                </button>
-                            </li>
-                        </ul>
-
-                        <!-- Chat List -->
-                        <div class="tab-content h-100">
-                            <div class="tab-pane fade show active h-100" id="private-chats" role="tabpanel" aria-labelledby="private-tab">
-                                <div class="chat-list h-100" id="private-chat-list" style="overflow-y: auto;">
-                                    <!-- Private chats will be loaded here -->
-                                    <div class="d-flex flex-column h-100 justify-content-center align-items-center">
-                                        <i class="fas fa-user-friends text-muted fs-2x mb-3"></i>
-                                        <div class="text-muted">No private chats</div>
-                                        <button class="btn btn-sm btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#newChatModal">
-                                            <i class="fas fa-plus me-1"></i> New Chat
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade h-100" id="group-chats" role="tabpanel" aria-labelledby="group-tab">
-                                <div class="chat-list h-100" id="group-chat-list" style="overflow-y: auto;">
-                                    <!-- Group chats will be loaded here -->
-                                    <div class="d-flex flex-column h-100 justify-content-center align-items-center">
-                                        <i class="fas fa-users text-muted fs-2x mb-3"></i>
-                                        <div class="text-muted">No group chats</div>
-                                        <button class="btn btn-sm btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#newChatModal" data-bs-tab-target="#group-tab-pane">
-                                            <i class="fas fa-plus me-1"></i> New Group
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-8 d-flex flex-column" id="chat-window">
-                        <div class="border-bottom p-3 bg-light">
-                            <div class="d-flex align-items-center">
-                                <div class="d-flex align-items-center flex-grow-1">
-                                    <div class="position-relative me-3">
-                                        <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=random"
-                                             class="rounded-circle" 
-                                             width="45" 
-                                             height="45"
-                                             alt="{{ auth()->user()->name }}">
-                                        <span class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-2 border-white" 
-                                              style="width: 12px; height: 12px;" 
-                                              id="user-status"></span>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-0" id="chat-title">Select a chat</h6>
-                                        <small class="text-muted" id="chat-subtitle">Start a conversation</small>
-                                    </div>
-                                </div>
-                                <div class="dropdown">
-                                    <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-ellipsis-v"></i>
+  Chat List Sidebar
+  <div class="col-md-4 border-end">
+                            <div class="p-3 border-bottom bg-light">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-comments text-primary me-2"></i>
+                                        Messages
+                                    </h5>
+                                    <button class="btn btn-sm btn-primary" id="newChatBtn">
+                                        <i class="fas fa-plus"></i> New Chat
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>View Profile</a></li>
-                                        <li><a class="dropdown-item" href="#"><i class="fas fa-bell-slash me-2"></i>Mute Notifications</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash-alt me-2"></i>Clear Chat</a></li>
-                                    </ul>
+                                </div>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" class="form-control" placeholder="Search chats..." id="chatSearch">
+                                </div>
+                            </div>
+                            <div class="chat-list" id="chatList" style="height: calc(80vh - 120px); overflow-y: auto;">
+                                <div class="text-center py-4">
+                                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                                    <p class="mt-2 text-muted">Loading chats...</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Messages -->
-                        <div class="flex-grow-1 p-3" id="messages-container" style="overflow-y: auto; background-color: #f8f9fa;">
-                            <div class="text-center py-5">
-                                <i class="fas fa-comment text-muted fs-2x mb-3"></i>
-                                <div class="text-muted">Select a chat to start messaging</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Message Input -->
-                        <div class="border-top p-3 bg-white">
-                            <div class="d-flex align-items-center">
-                                <button class="btn btn-link text-muted me-2" type="button">
-                                    <i class="fas fa-paperclip"></i>
-                                </button>
-                                <div class="flex-grow-1">
-                                    <input type="text" 
-                                           class="form-control" 
-                                           placeholder="Type a message..." 
-                                           id="message-input" 
-                                           disabled
-                                           style="border-radius: 20px;">
+                        <!-- Chat Window -->
+                        <div class="col-md-8">
+                            <div class="d-flex flex-column h-100">
+                                <!-- Chat Header -->
+                                <div class="border-bottom p-3 bg-light" id="chatHeader" style="display: none;">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                                     style="width: 50px; height: 50px;" id="chatAvatar">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-0" id="chatTitle">Select a chat</h5>
+                                                <small class="text-muted" id="chatSubtitle">Start a conversation</small>
+                                            </div>
+                                        </div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-link text-muted" type="button" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>View Profile</a></li>
+                                                <li><a class="dropdown-item" href="#"><i class="fas fa-bell-slash me-2"></i>Mute Notifications</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash-alt me-2"></i>Clear Chat</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
-                                <button class="btn btn-primary ms-2 rounded-circle" 
-                                        type="button" 
-                                        id="send-message-btn"
-                                        disabled
-                                        style="width: 40px; height: 40px;">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
+                                
+                                <!-- Messages Area -->
+                                <div class="flex-grow-1 p-3" id="messagesArea" style="overflow-y: auto; background-color: #f8f9fa;">
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-comment text-muted" style="font-size: 4rem;"></i>
+                                        <h5 class="text-muted mt-3">Welcome to Chat</h5>
+                                        <p class="text-muted">Select a chat from the sidebar to start messaging</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Message Input -->
+                                <div class="border-top p-3 bg-white" id="messageInputArea" style="display: none;">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Type a message..." id="messageInput">
+                                        <button class="btn btn-primary" id="sendBtn">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -167,395 +89,629 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">New Chat</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Start New Chat</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <ul class="nav nav-pills mb-4 px-3" id="newChatTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" 
-                                id="user-tab" 
-                                data-bs-toggle="pill" 
-                                data-bs-target="#user-tab-pane" 
-                                type="button"
-                                role="tab"
-                                aria-controls="user-tab-pane"
-                                aria-selected="true">
-                            <i class="fas fa-user me-1"></i> New Chat
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" 
-                                id="group-tab" 
-                                data-bs-toggle="pill" 
-                                data-bs-target="#group-tab-pane" 
-                                type="button"
-                                role="tab"
-                                aria-controls="group-tab-pane"
-                                aria-selected="false">
-                            <i class="fas fa-users me-1"></i> New Group
-                        </button>
-                    </li>
-                </ul>
+                <div class="mb-3">
+                    <label class="form-label">Chat Type</label>
+                    <select class="form-select" id="chatType">
+                        <option value="private">Private Chat</option>
+                        <option value="group">Group Chat</option>
+                    </select>
+                </div>
                 
-                <div class="tab-content px-3">
-                    <!-- User Tab -->
-                    <div class="tab-pane fade show active" id="user-tab-pane" role="tabpanel" aria-labelledby="user-tab">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text"><i class="fas fa-search"></i></span>
-                            <input type="text" class="form-control" placeholder="Search users..." id="search-users">
-                        </div>
-                        <div class="user-list" id="new-chat-user-list" style="max-height: 300px; overflow-y: auto;">
-                            <div class="text-center py-4 text-muted">
-                                <i class="fas fa-search fa-2x mb-2"></i>
-                                <p>Search for users to start a chat</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Group Tab -->
-                    <div class="tab-pane fade" id="group-tab-pane" role="tabpanel" aria-labelledby="group-tab">
-                        <form id="create-group-form">
-                            <div class="mb-3">
-                                <label class="form-label">Group Name</label>
-                                <input type="text" class="form-control" name="group_name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Add Members</label>
-                                <div class="input-group mb-2">
-                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                    <input type="text" class="form-control" id="search-group-members" placeholder="Search users to add...">
-                                </div>
-                                <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;" id="group-members-selection">
-                                    <div class="text-center py-4 text-muted">
-                                        <i class="fas fa-users fa-2x mb-2"></i>
-                                        <p>Search and add members to your group</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-plus-circle me-1"></i> Create Group
-                                </button>
-                            </div>
-                        </form>
+                <!-- Private Chat Section -->
+                <div id="privateChatSection">
+                    <div class="mb-3">
+                        <label class="form-label">Select User</label>
+                        <select class="form-select" id="selectedUser">
+                            <option value="">Choose a user...</option>
+                        </select>
                     </div>
                 </div>
+                
+                <!-- Group Chat Section -->
+                <div id="groupChatSection" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label">Group Name</label>
+                        <input type="text" class="form-control" id="groupName" placeholder="Enter group name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Group Description</label>
+                        <textarea class="form-control" id="groupDescription" rows="2" placeholder="Enter group description (optional)"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Members</label>
+                        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;" id="groupMembers">
+                            <!-- Group members will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="createChatBtn">Create Chat</button>
             </div>
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+class ChatSystem {
+    constructor() {
+        this.currentChatId = null;
+        this.currentUserId = {{ auth()->id() }};
+        this.chats = [];
+        this.users = [];
+        this.init();
+    }
 
-    // Initialize chat modals
-    const chatModal = new bootstrap.Modal(document.getElementById('chatModal'));
-    const newChatModal = new bootstrap.Modal(document.getElementById('newChatModal'));
+    init() {
+        console.log('Initializing Chat System...');
+        this.bindEvents();
+        this.loadUsers();
+        this.loadChats();
+    }
 
-    // Toggle fullscreen functionality
-    document.querySelectorAll('.toggle-fullscreen').forEach(button => {
-        button.addEventListener('click', function() {
-            const isFullscreen = this.getAttribute('data-fullscreen') === 'true';
-            const modal = this.closest('.modal-dialog');
+    bindEvents() {
+        // New chat button
+        document.getElementById('newChatBtn').addEventListener('click', () => {
+            new bootstrap.Modal(document.getElementById('newChatModal')).show();
+        });
+
+        // Chat type change
+        document.getElementById('chatType').addEventListener('change', (e) => {
+            const type = e.target.value;
+            document.getElementById('privateChatSection').style.display = type === 'private' ? 'block' : 'none';
+            document.getElementById('groupChatSection').style.display = type === 'group' ? 'block' : 'none';
             
-            if (isFullscreen) {
-                modal.classList.remove('modal-fullscreen');
-                this.setAttribute('data-fullscreen', 'false');
-                this.setAttribute('title', 'Enter Fullscreen');
-                this.querySelector('i').classList.remove('fa-compress');
-                this.querySelector('i').classList.add('fa-expand');
+            if (type === 'group') {
+                this.loadGroupMembers();
+            }
+        });
+
+        // Create chat button
+        document.getElementById('createChatBtn').addEventListener('click', () => {
+            this.createChat();
+        });
+
+        // Send message
+        document.getElementById('sendBtn').addEventListener('click', () => {
+            this.sendMessage();
+        });
+
+        // Send message on Enter
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.sendMessage();
+            }
+        });
+
+        // Search chats
+        document.getElementById('chatSearch').addEventListener('input', (e) => {
+            this.filterChats(e.target.value);
+        });
+    }
+
+    async loadChats() {
+        try {
+            console.log('Loading chats...');
+            const response = await fetch('/api/chat', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            const data = await response.json();
+            console.log('Chats response:', data);
+
+            if (data.success && data.chats) {
+                this.chats = data.chats;
+                this.renderChats();
             } else {
-                modal.classList.add('modal-fullscreen');
-                this.setAttribute('data-fullscreen', 'true');
-                this.setAttribute('title', 'Exit Fullscreen');
-                this.querySelector('i').classList.remove('fa-expand');
-                this.querySelector('i').classList.add('fa-compress');
+                this.renderChats([]);
             }
-            
-            // Update tooltip content
-            const tooltip = bootstrap.Tooltip.getInstance(this);
-            if (tooltip) {
-                tooltip.hide();
-                tooltip.setContent({'.tooltip-inner': this.getAttribute('title')});
-                tooltip.show();
+        } catch (error) {
+            console.error('Error loading chats:', error);
+            this.renderChats([]);
+        }
+    }
+
+    async loadUsers() {
+        try {
+            const response = await fetch('/api/chat/users', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            const data = await response.json();
+            console.log('Users response:', data);
+
+            if (data.success && data.users) {
+                this.users = data.users;
+                this.renderUserOptions();
             }
+        } catch (error) {
+            console.error('Error loading users:', error);
+        }
+    }
+
+    renderUserOptions() {
+        const select = document.getElementById('selectedUser');
+        select.innerHTML = '<option value="">Choose a user...</option>';
+        
+        this.users.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.id;
+            option.textContent = user.name;
+            select.appendChild(option);
         });
-    });
+    }
 
-    // Handle new chat button click
-    document.getElementById('new-chat-btn').addEventListener('click', function() {
-        // Show the new chat modal and activate the first tab
-        const firstTab = document.querySelector('#newChatTabs .nav-link');
-        if (firstTab) {
-            const tab = new bootstrap.Tab(firstTab);
-            tab.show();
-        }
-    });
-
-    // Handle new group button click in the groups tab
-    document.querySelector('[data-bs-tab-target="#group-tab-pane"]')?.addEventListener('click', function() {
-        const groupTab = document.querySelector('#newChatTabs [data-bs-target="#group-tab-pane"]');
-        if (groupTab) {
-            const tab = new bootstrap.Tab(groupTab);
-            tab.show();
-        }
-    });
-
-    // Handle new chat modal show event
-    document.getElementById('newChatModal').addEventListener('show.bs.modal', function() {
-        // Reset form and search when modal is shown
-        const form = document.getElementById('create-group-form');
-        if (form) form.reset();
+    renderChats(chats = this.chats) {
+        const chatList = document.getElementById('chatList');
         
-        const searchInput = document.getElementById('search-users');
-        if (searchInput) searchInput.value = '';
-        
-        const userList = document.getElementById('new-chat-user-list');
-        if (userList) {
-            userList.innerHTML = `
-                <div class="text-center py-4 text-muted">
-                    <i class="fas fa-search fa-2x mb-2"></i>
-                    <p>Search for users to start a chat</p>
-                </div>`;
+        if (chats.length === 0) {
+            chatList.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-comments text-muted" style="font-size: 3rem;"></i>
+                    <h6 class="text-muted mt-3">No chats yet</h6>
+                    <p class="text-muted">Start a conversation with someone</p>
+                    <button class="btn btn-primary" onclick="document.getElementById('newChatBtn').click()">
+                        <i class="fas fa-plus me-1"></i> Start New Chat
+                    </button>
+                </div>
+            `;
+            return;
         }
-    });
 
-    // Handle search for users
-    const searchUsers = document.getElementById('search-users');
-    if (searchUsers) {
-        searchUsers.addEventListener('input', function(e) {
-            const searchTerm = e.target.value.trim().toLowerCase();
-            // Here you would typically make an AJAX request to search for users
-            // For now, we'll just show a loading state
-            const userList = document.getElementById('new-chat-user-list');
-            if (userList) {
-                userList.innerHTML = `
-                    <div class="text-center py-4">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+        let html = '';
+        chats.forEach(chat => {
+            const isGroup = chat.type === 'group';
+            const chatName = isGroup ? chat.name : this.getOtherUserName(chat.users);
+            const latestMessage = chat.latest_message;
+            const unreadCount = chat.unread_count || 0;
+            
+            html += `
+                <div class="chat-item p-3 border-bottom" data-chat-id="${chat.id}" style="cursor: pointer; transition: background-color 0.2s;">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3 position-relative">
+                            ${isGroup ? 
+                                '<div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;"><i class="fas fa-users"></i></div>' :
+                                '<div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;"><i class="fas fa-user"></i></div>'
+                            }
+                            ${unreadCount > 0 ? `<span class="position-absolute top-0 end-0 badge bg-danger rounded-pill" style="font-size: 0.7rem;">${unreadCount}</span>` : ''}
                         </div>
-                        <p class="mt-2">Searching users...</p>
-                    </div>`;
-                
-                // Simulate API call
-                setTimeout(() => {
-                    if (searchTerm.length > 0) {
-                        // This would be replaced with actual user data from your backend
-                        userList.innerHTML = `
-                            <div class="list-group list-group-flush">
-                                <a href="#" class="list-group-item list-group-item-action">
-                                    <div class="d-flex align-items-center">
-                                        <img src="https://ui-avatars.com/api/?name=User+1&background=random" 
-                                             class="rounded-circle me-2" width="32" height="32">
-                                        <div>
-                                            <h6 class="mb-0">User 1</h6>
-                                            <small class="text-muted">user1@example.com</small>
-                                        </div>
-                                    </div>
-                                </a>
-                                <a href="#" class="list-group-item list-group-item-action">
-                                    <div class="d-flex align-items-center">
-                                        <img src="https://ui-avatars.com/api/?name=User+2&background=random" 
-                                             class="rounded-circle me-2" width="32" height="32">
-                                        <div>
-                                            <h6 class="mb-0">User 2</h6>
-                                            <small class="text-muted">user2@example.com</small>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>`;
-                    } else {
-                        userList.innerHTML = `
-                            <div class="text-center py-4 text-muted">
-                                <i class="fas fa-search fa-2x mb-2"></i>
-                                <p>Search for users to start a chat</p>
-                            </div>`;
-                    }
-                }, 500);
-            }
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">${chatName}</h6>
+                                    <small class="text-muted">
+                                        ${latestMessage ? this.truncateMessage(latestMessage.message, 40) : 'No messages yet'}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    ${latestMessage ? `<small class="text-muted">${this.formatTime(latestMessage.created_at)}</small>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        chatList.innerHTML = html;
+
+        // Bind click events
+        chatList.querySelectorAll('.chat-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const chatId = item.getAttribute('data-chat-id');
+                this.openChat(chatId);
+            });
+            
+            // Hover effects
+            item.addEventListener('mouseenter', () => {
+                item.style.backgroundColor = '#f8f9fa';
+            });
+            
+            item.addEventListener('mouseleave', () => {
+                item.style.backgroundColor = '';
+            });
         });
     }
 
-    // Handle form submission for creating a new group
-    const createGroupForm = document.getElementById('create-group-form');
-    if (createGroupForm) {
-        createGroupForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const groupName = formData.get('group_name');
+    async openChat(chatId) {
+        try {
+            console.log('Opening chat:', chatId);
+            this.currentChatId = chatId;
             
-            // Here you would typically make an AJAX request to create the group
-            console.log('Creating group:', groupName);
+            // Mark as active
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.style.backgroundColor = '';
+            });
             
-            // Show success message and close modal
-            const toast = new bootstrap.Toast(document.createElement('div'));
-            toast._element.classList.add('toast', 'align-items-center', 'text-white', 'bg-success', 'border-0');
-            toast._element.setAttribute('role', 'alert');
-            toast._element.setAttribute('aria-live', 'assertive');
-            toast._element.setAttribute('aria-atomic', 'true');
-            toast._element.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="fas fa-check-circle me-2"></i>
-                        Group "${groupName}" created successfully!
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>`;
+            const chatItem = document.querySelector(`[data-chat-id="${chatId}"]`);
+            if (chatItem) {
+                chatItem.style.backgroundColor = '#e3f2fd';
+            }
             
-            document.body.appendChild(toast._element);
-            toast.show();
-            
-            // Close the modal after a short delay
-            setTimeout(() => {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('newChatModal'));
-                if (modal) modal.hide();
-                
-                // Remove the toast after it's hidden
-                setTimeout(() => {
-                    toast.dispose();
-                    toast._element.remove();
-                }, 1000);
-            }, 1500);
-        });
+            const response = await fetch(`/api/chat/${chatId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            const data = await response.json();
+            console.log('Chat details:', data);
+
+            if (data.success && data.chat) {
+                this.currentMessages = data.messages || [];
+                this.renderChatWindow(data.chat, this.currentMessages);
+            } else {
+                console.error('Failed to load chat:', data);
+                alert('Failed to load chat details');
+            }
+        } catch (error) {
+            console.error('Error opening chat:', error);
+            alert('Failed to open chat: ' + error.message);
+        }
     }
+
+    renderChatWindow(chat, messages) {
+        const isGroup = chat.type === 'group';
+        const chatName = isGroup ? chat.name : this.getOtherUserName(chat.users);
+        
+        // Update header
+        document.getElementById('chatTitle').textContent = chatName;
+        document.getElementById('chatSubtitle').textContent = isGroup ? `${chat.users.length} members` : 'Online';
+        document.getElementById('chatHeader').style.display = 'block';
+        document.getElementById('messageInputArea').style.display = 'block';
+        
+        // Update avatar
+        const avatar = document.getElementById('chatAvatar');
+        if (isGroup) {
+            avatar.innerHTML = '<i class="fas fa-users"></i>';
+            avatar.className = 'bg-primary text-white rounded-circle d-flex align-items-center justify-content-center';
+        } else {
+            avatar.innerHTML = '<i class="fas fa-user"></i>';
+            avatar.className = 'bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center';
+        }
+        
+        // Render messages
+        this.renderMessages(messages);
+    }
+
+    renderMessages(messages) {
+        const messagesArea = document.getElementById('messagesArea');
+        
+        if (messages.length === 0) {
+            messagesArea.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-comment text-muted" style="font-size: 3rem;"></i>
+                    <h6 class="text-muted mt-3">No messages yet</h6>
+                    <p class="text-muted">Start the conversation!</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        messages.forEach(message => {
+            const isOwn = message.user_id == this.currentUserId;
+            html += `
+                <div class="message mb-3 d-flex ${isOwn ? 'justify-content-start' : 'justify-content-end'}">
+                    <div class="message-content ${isOwn ? 'text-end' : 'text-start'}" style="max-width: 70%;">
+                        <div class="d-inline-block p-3 rounded ${isOwn ? 'bg-primary text-white' : 'bg-white border shadow-sm'}" style="max-width: 100%;">
+                            ${this.escapeHtml(message.message)}
+                        </div>
+                        <div class="small text-muted mt-1">
+                            ${this.formatTime(message.created_at)}
+                            ${isOwn && message.is_read ? '<i class="fas fa-check-double text-primary ms-1"></i>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        messagesArea.innerHTML = html;
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+
+    async sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+        
+        if (!message || !this.currentChatId) return;
+
+        // Clear input immediately
+        input.value = '';
+        
+        // Create temporary message object for instant display
+        const tempMessage = {
+            id: 'temp_' + Date.now(),
+            user_id: this.currentUserId,
+            message: message,
+            created_at: new Date().toISOString(),
+            is_read: false,
+            is_temp: true
+        };
+
+        // Add message to current messages array
+        if (!this.currentMessages) {
+            this.currentMessages = [];
+        }
+        this.currentMessages.push(tempMessage);
+        
+        // Render messages instantly
+        this.renderMessages(this.currentMessages);
+
+        try {
+            const response = await fetch(`/api/chat/${this.currentChatId}/messages`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Remove temp message and add real message
+                this.currentMessages = this.currentMessages.filter(msg => !msg.is_temp);
+                this.currentMessages.push(data.message);
+                this.renderMessages(this.currentMessages);
+                
+                // Reload chat list to update latest message
+                this.loadChats();
+            } else {
+                // Remove temp message if sending failed
+                this.currentMessages = this.currentMessages.filter(msg => !msg.is_temp);
+                this.renderMessages(this.currentMessages);
+                alert('Failed to send message: ' + (data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            // Remove temp message if sending failed
+            this.currentMessages = this.currentMessages.filter(msg => !msg.is_temp);
+            this.renderMessages(this.currentMessages);
+            alert('Failed to send message: ' + error.message);
+        }
+    }
+
+    async createChat() {
+        const chatType = document.getElementById('chatType').value;
+        
+        if (chatType === 'private') {
+            const userId = document.getElementById('selectedUser').value;
+            if (!userId) {
+                alert('Please select a user');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/chat/private', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ user_id: userId })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('newChatModal')).hide();
+                    this.loadChats();
+                    // Wait a bit for the chat list to update before opening the chat
+                    setTimeout(() => {
+                        this.openChat(data.chat.id);
+                    }, 500);
+                } else {
+                    console.error('Failed to create private chat:', data);
+                    alert('Failed to create chat: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error creating private chat:', error);
+                alert('Failed to create chat: ' + error.message);
+            }
+        } else {
+            // Group chat creation
+            const groupName = document.getElementById('groupName').value.trim();
+            const groupDescription = document.getElementById('groupDescription').value.trim();
+            const selectedMembers = Array.from(document.querySelectorAll('#groupMembers input:checked')).map(cb => parseInt(cb.value));
+            
+            if (!groupName) {
+                alert('Please enter a group name');
+                return;
+            }
+            
+            if (selectedMembers.length === 0) {
+                alert('Please select at least one member');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        name: groupName,
+                        description: groupDescription,
+                        user_ids: selectedMembers
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('newChatModal')).hide();
+                    this.loadChats();
+                    // Wait a bit for the chat list to update before opening the chat
+                    setTimeout(() => {
+                        this.openChat(data.chat.id);
+                    }, 500);
+                } else {
+                    console.error('Failed to create group chat:', data);
+                    alert('Failed to create group chat: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error creating group chat:', error);
+                alert('Failed to create group chat: ' + error.message);
+            }
+        }
+    }
+
+    loadGroupMembers() {
+        const container = document.getElementById('groupMembers');
+        let html = '';
+        
+        this.users.forEach(user => {
+            html += `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="${user.id}" id="user-${user.id}">
+                    <label class="form-check-label" for="user-${user.id}">
+                        ${user.name}
+                    </label>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+
+    filterChats(query) {
+        const filteredChats = this.chats.filter(chat => {
+            const chatName = chat.type === 'group' ? chat.name : this.getOtherUserName(chat.users);
+            return chatName.toLowerCase().includes(query.toLowerCase());
+        });
+        
+        this.renderChats(filteredChats);
+    }
+
+    // Utility functions
+    getOtherUserName(users) {
+        const otherUser = users.find(user => user.id != this.currentUserId);
+        return otherUser?.name || 'Unknown User';
+    }
+
+    truncateMessage(message, length = 50) {
+        return message.length > length ? message.substring(0, length) + '...' : message;
+    }
+
+    formatTime(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diffInHours = (now - date) / (1000 * 60 * 60);
+
+        if (diffInHours < 1) {
+            const minutes = Math.floor((now - date) / (1000 * 60));
+            return minutes === 0 ? 'Just now' : `${minutes}m ago`;
+        } else if (diffInHours < 24) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else {
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        }
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+}
+
+// Initialize when document is ready
+document.addEventListener('DOMContentLoaded', function() {
+    window.chatSystem = new ChatSystem();
 });
 </script>
 @endpush
 
+@push('styles')
 <style>
-/* Fullscreen modal styles */
-.modal-fullscreen {
-    width: 100vw;
-    max-width: none;
-    height: 100%;
-    margin: 0;
-}
-
-.modal-fullscreen .modal-content {
-    height: 100%;
-    border: 0;
-    border-radius: 0;
-}
-
-.modal-fullscreen .modal-body {
-    overflow-y: auto;
-}
-/* Fullscreen chat styles */
-.fullscreen-chat {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    height: 100vh !important;
-    z-index: 9999 !important;
-    margin: 0 !important;
-    max-width: 100% !important;
-    border-radius: 0 !important;
-}
-
-.chat-tab {
-    border-radius: 0 !important;
-    color: #7e8299;
-    transition: all 0.3s ease;
-}
-
-.chat-tab.active {
-    background-color: #f5f8fa;
-    color: #009ef7;
-    border-bottom: 2px solid #009ef7;
-}
-
-.chat-tab-content {
-    display: none;
-}
-
-.chat-tab-content.active {
-    display: block;
-}
-
-.chat-item {
-    padding: 12px 16px;
-    border-bottom: 1px solid #f1f3f6;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
 .chat-item:hover {
-    background-color: #f8f9fa;
-}
-
-.chat-item.active {
-    background-color: #e8f4fd;
-    border-left: 3px solid #009ef7;
+    background-color: #f8f9fa !important;
 }
 
 .message {
-    margin-bottom: 15px;
-}
-
-.message.sent {
-    text-align: right;
-}
-
-.message.received {
-    text-align: left;
-}
-
-.message-bubble {
-    display: inline-block;
-    max-width: 70%;
-    padding: 8px 12px;
-    border-radius: 18px;
     word-wrap: break-word;
 }
 
-.message.sent .message-bubble {
-    background-color: #009ef7;
-    color: white;
-}
-
-.message.received .message-bubble {
-    background-color: #f1f3f6;
-    color: #3f4254;
-}
-
-.message-time {
-    font-size: 11px;
-    color: #7e8299;
-    margin-top: 4px;
-}
-
-.user-item {
-    padding: 10px 16px;
-    border-bottom: 1px solid #f1f3f6;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-.user-item:hover {
-    background-color: #f8f9fa;
-}
-
-.unread-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: #f1416c;
-    color: white;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 10px;
+.message-content {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+}
+
+/* Your messages (right side) */
+.message.justify-content-end .message-content {
+    align-items: flex-end;
+}
+
+.message.justify-content-end .message-content .d-inline-block {
+    background-color: #007bff !important;
+    color: white !important;
+    border-radius: 18px 18px 5px 18px;
+}
+
+/* Other messages (left side) */
+.message.justify-content-start .message-content {
+    align-items: flex-start;
+}
+
+.message.justify-content-start .message-content .d-inline-block {
+    background-color: #f1f3f6 !important;
+    color: #333 !important;
+    border-radius: 18px 18px 18px 5px;
+    border: 1px solid #e1e5e9 !important;
+}
+
+#chatList {
+    scrollbar-width: thin;
+    scrollbar-color: #ccc #f1f1f1;
+}
+
+#chatList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chatList::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#chatList::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+#messagesArea {
+    scrollbar-width: thin;
+    scrollbar-color: #ccc #f1f1f1;
+}
+
+#messagesArea::-webkit-scrollbar {
+    width: 6px;
+}
+
+#messagesArea::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#messagesArea::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
 }
 </style>
+@endpush

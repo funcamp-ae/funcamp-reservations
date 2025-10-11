@@ -87,17 +87,17 @@ class User extends Authenticatable
     }
 
     public function isActive(){
-        return $this->is_active === 1;
+        return $this->is_active === true;
     }
 
     public function scopeProviders($query)
     {
-       return $query->where(['is_active' => 1 , 'user_type' => 3]);
+       return $query->where(['is_active' => true , 'user_type' => 3]);
     }
 
     public function scopeAdmins($query)
     {
-       return $query->where(['is_active' => 1 , 'user_type' => 1]);
+       return $query->where(['is_active' => true , 'user_type' => 1]);
     }
 
     // public function setImageAttribute($value)

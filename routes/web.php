@@ -1721,6 +1721,9 @@ Route::group(['middleware' => ['auth']], function () {
         ->name('tasks.updateStatus');
 });
 
+// Chat Page Route
+Route::get('/chat', [App\Http\Controllers\ChatController::class, 'chatPage'])->name('chat.page')->middleware(['auth']);
+
 // Chat API routes
 Route::group(['middleware' => ['auth'], 'prefix' => 'api/chat'], function () {
     Route::get('/', [App\Http\Controllers\ChatController::class, 'index']);

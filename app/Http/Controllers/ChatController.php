@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\Validator;
 class ChatController extends Controller
 {
     /**
+     * Show the chat page.
+     */
+    public function chatPage()
+    {
+        return view('dashboard.chat.index');
+    }
+
+    /**
      * Get all chats for the authenticated user.
      */
     public function index()
@@ -197,7 +205,7 @@ class ChatController extends Controller
     public function getUsers()
     {
         $users = User::where('id', '!=', Auth::id())
-            ->where('is_active', 1) // Only active users
+            ->where('is_active', true) // Only active users
             ->select('id', 'name', 'email')
             ->get();
 
