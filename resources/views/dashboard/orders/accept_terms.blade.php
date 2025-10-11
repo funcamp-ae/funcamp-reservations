@@ -54,7 +54,7 @@
                                 @lang('dashboard.Customer_Signature')
                             </label>
 
-                            <div class="col-lg-8 d-flex flex-column gap-3 mb-2">
+                            <div class="col-lg-8 d-flex flex-column gap-3 mb-2 bg-light">
                                 @if(isset($order->signature_path))
                                     <div class="text-success fw-bold">
                                         {{ $order?->signature }}
