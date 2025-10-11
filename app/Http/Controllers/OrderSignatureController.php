@@ -53,7 +53,7 @@ class OrderSignatureController extends Controller
             'signature' => now()
         ]);
 
-        return redirect()->back()->with('success' , __('dashboard.success'));
+        // return redirect()->back()->with('success' , __('dashboard.success'));
     }
 
     public function destroy(Order $order)
