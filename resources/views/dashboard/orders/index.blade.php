@@ -242,9 +242,9 @@
                                 <!--begin::Agree_to_the_terms-->
                                 <td>
                                     @if($order->signature_path)
-                                    {{ __('dashboard.Done_agree_to_the_terms') }}
+                                    <span class ="badge bg-success">{{ __('dashboard.Done_agree_to_the_terms') }}</span>
                                     @else
-                                    {{ __('dashboard.no') }}
+                                    <span class ="badge bg-danger">{{ __('dashboard.no') }}</span>
                                     @endif
                                 </td>
                                 <!--end::Agree_to_the_terms-->
