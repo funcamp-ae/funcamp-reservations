@@ -239,10 +239,10 @@
 
             <div class="content">
                 <div class="sig-box">
-                    <img src="{{ Storage::url($order->signature_path) }}" alt="Signature">
+                    <img src="{{ asset('storage/' . $order->signature_path) }}" alt="Signature">
                     <div class="row">
-                        <a class="btn btn-primary" href="{{ Storage::url($order->signature_path) }}" download>@lang('dashboard.download_signature')</a>
-                        <a class="btn btn-outline" target="_blank" href="{{ Storage::url($order->signature_path) }}">@lang('dashboard.open_image')</a>
+                        <a class="btn btn-primary" href="{{ asset('storage/' . $order->signature_path) }}" download>@lang('dashboard.download_signature')</a>
+                        <a class="btn btn-outline" target="_blank" href="{{ asset('storage/' . $order->signature_path) }}">@lang('dashboard.open_image')</a>
                     </div>
                 </div>
 
