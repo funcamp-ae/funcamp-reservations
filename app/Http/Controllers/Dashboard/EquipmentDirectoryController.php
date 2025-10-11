@@ -89,7 +89,6 @@ class EquipmentDirectoryController extends Controller
 
     public function storeItem(Request $request, EquipmentDirectory $equipmentDirectory)
     {
-
         // ✅ فاليديشن على نفس ستايل OrderCheckinController
         $request->validate([
             'type'        => ['required', 'string', 'max:255'],
@@ -99,23 +98,23 @@ class EquipmentDirectoryController extends Controller
             'notes'       => ['nullable', 'string'],
             'is_active'   => ['boolean'],
 
-            // 🖼️ الصور (20MB) — نفس النمط
             'photo_attachments'   => ['nullable', 'array'],
             'photo_attachments.*' => 'file|mimes:jpg,jpeg,png,gif,webp',
 
-            // 🎵 الصوت (50MB) — نفس النمط بالضبط
             'audio_attachments'   => ['nullable', 'array'],
             'audio_attachments.*' => 'file|
                                        mimes:mp3,wav,ogg,webm,aac,m4a,mp4|
                                        mimetypes:audio/mpeg,audio/mp3,
                                                  audio/wav,audio/x-wav,audio/vnd.wave,
                                                  audio/ogg,application/ogg,
-                                                 audio/webm,video/webm,
+                                                 audio/webm,video/mp4,video/webm,
                                                  audio/aac,audio/x-aac,
                                                  audio/mp4,audio/x-m4a,audio/m4a,
                                                  audio/opus,
                                                  audio/3gpp,audio/3gpp2,audio/amr,
                                                  application/octet-stream',
+
+
 
             // 🎬 مفاتيح الفيديو (FilePond/S3) — نفس فكرة الصفحات الأخرى
             'uploaded_videos'   => ['nullable', 'array'],
@@ -125,27 +124,32 @@ class EquipmentDirectoryController extends Controller
             'video_attachments'   => ['nullable', 'array'],
             'video_attachments.*' => ['nullable','string'],
 
-
-
-
             // ❌ حقول الحذف
             'remove_photo'        => ['nullable', 'in:0,1'],
             'remove_audio'        => ['nullable', 'in:0,1'],
             'remove_video'        => ['nullable', 'in:0,1'],
         ]);
 
-        $item = EquipmentDirectoryItem::create([
-            'directory_id' => $equipmentDirectory->id,
-            'type'         => $request->type,
-            'name'         => $request->name,
-            'location'     => $request->location,
-            'quantity'     => $request->quantity,
-            'notes'        => $request->notes,
-            'is_active'    => $request->is_active ?? true,
-            'created_by'   => auth()->id(),
-        ]);
+        // ✅ في حال حدوث أي خطأ أثناء إنشاء الـ item أو حفظ الوسائط نرجع بالخطأ مع البيانات القديمة
+        try {
+            $item = EquipmentDirectoryItem::create([
+                'directory_id' => $equipmentDirectory->id,
+                'type'         => $request->type,
+                'name'         => $request->name,
+                'location'     => $request->location,
+                'quantity'     => $request->quantity,
+                'notes'        => $request->notes,
+                'is_active'    => $request->is_active ?? true,
+                'created_by'   => auth()->id(),
+            ]);
 
-        $this->storeMedia($item, $request, $equipmentDirectory);
+            $this->storeMedia($item, $request, $equipmentDirectory);
+
+        } catch (\Throwable $e) {
+            return back()
+                ->withErrors(['general' => __('An error occurred while adding the item.'), 'details' => $e->getMessage()])
+                ->withInput();
+        }
 
         return redirect()->route('equipment-directories.items.index', $equipmentDirectory)
             ->with('success', __('Item added successfully'));
@@ -178,7 +182,7 @@ class EquipmentDirectoryController extends Controller
                                        mimetypes:audio/mpeg,audio/mp3,
                                                  audio/wav,audio/x-wav,audio/vnd.wave,
                                                  audio/ogg,application/ogg,
-                                                 audio/webm,video/webm,
+                                                 audio/webm,video/mp4,video/webm,
                                                  audio/aac,audio/x-aac,
                                                  audio/mp4,audio/x-m4a,audio/m4a,
                                                  audio/opus,

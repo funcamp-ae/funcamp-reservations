@@ -57,17 +57,17 @@ class ViolationController extends Controller
             'photos.*'               => 'file|mimes:jpg,jpeg,png,gif,webp|max:20480', // 20MB
 
             'audios'                 => ['nullable', 'array'],
-            'audios.*'               => 'file|max:51200|
-                                         mimes:mp3,wav,ogg,webm,aac,m4a,mp4|
-                                         mimetypes:audio/mpeg,audio/mp3,
-                                                   audio/wav,audio/x-wav,audio/vnd.wave,
-                                                   audio/ogg,application/ogg,
-                                                   audio/webm,video/webm,
-                                                   audio/aac,audio/x-aac,
-                                                   audio/mp4,audio/x-m4a,audio/m4a,
-                                                   audio/opus,
-                                                   audio/3gpp,audio/3gpp2,audio/amr,
-                                                   application/octet-stream',
+            'audios.*'               => 'file|
+                                       mimes:mp3,wav,ogg,webm,aac,m4a,mp4|
+                                       mimetypes:audio/mpeg,audio/mp3,
+                                                 audio/wav,audio/x-wav,audio/vnd.wave,
+                                                 audio/ogg,application/ogg,
+                                                 audio/webm,video/mp4,video/webm,
+                                                 audio/aac,audio/x-aac,
+                                                 audio/mp4,audio/x-m4a,audio/m4a,
+                                                 audio/opus,
+                                                 audio/3gpp,audio/3gpp2,audio/amr,
+                                                 application/octet-stream',
 
             'uploaded_videos'        => ['nullable', 'array'],
             'uploaded_videos.*'      => ['nullable', 'string'],
@@ -169,17 +169,17 @@ class ViolationController extends Controller
             'photos.*'               => 'file|mimes:jpg,jpeg,png,gif,webp|max:20480', // <-- كان خطأ، الآن صور صحيحة
 
             'audios'                 => ['nullable', 'array'],
-            'audios.*'               => 'file|max:51200|
-                                         mimes:mp3,wav,ogg,webm,aac,m4a,mp4|
-                                         mimetypes:audio/mpeg,audio/mp3,
-                                                   audio/wav,audio/x-wav,audio/vnd.wave,
-                                                   audio/ogg,application/ogg,
-                                                   audio/webm,video/webm,
-                                                   audio/aac,audio/x-aac,
-                                                   audio/mp4,audio/x-m4a,audio/m4a,
-                                                   audio/opus,
-                                                   audio/3gpp,audio/3gpp2,audio/amr,
-                                                   application/octet-stream',
+            'audios.*'               => 'file|
+                                       mimes:mp3,wav,ogg,webm,aac,m4a,mp4|
+                                       mimetypes:audio/mpeg,audio/mp3,
+                                                 audio/wav,audio/x-wav,audio/vnd.wave,
+                                                 audio/ogg,application/ogg,
+                                                 audio/webm,video/mp4,video/webm,
+                                                 audio/aac,audio/x-aac,
+                                                 audio/mp4,audio/x-m4a,audio/m4a,
+                                                 audio/opus,
+                                                 audio/3gpp,audio/3gpp2,audio/amr,
+                                                 application/octet-stream',
 
             'uploaded_videos'        => ['nullable', 'array'],
             'uploaded_videos.*'      => ['nullable', 'string'],

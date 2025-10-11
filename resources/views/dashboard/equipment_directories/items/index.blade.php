@@ -141,19 +141,26 @@
                         </div>
 
                         <!-- Videos -->
-                        <div class="tab-pane fade" id="videos-{{ $item->id }}" role="tabpanel">
-                            <div class="row g-3">
-                                @forelse($item->media->where('file_type', 'video') as $media)
-                                    <div class="col-md-6">
-                                        <video controls class="w-100 rounded">
-                                            <source src="{{ $media->file_url }}" type="video/mp4">
-                                        </video>
-                                    </div>
-                                @empty
-                                    <p class="text-muted">@lang('dashboard.no_media')</p>
-                                @endforelse
-                            </div>
-                        </div>
+<div class="tab-pane fade" id="videos-{{ $item->id }}" role="tabpanel">
+    <div class="row g-3">
+        @forelse($item->media->where('file_type', 'video') as $media)
+            <div class="col-md-6">
+                <video
+                    class="w-100 rounded"
+                    controls
+                    playsinline
+                    preload="metadata"
+                    src="{{ $media->file_url }}">
+                    {{-- fallback --}}
+                    @lang('dashboard.video_not_supported')
+                </video>
+            </div>
+        @empty
+            <p class="text-muted">@lang('dashboard.no_media')</p>
+        @endforelse
+    </div>
+</div>
+
 
                         <!-- Audios -->
                         <div class="tab-pane fade" id="audios-{{ $item->id }}" role="tabpanel">
