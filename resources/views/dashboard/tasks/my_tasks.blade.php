@@ -466,7 +466,6 @@
 
 
 
-
 @push('js')
     <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
     <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
@@ -477,30 +476,39 @@
             const CSRF = '{{ csrf_token() }}';
             const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
             const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
             const ACCEPTED_VIDEOS = [
-                'video/mp4', 'video/quicktime', 'video/hevc', 'video/webm', 'video/avi',
-                'video/x-matroska', 'video/x-flv', 'video/3gpp', 'video/3gpp2', 'video/mpeg',
-                'video/mpg', 'video/x-ms-wmv', 'video/x-m4v'
+                'video/mp4','video/quicktime','video/hevc','video/webm','video/avi',
+                'video/x-matroska','video/x-flv','video/3gpp','video/3gpp2','video/mpeg',
+                'video/mpg','video/x-ms-wmv','video/x-m4v'
             ];
+            const isRTL = () =>
+                document.documentElement.dir === 'rtl' ||
+                getComputedStyle(document.body).direction === 'rtl';
 
-            const isRTL = () => document.documentElement.dir === 'rtl' || getComputedStyle(document.body).direction === 'rtl';
-            const createHidden = (name, val) => { const i=document.createElement('input'); i.type='hidden'; i.name=name; i.value=val; return i; };
+            const createHidden = (name, val) => {
+                const i = document.createElement('input');
+                i.type = 'hidden'; i.name = name; i.value = val; return i;
+            };
 
-            // كشف نوع الفيديو عند غياب type (خصوصاً سفاري)
+            // استدلال MIME (لسفاري)
             function inferMime(file) {
                 let t = (file?.type || '').split(';')[0].trim();
                 if (!t) {
                     const ext = (file?.name || '').split('.').pop()?.toLowerCase();
-                    const map = { mp4:'video/mp4', m4v:'video/x-m4v', mov:'video/quicktime', webm:'video/webm',
-                                  mkv:'video/x-matroska', avi:'video/avi', flv:'video/x-flv', mpg:'video/mpeg',
-                                  mpeg:'video/mpeg', '3gp':'video/3gpp', '3gpp':'video/3gpp', '3gpp2':'video/3gpp2', hevc:'video/hevc' };
+                    const map = {
+                        mp4:'video/mp4', m4v:'video/x-m4v', mov:'video/quicktime', webm:'video/webm',
+                        mkv:'video/x-matroska', avi:'video/avi', flv:'video/x-flv', mpg:'video/mpeg',
+                        mpeg:'video/mpeg', '3gp':'video/3gpp', '3gpp':'video/3gpp', '3gpp2':'video/3gpp2',
+                        hevc:'video/hevc'
+                    };
                     t = map[ext] || 'video/mp4';
                 }
                 return t;
             }
             const cleanMime = (type) => (type || '').split(';')[0].trim() || 'video/webm';
 
-            // ====== PHOTO BOX ======
+            /* ================== PHOTO BOX ================== */
             function initPhotoBox(box) {
                 const uploadBtn = box.querySelector('.upload-media');
                 const captureBtn = box.querySelector('.capture-media');
@@ -541,32 +549,6 @@
                     slider.classList.remove('d-none'); imgEl.src = photos[current]; renderDots();
                 }
 
-                // refresh من المودال
-                box.addEventListener('media:refresh', () => {
-                    try { photos = JSON.parse(box.dataset.existing || '[]') || []; } catch { photos = []; }
-                    current = 0; fileState = []; syncInput(); render();
-                });
-
-                // Lightbox عام
-                (function lightboxInit(){
-                    const lb = document.getElementById('photo-lightbox'); if (!lb) return;
-                    const lbImg = lb.querySelector('.lightbox-img');
-                    const lbClose = lb.querySelector('.close');
-                    const lbPrev = lb.querySelector('.nav.prev');
-                    const lbNext = lb.querySelector('.nav.next');
-                    imgEl.addEventListener('click', ()=>{ if(!photos.length) return; lb.classList.remove('d-none'); lbImg.src = photos[current]; });
-                    lbClose.addEventListener('click', ()=> lb.classList.add('d-none'));
-                    lbPrev.addEventListener('click', ()=>{ current=(current-1+photos.length)%photos.length; lbImg.src=photos[current]; });
-                    lbNext.addEventListener('click', ()=>{ current=(current+1)%photos.length; lbImg.src=photos[current]; });
-                    document.addEventListener('keydown', e=>{
-                        if (lb.classList.contains('d-none')) return;
-                        if (e.key==='Escape') lb.classList.add('d-none');
-                        if (e.key==='ArrowLeft') lbPrev.click();
-                        if (e.key==='ArrowRight') lbNext.click();
-                    });
-                })();
-
-                // سحب للموبايل
                 (function(){
                     let sx=0;
                     viewport.addEventListener('touchstart', e=> sx = e.changedTouches[0].clientX, {passive:true});
@@ -579,7 +561,6 @@
                 prevBtn.addEventListener('click', ()=>{ if(!photos.length) return; current=(current-1+photos.length)%photos.length; render(); });
                 nextBtn.addEventListener('click', ()=>{ if(!photos.length) return; current=(current+1)%photos.length; render(); });
 
-                // ضغط صور
                 function compressImage(file, quality=0.7, maxW=1280, maxH=1280){
                     return new Promise((resolve,reject)=>{
                         const img=new Image(); const url=URL.createObjectURL(file);
@@ -615,35 +596,8 @@
                     if (removeFlg) removeFlg.value='0'; e.target.value='';
                 });
 
-                captureBtn?.addEventListener('click', ()=>{
-                    if (camInput && isMobile) { camInput.click(); return; }
-                    (async ()=>{
-                        try{
-                            const stream = await navigator.mediaDevices.getUserMedia({ video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}, audio:false });
-                            const overlay=document.createElement('div');
-                            overlay.style.cssText='position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5;';
-                            const v=document.createElement('video'); v.autoplay=v.muted=true; v.playsInline=true; v.srcObject=stream;
-                            v.style.cssText='width:100%;height:100%;object-fit:contain;';
-                            const snap=document.createElement('button'); snap.type='button'; snap.className='btn btn-success btn-sm'; snap.textContent='Snap';
-                            Object.assign(snap.style,{position:'absolute',bottom:'12px',left:'50%',transform:'translateX(-50%)'});
-                            viewport.appendChild(overlay); overlay.appendChild(v); overlay.appendChild(snap);
-                            slider.classList.remove('d-none');
-                            snap.addEventListener('click', ()=>{
-                                const canvas=document.createElement('canvas'); canvas.width=v.videoWidth||640; canvas.height=v.videoHeight||480;
-                                canvas.getContext('2d').drawImage(v,0,0);
-                                try{ stream.getTracks().forEach(t=>t.stop()); }catch{}
-                                canvas.toBlob(async blob=>{
-                                    if(!blob){ overlay.remove(); return; }
-                                    let file=new File([blob],`photo_${Date.now()}.jpg`,{type:'image/jpeg'});
-                                    try{ file=await compressImage(file,.7);}catch{}
-                                    if (addFileUnique(file)) addPhotoUrl(URL.createObjectURL(file));
-                                    if (removeFlg) removeFlg.value='0';
-                                    overlay.remove();
-                                },'image/jpeg',.95);
-                            });
-                        }catch(e){ alert('Camera error: ' + (e?.message||e)); }
-                    })();
-                });
+                // افتح كاميرا النظام للصور
+                captureBtn?.addEventListener('click', ()=> camInput?.click());
 
                 removeBtnAll?.addEventListener('click', ()=>{
                     photos.forEach(u=>{ try{ if(u.startsWith('blob:')) URL.revokeObjectURL(u); }catch{} });
@@ -653,7 +607,7 @@
                 if (photos.length) render();
             }
 
-            // ====== AUDIO BOX ======
+            /* ================== AUDIO BOX ================== */
             function initAudioBox(box){
                 const input = box.querySelector('.media-input');
                 const uploadBtn = box.querySelector('.upload-media');
@@ -689,7 +643,7 @@
                     previewBox.style.display='block'; if (removeFlg) removeFlg.value='0';
                 });
 
-                // Recorder + WAV fallback
+                // تسجيل بسيط + WAV fallback
                 let recorder=null, fallback=null, chunks=[], stream=null, indicator=null;
                 captureBtn?.addEventListener('click', async ()=>{
                     if ((recorder && recorder.state==='recording') || fallback){
@@ -759,7 +713,7 @@
                 });
             }
 
-            // ====== VIDEO BOX (FilePond + Slider) ======
+            /* ================== FilePond Register ================== */
             if (window.FilePond){
                 try{
                     FilePond.registerPlugin(
@@ -769,7 +723,6 @@
                 }catch{}
             }
 
-            // مراقبة FilePond لتعطيل زر الحفظ أثناء الرفع
             function bindSaveButtonToPonds(saveBtn, ponds){
                 const FP = window.FilePond;
                 if (!saveBtn || !FP) return;
@@ -794,21 +747,22 @@
                 update();
             }
 
+            /* ================== VIDEO BOX ================== */
             function initVideoBox(box){
-                const captureBtn = box.querySelector('.capture-media');
-                const removeAll = box.querySelector('.remove-video-all');
-                const input = box.querySelector('.media-input');
-                const camInput = box.querySelector('.camera-video-input');
-                const pondInput = box.querySelector('.pond-video');
-                const keysWrap = box.querySelector('.uploaded-keys');
-                const removeFlg = box.querySelector('.remove-flag');
-                const errorBox = box.querySelector('.video-error');
+                const captureBtn = box.querySelector('.capture-media');      // زر التسجيل
+                const removeAll  = box.querySelector('.remove-video-all');
+                const input      = box.querySelector('.media-input');        // input احتياطي
+                const camInput   = box.querySelector('.camera-video-input'); // ✅ كاميرا النظام (عدّاد)
+                const pondInput  = box.querySelector('.pond-video');
+                const keysWrap   = box.querySelector('.uploaded-keys');
+                const removeFlg  = box.querySelector('.remove-flag');
+                const errorBox   = box.querySelector('.video-error');
 
-                const slider = box.querySelector('.video-slider');
-                const player = slider.querySelector('.slider-video');
-                const prevBtn = slider.querySelector('.prev');
-                const nextBtn = slider.querySelector('.next');
-                const dots = slider.querySelector('.slider-dots');
+                const slider   = box.querySelector('.video-slider');
+                const player   = slider.querySelector('.slider-video');
+                const prevBtn  = slider.querySelector('.prev');
+                const nextBtn  = slider.querySelector('.next');
+                const dots     = slider.querySelector('.slider-dots');
                 const viewport = slider.querySelector('.slider-viewport');
 
                 prevBtn.innerHTML = isRTL() ? '›' : '‹';
@@ -830,66 +784,10 @@
                     if (idx>-1){ const it = items[idx]; if (it.revoke){ try{ URL.revokeObjectURL(it.url);}catch{} } items.splice(idx,1); if (current>=items.length) current=Math.max(0,items.length-1); renderVideo(); }
                 }
 
-                box.addEventListener('media:refresh', ()=>{
-                    try{
-                        const arr=JSON.parse(box.dataset.existing||'[]')||[];
-                        items = arr.map((u,i)=>({id:'server-'+i,url:u,revoke:false}));
-                    }catch{ items = []; }
-                    current=0;
-                    try{ pond?.removeFiles(); }catch{}
-                    keysWrap.innerHTML='';
-                    if (removeFlg) removeFlg.value='0';
-                    renderVideo();
-                });
-
+                // تحريك/سحب
+                (function(){ let sx=0; viewport.addEventListener('touchstart',e=> sx=e.changedTouches[0].clientX,{passive:true}); viewport.addEventListener('touchend',e=>{ const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>40) isRTL() ? (dx<0?prevBtn.click():nextBtn.click()) : (dx<0?nextBtn.click():prevBtn.click()); },{passive:true}); })();
                 prevBtn.addEventListener('click', ()=>{ if (!items.length) return; current=(current-1+items.length)%items.length; renderVideo(); });
                 nextBtn.addEventListener('click', ()=>{ if (!items.length) return; current=(current+1)%items.length; renderVideo(); });
-                (function(){ let sx=0; viewport.addEventListener('touchstart',e=> sx=e.changedTouches[0].clientX,{passive:true}); viewport.addEventListener('touchend',e=>{ const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>40) isRTL() ? (dx<0?prevBtn.click():nextBtn.click()) : (dx<0?nextBtn.click():prevBtn.click()); },{passive:true}); })();
-
-                camInput?.addEventListener('change', e=>{
-                    const files = Array.from(e.target.files||[]); if (!files.length || !pond) return;
-                    files.forEach(f=> pond.addFile(f)); if (removeFlg) removeFlg.value='0'; e.target.value='';
-                });
-
-                // تسجيل فيديو ديسكتوب
-                let recStream=null, recorder=null, chunks=[], overlay=null, timer=null, t0=0;
-                const fmt = ms => { const s=Math.floor(ms/1000), m=String(Math.floor(s/60)).padStart(2,'0'), ss=String(s%60).padStart(2,'0'); return `${m}:${ss}`; };
-                const stopStream = s=>{ try{ s?.getTracks()?.forEach(t=>t.stop()); }catch{} };
-
-                captureBtn?.addEventListener('click', async ()=>{
-                    if (isMobile || !('MediaRecorder' in window)){ camInput?.click(); return; }
-                    if (recorder && recorder.state==='recording'){ try{ recorder.stop(); }catch{} return; }
-                    try{
-                        recStream = await navigator.mediaDevices.getUserMedia({ video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}, audio:true });
-                        slider.classList.remove('d-none');
-                        overlay=document.createElement('div'); overlay.style.cssText='position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5;';
-                        const live=document.createElement('video'); live.autoplay=true; live.muted=true; live.playsInline=true; live.srcObject=recStream; live.style.cssText='width:100%;height:100%;object-fit:contain;';
-                        const ind=document.createElement('div'); ind.className='text-danger small'; ind.style.cssText='position:absolute;bottom:10px;left:50%;transform:translateX(-50%);';
-                        viewport.appendChild(overlay); overlay.appendChild(live); overlay.appendChild(ind);
-                        t0=Date.now(); ind.textContent='🔴 Recording... 00:00'; timer=setInterval(()=> ind.textContent='🔴 Recording... '+fmt(Date.now()-t0),1000);
-
-                        const V_BPS=800_000, A_BPS=64_000;
-                        let mimeType = 'video/webm;codecs=vp8,opus';
-                        if (!MediaRecorder.isTypeSupported?.(mimeType)) mimeType = MediaRecorder.isTypeSupported?.('video/webm') ? 'video/webm' : 'video/mp4';
-
-                        recorder = new MediaRecorder(recStream,{mimeType, videoBitsPerSecond:V_BPS, audioBitsPerSecond:A_BPS});
-                        recorder.ondataavailable = e=>{ if (e.data && e.data.size>0) chunks.push(e.data); };
-                        recorder.onstop = ()=>{
-                            clearInterval(timer); timer=null; try{ overlay.remove(); }catch{} overlay=null; stopStream(recStream); recStream=null;
-                            const type = cleanMime(recorder.mimeType) || 'video/webm';
-                            const ext = type.includes('mp4') ? 'mp4' : 'webm';
-                            const blob = new Blob(chunks,{type}); const file = new File([blob], `rec_${Date.now()}.${ext}`, {type});
-                            try{ pond && pond.addFile(file); }catch{}
-                            if (removeFlg) removeFlg.value='0';
-                            chunks=[]; recorder=null;
-                        };
-                        recorder.start();
-                        captureBtn.classList.remove('btn-brown'); captureBtn.classList.add('btn-danger'); captureBtn.innerHTML='<i class="bi bi-stop"></i> {{ __('dashboard.stop') }}';
-                    }catch(e){
-                        stopStream(recStream); recStream=null; try{ overlay?.remove(); }catch{} if (timer){ clearInterval(timer); timer=null; }
-                        recorder=null; alert('Camera/Mic error: ' + (e?.message||e));
-                    }
-                });
 
                 // FilePond
                 let pond = null; const mapFileToSliderId = new WeakMap();
@@ -947,12 +845,7 @@
                                         });
                                         if (!completeRes.ok) throw new Error('completeMultipart failed');
 
-                                        // خزّن المفتاح وأضف معاينة للسلايدر
                                         keysWrap.appendChild(createHidden('uploaded_videos[]', key));
-                                        const blobURL = URL.createObjectURL(file);
-                                        const sliderId = 'pond-' + Math.random().toString(36).slice(2);
-                                        addItem(sliderId, blobURL, true); mapFileToSliderId.set(file, sliderId);
-
                                         if (removeFlg) removeFlg.value='0';
                                         progress(true, file.size, file.size);
                                         load(key);
@@ -969,10 +862,18 @@
                         }
                     });
 
-                    // اربط زر الحفظ بهذه الـ pond لتعطيله أثناء الرفع
                     const saveBtn = document.getElementById('saveStatus');
                     bindSaveButtonToPonds(saveBtn, [pond]);
 
+                    // معاينة السلايدر عند إضافة ملف
+                    pond.on('addfile', (err, fileItem)=>{
+                        if (err || !fileItem) return;
+                        const blobURL = URL.createObjectURL(fileItem.file);
+                        const sliderId = 'pond-' + Math.random().toString(36).slice(2);
+                        addItem(sliderId, blobURL, true);
+                        mapFileToSliderId.set(fileItem.file, sliderId);
+                        if (removeFlg) removeFlg.value='0';
+                    });
                     pond.on('removefile', (fileItem)=>{
                         if (!fileItem) return;
                         const sliderId = mapFileToSliderId.get(fileItem.file);
@@ -980,32 +881,144 @@
                     });
                 }
 
-                removeAll?.addEventListener('click', ()=>{
-                    try{ pond?.removeFiles(); }catch{}
-                    keysWrap.innerHTML=''; items=[]; current=0; renderVideo();
-                    if (removeFlg) removeFlg.value='1';
+                // ✅ السلوك المطلوب:
+                // - الهاتف: افتح كاميرا النظام مباشرة (عداد أصلي)
+                // - الكمبيوتر: تسجيل عبر MediaRecorder مع معاينة مباشرة داخل السلايدر
+                let recStream = null, recorder = null, chunks = [];
+                let overlay = null;
+                function showLiveOverlay(stream){
+                    slider.classList.remove('d-none');
+                    overlay = document.createElement('div');
+                    overlay.style.cssText = 'position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5;';
+                    const live = document.createElement('video');
+                    Object.assign(live, { autoplay:true, muted:true, playsInline:true });
+                    live.srcObject = stream;
+                    live.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+                    viewport.appendChild(overlay);
+                    overlay.appendChild(live);
+                }
+                function cleanupOverlay(){
+                    try { overlay?.remove(); } catch {}
+                    overlay = null;
+                }
+                function stopTracks(stream){
+                    try { stream?.getTracks()?.forEach(t => t.stop()); } catch {}
+                }
+
+                captureBtn?.addEventListener('click', async ()=>{
+                    // موبايل → كاميرا النظام (بعدّاد)
+                    if (isMobile || !('MediaRecorder' in window)) {
+                        camInput?.click();
+                        return;
+                    }
+
+                    // لو في تسجيل جارٍ → أوقفه
+                    if (recorder && recorder.state === 'recording') {
+                        try { recorder.stop(); } catch {}
+                        captureBtn.classList.remove('btn-danger');
+                        captureBtn.classList.add('btn-brown');
+                        captureBtn.innerHTML = `🎥 {{ __('dashboard.start_recording_video') }}`;
+                        return;
+                    }
+
+                    // بداية تسجيل جديد (كمبيوتر)
+                    try{
+                        recStream = await navigator.mediaDevices.getUserMedia({
+                            video: { facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:720}, aspectRatio:{ideal:16/9} },
+                            audio: true
+                        });
+                        showLiveOverlay(recStream);
+                        chunks = [];
+
+                        let mimeType = 'video/webm;codecs=vp8,opus';
+                        if (!MediaRecorder.isTypeSupported?.(mimeType)) mimeType = MediaRecorder.isTypeSupported?.('video/webm') ? 'video/webm' : 'video/mp4';
+
+                        recorder = new MediaRecorder(recStream, {
+                            mimeType,
+                            videoBitsPerSecond: 800000,
+                            audioBitsPerSecond: 64000
+                        });
+
+                        recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+                        recorder.onstop = ()=>{
+                            stopTracks(recStream); recStream = null;
+                            cleanupOverlay();
+
+                            const type = cleanMime(recorder.mimeType || mimeType || 'video/webm');
+                            const ext  = type.includes('mp4') ? 'mp4' : 'webm';
+                            const blob = new Blob(chunks, { type });
+                            const file = new File([blob], `rec_${Date.now()}.${ext}`, { type });
+                            try{ pond && pond.addFile(file); }catch{}
+
+                            captureBtn.classList.remove('btn-danger');
+                            captureBtn.classList.add('btn-brown');
+                            captureBtn.innerHTML = `🎥 {{ __('dashboard.start_recording_video') }}`;
+
+                            chunks = [];
+                            recorder = null;
+                            if (removeFlg) removeFlg.value='0';
+                        };
+
+                        recorder.start();
+                        captureBtn.classList.remove('btn-brown');
+                        captureBtn.classList.add('btn-danger');
+                        captureBtn.innerHTML = `<i class="bi bi-stop"></i> {{ __('dashboard.stop') }}`;
+                    }catch(e){
+                        stopTracks(recStream); recStream = null;
+                        cleanupOverlay();
+                        recorder = null; chunks = [];
+                        captureBtn.classList.remove('btn-danger');
+                        captureBtn.classList.add('btn-brown');
+                        captureBtn.innerHTML = `🎥 {{ __('dashboard.start_recording_video') }}`;
+                        alert('Camera/Mic error: ' + (e?.message || e));
+                    }
                 });
 
+                // كاميرا النظام/الاستوديو → أضف إلى FilePond
+                camInput?.setAttribute('capture','environment');
+                camInput?.setAttribute('accept','video/*');
+                camInput?.addEventListener('change', e=>{
+                    const files = Array.from(e.target.files||[]);
+                    if (!files.length || !pond) return;
+                    files.forEach(f=> pond.addFile(f));
+                    if (removeFlg) removeFlg.value='0';
+                    e.target.value='';
+                });
+
+                // إدخال احتياطي
                 input?.addEventListener('change', e=>{
                     if (!pond) return;
                     Array.from(e.target.files||[]).forEach(f=> pond.addFile(f));
                     e.target.value=''; if (removeFlg) removeFlg.value='0';
                 });
 
+                removeAll?.addEventListener('click', ()=>{
+                    try{ pond?.removeFiles(); }catch{}
+                    keysWrap.innerHTML=''; items=[]; current=0; renderVideo();
+                    if (removeFlg) removeFlg.value='1';
+                });
+
                 renderVideo();
             }
 
-            // Init كل البوكسات داخل المودال
+            // Init
             document.querySelectorAll('.photo-box').forEach(initPhotoBox);
             document.querySelectorAll('.audio-box').forEach(initAudioBox);
             document.querySelectorAll('.video-box').forEach(initVideoBox);
 
-            // تأكد أن أزرار السلايدر/اللايت بوكس ليست submit
+            // type=button لأزرار السلايدر/اللايت بوكس
             document.querySelectorAll('#photo-lightbox button, .photo-slider button, .video-slider button')
               .forEach(btn=>{ if(!btn.hasAttribute('type')) btn.setAttribute('type','button'); });
         });
     </script>
 @endpush
+
+
+
+
+
+
+
 
 @section('scripts')
     <script>

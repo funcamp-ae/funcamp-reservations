@@ -73,25 +73,30 @@
                                         {{ $item->is_active ? __('dashboard.active') : __('dashboard.inactive') }}
                                     </span>
                                 </td>
-                                <td>
-                                    @if (Gate::allows('equipment.edit'))
-                                        <a href="{{ route('equipment-directories.items.edit', [$equipmentDirectory, $item]) }}"
-                                            class="btn btn-sm btn-primary" title="@lang('dashboard.edit')">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                    @endif
-                                    @if (Gate::allows('equipment.destroy'))
-                                        <form
-                                            action="{{ route('equipment-directories.items.destroy', [$equipmentDirectory, $item]) }}"
-                                            method="POST" class="d-inline">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" title="@lang('dashboard.delete')"
-                                                onclick="return confirm('@lang('dashboard.confirm_delete')')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    @endif
-                                </td>
+                                <td class="text-end">
+    <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap">
+        @if (Gate::allows('equipment.edit'))
+            <a href="{{ route('equipment-directories.items.edit', [$equipmentDirectory, $item]) }}"
+               class="btn btn-sm btn-icon btn-primary" title="@lang('dashboard.edit')">
+                <i class="fas fa-edit fs-6"></i>
+            </a>
+        @endif
+
+        @if (Gate::allows('equipment.destroy'))
+            <form action="{{ route('equipment-directories.items.destroy', [$equipmentDirectory, $item]) }}"
+                  method="POST" class="m-0">
+                @csrf @method('DELETE')
+                <button type="submit"
+                        class="btn btn-sm btn-icon btn-danger"
+                        title="@lang('dashboard.delete')"
+                        onclick="return confirm('@lang('dashboard.confirm_delete')')">
+                    <i class="fas fa-trash fs-6"></i>
+                </button>
+            </form>
+        @endif
+    </div>
+</td>
+
                             </tr>
 
                             <!-- Media Modal -->
@@ -281,6 +286,23 @@ document.querySelectorAll('[data-bs-toggle="tab"]').forEach(function(tab){
         });
     });
 });
+
+/* أيقونات أزرار داخل الجداول: حجم ثابت ومحاذاة مثالية */
+.table .btn.btn-icon{
+  width: 34px; height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1; /* يمنع القص */
+}
+.table .btn.btn-icon.btn-sm{
+  width: 30px; height: 30px; /* أصغر في حجم sm لكن بدون قص */
+}
+.table .btn.btn-icon i{
+  line-height: 1; /* مهم مع بعض خطوط الأيقونات */
+}
+
 </script>
 
 @endphp
