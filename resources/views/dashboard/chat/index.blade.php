@@ -165,28 +165,44 @@ class ChatSystem {
         this.loadChats();
         this.setupGlobalChatListener();
     }
-    if (typeof Echo !== 'undefined') {
-        Echo.private(`chat.${this.currentChatId}`).listen('.message.sent', (e) => {  // Changed from NewChatMessage to message.sent
-            console.log('New message received:', e);
-            this.handleNewMessage(e);
-        });
-    }
 
 setupGlobalChatListener() {
-    if (typeof Echo !== 'undefined') {
-        // The channel name will be automatically converted to private-user.{userId} by Laravel Echo
-        Echo.private(`chat.${this.currentChatId}`)
-            .listen('.message.sent', (e) => {  // Changed from NewChatMessage to message.sent
-                console.log('New message received:', e);
-                this.handleNewMessage(e);
-            });
-        
-        console.log('Global chat listener setup for user:', this.currentUserId);
-    } else {
+    if (typeof Echo === 'undefined') {
         console.error('Laravel Echo is not initialized');
+        return;
     }
-}
 
+    // Check if we have a chat ID
+    if (!this.currentChatId) {
+        console.log('No active chat selected');
+        return;
+    }
+
+    // Unsubscribe from any existing channel first
+    if (this.currentChannel) {
+        Echo.leave(this.currentChannel);
+    }
+
+    // Store the current channel name
+    this.currentChannel = `chat.${this.currentChatId}`;
+    
+    console.log('Subscribing to channel:', this.currentChannel);
+    
+    // Subscribe to the private channel
+    Echo.private(this.currentChannel)
+        .listen('.message.sent', (e) => {
+            console.log('New message received from Pusher:', e);
+            this.handleNewMessage(e);
+        })
+        .listen('pusher:subscription_succeeded', () => {
+            console.log('Successfully subscribed to channel:', this.currentChannel);
+        })
+        .listen('pusher:subscription_error', (status) => {
+            console.error('Failed to subscribe to channel:', status);
+        });
+    
+    console.log('Global chat listener setup for chat:', this.currentChatId);
+}
     setupChatChannel(chatId) {
         // Unsubscribe from previous chat channel if exists
         if (this.activeChannels.has('chat')) {
