@@ -59,9 +59,6 @@
                                                 <i class="fas fa-ellipsis-v"></i>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end">
-                                                <!-- <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>View Profile</a></li>
-                                                <li><a class="dropdown-item" href="#"><i class="fas fa-bell-slash me-2"></i>Mute Notifications</a></li>
-                                                <li><hr class="dropdown-divider"></li> -->
                                                 <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash-alt me-2"></i>Clear Chat</a></li>
                                             </ul>
                                         </div>
@@ -157,6 +154,7 @@ class ChatSystem {
         this.currentUserId = {{ auth()->id() }};
         this.chats = [];
         this.users = [];
+        this.activeChannels = new Map(); // Track active Echo channels
         this.init();
     }
 
@@ -165,6 +163,148 @@ class ChatSystem {
         this.bindEvents();
         this.loadUsers();
         this.loadChats();
+        this.setupGlobalChatListener();
+    }
+
+    setupGlobalChatListener() {
+        // Listen for new messages across all user's chats
+        if (typeof Echo !== 'undefined') {
+            Echo.private(`user.${this.currentUserId}`)
+                .listen('NewChatMessage', (e) => {
+                    console.log('New message received:', e);
+                    this.handleNewMessage(e);
+                });
+            
+            console.log('Global chat listener setup for user:', this.currentUserId);
+        } else {
+            console.error('Laravel Echo is not initialized');
+        }
+    }
+
+    setupChatChannel(chatId) {
+        // Unsubscribe from previous chat channel if exists
+        if (this.activeChannels.has('chat')) {
+            const oldChannel = this.activeChannels.get('chat');
+            Echo.leave(oldChannel);
+            this.activeChannels.delete('chat');
+        }
+
+        // Subscribe to the new chat channel
+        if (typeof Echo !== 'undefined') {
+            const channelName = `chat.${chatId}`;
+            
+            Echo.private(channelName)
+                .listen('MessageSent', (e) => {
+                    console.log('Message received in chat:', e);
+                    this.handleChatMessage(e);
+                })
+                .listen('MessageRead', (e) => {
+                    console.log('Message read status updated:', e);
+                    this.updateMessageReadStatus(e);
+                });
+            
+            this.activeChannels.set('chat', channelName);
+            console.log('Subscribed to chat channel:', channelName);
+        }
+    }
+
+    handleNewMessage(event) {
+        const { message, chat_id, user } = event;
+        
+        // Update chat list - move chat to top and update latest message
+        this.updateChatInList(chat_id, message);
+        
+        // If the message is for the currently open chat and not sent by current user
+        if (this.currentChatId == chat_id && message.user_id != this.currentUserId) {
+            // Add message to current view
+            if (!this.currentMessages) {
+                this.currentMessages = [];
+            }
+            this.currentMessages.push(message);
+            this.renderMessages(this.currentMessages);
+            
+            // Mark message as read
+            this.markMessageAsRead(message.id);
+        } else if (message.user_id != this.currentUserId) {
+            // Show notification for messages in other chats
+            this.showNotification(user.name, message.message);
+        }
+    }
+
+    handleChatMessage(event) {
+        const { message, chat_id, user } = event;
+        
+        // Only handle if it's the current chat and not from current user
+        if (this.currentChatId == chat_id && message.user_id != this.currentUserId) {
+            if (!this.currentMessages) {
+                this.currentMessages = [];
+            }
+            this.currentMessages.push(message);
+            this.renderMessages(this.currentMessages);
+            
+            // Mark as read
+            this.markMessageAsRead(message.id);
+        }
+    }
+
+    updateMessageReadStatus(event) {
+        const { message_id, user_id } = event;
+        
+        if (this.currentMessages) {
+            const message = this.currentMessages.find(m => m.id === message_id);
+            if (message) {
+                message.is_read = true;
+                message.read_at = new Date().toISOString();
+                this.renderMessages(this.currentMessages);
+            }
+        }
+    }
+
+    updateChatInList(chatId, latestMessage) {
+        // Find and update the chat in the list
+        const chatIndex = this.chats.findIndex(c => c.id == chatId);
+        if (chatIndex !== -1) {
+            this.chats[chatIndex].latest_message = latestMessage;
+            
+            // Increment unread count if not current chat
+            if (this.currentChatId != chatId && latestMessage.user_id != this.currentUserId) {
+                this.chats[chatIndex].unread_count = (this.chats[chatIndex].unread_count || 0) + 1;
+            }
+            
+            // Move chat to top
+            const chat = this.chats.splice(chatIndex, 1)[0];
+            this.chats.unshift(chat);
+            
+            // Re-render chat list
+            this.renderChats();
+        } else {
+            // If chat not in list, reload all chats
+            this.loadChats();
+        }
+    }
+
+    async markMessageAsRead(messageId) {
+        try {
+            await fetch(`/api/chat/messages/${messageId}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+        } catch (error) {
+            console.error('Error marking message as read:', error);
+        }
+    }
+
+    showNotification(senderName, message) {
+        // Check if browser supports notifications
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification(`New message from ${senderName}`, {
+                body: this.truncateMessage(message, 50),
+                icon: '/path/to/notification-icon.png'
+            });
+        }
     }
 
     bindEvents() {
@@ -205,6 +345,11 @@ class ChatSystem {
         document.getElementById('chatSearch').addEventListener('input', (e) => {
             this.filterChats(e.target.value);
         });
+
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
     }
 
     async loadChats() {
@@ -325,15 +470,6 @@ class ChatSystem {
                 const chatId = item.getAttribute('data-chat-id');
                 this.openChat(chatId);
             });
-            
-            // Hover effects
-            // item.addEventListener('mouseenter', () => {
-            //     item.style.backgroundColor = '#f8f9fa';
-            // });
-            
-            // item.addEventListener('mouseleave', () => {
-            //     item.style.backgroundColor = '';
-            // });
         });
     }
 
@@ -341,6 +477,9 @@ class ChatSystem {
         try {
             console.log('Opening chat:', chatId);
             this.currentChatId = chatId;
+            
+            // Setup real-time channel for this chat
+            this.setupChatChannel(chatId);
             
             // Mark as active
             document.querySelectorAll('.chat-item').forEach(item => {
@@ -365,6 +504,13 @@ class ChatSystem {
             if (data.success && data.chat) {
                 this.currentMessages = data.messages || [];
                 this.renderChatWindow(data.chat, this.currentMessages);
+                
+                // Reset unread count for this chat
+                const chat = this.chats.find(c => c.id == chatId);
+                if (chat) {
+                    chat.unread_count = 0;
+                    this.renderChats();
+                }
             } else {
                 console.error('Failed to load chat:', data);
                 alert('Failed to load chat details');
@@ -381,7 +527,6 @@ class ChatSystem {
         
         // Update header
         document.getElementById('chatTitle').textContent = chatName;
-        // document.getElementById('chatSubtitle').textContent = isGroup ? `${chat.users.length} members` : 'Online';
         document.getElementById('chatHeader').style.display = 'block';
         document.getElementById('messageInputArea').style.display = 'block';
         
@@ -481,8 +626,8 @@ class ChatSystem {
                 this.currentMessages.push(data.message);
                 this.renderMessages(this.currentMessages);
                 
-                // Reload chat list to update latest message
-                this.loadChats();
+                // Update chat list
+                this.updateChatInList(this.currentChatId, data.message);
             } else {
                 // Remove temp message if sending failed
                 this.currentMessages = this.currentMessages.filter(msg => !msg.is_temp);
@@ -523,7 +668,6 @@ class ChatSystem {
                 if (data.success) {
                     bootstrap.Modal.getInstance(document.getElementById('newChatModal')).hide();
                     this.loadChats();
-                    // Wait a bit for the chat list to update before opening the chat
                     setTimeout(() => {
                         this.openChat(data.chat.id);
                     }, 500);
@@ -570,7 +714,6 @@ class ChatSystem {
                 if (data.success) {
                     bootstrap.Modal.getInstance(document.getElementById('newChatModal')).hide();
                     this.loadChats();
-                    // Wait a bit for the chat list to update before opening the chat
                     setTimeout(() => {
                         this.openChat(data.chat.id);
                     }, 500);
