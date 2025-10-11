@@ -166,20 +166,20 @@ class ChatSystem {
         this.setupGlobalChatListener();
     }
 
-    setupGlobalChatListener() {
-        // Listen for new messages across all user's chats
-        if (typeof Echo !== 'undefined') {
-            Echo.private(`user.${this.currentUserId}`)
-                .listen('NewChatMessage', (e) => {
-                    console.log('New message received:', e);
-                    this.handleNewMessage(e);
-                });
-            
-            console.log('Global chat listener setup for user:', this.currentUserId);
-        } else {
-            console.error('Laravel Echo is not initialized');
-        }
+setupGlobalChatListener() {
+    if (typeof Echo !== 'undefined') {
+        // The channel name will be automatically converted to private-user.{userId} by Laravel Echo
+        Echo.private(`user.${this.currentUserId}`)
+            .listen('message.sent', (e) => {  // Changed from NewChatMessage to message.sent
+                console.log('New message received:', e);
+                this.handleNewMessage(e);
+            });
+        
+        console.log('Global chat listener setup for user:', this.currentUserId);
+    } else {
+        console.error('Laravel Echo is not initialized');
     }
+}
 
     setupChatChannel(chatId) {
         // Unsubscribe from previous chat channel if exists
