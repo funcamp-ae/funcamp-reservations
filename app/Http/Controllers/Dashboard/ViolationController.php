@@ -135,9 +135,11 @@ class ViolationController extends Controller
     }
 
     public function show(Violation $violation)
-    {
-        return view('dashboard.violations.show', compact('violation'));
-    }
+{
+    $violation->load(['attachments', 'type', 'employee', 'creator']);
+    return view('dashboard.violations.show', compact('violation'));
+}
+
 
     public function edit(Violation $violation)
     {
