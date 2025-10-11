@@ -4,8 +4,7 @@
 @section('content')
     <div class="card mb-5 mb-xl-10">
         <div class="card-header">
-            <h3 class="
-            -title">@lang('dashboard.' . (isset($campReport) ? 'edit_camp_report' : 'create_camp_report'))</h3>
+            <h3 class="card-title">@lang('dashboard.' . (isset($campReport) ? 'edit_camp_report' : 'create_camp_report'))</h3>
         </div>
 
         <div class="card-body">
@@ -586,9 +585,6 @@
 
 
 
-
-
-
 @push('js')
     <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
     <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
@@ -1005,6 +1001,43 @@
                 } catch (_) {}
             }
 
+            // ===== تحكّم بإرسال النموذج أثناء رفع الملفات =====
+            const submitBtn = document.querySelector('form button[type="submit"]');
+            const FP = window.FilePond;
+
+            function getAllPonds() {
+                return Array.from(document.querySelectorAll('.pond-video'))
+                    .map(input => FilePond.find(input))
+                    .filter(Boolean);
+            }
+            function updateSubmitDisabled() {
+                if (!FP || !submitBtn) return;
+                const ponds = getAllPonds();
+                const pending = ponds.some(p =>
+                    p.getFiles().some(f =>
+                        f.status !== FP.FileStatus.PROCESSING_COMPLETE &&
+                        f.status !== FP.FileStatus.IDLE
+                    )
+                );
+                submitBtn.disabled = pending;
+                submitBtn.classList.toggle('disabled', pending);
+                submitBtn.dataset.pending = pending ? '1' : '0';
+            }
+            function bindPondToSubmit(pond) {
+                ['addfile', 'processfilestart','processfileprogress','processfile',
+                 'processfileabort','processfileundo','removefile','error','initfile']
+                 .forEach(ev => pond.on(ev, updateSubmitDisabled));
+                updateSubmitDisabled();
+            }
+
+            const form = document.querySelector('form');
+            form?.addEventListener('submit', (e) => {
+                if (submitBtn?.dataset.pending === '1') {
+                    e.preventDefault();
+                    alert('انتظر حتى يكتمل رفع الفيديوهات…');
+                }
+            });
+
             function initVideoBox(box) {
                 const captureBtn = box.querySelector('.capture-media');
                 const removeAll  = box.querySelector('.remove-video-all');
@@ -1226,9 +1259,9 @@
                                             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
                                             body: JSON.stringify({
                                                 fileName: file.name,
-                                                contentType: cleanMime(file.type),
+                                                contentType: inferMimeByExt(file),
                                                 fileSize: file.size,
-                                                prefix: 'uploads/signin/videos'
+                                                prefix: 'camp_reports/videos'
                                             })
                                         });
                                         if (!createRes.ok) throw new Error('createMultipart failed');
@@ -1259,7 +1292,6 @@
                                                 };
                                                 xhr.onload = () => {
                                                     currentXhr = null;
-                                                    if (xhr.status >= 200 && xhr < 300) { /* older libs check */ }
                                                     if (xhr.status >= 200 && xhr.status < 300) {
                                                         const etag = (xhr.getResponseHeader('ETag') || '').replace(/"/g, '');
                                                         if (!etag) return reject(new Error('Missing ETag'));
@@ -1284,11 +1316,14 @@
                                         if (!completeRes.ok) throw new Error('completeMultipart failed');
 
                                         keysWrap.appendChild(createHidden(`items[${idx}][uploaded_videos][]`, key));
+                                        const hidden = keysWrap.lastElementChild;
+                                        file.serverId = key;
+                                        file._hiddenInputEl = hidden;
 
                                         const blobURL = URL.createObjectURL(file);
                                         const sliderId = 'pond-' + Math.random().toString(36).slice(2);
-                                        // أثناء التسجيل: فقط حدّث النقاط ولا تغيّر srcObject
                                         addItem(sliderId, blobURL, true);
+                                        pondFileToSliderId.set(file, sliderId);
 
                                         if (removeFlg) removeFlg.value = '0';
                                         load(key);
@@ -1315,11 +1350,23 @@
                         }
                     });
 
+                    // ربط زر الإرسال بحالة الرفع
+                    bindPondToSubmit(pond);
+
                     pond.on('removefile', (fileItem) => {
                         if (!fileItem) return;
-                        // ما نستخدمش map هنا، لأننا أضفنا via process بخاصية sliderId مستقلة
-                        // فهنا نبحث بالـ serverId/blobs غير مضمونة، فنخلي الإزالة للزر العام أو اكتب لو تحب mapping
-                        // اختياري: لا شيء.
+                        const f = fileItem.file;
+                        // امسح مفتاح S3
+                        if (f && f._hiddenInputEl && f._hiddenInputEl.parentNode) {
+                            f._hiddenInputEl.parentNode.removeChild(f._hiddenInputEl);
+                        }
+                        // امسح معاينة السلايدر لهذا الملف
+                        const sid = pondFileToSliderId.get(f);
+                        if (sid) {
+                            removeItem(sid);
+                            pondFileToSliderId.delete(f);
+                        }
+                        updateSubmitDisabled();
                     });
 
                     removeAll?.addEventListener('click', () => {
@@ -1327,6 +1374,7 @@
                         input.value = ''; keysWrap.innerHTML = '';
                         items = []; current = 0; renderVideo();
                         removeFlg.value = '1';
+                        updateSubmitDisabled();
                     });
                 }
 
@@ -1441,6 +1489,7 @@
                 initPhotoBox(newCard.querySelector('.photo-box'));
                 initAudioBox(newCard.querySelector('.audio-box'));
                 initVideoBox(newCard.querySelector('.video-box'));
+                updateSubmitDisabled();
 
                 itemIndex++;
             });
@@ -1458,8 +1507,16 @@
                         document.querySelector('form').appendChild(deleted);
                     }
                     itemRow.remove();
+                    updateSubmitDisabled();
                 }
             });
+
+            // تأكيد أن أزرار التنقّل ليست submit (احتياطي)
+            document.querySelectorAll('#photo-lightbox button, .photo-slider button, .video-slider button')
+                .forEach(b => { if (!b.hasAttribute('type')) b.setAttribute('type','button'); });
+
+            // أول تحديث لحالة زر الإرسال
+            updateSubmitDisabled();
         });
     </script>
 @endpush

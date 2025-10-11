@@ -467,13 +467,10 @@
 
 
 
-
 @push('js')
     <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
-    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js">
-    </script>
-    <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.min.js">
-    </script>
+    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.min.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -486,20 +483,24 @@
                 'video/mpg', 'video/x-ms-wmv', 'video/x-m4v'
             ];
 
-            function isRTL() {
-                return document.documentElement.dir === 'rtl' || getComputedStyle(document.body).direction ===
-                    'rtl';
-            }
+            const isRTL = () => document.documentElement.dir === 'rtl' || getComputedStyle(document.body).direction === 'rtl';
+            const createHidden = (name, val) => { const i=document.createElement('input'); i.type='hidden'; i.name=name; i.value=val; return i; };
 
-            function createHidden(name, val) {
-                const i = document.createElement('input');
-                i.type = 'hidden';
-                i.name = name;
-                i.value = val;
-                return i;
+            // كشف نوع الفيديو عند غياب type (خصوصاً سفاري)
+            function inferMime(file) {
+                let t = (file?.type || '').split(';')[0].trim();
+                if (!t) {
+                    const ext = (file?.name || '').split('.').pop()?.toLowerCase();
+                    const map = { mp4:'video/mp4', m4v:'video/x-m4v', mov:'video/quicktime', webm:'video/webm',
+                                  mkv:'video/x-matroska', avi:'video/avi', flv:'video/x-flv', mpg:'video/mpeg',
+                                  mpeg:'video/mpeg', '3gp':'video/3gpp', '3gpp':'video/3gpp', '3gpp2':'video/3gpp2', hevc:'video/hevc' };
+                    t = map[ext] || 'video/mp4';
+                }
+                return t;
             }
+            const cleanMime = (type) => (type || '').split(';')[0].trim() || 'video/webm';
 
-            // ===== PHOTO BOX =====
+            // ====== PHOTO BOX ======
             function initPhotoBox(box) {
                 const uploadBtn = box.querySelector('.upload-media');
                 const captureBtn = box.querySelector('.capture-media');
@@ -515,309 +516,145 @@
                 const nextBtn = slider.querySelector('.next');
                 const dotsBox = slider.querySelector('.slider-dots');
 
-                const rtl = isRTL();
-                prevBtn.innerHTML = rtl ? '›' : '‹';
-                nextBtn.innerHTML = rtl ? '‹' : '›';
+                prevBtn.innerHTML = isRTL() ? '›' : '‹';
+                nextBtn.innerHTML = isRTL() ? '‹' : '›';
 
-                const existing = (() => {
-                    try {
-                        const j = JSON.parse(box.dataset.existing || '[]');
-                        return Array.isArray(j) ? j : [];
-                    } catch {
-                        return [];
-                    }
-                })();
-
-                let photos = existing.slice();
+                let photos = (() => { try { const j = JSON.parse(box.dataset.existing || '[]'); return Array.isArray(j) ? j : []; } catch { return []; } })();
                 let current = 0;
-                let fileState = []; // ملفات جديدة (سنزامنها مع input.files)
+                let fileState = [];
 
-                function syncInput() {
-                    const dt = new DataTransfer();
-                    fileState.forEach(f => dt.items.add(f));
-                    input.files = dt.files;
-                }
+                const syncInput = () => { const dt = new DataTransfer(); fileState.forEach(f => dt.items.add(f)); input.files = dt.files; };
                 const fileKey = f => `${f.name}__${f.size}__${f.lastModified||0}__${f.type}`;
-
-                function addFileUnique(f) {
-                    const k = fileKey(f);
-                    if (fileState.some(x => fileKey(x) === k)) return false;
-                    fileState.push(f);
-                    syncInput();
-                    return true;
-                }
+                const addFileUnique = f => { const k=fileKey(f); if (fileState.some(x=>fileKey(x)===k)) return false; fileState.push(f); syncInput(); return true; };
 
                 function renderDots() {
                     dotsBox.innerHTML = '';
                     photos.forEach((_, i) => {
                         const d = document.createElement('div');
                         d.className = 'slider-dot' + (i === current ? ' active' : '');
-                        d.addEventListener('click', () => {
-                            current = i;
-                            render();
-                        });
+                        d.addEventListener('click', () => { current = i; render(); });
                         dotsBox.appendChild(d);
                     });
                 }
-
                 function render() {
-                    if (!photos.length) {
-                        slider.classList.add('d-none');
-                        imgEl.removeAttribute('src');
-                        return;
-                    }
-                    slider.classList.remove('d-none');
-                    imgEl.src = photos[current];
-                    renderDots();
+                    if (!photos.length) { slider.classList.add('d-none'); imgEl.removeAttribute('src'); return; }
+                    slider.classList.remove('d-none'); imgEl.src = photos[current]; renderDots();
                 }
 
-                // === دعم التحديث عبر media:refresh ===
+                // refresh من المودال
                 box.addEventListener('media:refresh', () => {
-                    try {
-                        const arr = JSON.parse(box.dataset.existing || '[]');
-                        photos = Array.isArray(arr) ? arr.slice() : [];
-                    } catch {
-                        photos = [];
-                    }
-                    current = 0;
-                    fileState = [];
-                    syncInput();
-                    render();
+                    try { photos = JSON.parse(box.dataset.existing || '[]') || []; } catch { photos = []; }
+                    current = 0; fileState = []; syncInput(); render();
                 });
 
-                // Lightbox
-                (function lightboxInit() {
-                    const lb = document.getElementById('photo-lightbox');
-                    if (!lb) return;
+                // Lightbox عام
+                (function lightboxInit(){
+                    const lb = document.getElementById('photo-lightbox'); if (!lb) return;
                     const lbImg = lb.querySelector('.lightbox-img');
                     const lbClose = lb.querySelector('.close');
                     const lbPrev = lb.querySelector('.nav.prev');
                     const lbNext = lb.querySelector('.nav.next');
-
-                    imgEl.addEventListener('click', () => {
-                        if (!photos.length) return;
-                        lb.classList.remove('d-none');
-                        lbImg.src = photos[current];
-                    });
-                    lbClose.addEventListener('click', () => lb.classList.add('d-none'));
-                    lbPrev.addEventListener('click', () => {
-                        current = (current - 1 + photos.length) % photos.length;
-                        lbImg.src = photos[current];
-                    });
-                    lbNext.addEventListener('click', () => {
-                        current = (current + 1) % photos.length;
-                        lbImg.src = photos[current];
-                    });
-                    document.addEventListener('keydown', e => {
+                    imgEl.addEventListener('click', ()=>{ if(!photos.length) return; lb.classList.remove('d-none'); lbImg.src = photos[current]; });
+                    lbClose.addEventListener('click', ()=> lb.classList.add('d-none'));
+                    lbPrev.addEventListener('click', ()=>{ current=(current-1+photos.length)%photos.length; lbImg.src=photos[current]; });
+                    lbNext.addEventListener('click', ()=>{ current=(current+1)%photos.length; lbImg.src=photos[current]; });
+                    document.addEventListener('keydown', e=>{
                         if (lb.classList.contains('d-none')) return;
-                        if (e.key === 'Escape') lb.classList.add('d-none');
-                        if (e.key === 'ArrowLeft') lbPrev.click();
-                        if (e.key === 'ArrowRight') lbNext.click();
+                        if (e.key==='Escape') lb.classList.add('d-none');
+                        if (e.key==='ArrowLeft') lbPrev.click();
+                        if (e.key==='ArrowRight') lbNext.click();
                     });
                 })();
 
-                // Swipe
-                (function swipeInit() {
-                    let sx = 0;
-                    viewport.addEventListener('touchstart', e => sx = e.changedTouches[0].clientX, {
-                        passive: true
-                    });
-                    viewport.addEventListener('touchend', e => {
+                // سحب للموبايل
+                (function(){
+                    let sx=0;
+                    viewport.addEventListener('touchstart', e=> sx = e.changedTouches[0].clientX, {passive:true});
+                    viewport.addEventListener('touchend', e=>{
                         const dx = e.changedTouches[0].clientX - sx;
-                        if (Math.abs(dx) > 40) {
-                            if (rtl) {
-                                (dx < 0) ? prevBtn.click(): nextBtn.click();
-                            } else {
-                                (dx < 0) ? nextBtn.click(): prevBtn.click();
-                            }
-                        }
-                    }, {
-                        passive: true
-                    });
+                        if (Math.abs(dx) > 40) isRTL() ? (dx<0?prevBtn.click():nextBtn.click()) : (dx<0?nextBtn.click():prevBtn.click());
+                    }, {passive:true});
                 })();
 
-                prevBtn.addEventListener('click', () => {
-                    if (!photos.length) return;
-                    current = (current - 1 + photos.length) % photos.length;
-                    render();
-                });
-                nextBtn.addEventListener('click', () => {
-                    if (!photos.length) return;
-                    current = (current + 1) % photos.length;
-                    render();
-                });
+                prevBtn.addEventListener('click', ()=>{ if(!photos.length) return; current=(current-1+photos.length)%photos.length; render(); });
+                nextBtn.addEventListener('click', ()=>{ if(!photos.length) return; current=(current+1)%photos.length; render(); });
 
-                // ضغط الصور
-                function compressImage(file, quality = 0.7, maxW = 1280, maxH = 1280) {
-                    return new Promise((resolve, reject) => {
-                        const img = new Image();
-                        const url = URL.createObjectURL(file);
-                        img.onload = () => {
-                            let {
-                                width,
-                                height
-                            } = img;
-                            if (width > maxW || height > maxH) {
-                                const s = Math.min(maxW / width, maxH / height);
-                                width = Math.round(width * s);
-                                height = Math.round(height * s);
-                            }
-                            const canvas = document.createElement('canvas');
-                            canvas.width = width;
-                            canvas.height = height;
-                            canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                            canvas.toBlob(b => {
-                                URL.revokeObjectURL(url);
-                                if (!b) return reject('Compression failed');
-                                const name = (file.name || 'photo').replace(/\.[^.]+$/, '') +
-                                    '.jpg';
-                                resolve(new File([b], name, {
-                                    type: 'image/jpeg'
-                                }));
-                            }, 'image/jpeg', quality);
+                // ضغط صور
+                function compressImage(file, quality=0.7, maxW=1280, maxH=1280){
+                    return new Promise((resolve,reject)=>{
+                        const img=new Image(); const url=URL.createObjectURL(file);
+                        img.onload=()=>{
+                            let {width,height}=img;
+                            if (width>maxW || height>maxH){ const s=Math.min(maxW/width,maxH/height); width=Math.round(width*s); height=Math.round(height*s); }
+                            const canvas=document.createElement('canvas'); canvas.width=width; canvas.height=height;
+                            canvas.getContext('2d').drawImage(img,0,0,width,height);
+                            canvas.toBlob(b=>{ URL.revokeObjectURL(url); if(!b) return reject('Compression failed');
+                                resolve(new File([b], (file.name||'photo').replace(/\.[^.]+$/,'')+'.jpg', {type:'image/jpeg'})); }, 'image/jpeg', quality);
                         };
-                        img.onerror = () => {
-                            URL.revokeObjectURL(url);
-                            reject('Decode failed');
-                        };
-                        img.src = url;
+                        img.onerror=()=>{ URL.revokeObjectURL(url); reject('Decode failed'); };
+                        img.src=url;
                     });
                 }
 
-                function addPhotoUrl(url) {
-                    photos.push(url);
-                    current = photos.length - 1;
-                    render();
-                }
+                const addPhotoUrl = (u)=>{ photos.push(u); current = photos.length-1; render(); };
 
-                // رفع من الجهاز
-                uploadBtn?.addEventListener('click', () => input?.click());
-                input?.addEventListener('change', async (e) => {
-                    const files = Array.from(e.target.files || []);
-                    for (const f of files) {
-                        let ff = f;
-                        try {
-                            ff = await compressImage(f, 0.7);
-                        } catch {}
+                uploadBtn?.addEventListener('click', ()=> input?.click());
+                input?.addEventListener('change', async e=>{
+                    for (const f of Array.from(e.target.files||[])) {
+                        let ff=f; try{ ff=await compressImage(f, .7);}catch{}
                         if (addFileUnique(ff)) addPhotoUrl(URL.createObjectURL(ff));
                     }
-                    if (removeFlg) removeFlg.value = '0';
-                    e.target.value = '';
+                    if (removeFlg) removeFlg.value='0'; e.target.value='';
                 });
 
-                // كاميرا الهاتف
-                camInput?.addEventListener('change', async (e) => {
-                    const files = Array.from(e.target.files || []);
-                    for (const f of files) {
-                        let ff = f;
-                        try {
-                            ff = await compressImage(f, 0.7);
-                        } catch {}
+                camInput?.addEventListener('change', async e=>{
+                    for (const f of Array.from(e.target.files||[])) {
+                        let ff=f; try{ ff=await compressImage(f, .7);}catch{}
                         if (addFileUnique(ff)) addPhotoUrl(URL.createObjectURL(ff));
                     }
-                    if (removeFlg) removeFlg.value = '0';
-                    e.target.value = '';
+                    if (removeFlg) removeFlg.value='0'; e.target.value='';
                 });
 
-                // التقاط من كاميرا الديسكتوب
-                captureBtn?.addEventListener('click', () => {
-                    if (camInput && isMobile) {
-                        camInput.click();
-                        return;
-                    }
-                    (async () => {
-                        try {
-                            const stream = await navigator.mediaDevices.getUserMedia({
-                                video: {
-                                    facingMode: {
-                                        ideal: 'environment'
-                                    },
-                                    width: {
-                                        ideal: 1280
-                                    },
-                                    height: {
-                                        ideal: 720
-                                    }
-                                },
-                                audio: false
-                            });
-                            const overlay = document.createElement('div');
-                            overlay.style.cssText =
-                                'position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5;';
-                            const v = document.createElement('video');
-                            v.autoplay = v.muted = true;
-                            v.playsInline = true;
-                            v.srcObject = stream;
-                            v.style.cssText = 'width:100%;height:100%;object-fit:contain;';
-                            const snap = document.createElement('button');
-                            snap.type = 'button';
-                            snap.className = 'btn btn-success btn-sm';
-                            snap.textContent = 'Snap';
-                            Object.assign(snap.style, {
-                                position: 'absolute',
-                                bottom: '12px',
-                                left: '50%',
-                                transform: 'translateX(-50%)'
-                            });
-                            viewport.appendChild(overlay);
-                            overlay.appendChild(v);
-                            overlay.appendChild(snap);
+                captureBtn?.addEventListener('click', ()=>{
+                    if (camInput && isMobile) { camInput.click(); return; }
+                    (async ()=>{
+                        try{
+                            const stream = await navigator.mediaDevices.getUserMedia({ video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}, audio:false });
+                            const overlay=document.createElement('div');
+                            overlay.style.cssText='position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5;';
+                            const v=document.createElement('video'); v.autoplay=v.muted=true; v.playsInline=true; v.srcObject=stream;
+                            v.style.cssText='width:100%;height:100%;object-fit:contain;';
+                            const snap=document.createElement('button'); snap.type='button'; snap.className='btn btn-success btn-sm'; snap.textContent='Snap';
+                            Object.assign(snap.style,{position:'absolute',bottom:'12px',left:'50%',transform:'translateX(-50%)'});
+                            viewport.appendChild(overlay); overlay.appendChild(v); overlay.appendChild(snap);
                             slider.classList.remove('d-none');
-
-                            snap.addEventListener('click', async () => {
-                                const canvas = document.createElement('canvas');
-                                canvas.width = v.videoWidth || 640;
-                                canvas.height = v.videoHeight || 480;
-                                canvas.getContext('2d').drawImage(v, 0, 0);
-                                try {
-                                    stream.getTracks().forEach(t => t.stop());
-                                } catch {}
-                                canvas.toBlob(async blob => {
-                                    if (!blob) {
-                                        overlay.remove();
-                                        return;
-                                    }
-                                    let file = new File([blob], 'photo_' +
-                                        Date.now() + '.jpg', {
-                                            type: 'image/jpeg'
-                                        });
-                                    try {
-                                        file = await compressImage(file,
-                                            0.7);
-                                    } catch {}
-                                    if (addFileUnique(file)) addPhotoUrl(URL
-                                        .createObjectURL(file));
-                                    if (removeFlg) removeFlg.value = '0';
+                            snap.addEventListener('click', ()=>{
+                                const canvas=document.createElement('canvas'); canvas.width=v.videoWidth||640; canvas.height=v.videoHeight||480;
+                                canvas.getContext('2d').drawImage(v,0,0);
+                                try{ stream.getTracks().forEach(t=>t.stop()); }catch{}
+                                canvas.toBlob(async blob=>{
+                                    if(!blob){ overlay.remove(); return; }
+                                    let file=new File([blob],`photo_${Date.now()}.jpg`,{type:'image/jpeg'});
+                                    try{ file=await compressImage(file,.7);}catch{}
+                                    if (addFileUnique(file)) addPhotoUrl(URL.createObjectURL(file));
+                                    if (removeFlg) removeFlg.value='0';
                                     overlay.remove();
-                                }, 'image/jpeg', .95);
+                                },'image/jpeg',.95);
                             });
-                        } catch (e) {
-                            alert('Camera error: ' + (e?.message || e));
-                        }
+                        }catch(e){ alert('Camera error: ' + (e?.message||e)); }
                     })();
                 });
 
-                // حذف الكل
-                removeBtnAll?.addEventListener('click', () => {
-                    photos.forEach(u => {
-                        try {
-                            if (u.startsWith('blob:')) URL.revokeObjectURL(u);
-                        } catch {}
-                    });
-                    photos = [];
-                    current = 0;
-                    render();
-                    fileState = [];
-                    syncInput();
-                    if (removeFlg) removeFlg.value = '1';
+                removeBtnAll?.addEventListener('click', ()=>{
+                    photos.forEach(u=>{ try{ if(u.startsWith('blob:')) URL.revokeObjectURL(u); }catch{} });
+                    photos=[]; current=0; render(); fileState=[]; syncInput(); if (removeFlg) removeFlg.value='1';
                 });
 
-                // أول عرض
                 if (photos.length) render();
             }
 
-            // ===== AUDIO BOX =====
-            function initAudioBox(box) {
+            // ====== AUDIO BOX ======
+            function initAudioBox(box){
                 const input = box.querySelector('.media-input');
                 const uploadBtn = box.querySelector('.upload-media');
                 const captureBtn = box.querySelector('.capture-media');
@@ -827,254 +664,140 @@
                 const previewBox = box.querySelector('.preview-audio-container');
                 const list = box.querySelector('.preview-audio-list');
 
-                const existing = (() => {
-                    try {
-                        const j = JSON.parse(box.dataset.existing || '[]');
-                        return Array.isArray(j) ? j : [];
-                    } catch {
-                        return [];
-                    }
-                })();
-
-                // refresh listener
-                box.addEventListener('media:refresh', () => {
-                    list.innerHTML = '';
-                    const arr = (() => {
-                        try {
-                            return JSON.parse(box.dataset.existing || '[]');
-                        } catch {
-                            return [];
-                        }
-                    })();
-                    if (arr.length) {
-                        previewBox.style.display = 'block';
-                        arr.forEach(u => {
-                            const a = document.createElement('audio');
-                            a.controls = true;
-                            a.className = 'w-100 mb-2';
-                            a.src = u;
-                            list.appendChild(a);
-                        });
-                    } else {
-                        previewBox.style.display = 'none';
-                    }
-                    if (input) input.value = '';
-                    if (removeFlg) removeFlg.value = '0';
-                });
-
-                if (existing.length) {
-                    previewBox.style.display = 'block';
-                    existing.forEach(u => {
-                        const a = document.createElement('audio');
-                        a.controls = true;
-                        a.className = 'w-100 mb-2';
-                        a.src = u;
-                        list.appendChild(a);
-                    });
+                let existing = (()=>{ try{ const j=JSON.parse(box.dataset.existing||'[]'); return Array.isArray(j)?j:[]; }catch{return []} })();
+                if (existing.length){
+                    previewBox.style.display='block';
+                    existing.forEach(u=>{ const a=document.createElement('audio'); a.controls=true; a.className='w-100 mb-2'; a.src=u; list.appendChild(a); });
                 }
 
-                uploadBtn?.addEventListener('click', () => input?.click());
-                input?.addEventListener('change', () => {
-                    if (!input.files?.length) return;
-                    Array.from(input.files).forEach(f => {
-                        const a = document.createElement('audio');
-                        a.controls = true;
-                        a.className = 'w-100 mb-2';
-                        a.src = URL.createObjectURL(f);
-                        list.appendChild(a);
-                    });
-                    previewBox.style.display = 'block';
-                    if (removeFlg) removeFlg.value = '0';
+                box.addEventListener('media:refresh', ()=>{
+                    list.innerHTML=''; try{ existing=JSON.parse(box.dataset.existing||'[]')||[]; }catch{ existing=[]; }
+                    if (existing.length){
+                        previewBox.style.display='block';
+                        existing.forEach(u=>{ const a=document.createElement('audio'); a.controls=true; a.className='w-100 mb-2'; a.src=u; list.appendChild(a); });
+                    } else previewBox.style.display='none';
+                    if (input) input.value=''; if (removeFlg) removeFlg.value='0';
                 });
 
-                // Recorder
-                let recorder = null,
-                    fallback = null,
-                    chunks = [],
-                    stream = null,
-                    indicator = null;
+                uploadBtn?.addEventListener('click', ()=> input?.click());
+                input?.addEventListener('change', ()=>{
+                    if (!input.files?.length) return;
+                    Array.from(input.files).forEach(f=>{
+                        const a=document.createElement('audio'); a.controls=true; a.className='w-100 mb-2'; a.src=URL.createObjectURL(f);
+                        list.appendChild(a);
+                    });
+                    previewBox.style.display='block'; if (removeFlg) removeFlg.value='0';
+                });
 
-                captureBtn?.addEventListener('click', async () => {
-                    // stop
-                    if ((recorder && recorder.state === 'recording') || fallback) {
-                        try {
-                            if (recorder) recorder.stop();
-                            if (fallback) fallback.stop();
-                        } catch {}
-                        captureBtn.className = 'btn btn-sm btn-brown';
-                        captureBtn.innerHTML = '<i class="bi bi-mic"></i> {{ __('dashboard.record') }}';
-                        if (indicator) {
-                            indicator.remove();
-                            indicator = null;
-                        }
-                        return;
+                // Recorder + WAV fallback
+                let recorder=null, fallback=null, chunks=[], stream=null, indicator=null;
+                captureBtn?.addEventListener('click', async ()=>{
+                    if ((recorder && recorder.state==='recording') || fallback){
+                        try{ recorder?.stop(); fallback?.stop(); }catch{}
+                        captureBtn.className='btn btn-sm btn-brown';
+                        captureBtn.innerHTML='<i class="bi bi-mic"></i> {{ __('dashboard.record') }}';
+                        indicator?.remove(); indicator=null; return;
                     }
-
-                    try {
-                        stream = await navigator.mediaDevices.getUserMedia({
-                            audio: true
-                        });
-                        chunks = [];
-                        let mime = 'audio/webm';
-                        if (!(window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder
-                                .isTypeSupported(mime))) {
-                            mime = 'audio/mp4';
-                            if (!(MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(mime)))
-                                mime = 'audio/ogg';
+                    try{
+                        stream = await navigator.mediaDevices.getUserMedia({audio:true});
+                        chunks=[];
+                        let mime='audio/webm';
+                        if (!(window.MediaRecorder && MediaRecorder.isTypeSupported?.(mime))){
+                            if (MediaRecorder?.isTypeSupported?.('audio/mp4')) mime='audio/mp4';
+                            else if (MediaRecorder?.isTypeSupported?.('audio/aac')) mime='audio/aac';
+                            else mime='';
                         }
-
-                        if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder
-                            .isTypeSupported(mime)) {
-                            recorder = new MediaRecorder(stream, {
-                                mimeType: mime
-                            });
-                            recorder.ondataavailable = e => {
-                                if (e.data.size > 0) chunks.push(e.data);
-                            };
-                            recorder.onstop = () => {
-                                try {
-                                    stream.getTracks().forEach(t => t.stop());
-                                } catch {}
-                                const blob = new Blob(chunks, {
-                                    type: mime
-                                });
-                                const ext = mime.includes('mp4') ? '.m4a' : (mime.includes('ogg') ?
-                                    '.ogg' : '.webm');
+                        if (mime){
+                            recorder=new MediaRecorder(stream,{mimeType:mime});
+                            recorder.ondataavailable=e=>{ if(e.data.size>0) chunks.push(e.data); };
+                            recorder.onstop=()=>{
+                                try{ stream.getTracks().forEach(t=>t.stop()); }catch{}
+                                const blob=new Blob(chunks,{type:mime});
+                                const ext = mime.includes('mp4')?'.m4a':(mime.includes('aac')?'.aac':'.webm');
                                 appendAudioFile(blob, ext, mime);
                             };
                             recorder.start();
                         } else {
-                            // WAV fallback
-                            fallback = startWavRecorder(stream, (wavBlob) => appendAudioFile(wavBlob,
-                                '.wav', 'audio/wav'));
+                            fallback = startWavRecorder(stream, (wavBlob)=> appendAudioFile(wavBlob,'.wav','audio/wav'));
                         }
-
-                        captureBtn.className = 'btn btn-sm btn-danger';
-                        captureBtn.innerHTML = '<i class="bi bi-stop"></i> {{ __('dashboard.stop') }}';
-                        previewBox.style.display = 'block';
-                        indicator = document.createElement('div');
-                        indicator.className = 'text-danger mt-2 small';
-                        indicator.textContent = '🔴 Recording...';
+                        captureBtn.className='btn btn-sm btn-danger';
+                        captureBtn.innerHTML='<i class="bi bi-stop"></i> {{ __('dashboard.stop') }}';
+                        previewBox.style.display='block';
+                        indicator=document.createElement('div'); indicator.className='text-danger mt-2 small'; indicator.textContent='🔴 Recording...';
                         list.appendChild(indicator);
-                    } catch (e) {
-                        alert('Mic error: ' + (e?.message || e));
-                    }
+                    }catch(e){ alert('Mic error: ' + (e?.message||e)); }
                 });
 
-                function appendAudioFile(blob, ext, type) {
-                    const file = new File([blob], 'rec_' + Date.now() + ext, {
-                        type
-                    });
-                    const dt = new DataTransfer();
-                    if (input.files) Array.from(input.files).forEach(f => dt.items.add(f));
-                    dt.items.add(file);
-                    input.files = dt.files;
-
-                    if (indicator) {
-                        indicator.remove();
-                        indicator = null;
-                    }
-                    const a = document.createElement('audio');
-                    a.controls = true;
-                    a.className = 'w-100 mb-2';
-                    a.src = URL.createObjectURL(file);
-                    list.appendChild(a);
-                    previewBox.style.display = 'block';
-                    if (removeFlg) removeFlg.value = '0';
-
-                    // cleanup
-                    try {
-                        stream?.getTracks()?.forEach(t => t.stop());
-                    } catch {}
-                    recorder = null;
-                    fallback = null;
-                    stream = null;
+                function appendAudioFile(blob, ext, type){
+                    const file = new File([blob], 'rec_'+Date.now()+ext, {type});
+                    const dt=new DataTransfer(); if (input.files) Array.from(input.files).forEach(f=>dt.items.add(f)); dt.items.add(file); input.files=dt.files;
+                    indicator?.remove(); indicator=null;
+                    const a=document.createElement('audio'); a.controls=true; a.className='w-100 mb-2'; a.src=URL.createObjectURL(file); list.appendChild(a);
+                    previewBox.style.display='block'; if (removeFlg) removeFlg.value='0';
+                    try{ stream?.getTracks()?.forEach(t=>t.stop()); }catch{} recorder=null; fallback=null; stream=null;
                 }
 
-                // WAV fallback
-                function startWavRecorder(stream, cb) {
-                    const ctx = new(window.AudioContext || window.webkitAudioContext)();
-                    const src = ctx.createMediaStreamSource(stream);
-                    const proc = ctx.createScriptProcessor(4096, 1, 1);
-                    let buf = [];
-                    proc.onaudioprocess = e => buf.push(new Float32Array(e.inputBuffer.getChannelData(0)));
-                    src.connect(proc);
-                    proc.connect(ctx.destination);
-                    return {
-                        stop: () => {
-                            src.disconnect();
-                            proc.disconnect();
-                            ctx.close();
-                            const blob = encodeWav(buf, 44100);
-                            cb(blob);
-                            try {
-                                stream.getTracks().forEach(t => t.stop());
-                            } catch {}
-                            fallback = null;
-                        }
-                    };
+                function startWavRecorder(stream, cb){
+                    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+                    const src=ctx.createMediaStreamSource(stream);
+                    const proc=ctx.createScriptProcessor(4096,1,1);
+                    let buf=[]; proc.onaudioprocess=e=> buf.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+                    src.connect(proc); proc.connect(ctx.destination);
+                    return { stop:()=>{ src.disconnect(); proc.disconnect(); ctx.close(); const blob=encodeWav(buf,44100); cb(blob); try{ stream.getTracks().forEach(t=>t.stop()); }catch{} } };
+                }
+                function encodeWav(chunks, rate){
+                    const len=chunks.reduce((a,c)=>a+c.length,0), data=new Float32Array(len); let off=0; chunks.forEach(c=>{data.set(c,off); off+=c.length;});
+                    const ab=new ArrayBuffer(44+data.length*2); const v=new DataView(ab); const w=(o,s)=>{for(let i=0;i<s.length;i++) v.setUint8(o+i,s.charCodeAt(i));};
+                    w(0,'RIFF'); v.setUint32(4,36+data.length*2,true); w(8,'WAVE'); w(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+                    v.setUint32(24,rate,true); v.setUint32(28,rate*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true); w(36,'data'); v.setUint32(40,data.length*2,true);
+                    let idx=44; for(let i=0;i<data.length;i++,idx+=2){ const s=Math.max(-1,Math.min(1,data[i])); v.setInt16(idx,s<0?s*0x8000:s*0x7FFF,true); }
+                    return new Blob([v],{type:'audio/wav'});
                 }
 
-                function encodeWav(chunks, rate) {
-                    const len = chunks.reduce((a, c) => a + c.length, 0);
-                    const data = new Float32Array(len);
-                    let off = 0;
-                    chunks.forEach(c => {
-                        data.set(c, off);
-                        off += c.length;
-                    });
-                    const ab = new ArrayBuffer(44 + data.length * 2);
-                    const v = new DataView(ab);
-                    const w = (o, s) => {
-                        for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i));
-                    };
-                    w(0, 'RIFF');
-                    v.setUint32(4, 36 + data.length * 2, true);
-                    w(8, 'WAVE');
-                    w(12, 'fmt ');
-                    v.setUint32(16, 16, true);
-                    v.setUint16(20, 1, true);
-                    v.setUint16(22, 1, true);
-                    v.setUint32(24, rate, true);
-                    v.setUint32(28, rate * 2, true);
-                    v.setUint16(32, 2, true);
-                    v.setUint16(34, 16, true);
-                    w(36, 'data');
-                    v.setUint32(40, data.length * 2, true);
-                    let idx = 44;
-                    for (let i = 0; i < data.length; i++, idx += 2) {
-                        const s = Math.max(-1, Math.min(1, data[i]));
-                        v.setInt16(idx, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
-                    }
-                    return new Blob([v], {
-                        type: 'audio/wav'
-                    });
-                }
-
-                // حذف الكل (المحلي فقط)
-                removeBtn?.addEventListener('click', () => {
-                    list.innerHTML = '';
-                    previewBox.style.display = 'none';
-                    if (input) input.value = '';
-                    if (removeFlg) removeFlg.value = '1';
+                removeBtn?.addEventListener('click', ()=>{
+                    list.innerHTML=''; previewBox.style.display='none'; if (input) input.value=''; if (removeFlg) removeFlg.value='1';
                 });
             }
 
-            // ===== FilePond register =====
-            if (window.FilePond) {
-                try {
+            // ====== VIDEO BOX (FilePond + Slider) ======
+            if (window.FilePond){
+                try{
                     FilePond.registerPlugin(
-                        window.FilePondPluginFileValidateType || (() => {}),
-                        window.FilePondPluginFileValidateSize || (() => {})
+                        window.FilePondPluginFileValidateType || (()=>{}),
+                        window.FilePondPluginFileValidateSize || (()=>{})
                     );
-                } catch (e) {}
+                }catch{}
             }
 
-            // ===== VIDEO BOX =====
-            function initVideoBox(box) {
+            // مراقبة FilePond لتعطيل زر الحفظ أثناء الرفع
+            function bindSaveButtonToPonds(saveBtn, ponds){
+                const FP = window.FilePond;
+                if (!saveBtn || !FP) return;
+                const isPending = () => ponds.some(p => p.getFiles().some(f =>
+                    f.status !== FP.FileStatus.PROCESSING_COMPLETE && f.status !== FP.FileStatus.IDLE
+                ));
+                const update = () => {
+                    const pending = isPending();
+                    saveBtn.disabled = pending;
+                    saveBtn.classList.toggle('disabled', pending);
+                };
+                ponds.forEach(p=>{
+                    p.on('addfile', update);
+                    p.on('processfilestart', update);
+                    p.on('processfileprogress', update);
+                    p.on('processfile', update);
+                    p.on('processfileabort', update);
+                    p.on('processfileundo', update);
+                    p.on('removefile', update);
+                    p.on('error', update);
+                });
+                update();
+            }
+
+            function initVideoBox(box){
                 const captureBtn = box.querySelector('.capture-media');
                 const removeAll = box.querySelector('.remove-video-all');
-                const input = box.querySelector('.media-input'); // احتياطي
+                const input = box.querySelector('.media-input');
                 const camInput = box.querySelector('.camera-video-input');
                 const pondInput = box.querySelector('.pond-video');
                 const keysWrap = box.querySelector('.uploaded-keys');
@@ -1087,271 +810,90 @@
                 const nextBtn = slider.querySelector('.next');
                 const dots = slider.querySelector('.slider-dots');
                 const viewport = slider.querySelector('.slider-viewport');
+
                 prevBtn.innerHTML = isRTL() ? '›' : '‹';
                 nextBtn.innerHTML = isRTL() ? '‹' : '›';
 
-                const existing = (() => {
-                    try {
-                        const j = JSON.parse(box.dataset.existing || '[]');
-                        return Array.isArray(j) ? j : [];
-                    } catch {
-                        return [];
-                    }
-                })();
-                let items = existing.map((u, i) => ({
-                    id: 'server-' + i,
-                    url: u,
-                    revoke: false
-                }));
+                let items = (()=>{ try{ const a=JSON.parse(box.dataset.existing||'[]')||[]; return a.map((u,i)=>({id:'server-'+i,url:u,revoke:false})); }catch{return []} })();
                 let current = 0;
 
-                function renderDots() {
-                    dots.innerHTML = '';
-                    items.forEach((_, i) => {
-                        const d = document.createElement('div');
-                        d.className = 'slider-dot' + (i === current ? ' active' : '');
-                        d.addEventListener('click', () => {
-                            current = i;
-                            renderVideo();
-                        });
-                        dots.appendChild(d);
-                    });
+                function renderDots(){
+                    dots.innerHTML=''; items.forEach((_,i)=>{ const d=document.createElement('div'); d.className='slider-dot'+(i===current?' active':''); d.addEventListener('click',()=>{current=i; renderVideo();}); dots.appendChild(d); });
+                }
+                function renderVideo(){
+                    if (!items.length){ slider.classList.add('d-none'); player.removeAttribute('src'); player.load(); return; }
+                    slider.classList.remove('d-none'); player.src = items[current].url; player.load(); renderDots();
+                }
+                function addItem(id, url, revoke){ items.push({id,url,revoke}); current=items.length-1; renderVideo(); }
+                function removeItem(id){
+                    const idx = items.findIndex(x=>x.id===id);
+                    if (idx>-1){ const it = items[idx]; if (it.revoke){ try{ URL.revokeObjectURL(it.url);}catch{} } items.splice(idx,1); if (current>=items.length) current=Math.max(0,items.length-1); renderVideo(); }
                 }
 
-                function renderVideo() {
-                    if (!items.length) {
-                        slider.classList.add('d-none');
-                        player.removeAttribute('src');
-                        player.load();
-                        return;
-                    }
-                    slider.classList.remove('d-none');
-                    player.src = items[current].url;
-                    player.load();
-                    renderDots();
-                }
-
-                // === refresh listener ===
-                box.addEventListener('media:refresh', () => {
-                    try {
-                        const arr = JSON.parse(box.dataset.existing || '[]');
-                        items = (Array.isArray(arr) ? arr : []).map((u, i) => ({
-                            id: 'server-' + i,
-                            url: u,
-                            revoke: false
-                        }));
-                    } catch {
-                        items = [];
-                    }
-                    current = 0;
-                    try {
-                        pond?.removeFiles();
-                    } catch {}
-                    keysWrap.innerHTML = '';
-                    if (removeFlg) removeFlg.value = '0';
+                box.addEventListener('media:refresh', ()=>{
+                    try{
+                        const arr=JSON.parse(box.dataset.existing||'[]')||[];
+                        items = arr.map((u,i)=>({id:'server-'+i,url:u,revoke:false}));
+                    }catch{ items = []; }
+                    current=0;
+                    try{ pond?.removeFiles(); }catch{}
+                    keysWrap.innerHTML='';
+                    if (removeFlg) removeFlg.value='0';
                     renderVideo();
                 });
 
-                function addItem(id, url, revoke) {
-                    items.push({
-                        id,
-                        url,
-                        revoke
-                    });
-                    current = items.length - 1;
-                    renderVideo();
-                }
+                prevBtn.addEventListener('click', ()=>{ if (!items.length) return; current=(current-1+items.length)%items.length; renderVideo(); });
+                nextBtn.addEventListener('click', ()=>{ if (!items.length) return; current=(current+1)%items.length; renderVideo(); });
+                (function(){ let sx=0; viewport.addEventListener('touchstart',e=> sx=e.changedTouches[0].clientX,{passive:true}); viewport.addEventListener('touchend',e=>{ const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>40) isRTL() ? (dx<0?prevBtn.click():nextBtn.click()) : (dx<0?nextBtn.click():prevBtn.click()); },{passive:true}); })();
 
-                function removeItem(id) {
-                    const pos = items.findIndex(x => x.id === id);
-                    if (pos > -1) {
-                        const it = items[pos];
-                        if (it.revoke) {
-                            try {
-                                URL.revokeObjectURL(it.url);
-                            } catch {}
-                        }
-                        items.splice(pos, 1);
-                        if (current >= items.length) current = Math.max(0, items.length - 1);
-                        renderVideo();
-                    }
-                }
-                prevBtn.addEventListener('click', () => {
-                    if (!items.length) return;
-                    current = (current - 1 + items.length) % items.length;
-                    renderVideo();
-                });
-                nextBtn.addEventListener('click', () => {
-                    if (!items.length) return;
-                    current = (current + 1) % items.length;
-                    renderVideo();
-                });
-
-                // سحب
-                (function() {
-                    let sx = 0;
-                    viewport.addEventListener('touchstart', e => sx = e.changedTouches[0].clientX, {
-                        passive: true
-                    });
-                    viewport.addEventListener('touchend', e => {
-                        const dx = e.changedTouches[0].clientX - sx;
-                        if (Math.abs(dx) > 40) {
-                            if (isRTL()) {
-                                (dx < 0) ? prevBtn.click(): nextBtn.click();
-                            } else {
-                                (dx < 0) ? nextBtn.click(): prevBtn.click();
-                            }
-                        }
-                    }, {
-                        passive: true
-                    });
-                })();
-
-                // كاميرا الهاتف -> FilePond
-                camInput?.addEventListener('change', (e) => {
-                    const files = Array.from(e.target.files || []);
-                    if (!files.length || !pond) return;
-                    files.forEach(f => pond.addFile(f));
-                    if (removeFlg) removeFlg.value = '0';
-                    e.target.value = '';
+                camInput?.addEventListener('change', e=>{
+                    const files = Array.from(e.target.files||[]); if (!files.length || !pond) return;
+                    files.forEach(f=> pond.addFile(f)); if (removeFlg) removeFlg.value='0'; e.target.value='';
                 });
 
                 // تسجيل فيديو ديسكتوب
-                let recStream = null,
-                    recorder = null,
-                    chunks = [],
-                    overlay = null,
-                    recTimer = null,
-                    recStart = 0;
+                let recStream=null, recorder=null, chunks=[], overlay=null, timer=null, t0=0;
+                const fmt = ms => { const s=Math.floor(ms/1000), m=String(Math.floor(s/60)).padStart(2,'0'), ss=String(s%60).padStart(2,'0'); return `${m}:${ss}`; };
+                const stopStream = s=>{ try{ s?.getTracks()?.forEach(t=>t.stop()); }catch{} };
 
-
-
-                function stopStream(s) {
-                    try {
-                        s?.getTracks()?.forEach(t => t.stop());
-                    } catch {}
-                }
-
-                function fmt(ms) {
-                    const s = Math.floor(ms / 1000);
-                    const m = String(Math.floor(s / 60)).padStart(2, '0');
-                    const ss = String(s % 60).padStart(2, '0');
-                    return `${m}:${ss}`;
-                }
-
-                captureBtn?.addEventListener('click', async () => {
-                    if (isMobile || !('MediaRecorder' in window)) {
-                        camInput?.click();
-                        return;
-                    }
-                    if (recorder && recorder.state === 'recording') {
-                        captureBtn.disabled = true;
-                        try {
-                            recorder.stop();
-                        } catch {}
-                        return;
-                    }
-                    try {
-                        recStream = await navigator.mediaDevices.getUserMedia({
-                            video: {
-                                facingMode: {
-                                    ideal: 'environment'
-                                },
-                                width: {
-                                    ideal: 1280
-                                },
-                                height: {
-                                    ideal: 720
-                                }
-                            },
-                            audio: true
-                        });
+                captureBtn?.addEventListener('click', async ()=>{
+                    if (isMobile || !('MediaRecorder' in window)){ camInput?.click(); return; }
+                    if (recorder && recorder.state==='recording'){ try{ recorder.stop(); }catch{} return; }
+                    try{
+                        recStream = await navigator.mediaDevices.getUserMedia({ video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}, audio:true });
                         slider.classList.remove('d-none');
-                        overlay = document.createElement('div');
-                        overlay.style.cssText =
-                            'position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5;';
-                        const live = document.createElement('video');
-                        live.autoplay = true;
-                        live.muted = true;
-                        live.playsInline = true;
-                        live.srcObject = recStream;
-                        live.style.cssText = 'width:100%;height:100%;object-fit:contain;';
-                        viewport.appendChild(overlay);
-                        overlay.appendChild(live);
-                        const ind = document.createElement('div');
-                        ind.className = 'text-danger small';
-                        ind.style.cssText =
-                            'position:absolute;bottom:10px;left:50%;transform:translateX(-50%);';
-                        overlay.appendChild(ind);
-                        recStart = Date.now();
-                        ind.textContent = '🔴 Recording... 00:00';
-                        recTimer = setInterval(() => ind.textContent = '🔴 Recording... ' + fmt(Date
-                            .now() - recStart), 1000);
+                        overlay=document.createElement('div'); overlay.style.cssText='position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;z-index:5;';
+                        const live=document.createElement('video'); live.autoplay=true; live.muted=true; live.playsInline=true; live.srcObject=recStream; live.style.cssText='width:100%;height:100%;object-fit:contain;';
+                        const ind=document.createElement('div'); ind.className='text-danger small'; ind.style.cssText='position:absolute;bottom:10px;left:50%;transform:translateX(-50%);';
+                        viewport.appendChild(overlay); overlay.appendChild(live); overlay.appendChild(ind);
+                        t0=Date.now(); ind.textContent='🔴 Recording... 00:00'; timer=setInterval(()=> ind.textContent='🔴 Recording... '+fmt(Date.now()-t0),1000);
 
-                        chunks = [];
-                        // 2) إعداد الـ MediaRecorder ببتريت متوسط
-                        const V_BPS = 800_000; // فيديو ~800 kbps
-                        const A_BPS = 64_000; // صوت ~64 kbps
+                        const V_BPS=800_000, A_BPS=64_000;
+                        let mimeType = 'video/webm;codecs=vp8,opus';
+                        if (!MediaRecorder.isTypeSupported?.(mimeType)) mimeType = MediaRecorder.isTypeSupported?.('video/webm') ? 'video/webm' : 'video/mp4';
 
-                        recorder = new MediaRecorder(recStream, {
-                            bitsPerSecond: V_BPS + A_BPS,
-                            videoBitsPerSecond: V_BPS,
-                            audioBitsPerSecond: A_BPS
-                        });
-                        recorder.ondataavailable = (e) => {
-                            if (e.data && e.data.size > 0) chunks.push(e.data);
-                        };
-                        recorder.onstop = () => {
-                            clearInterval(recTimer);
-                            recTimer = null;
-                            try {
-                                overlay.remove();
-                            } catch {}
-                            overlay = null;
-                            stopStream(recStream);
-                            recStream = null;
-                            const type = recorder.mimeType || mime || 'video/webm';
+                        recorder = new MediaRecorder(recStream,{mimeType, videoBitsPerSecond:V_BPS, audioBitsPerSecond:A_BPS});
+                        recorder.ondataavailable = e=>{ if (e.data && e.data.size>0) chunks.push(e.data); };
+                        recorder.onstop = ()=>{
+                            clearInterval(timer); timer=null; try{ overlay.remove(); }catch{} overlay=null; stopStream(recStream); recStream=null;
+                            const type = cleanMime(recorder.mimeType) || 'video/webm';
                             const ext = type.includes('mp4') ? 'mp4' : 'webm';
-                            const blob = new Blob(chunks, {
-                                type
-                            });
-                            const file = new File([blob], `rec_${Date.now()}.${ext}`, {
-                                type
-                            });
-                            if (pond) pond.addFile(file);
-                            if (removeFlg) removeFlg.value = '0';
-                            captureBtn.disabled = false;
-                            captureBtn.classList.remove('btn-danger');
-                            captureBtn.classList.add('btn-brown');
-                            captureBtn.textContent =
-                                '🎥 {{ __('dashboard.start_recording_video') }}';
-                            recorder = null;
+                            const blob = new Blob(chunks,{type}); const file = new File([blob], `rec_${Date.now()}.${ext}`, {type});
+                            try{ pond && pond.addFile(file); }catch{}
+                            if (removeFlg) removeFlg.value='0';
+                            chunks=[]; recorder=null;
                         };
                         recorder.start();
-                        captureBtn.classList.remove('btn-brown');
-                        captureBtn.classList.add('btn-danger');
-                        captureBtn.innerHTML = '<i class="bi bi-stop"></i> {{ __('dashboard.stop') }}';
-                    } catch (e) {
-                        stopStream(recStream);
-                        recStream = null;
-                        if (overlay) {
-                            try {
-                                overlay.remove();
-                            } catch {}
-                        }
-                        if (recTimer) {
-                            clearInterval(recTimer);
-                            recTimer = null;
-                        }
-                        recorder = null;
-                        alert('Camera/Mic error: ' + (e?.message || e));
+                        captureBtn.classList.remove('btn-brown'); captureBtn.classList.add('btn-danger'); captureBtn.innerHTML='<i class="bi bi-stop"></i> {{ __('dashboard.stop') }}';
+                    }catch(e){
+                        stopStream(recStream); recStream=null; try{ overlay?.remove(); }catch{} if (timer){ clearInterval(timer); timer=null; }
+                        recorder=null; alert('Camera/Mic error: ' + (e?.message||e));
                     }
                 });
 
                 // FilePond
-                let pond = null;
-                const mapFileToSliderId = new WeakMap();
-                if (window.FilePond) {
+                let pond = null; const mapFileToSliderId = new WeakMap();
+                if (window.FilePond){
                     pond = FilePond.create(pondInput, {
                         allowMultiple: true,
                         credits: false,
@@ -1360,229 +902,120 @@
                         instantUpload: true,
                         allowRevert: true,
                         labelIdle: '{{ __('dashboard.upload') }}',
+                        fileValidateTypeDetectType: (source, type) => new Promise(resolve => resolve(type || inferMime(source))),
                         server: {
                             process: (fieldName, file, metadata, load, error, progress, abort) => {
-                                let cancelled = false,
-                                    currentXhr = null,
-                                    uploadId = '',
-                                    key = '';
-                                const parts = [];
-                                let uploadedBase = 0;
-                                progress(true, 0, file.size);
-                                (async () => {
-                                    try {
-                                        // 1) create multipart
-                                        const createRes = await fetch(
-                                            `{{ route('multipart.create') }}`, {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'X-CSRF-TOKEN': CSRF
-                                                },
-                                                body: JSON.stringify({
-                                                    fileName: file.name,
-                                                    contentType: (file.type || '')
-                                                        .split(';')[0] ||
-                                                        'video/webm',
-                                                    fileSize: file.size,
-                                                    prefix: 'task_attachments/videos'
-                                                })
-                                            });
-                                        if (!createRes.ok) throw new Error(
-                                            'createMultipart failed');
-                                        const createJson = await createRes.json();
-                                        uploadId = createJson.uploadId;
-                                        key = createJson.key;
+                                let cancelled=false, currentXhr=null, uploadId='', key='';
+                                const parts=[]; let uploadedBase=0; progress(true,0,file.size);
 
-                                        // 2) upload parts
-                                        const totalParts = Math.ceil(file.size / CHUNK_SIZE);
-                                        for (let partNumber = 1; partNumber <=
-                                            totalParts; partNumber++) {
+                                (async ()=>{
+                                    try{
+                                        const createRes = await fetch(`{{ route('multipart.create') }}`,{
+                                            method:'POST',
+                                            headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF},
+                                            body: JSON.stringify({ fileName:file.name, contentType: inferMime(file), fileSize:file.size, prefix:'task_attachments/videos' })
+                                        });
+                                        if (!createRes.ok) throw new Error('createMultipart failed');
+                                        const { uploadId:uid, key:k } = await createRes.json(); uploadId=uid; key=k;
+
+                                        const totalParts=Math.ceil(file.size/CHUNK_SIZE);
+                                        for (let partNumber=1; partNumber<=totalParts; partNumber++){
                                             if (cancelled) return;
-                                            const start = (partNumber - 1) * CHUNK_SIZE,
-                                                end = Math.min(start + CHUNK_SIZE, file.size);
-                                            const blob = file.slice(start, end);
-                                            const signRes = await fetch(
-                                                `{{ route('multipart.sign') }}`, {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'Content-Type': 'application/json',
-                                                        'X-CSRF-TOKEN': CSRF
-                                                    },
-                                                    body: JSON.stringify({
-                                                        key,
-                                                        uploadId,
-                                                        partNumber
-                                                    })
-                                                });
+                                            const start=(partNumber-1)*CHUNK_SIZE, end=Math.min(start+CHUNK_SIZE,file.size);
+                                            const blob=file.slice(start,end);
+                                            const signRes = await fetch(`{{ route('multipart.sign') }}`,{
+                                                method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF},
+                                                body: JSON.stringify({ key, uploadId, partNumber })
+                                            });
                                             if (!signRes.ok) throw new Error('signPart failed');
-                                            const {
-                                                url
-                                            } = await signRes.json();
+                                            const { url } = await signRes.json();
 
-                                            await new Promise((resolve, reject) => {
-                                                const xhr = new XMLHttpRequest();
-                                                currentXhr = xhr;
-                                                xhr.open('PUT', url, true);
-                                                xhr.upload.onprogress = (e) => {
-                                                    if (e.lengthComputable)
-                                                        progress(true,
-                                                            uploadedBase + e.loaded,
-                                                            file.size);
-                                                };
-                                                xhr.onload = () => {
-                                                    currentXhr = null;
-                                                    if (xhr.status >= 200 && xhr
-                                                        .status < 300) {
-                                                        const etag = (xhr
-                                                                .getResponseHeader(
-                                                                    'ETag') || '')
-                                                            .replace(/"/g, '');
-                                                        if (!etag) return reject(
-                                                            new Error(
-                                                                'Missing ETag'
-                                                            ));
-                                                        parts.push({
-                                                            ETag: etag,
-                                                            PartNumber: partNumber
-                                                        });
-                                                        uploadedBase += blob.size;
-                                                        progress(true, uploadedBase,
-                                                            file.size);
-                                                        resolve();
-                                                    } else reject(new Error(
-                                                        'PUT failed: ' + xhr
-                                                        .status));
-                                                };
-                                                xhr.onerror = () => reject(new Error(
-                                                    'Network error'));
-                                                xhr.onabort = () => reject(new Error(
-                                                    'Aborted'));
-                                                xhr.send(blob);
+                                            await new Promise((resolve,reject)=>{
+                                                const xhr=new XMLHttpRequest(); currentXhr=xhr; xhr.open('PUT',url,true);
+                                                xhr.upload.onprogress=e=>{ if(e.lengthComputable) progress(true, uploadedBase + e.loaded, file.size); };
+                                                xhr.onload=()=>{ currentXhr=null; if(xhr.status>=200 && xhr.status<300){
+                                                    const etag=(xhr.getResponseHeader('ETag')||'').replace(/"/g,''); if(!etag) return reject(new Error('Missing ETag'));
+                                                    parts.push({ETag:etag, PartNumber:partNumber}); uploadedBase+=blob.size; progress(true,uploadedBase,file.size); resolve();
+                                                } else reject(new Error('PUT failed: '+xhr.status)); };
+                                                xhr.onerror=()=>reject(new Error('Network error')); xhr.onabort=()=>reject(new Error('Aborted')); xhr.send(blob);
                                             });
                                         }
 
-                                        // 3) complete
-                                        if (cancelled) return;
-                                        const completeRes = await fetch(
-                                            `{{ route('multipart.complete') }}`, {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'X-CSRF-TOKEN': CSRF
-                                                },
-                                                body: JSON.stringify({
-                                                    key,
-                                                    uploadId,
-                                                    parts
-                                                })
-                                            });
-                                        if (!completeRes.ok) throw new Error(
-                                            'completeMultipart failed');
+                                        const completeRes = await fetch(`{{ route('multipart.complete') }}`,{
+                                            method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF},
+                                            body: JSON.stringify({ key, uploadId, parts })
+                                        });
+                                        if (!completeRes.ok) throw new Error('completeMultipart failed');
 
-                                        // خزّن key
-                                        keysWrap.appendChild(createHidden('uploaded_videos[]',
-                                            key));
-
-                                        // معاينة للسلايدر
+                                        // خزّن المفتاح وأضف معاينة للسلايدر
+                                        keysWrap.appendChild(createHidden('uploaded_videos[]', key));
                                         const blobURL = URL.createObjectURL(file);
-                                        const sliderId = 'pond-' + Math.random().toString(36)
-                                            .slice(2);
-                                        addItem(sliderId, blobURL, true);
-                                        mapFileToSliderId.set(file, sliderId);
+                                        const sliderId = 'pond-' + Math.random().toString(36).slice(2);
+                                        addItem(sliderId, blobURL, true); mapFileToSliderId.set(file, sliderId);
 
-                                        if (removeFlg) removeFlg.value = '0';
+                                        if (removeFlg) removeFlg.value='0';
+                                        progress(true, file.size, file.size);
                                         load(key);
-                                    } catch (e) {
+                                    }catch(e){
                                         if (cancelled) return;
-                                        console.error(e);
-                                        error(e.message || 'upload failed');
-                                        errorBox?.classList.remove('d-none');
-                                        if (errorBox) errorBox.textContent =
-                                            'فشل رفع الفيديو. حاول من جديد.';
+                                        console.error(e); error(e.message||'upload failed');
+                                        errorBox?.classList.remove('d-none'); if (errorBox) errorBox.textContent='فشل رفع الفيديو. حاول من جديد.';
                                     }
                                 })();
 
-                                return {
-                                    abort: () => {
-                                        cancelled = true;
-                                        try {
-                                            if (currentXhr) currentXhr.abort();
-                                        } catch {}
-                                        abort();
-                                    }
-                                };
+                                return { abort: ()=>{ cancelled=true; try{ currentXhr?.abort(); }catch{} abort(); } };
                             },
-                            revert: (uniqueFileId, load) => {
-                                // هنا فقط نسمح لـ FilePond بإزالة الملف من قائمته
-                                load();
-                            }
+                            revert: (id, load)=>{ load(); }
                         }
                     });
 
-                    pond.on('removefile', (fileItem) => {
+                    // اربط زر الحفظ بهذه الـ pond لتعطيله أثناء الرفع
+                    const saveBtn = document.getElementById('saveStatus');
+                    bindSaveButtonToPonds(saveBtn, [pond]);
+
+                    pond.on('removefile', (fileItem)=>{
                         if (!fileItem) return;
                         const sliderId = mapFileToSliderId.get(fileItem.file);
-                        if (sliderId) {
-                            removeItem(sliderId);
-                            mapFileToSliderId.delete(fileItem.file);
-                        }
+                        if (sliderId){ removeItem(sliderId); mapFileToSliderId.delete(fileItem.file); }
                     });
                 }
 
-                // حذف الكل
-                removeAll?.addEventListener('click', () => {
-                    try {
-                        pond.removeFiles();
-                    } catch {}
-                    keysWrap.innerHTML = '';
-                    items = [];
-                    current = 0;
-                    renderVideo();
-                    if (removeFlg) removeFlg.value = '1';
+                removeAll?.addEventListener('click', ()=>{
+                    try{ pond?.removeFiles(); }catch{}
+                    keysWrap.innerHTML=''; items=[]; current=0; renderVideo();
+                    if (removeFlg) removeFlg.value='1';
                 });
 
-                // احتياطي: أي ملفات تُختار عبر input العادي تُدفع لـ FilePond
-                input?.addEventListener('change', (e) => {
+                input?.addEventListener('change', e=>{
                     if (!pond) return;
-                    const files = Array.from(e.target.files || []);
-                    files.forEach(f => pond.addFile(f));
-                    e.target.value = '';
-                    if (removeFlg) removeFlg.value = '0';
+                    Array.from(e.target.files||[]).forEach(f=> pond.addFile(f));
+                    e.target.value=''; if (removeFlg) removeFlg.value='0';
                 });
 
-                // أول عرض
                 renderVideo();
             }
 
-            // init
+            // Init كل البوكسات داخل المودال
             document.querySelectorAll('.photo-box').forEach(initPhotoBox);
             document.querySelectorAll('.audio-box').forEach(initAudioBox);
             document.querySelectorAll('.video-box').forEach(initVideoBox);
+
+            // تأكد أن أزرار السلايدر/اللايت بوكس ليست submit
+            document.querySelectorAll('#photo-lightbox button, .photo-slider button, .video-slider button')
+              .forEach(btn=>{ if(!btn.hasAttribute('type')) btn.setAttribute('type','button'); });
         });
     </script>
 @endpush
 
-
-
-
-
-
-
 @section('scripts')
     <script>
-        $(function() {
-
+        $(function () {
             // فتح المودال + تعبئة + refresh للوسائط
-            $('.view-task').on('click', function() {
+            $('.view-task').on('click', function () {
                 const task = $(this).data('task');
                 const notificationId = $(this).data('notification-id');
 
-                const formatDate = d => new Date(d).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric'
-                });
+                const formatDate = d => new Date(d).toLocaleDateString('en-US', {year:'numeric', month:'short', day:'numeric'});
 
                 // مرّر الروابط الموجودة للبوكسات
                 const photos = task.photos_urls || [];
@@ -1593,28 +1026,13 @@
                 const audioBox = document.querySelector('.audio-box');
                 const videoBox = document.querySelector('.video-box');
 
-                if (photoBox) {
-                    photoBox.dataset.existing = JSON.stringify(photos);
-                    photoBox.dispatchEvent(new Event('media:refresh'));
-                }
-                if (audioBox) {
-                    audioBox.dataset.existing = JSON.stringify(audios);
-                    audioBox.dispatchEvent(new Event('media:refresh'));
-                }
-                if (videoBox) {
-                    videoBox.dataset.existing = JSON.stringify(videos);
-                    videoBox.dispatchEvent(new Event('media:refresh'));
-                }
+                if (photoBox) { photoBox.dataset.existing = JSON.stringify(photos); photoBox.dispatchEvent(new Event('media:refresh')); }
+                if (audioBox) { audioBox.dataset.existing = JSON.stringify(audios); audioBox.dispatchEvent(new Event('media:refresh')); }
+                if (videoBox) { videoBox.dataset.existing = JSON.stringify(videos); videoBox.dispatchEvent(new Event('media:refresh')); }
 
-                // علّم الإشعار مقروء (اختياري) — استعمل POST فقط إذا route يدعم POST
+                // علّم الإشعار مقروء (POST)
                 if (notificationId) {
-                    $.ajax({
-                        url: `/notifications/${notificationId}/read`,
-                        type: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        } // لا ترسل _method هنا
-                    });
+                    $.ajax({ url: `/notifications/${notificationId}/read`, type: 'POST', data: { _token: '{{ csrf_token() }}' } });
                 }
 
                 // تعبئة معلومات المهمة
@@ -1625,20 +1043,16 @@
                 $('#taskId').val(task.id);
                 $('#taskStatus').val(task.status);
 
-                const priorityColors = {
-                    low: 'primary',
-                    medium: 'warning',
-                    high: 'danger'
-                };
+                const priorityColors = { low: 'primary', medium: 'warning', high: 'danger' };
                 const priorityTranslations = {
-                    low: '@lang('dashboard.low')',
-                    medium: '@lang('dashboard.medium')',
-                    high: '@lang('dashboard.high')'
+                    low: @json(__('dashboard.low')),
+                    medium: @json(__('dashboard.medium')),
+                    high: @json(__('dashboard.high'))
                 };
                 $('#taskPriority').html(
                     `<span class="badge bg-${priorityColors[task.priority] || 'secondary'}">
-        ${priorityTranslations[task.priority] || task.priority}
-      </span>`
+                        ${priorityTranslations[task.priority] || task.priority}
+                    </span>`
                 );
 
                 if (task.status === 'failed') {
@@ -1649,26 +1063,23 @@
                     $('textarea[name="failure_reason"]').val('');
                 }
 
-                // مافي حتى reset للـ inputs/containers القديمة
                 $('#taskModal').modal('show');
             });
 
             // تبديل الحالة
-            $('#taskStatus').on('change', function() {
-                $(this).val() === 'failed' ? $('#failureReasonContainer').show() : $(
-                    '#failureReasonContainer').hide();
+            $('#taskStatus').on('change', function () {
+                $(this).val() === 'failed' ? $('#failureReasonContainer').show() : $('#failureReasonContainer').hide();
             });
 
             // حفظ الحالة + المرفقات
-            $('#saveStatus').on('click', async function() {
-                // امنع الحفظ أثناء رفع FilePond
+            $('#saveStatus').on('click', async function () {
+                // احتياط: امنع الحفظ أثناء رفع FilePond
                 const ponds = Array.from(document.querySelectorAll('.pond-video'))
                     .map(input => FilePond.find(input))
                     .filter(Boolean);
                 const FP = window.FilePond;
                 const hasPending = ponds.some(p =>
-                    p.getFiles().some(f => f.status !== FP.FileStatus.PROCESSING_COMPLETE && f
-                        .status !== FP.FileStatus.IDLE)
+                    p.getFiles().some(f => f.status !== FP.FileStatus.PROCESSING_COMPLETE && f.status !== FP.FileStatus.IDLE)
                 );
                 if (hasPending) {
                     alert('انتظر حتى يكتمل رفع الفيديوهات…');
@@ -1677,13 +1088,13 @@
 
                 const $btn = $(this).prop('disabled', true).addClass('disabled');
                 const form = document.getElementById('statusForm');
-                const formData = new FormData(form); // لا تضيف _method
+                const formData = new FormData(form);
 
                 try {
                     const id = $('#taskId').val();
                     await $.ajax({
                         url: `/tasks/${id}/status`,
-                        method: 'POST', // الراوت عندك POST
+                        method: 'POST',
                         data: formData,
                         processData: false,
                         contentType: false
@@ -1691,14 +1102,14 @@
                     $('#taskModal').modal('hide');
                     location.reload();
                 } catch (xhr) {
-                    // عرض أخطاء الفاليديشن
+                    // تنظيف قديم
                     $('.invalid-feedback').remove();
                     $('.is-invalid').removeClass('is-invalid');
+
                     const errors = xhr?.responseJSON?.errors || {};
 
                     if (errors.status) {
-                        $('#taskStatus').addClass('is-invalid')
-                            .after(`<div class="invalid-feedback">${errors.status[0]}</div>`);
+                        $('#taskStatus').addClass('is-invalid').after(`<div class="invalid-feedback">${errors.status[0]}</div>`);
                     }
                     if (errors.failure_reason) {
                         $('textarea[name="failure_reason"]').addClass('is-invalid')
@@ -1708,23 +1119,17 @@
                         const $inp = $('input[name="photos[]"]');
                         $inp.addClass('is-invalid')
                             .closest('.media-upload-container')
-                            .append(
-                                `<div class="invalid-feedback d-block">${(errors.photos?.[0] || errors['photos.0']?.[0])}</div>`
-                            );
+                            .append(`<div class="invalid-feedback d-block">${(errors.photos?.[0] || errors['photos.0']?.[0])}</div>`);
                     }
                     if (errors.audios || errors['audios.0']) {
                         const $inp = $('input[name="audios[]"]');
                         $inp.addClass('is-invalid')
                             .closest('.media-upload-container')
-                            .append(
-                                `<div class="invalid-feedback d-block">${(errors.audios?.[0] || errors['audios.0']?.[0])}</div>`
-                            );
+                            .append(`<div class="invalid-feedback d-block">${(errors.audios?.[0] || errors['audios.0']?.[0])}</div>`);
                     }
                     if (errors.uploaded_videos || errors['uploaded_videos.0']) {
                         const $box = $('.video-box');
-                        $box.append(
-                            `<div class="invalid-feedback d-block">${(errors.uploaded_videos?.[0] || errors['uploaded_videos.0']?.[0])}</div>`
-                        );
+                        $box.append(`<div class="invalid-feedback d-block">${(errors.uploaded_videos?.[0] || errors['uploaded_videos.0']?.[0])}</div>`);
                     }
 
                     if (!Object.keys(errors).length) {
@@ -1735,6 +1140,10 @@
                 }
             });
 
+            // اجعل أزرار السلايدر/اللايت بوكس من النوع button
+            $('#photo-lightbox button, .photo-slider button, .video-slider button').each(function(){
+                if (!this.hasAttribute('type')) this.setAttribute('type','button');
+            });
         });
     </script>
 @endsection
