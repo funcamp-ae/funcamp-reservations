@@ -248,12 +248,12 @@ class OrderController extends Controller
         }
 
         if ($request->filled('time_to')) {
-            $timeTo = Carbon::parse($request->time_to)->format('H:i:s');
+            $timeTo = Carbon::parse($request->time_to)->format('H:i');
 
-            // If time_from is set and time_to is before time_from, set time_to to 24:00:00
-            if (isset($validatedData['time_from']) && $validatedData['time_from'] > $timeTo) {
-                $timeTo = '24:00:00';
-            }
+            // // If time_from is set and time_to is before time_from, set time_to to 24:00:00
+            // if (isset($validatedData['time_from']) && $validatedData['time_from'] > $timeTo) {
+            //     $timeTo = '24:00:00';
+            // }
 
             $validatedData['time_to'] = $timeTo;
         }
