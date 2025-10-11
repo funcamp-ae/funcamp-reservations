@@ -17,7 +17,7 @@
                                  <form id="kt_ecommerce_add_product_form" class="d-inline store" action="{{ route('signature.destroy', $order) }}" method="post" data-success-message="@lang('dashboard.deleted_successfully')" data-kt-redirect="{{ request()->fullUrl() }}">
                                     @csrf
                                     @method('DELETE')
-                                <button type="button" id="kt_ecommerce_add_product_submit" class="btn btn-danger btn-sm text-white d-inline-flex align-items-center gap-1" onclick="confirmDelete('{{ route('signature.destroy', $order) }}', '{{ csrf_token() }}')">
+                                <button type="button" id="kt_ecommerce_add_product_submit" class="btn btn-danger btn-sm text-white d-inline-flex align-items-center gap-1">
                                         <i class="fa fa-trash"></i>
                                         {{ __('dashboard.delete') }}
                                     </button>
