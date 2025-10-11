@@ -32,7 +32,8 @@ class S3MultipartUploadController extends Controller
             'fileName'    => 'required|string|max:255',
             'contentType' => 'required|string|max:255',
             'fileSize'    => 'required|integer|min:1',
-            'prefix'      => 'nullable|string|max:255',
+            // ✅ نتجاهل أي prefix من الواجهة
+            // 'prefix'    => 'nullable|string|max:255',
         ]);
 
         $allowed = [
@@ -47,15 +48,27 @@ class S3MultipartUploadController extends Controller
             $client = $this->s3Client();
             $bucket = env('AWS_BUCKET');
 
-            $prefix   = $validated['prefix'] ?: 'uploads/signin/videos';
-            $safeName = Str::uuid()->toString() . '_' . preg_replace('/[^\w\-.]+/u', '_', $validated['fileName']);
-            $key      = trim($prefix, '/').'/'.$safeName;
+            // ✅ نولّد userSlug: u{id}-{slug(name)}
+            $userId   = auth()->id() ?? 0;
+            $userName = optional(auth()->user())->name ?? 'guest';
+            $userSlug = 'u' . $userId . '-' . Str::slug($userName, '-');
+
+            // ✅ اسم ملف آمن مع UUID لتفادي التعارض
+            $originalFile = $validated['fileName'];
+            $safeOriginal = preg_replace('/[^\w\-.]+/u', '_', $originalFile);
+            $safeName     = Str::uuid()->toString() . '_' . $safeOriginal;
+
+            // ✅ جذر عام للحفظ + توزيع حسب السنة/الشهر
+            $basePrefix = 'uploads/videos';
+            $datedPath  = date('Y/m');
+            $key        = trim($basePrefix, '/') . '/' . $userSlug . '/' . $datedPath . '/' . $safeName;
 
             $result = $client->createMultipartUpload([
                 'Bucket'      => $bucket,
                 'Key'         => $key,
                 'ContentType' => $validated['contentType'],
-                'ACL'         => 'public-read', // باش يولي متاح
+                'ACL'         => 'public-read', // يجعل الملف متاحًا للعرض
+                // 'ContentDisposition' => 'inline', // فعّلها لو حاب تضمن العرض inline في بعض المتصفحات
             ]);
 
             return response()->json([

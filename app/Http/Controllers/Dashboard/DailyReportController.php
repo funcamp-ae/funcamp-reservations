@@ -9,6 +9,7 @@ use App\Notifications\NewDailyReportNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Mpdf\Mpdf;
 use Mpdf\Output\Destination;
 
@@ -41,7 +42,18 @@ class DailyReportController extends Controller
             'notes'   => 'nullable|string',
 
             'photo_attachments.*' => 'nullable|image|max:5120',
-            'audio_attachments.*' => 'nullable',
+            'audio_attachments.*' => 'file|
+                                       mimes:mp3,wav,ogg,webm,aac,m4a,mp4|
+                                       mimetypes:audio/mpeg,audio/mp3,
+                                                 audio/wav,audio/x-wav,audio/vnd.wave,
+                                                 audio/ogg,application/ogg,
+                                                 audio/webm,video/mp4,video/webm,
+                                                 audio/aac,audio/x-aac,
+                                                 audio/mp4,audio/x-m4a,audio/m4a,
+                                                 audio/opus,
+                                                 audio/3gpp,audio/3gpp2,audio/amr,
+                                                 application/octet-stream',
+
             'video_attachments.*' => 'nullable',
         ]);
 
@@ -71,7 +83,18 @@ class DailyReportController extends Controller
             'notes'   => 'nullable|string',
 
             'photo_attachments.*' => 'nullable|image|max:5120',
-            'audio_attachments.*' => 'nullable',
+            'audio_attachments.*' => 'file|
+                                       mimes:mp3,wav,ogg,webm,aac,m4a,mp4|
+                                       mimetypes:audio/mpeg,audio/mp3,
+                                                 audio/wav,audio/x-wav,audio/vnd.wave,
+                                                 audio/ogg,application/ogg,
+                                                 audio/webm,video/mp4,video/webm,
+                                                 audio/aac,audio/x-aac,
+                                                 audio/mp4,audio/x-m4a,audio/m4a,
+                                                 audio/opus,
+                                                 audio/3gpp,audio/3gpp2,audio/amr,
+                                                 application/octet-stream',
+
             'video_attachments.*' => 'nullable',
             'remove_photo'        => 'nullable|in:0,1',
             'remove_audio'        => 'nullable|in:0,1',
@@ -116,6 +139,12 @@ class DailyReportController extends Controller
 
     private function storeMedia(DailyReport $report, Request $request)
     {
+        // 👇 جذر حفظ موحّد يتضمن اسم رافع الملف (userSlug) + التاريخ + رقم التقرير
+        $userId   = auth()->id() ?? 0;
+        $userName = optional(auth()->user())->name ?? 'guest';
+        $userSlug = 'u' . $userId . '-' . Str::slug($userName, '-');
+        $baseRoot = "uploads/daily-reports/{$userSlug}/" . date('Y/m') . "/{$report->id}";
+
         foreach (['photo' => 'photo_attachments', 'audio' => 'audio_attachments', 'video' => 'video_attachments'] as $type => $field) {
 
             $removeFlag = $request->input("remove_{$type}", "0");
@@ -134,8 +163,10 @@ class DailyReportController extends Controller
                     $path = null;
 
                     if ($item instanceof \Illuminate\Http\UploadedFile) {
-                        $path = $item->store("daily-reports/{$type}s", 'hetzner');
+                        // 👈 نحفظ تحت المسار الذي يحتوي على اسم الرافع
+                        $path = $item->store("{$baseRoot}/{$type}s", 'hetzner');
                     } elseif (is_string($item)) {
+                        // في حالة مفاتيح الرفع المُجزأ (S3) نتركها كما هي (المسار مُكوّن مسبقاً في سيرفر الرفع)
                         $path = $item;
                     }
 
@@ -151,11 +182,10 @@ class DailyReportController extends Controller
     }
 
     public function show(DailyReport $dailyReport)
-{
-    // نحمّل العلاقة media باش نعرض الصور/الفيديو/الصوت
-    $dailyReport->load(['employee','media']);
+    {
+        // نحمّل العلاقة media باش نعرض الصور/الفيديو/الصوت
+        $dailyReport->load(['employee','media']);
 
-    return view('dashboard.daily_reports.show', compact('dailyReport'));
-}
-
+        return view('dashboard.daily_reports.show', compact('dailyReport'));
+    }
 }

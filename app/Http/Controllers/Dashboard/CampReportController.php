@@ -9,6 +9,7 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 use Mpdf\Mpdf;
 
 class CampReportController extends Controller
@@ -198,7 +199,7 @@ class CampReportController extends Controller
         foreach ($campReport->items as $item) {
             $this->deleteItemAttachments($item);
 
-            // حذف مجلد العنصر من قرص hetzner لو موجود
+            // حذف مجلد العنصر من قرص hetzner لو موجود (قد يبقى فارغًا بعد حذف الملفات)
             $itemFolder = "camp-reports/{$item->id}";
             if (Storage::disk('hetzner')->exists($itemFolder)) {
                 Storage::disk('hetzner')->deleteDirectory($itemFolder);
@@ -217,6 +218,12 @@ class CampReportController extends Controller
     {
         $disk = Storage::disk('hetzner');
 
+        // مسار أساسي يتضمن رافع الملف + التاريخ
+        $userId   = auth()->id() ?? 0;
+        $userName = optional(auth()->user())->name ?? 'guest';
+        $userSlug = 'u' . $userId . '-' . Str::slug($userName, '-');
+        $baseRoot = "uploads/camp-reports/{$userSlug}/" . date('Y/m') . "/{$item->id}";
+
         // 1) حذف القديم حسب الفلاق
         if (!empty($itemData['remove_photos'])) {
             $this->deleteType($item, 'photo', $disk);
@@ -231,7 +238,7 @@ class CampReportController extends Controller
         // 2) رفع جديد (صور -> type=photo)
         if (!empty($itemData['photos']) && is_array($itemData['photos'])) {
             foreach ($itemData['photos'] as $file) {
-                $path = $file->store("camp-reports/{$item->id}/images", 'hetzner');
+                $path = $file->store("{$baseRoot}/images", 'hetzner');
                 $item->media()->create([
                     'path' => $path,
                     'type' => 'photo',
@@ -242,7 +249,7 @@ class CampReportController extends Controller
         // 3) رفع جديد (صوت)
         if (!empty($itemData['audios']) && is_array($itemData['audios'])) {
             foreach ($itemData['audios'] as $file) {
-                $path = $file->store("camp-reports/{$item->id}/audios", 'hetzner');
+                $path = $file->store("{$baseRoot}/audios", 'hetzner');
                 $item->media()->create([
                     'path' => $path,
                     'type' => 'audio',
@@ -253,7 +260,7 @@ class CampReportController extends Controller
         // 4) رفع جديد (فيديو)
         if (!empty($itemData['videos']) && is_array($itemData['videos'])) {
             foreach ($itemData['videos'] as $file) {
-                $path = $file->store("camp-reports/{$item->id}/videos", 'hetzner');
+                $path = $file->store("{$baseRoot}/videos", 'hetzner');
                 $item->media()->create([
                     'path' => $path,
                     'type' => 'video',

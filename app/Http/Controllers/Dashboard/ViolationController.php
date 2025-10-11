@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ViolationController extends Controller
 {
@@ -73,18 +74,10 @@ class ViolationController extends Controller
             'uploaded_videos.*'      => ['nullable', 'string'],
         ]);
 
-        // رفع الملفات
-        $photoPaths = [];
-        foreach ((array) $request->file('photos', []) as $photo) {
-            $photoPaths[] = Storage::disk('hetzner')->putFile('violation_attachments/photos', $photo);
-        }
-
-        $audioPaths = [];
-        foreach ((array) $request->file('audios', []) as $audio) {
-            $audioPaths[] = Storage::disk('hetzner')->putFile('violation_attachments/audio', $audio);
-        }
-
-        $videoKeys = (array) $request->input('uploaded_videos', []);
+        // ⚠️ ملاحظة: سنرفع الملفات داخل الحلقة لكل مخالفة بحيث يتضمّن المسار اسم رافع الملف ومعرّف المخالفة
+        $photoFiles = (array) $request->file('photos', []);
+        $audioFiles = (array) $request->file('audios', []);
+        $videoKeys  = (array) $request->input('uploaded_videos', []);
 
         DB::beginTransaction();
         try {
@@ -104,14 +97,24 @@ class ViolationController extends Controller
                     'notes'                  => $request->notes,
                 ]);
 
-                foreach ($photoPaths as $p) {
-                    $violation->attachments()->create(['type' => 'photo', 'path' => $p]);
+                // ✅ جذر الحفظ متضمّن اسم رافع الملف
+                $base = $this->violationBaseRoot($violation->id);
+
+                // صور
+                foreach ($photoFiles as $photo) {
+                    $path = $photo->store($base . '/photos', 'hetzner');
+                    $violation->attachments()->create(['type' => 'photo', 'path' => $path]);
                 }
-                foreach ($audioPaths as $p) {
-                    $violation->attachments()->create(['type' => 'audio', 'path' => $p]);
+
+                // صوت
+                foreach ($audioFiles as $audio) {
+                    $path = $audio->store($base . '/audio', 'hetzner');
+                    $violation->attachments()->create(['type' => 'audio', 'path' => $path]);
                 }
+
+                // فيديو (مفاتيح من رفع مُجزّأ)
                 foreach ($videoKeys as $key) {
-                    $violation->attachments()->create(['type' => 'video', 'path' => $key]); // مفاتيح S3 أو مشابه
+                    $violation->attachments()->create(['type' => 'video', 'path' => $key]);
                 }
 
                 $createdCount++;
@@ -166,7 +169,7 @@ class ViolationController extends Controller
 
             // المرفقات
             'photos'                 => ['nullable', 'array'],
-            'photos.*'               => 'file|mimes:jpg,jpeg,png,gif,webp|max:20480', // <-- كان خطأ، الآن صور صحيحة
+            'photos.*'               => 'file|mimes:jpg,jpeg,png,gif,webp|max:20480',
 
             'audios'                 => ['nullable', 'array'],
             'audios.*'               => 'file|
@@ -218,14 +221,17 @@ class ViolationController extends Controller
                 $violation->videos()->each(fn($att) => $att->delete());
             }
 
+            // ✅ جذر الحفظ متضمّن اسم رافع الملف
+            $base = $this->violationBaseRoot($violation->id);
+
             // إضافة مرفقات جديدة (لو وُجدت)
             foreach ((array) $request->file('photos', []) as $photo) {
-                $path = Storage::disk('hetzner')->putFile('violation_attachments/photos', $photo);
+                $path = $photo->store($base . '/photos', 'hetzner');
                 $violation->attachments()->create(['type' => 'photo', 'path' => $path]);
             }
 
             foreach ((array) $request->file('audios', []) as $audio) {
-                $path = Storage::disk('hetzner')->putFile('violation_attachments/audio', $audio);
+                $path = $audio->store($base . '/audio', 'hetzner');
                 $violation->attachments()->create(['type' => 'audio', 'path' => $path]);
             }
 
@@ -256,5 +262,19 @@ class ViolationController extends Controller
 
         $violation->delete();
         return redirect()->route('violations.index')->with('success', __('dashboard.deleted_successfully'));
+    }
+
+    /**
+     * يبني جذر الحفظ لمرفقات المخالفات مع تضمين هوية واسم رافع الملف.
+     * مثال: uploads/violations/u5-ahmed-ali/2025/10/violations/123
+     */
+    private function violationBaseRoot(int $violationId): string
+    {
+        $user     = auth()->user();
+        $userId   = $user?->id ?? 0;
+        $userName = $user?->name ?? 'guest';
+        $userSlug = 'u' . $userId . '-' . Str::slug($userName, '-');
+
+        return "uploads/violations/{$userSlug}/" . date('Y/m') . "/violations/{$violationId}";
     }
 }

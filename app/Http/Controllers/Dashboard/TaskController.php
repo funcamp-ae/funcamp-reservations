@@ -11,6 +11,7 @@ use App\Repositories\IUserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 class TaskController extends Controller
@@ -102,19 +103,22 @@ class TaskController extends Controller
                 'task_type_id' => $data['task_type_id'] ?? null,
             ]);
 
+            // ✅ جذر الحفظ الذي يحتوي على اسم رافع الملف
+            $base = $this->taskBaseRoot($task->id);
+
             // صور
             foreach ((array) $request->file('photos', []) as $photo) {
-                $path = Storage::disk('hetzner')->putFile('task_attachments/photos', $photo);
+                $path = $photo->store($base . '/photos', 'hetzner');
                 $task->attachments()->create(['type' => 'photo', 'path' => $path]);
             }
 
             // صوتيات
             foreach ((array) $request->file('audios', []) as $audio) {
-                $path = Storage::disk('hetzner')->putFile('task_attachments/audio', $audio);
+                $path = $audio->store($base . '/audio', 'hetzner');
                 $task->attachments()->create(['type' => 'audio', 'path' => $path]);
             }
 
-            // فيديوهات من FilePond (مفاتيح جاهزة)
+            // فيديوهات من FilePond (مفاتيح جاهزة من رفع مُجزّأ)
             foreach ((array) $request->input('uploaded_videos', []) as $key) {
                 $task->attachments()->create(['type' => 'video', 'path' => $key]);
             }
@@ -180,21 +184,24 @@ class TaskController extends Controller
             }
             if ($request->input('remove_videos') === '1') {
                 $task->videos()->each(function ($att) {
-                    // إن أردت حذف الفيديو من التخزين فعل السطر التالي
+                    // إن أردت حذف الفيديو من التخزين فعّل السطر التالي إذا كانت المفاتيح تتحكم فيها أنت
                     // try { Storage::disk('hetzner')->delete($att->path); } catch (\Throwable $e) {}
                     $att->delete();
                 });
             }
 
+            // ✅ جذر الحفظ الذي يحتوي على اسم رافع الملف
+            $base = $this->taskBaseRoot($task->id);
+
             // صور جديدة
             foreach ((array) $request->file('photos', []) as $photo) {
-                $path = Storage::disk('hetzner')->putFile('task_attachments/photos', $photo);
+                $path = $photo->store($base . '/photos', 'hetzner');
                 $task->attachments()->create(['type' => 'photo', 'path' => $path]);
             }
 
             // صوتيات جديدة
             foreach ((array) $request->file('audios', []) as $audio) {
-                $path = Storage::disk('hetzner')->putFile('task_attachments/audio', $audio);
+                $path = $audio->store($base . '/audio', 'hetzner');
                 $task->attachments()->create(['type' => 'audio', 'path' => $path]);
             }
 
@@ -231,23 +238,22 @@ class TaskController extends Controller
     }
 
     public function myTasks()
-{
-    $tasks = Task::where('assigned_to', auth()->id())
-        ->with([
-            'creator',
-            'notifications',
-            'taskType',
-            // حمّل المرفقات المفلترة لتقليل الاستعلامات
-            'photos:id,task_id,path,type',
-            'audios:id,task_id,path,type',
-            'videos:id,task_id,path,type',
-        ])
-        ->latest()
-        ->get();
+    {
+        $tasks = Task::where('assigned_to', auth()->id())
+            ->with([
+                'creator',
+                'notifications',
+                'taskType',
+                // حمّل المرفقات المفلترة لتقليل الاستعلامات
+                'photos:id,task_id,path,type',
+                'audios:id,task_id,path,type',
+                'videos:id,task_id,path,type',
+            ])
+            ->latest()
+            ->get();
 
-    return view('dashboard.tasks.my_tasks', compact('tasks'));
-}
-
+        return view('dashboard.tasks.my_tasks', compact('tasks'));
+    }
 
     public function updateTaskStatus(Request $request, Task $task)
     {
@@ -304,15 +310,18 @@ class TaskController extends Controller
                 });
             }
 
+            // ✅ جذر الحفظ الذي يحتوي على اسم رافع الملف
+            $base = $this->taskBaseRoot($task->id);
+
             // صور جديدة
             foreach ((array) $request->file('photos', []) as $photo) {
-                $path = Storage::disk('hetzner')->putFile('task_attachments/photos', $photo);
+                $path = $photo->store($base . '/photos', 'hetzner');
                 $task->attachments()->create(['type' => 'photo', 'path' => $path]);
             }
 
             // صوتيات جديدة
             foreach ((array) $request->file('audios', []) as $audio) {
-                $path = Storage::disk('hetzner')->putFile('task_attachments/audio', $audio);
+                $path = $audio->store($base . '/audio', 'hetzner');
                 $task->attachments()->create(['type' => 'audio', 'path' => $path]);
             }
 
@@ -371,5 +380,19 @@ class TaskController extends Controller
             request('date_from'),
             request('date_to')
         ), 'tasks-report.xlsx');
+    }
+
+    /**
+     * بناء جذر الحفظ للمرفقات شاملاً هوية المستخدم و اسمه.
+     * مثال: uploads/tasks/u5-ahmed-ali/2025/10/tasks/123
+     */
+    private function taskBaseRoot(int $taskId): string
+    {
+        $user    = auth()->user();
+        $userId  = $user?->id ?? 0;
+        $name    = $user?->name ?? 'guest';
+        $userSlug = 'u' . $userId . '-' . Str::slug($name, '-');
+
+        return "uploads/tasks/{$userSlug}/" . date('Y/m') . "/tasks/{$taskId}";
     }
 }

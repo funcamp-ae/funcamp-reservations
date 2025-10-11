@@ -8,6 +8,7 @@ use App\Models\EquipmentDirectoryItem;
 use App\Models\EquipmentDirectoryMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Mpdf\Mpdf;
 
 class EquipmentDirectoryController extends Controller
@@ -113,8 +114,6 @@ class EquipmentDirectoryController extends Controller
                                                  audio/opus,
                                                  audio/3gpp,audio/3gpp2,audio/amr,
                                                  application/octet-stream',
-
-
 
             // 🎬 مفاتيح الفيديو (FilePond/S3) — نفس فكرة الصفحات الأخرى
             'uploaded_videos'   => ['nullable', 'array'],
@@ -282,6 +281,12 @@ class EquipmentDirectoryController extends Controller
     // ====== PRIVATE ======
     private function storeMedia(EquipmentDirectoryItem $item, Request $request, EquipmentDirectory $directory)
     {
+        // 👇 مسار جذر موحّد يحتوي على اسم رافع الملف (userSlug) + التاريخ
+        $userId   = auth()->id() ?? 0;
+        $userName = optional(auth()->user())->name ?? 'guest';
+        $userSlug = 'u' . $userId . '-' . Str::slug($userName, '-');
+        $baseRoot = "uploads/equipment-directory/{$userSlug}/" . date('Y/m') . "/{$directory->id}/{$item->id}";
+
         // 🖼️ الصور
         if ($request->boolean('remove_photo')) {
             foreach ($item->media()->where('file_type', 'image')->get() as $m) {
@@ -291,7 +296,7 @@ class EquipmentDirectoryController extends Controller
         }
         if ($request->hasFile('photo_attachments')) {
             foreach ($request->file('photo_attachments') as $file) {
-                $path = $file->store("equipment-directory/{$directory->id}/{$item->id}", 'hetzner');
+                $path = $file->store($baseRoot, 'hetzner');
                 $item->media()->create([
                     'file_path' => $path,
                     'file_type' => 'image',
@@ -308,7 +313,7 @@ class EquipmentDirectoryController extends Controller
         }
         if ($request->hasFile('audio_attachments')) {
             foreach ($request->file('audio_attachments') as $file) {
-                $path = $file->store("equipment-directory/{$directory->id}/{$item->id}", 'hetzner');
+                $path = $file->store($baseRoot, 'hetzner');
                 $item->media()->create([
                     'file_path' => $path,
                     'file_type' => 'audio',
@@ -325,7 +330,7 @@ class EquipmentDirectoryController extends Controller
         }
         if ($request->hasFile('video_attachments')) {
             foreach ($request->file('video_attachments') as $file) {
-                $path = $file->store("equipment-directory/{$directory->id}/{$item->id}", 'hetzner');
+                $path = $file->store($baseRoot, 'hetzner');
                 $item->media()->create([
                     'file_path' => $path,
                     'file_type' => 'video',
@@ -333,7 +338,7 @@ class EquipmentDirectoryController extends Controller
             }
         }
 
-        // 🎬 الفيديوهات المرفوعة مسبقًا (FilePond/S3) كمفاتيح
+        // 🎬 الفيديوهات المرفوعة مسبقًا (FilePond/S3) كمفاتيح — تُحفظ كما هي (المفتاح مكوَّن مسبقاً في سيرفر الرفع)
         if ($request->filled('uploaded_videos')) {
             $keys = collect((array) $request->input('uploaded_videos'))
                 ->filter(fn($v) => filled($v))
