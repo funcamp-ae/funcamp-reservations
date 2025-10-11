@@ -66,7 +66,8 @@ class Order extends Model
         // أعمدة الخروج
         'video_note_logout',
         'voice_note_logout',
-        "signature_path"
+        "signature_path" , 
+         "signature"
     ];
 
     public function addHoursCount()
