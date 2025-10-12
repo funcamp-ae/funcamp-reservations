@@ -8,18 +8,28 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body p-0">
-                    <div class="row g-0" style="height: 80vh;">
+                    <div class="row g-0 h-100 position-relative">
+                        <!-- Toggle Button (Visible on mobile) -->
+                        <button class="btn btn-sm btn-primary d-md-none position-absolute" id="sidebarToggle" style="z-index: 50; @if(session('lang') == 'ar')right: 10px;@else left: 10px; @endif top: 10px;width: fit-content;">
+                            <i class="fas fa-bars"></i>
+                        </button>
+
                         <!-- Chat List Sidebar -->
-                        <div class="col-md-4 border-end">
+                        <div class="col-md-4 border-end bg-white" id="chatSidebar" style="transition: transform 0.3s ease-in-out; height: 100%; overflow-y: auto;">
                             <div class="p-3 border-bottom">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="mb-0">
                                         <i class="fas fa-comments text-primary me-2"></i>
                                         Messages
                                     </h5>
-                                    <button class="btn btn-sm btn-primary" id="newChatBtn">
-                                        <i class="fas fa-plus"></i> New Chat
-                                    </button>
+                                    <div>
+                                        <button class="btn btn-sm btn-primary me-2" id="newChatBtn">
+                                            <i class="fas fa-plus"></i> New
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary d-md-none" id="closeSidebar">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text">
@@ -28,7 +38,7 @@
                                     <input type="text" class="form-control" placeholder="Search chats..." id="chatSearch">
                                 </div>
                             </div>
-                            <div class="chat-list" id="chatList" style="height: calc(80vh - 120px); overflow-y: auto;">
+                            <div class="chat-list" id="chatList" style="height: calc(100vh - 180px); overflow-y: auto;">
                                 <div class="text-center py-4">
                                     <div class="spinner-border spinner-border-sm" role="status"></div>
                                     <p class="mt-2 text-muted">Loading chats...</p>
@@ -36,12 +46,14 @@
                             </div>
                         </div>
                         
+                        <!-- Chat Content -->
+                        <div class="col-md-8 d-flex flex-column" id="chatContent" style="height: calc(100vh - 60px);">
                         <!-- Chat Window -->
                         <div class="col-md-8">
                             <div class="d-flex flex-column h-100">
                                 <!-- Chat Header -->
                                 <div class="border-bottom p-3" id="chatHeader" style="display: none;">
-                                    <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center justify-content-center">
                                         <div class="d-flex align-items-center">
                                             <div class="me-3">
                                                 <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
@@ -54,14 +66,7 @@
                                                 <small class="text-muted" id="chatSubtitle">Start a conversation</small>
                                             </div>
                                         </div>
-                                        <div class="dropdown">
-                                            <button class="btn btn-link text-muted" type="button" data-bs-toggle="dropdown">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash-alt me-2"></i>Clear Chat</a></li>
-                                            </ul>
-                                        </div>
+                                        
                                     </div>
                                 </div>
                                 
@@ -811,8 +816,69 @@ setupGlobalChatListener() {
 // Initialize when document is ready
 document.addEventListener('DOMContentLoaded', function() {
     window.chatSystem = new ChatSystem();
+    
+    // Toggle sidebar on mobile
+    const sidebar = document.getElementById('chatSidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const closeSidebar = document.getElementById('closeSidebar');
+    const chatContent = document.getElementById('chatContent');
+    
+    // Hide sidebar by default on mobile
+    if (window.innerWidth < 768) {
+        sidebar.style.transform = @if(session('lang') == 'ar')'translateX(100%)'@else 'translateX(-100%)' @endif;
+        chatContent.style.display = 'none';
+    }
+    
+    // Toggle sidebar
+    function toggleSidebar() {
+        if (window.innerWidth < 768) {
+            const isOpen = sidebar.style.transform === 'translateX(0px)';
+            sidebar.style.transform = isOpen ? @if(session('lang') == 'ar')'translateX(100%)'@else 'translateX(-100%)' @endif : 'translateX(0)';
+            chatContent.style.display = isOpen ? 'none' : 'flex';
+        }
+    }
+    
+    // Event listeners
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    closeSidebar.addEventListener('click', toggleSidebar);
+    
+    // Close sidebar when clicking on a chat item on mobile
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth < 768 && 
+            e.target.closest('.chat-item') && 
+            !e.target.closest('#chatSidebar > .p-3')) {
+            toggleSidebar();
+        }
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768) {
+            sidebar.style.transform = 'none';
+            chatContent.style.display = 'flex';
+        } else if (sidebar.style.transform === 'none') {
+            sidebar.style.transform = @if(session('lang') == 'ar')'translateX(100%)'@else 'translateX(-100%)' @endif;
+            chatContent.style.display = 'none';
+        }
+    });
 });
 </script>
+<style>
+    @media (max-width: 767.98px) {
+        #chatSidebar {
+            position: fixed;
+            top: 0;
+            @if(session('lang') == 'ar')right: 0;@else left: 0; @endif
+            bottom: 0;
+            z-index: 100;
+            width: 280px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        #chatContent {
+            width: 100%;
+        }
+    }
+</style>
 @endpush
 
 @push('styles')
