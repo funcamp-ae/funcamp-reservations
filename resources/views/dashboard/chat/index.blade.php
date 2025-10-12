@@ -214,20 +214,18 @@ setupGlobalChatListener() {
         // Subscribe to the new chat channel
         if (typeof Echo !== 'undefined') {
             const channelName = `chat.${chatId}`;
-            
             Echo.private(channelName)
-                .listen('MessageSent', (e) => {
-                    console.log('Message received in chat:', e);
-                    this.handleChatMessage(e);
-                })
-                .listen('MessageRead', (e) => {
-                    console.log('Message read status updated:', e);
-                    this.updateMessageReadStatus(e);
-                });
-            
+            .listen('.message.sent', (e) => {
+              console.log('Message received in chat:', e);
+              this.handleChatMessage(e);
+            })
+            .listen('.message.read', (e) => {
+            console.log('Message read status updated:', e);
+            this.updateMessageReadStatus(e);
+            });           
             this.activeChannels.set('chat', channelName);
             console.log('Subscribed to chat channel:', channelName);
-        }
+        
     }
 
     handleNewMessage(event) {
