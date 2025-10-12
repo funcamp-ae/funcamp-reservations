@@ -258,6 +258,9 @@ setupGlobalChatListener() {
     handleChatMessage(event) {
         const { message, chat_id, user } = event;
         
+        // Update chat list - move chat to top and update latest message
+        this.updateChatInList(chat_id, message);
+        
         // Only handle if it's the current chat and not from current user
         if (this.currentChatId == chat_id && message.user_id != this.currentUserId) {
             if (!this.currentMessages) {
