@@ -306,7 +306,7 @@ setupGlobalChatListener() {
 
     async markMessageAsRead(messageId) {
         try {
-            await fetch(`/api/chat/messages/${messageId}/read`, {
+            await fetch(`/api/chat/messages/${messageId}/mark-message-read`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

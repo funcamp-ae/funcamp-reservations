@@ -1736,6 +1736,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'api/chat'], function () {
     Route::get('/{chat}', [App\Http\Controllers\ChatController::class, 'show']);
     Route::post('/{chat}/messages', [App\Http\Controllers\ChatController::class, 'sendMessage']);
     Route::post('/{chat}/mark-read', [App\Http\Controllers\ChatController::class, 'markAsRead']);
+    Route::post('/messages/{message}/mark-message-read', [App\Http\Controllers\ChatController::class, 'markMessageAsRead']);
     Route::delete('/{chat}/leave', [App\Http\Controllers\ChatController::class, 'leaveChat']);
 });
 

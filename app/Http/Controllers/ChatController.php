@@ -269,7 +269,21 @@ class ChatController extends Controller
             'message' => 'Messages marked as read'
         ]);
     }
+    /**
+     * Mark a specific message as read.
+     */
+    public function markMessageAsRead(Message $message)
+    {
+        $message->update([
+            'is_read' => true,
+            'read_at' => now()
+        ]);
 
+        return response()->json([
+            'success' => true,
+            'message' => 'Message marked as read'
+        ]);
+    }
     /**
      * Leave a group chat.
      */
