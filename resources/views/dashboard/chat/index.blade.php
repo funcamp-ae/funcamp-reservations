@@ -220,6 +220,17 @@ setupGlobalChatListener() {
             Echo.private(channelName)
             .listen('.message.sent', (e) => {
               console.log('Message received in chat:', e);
+              
+              // Update the chat in the list with the new message and increment unread count
+              const chat = this.chats.find(c => c.id == e.chat_id);
+              if (chat) {
+                chat.latest_message = e.message;
+                if (this.currentChatId != e.chat_id && e.message.user_id != this.currentUserId) {
+                  chat.unread_count = (chat.unread_count || 0) + 1;
+                }
+                this.renderChats();
+              }
+              
               this.handleChatMessage(e);
             })
             .listen('.message.read', (e) => {
@@ -257,9 +268,6 @@ setupGlobalChatListener() {
 
     handleChatMessage(event) {
         const { message, chat_id, user } = event;
-        
-        // Update chat list - move chat to top and update latest message
-        this.updateChatInList(chat_id, message);
         
         // Only handle if it's the current chat and not from current user
         if (this.currentChatId == chat_id && message.user_id != this.currentUserId) {
