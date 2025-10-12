@@ -15,7 +15,7 @@
                         </button>
 
                         <!-- Chat List Sidebar -->
-                        <div class="col-md-4 border-end bg-white" id="chatSidebar" style="transition: transform 0.3s ease-in-out; height: 100%; overflow-y: auto;">
+                        <div class="col-md-4 border-end " id="chatSidebar" style="transition: transform 0.3s ease-in-out; overflow-y: auto;">
                             <div class="p-3 border-bottom">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="mb-0">
