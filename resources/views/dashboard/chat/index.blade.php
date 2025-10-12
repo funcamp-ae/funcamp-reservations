@@ -940,6 +940,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Hide sidebar by default on mobile
     if (window.innerWidth < 768) {
+        sudebar.style.display ="none" ;
         sidebar.style.transform = @if(session('lang') == 'ar')'translateX(100%)'@else 'translateX(-100%)' @endif;
         chatContent.style.display = 'none';
     }
