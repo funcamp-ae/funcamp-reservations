@@ -100,24 +100,24 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Start New Chat</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title">{{ __('dashboard.start_new_chat') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label">Chat Type</label>
+                    <label class="form-label">{{ __('dashboard.chat_type') }}</label>
                     <select class="form-select" id="chatType">
-                        <option value="private">Private Chat</option>
-                        <option value="group">Group Chat</option>
+                        <option value="private">{{ __('dashboard.private_chat') }}</option>
+                        <option value="group">{{ __('dashboard.group_chat') }}</option>
                     </select>
                 </div>
                 
                 <!-- Private Chat Section -->
                 <div id="privateChatSection">
                     <div class="mb-3">
-                        <label class="form-label">Select User</label>
+                        <label class="form-label">{{ __('dashboard.select_user') }}</label>
                         <select class="form-select" id="selectedUser">
-                            <option value="">Choose a user...</option>
+                            <option value="">{{ __('dashboard.choose_user') }}</option>
                         </select>
                     </div>
                 </div>
@@ -125,15 +125,15 @@
                 <!-- Group Chat Section -->
                 <div id="groupChatSection" style="display: none;">
                     <div class="mb-3">
-                        <label class="form-label">Group Name</label>
-                        <input type="text" class="form-control" id="groupName" placeholder="Enter group name">
+                        <label class="form-label">{{ __('dashboard.group_name') }}</label>
+                        <input type="text" class="form-control" id="groupName" placeholder="{{ __('dashboard.enter_group_name') }}">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Group Description</label>
-                        <textarea class="form-control" id="groupDescription" rows="2" placeholder="Enter group description (optional)"></textarea>
+                        <label class="form-label">{{ __('dashboard.group_description') }}</label>
+                        <textarea class="form-control" id="groupDescription" rows="2" placeholder="{{ __('dashboard.enter_group_description') }}"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Select Members</label>
+                        <label class="form-label">{{ __('dashboard.select_members') }}</label>
                         <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;" id="groupMembers">
                             <!-- Group members will be loaded here -->
                         </div>
@@ -141,8 +141,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="createChatBtn">Create Chat</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('dashboard.cancel') }}</button>
+                <button type="button" class="btn btn-primary" id="createChatBtn">{{ __('dashboard.create_chat') }}</button>
             </div>
         </div>
     </div>
@@ -166,34 +166,132 @@ class ChatSystem {
         this.bindEvents();
         this.loadUsers();
         this.loadChats();
-        this.setupGlobalChatListener();
+        this.setupGlobalMessageListener();
+        if (this.currentChatId) {
+            this.setupChatChannel(this.currentChatId);
+        }
     }
 
-setupGlobalChatListener() {
-    if (typeof Echo === 'undefined') {
-        console.error('Laravel Echo is not initialized');
-        return;
+    // Calculate total unread messages across all chats
+    getTotalUnreadCount() {
+        return this.chats.reduce((total, chat) => {
+            return total + (chat.unread_count || 0);
+        }, 0);
     }
 
-    // Check if we have a chat ID
-    if (!this.currentChatId) {
-        console.log('No active chat selected');
-        return;
+    // Update the unread badge in the header
+    updateUnreadBadge(totalUnread) {
+        const chatButton = document.querySelector('a[title="Open Chat"]');
+        
+        if (!chatButton) return;
+
+        let badge = chatButton.querySelector('.unread-badge');
+        
+        // Create badge if it doesn't exist
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'unread-badge position-absolute end-0  unread-badge badge rounded-pill bg-danger';
+            badge.style.fontSize = '0.6rem';
+            badge.style.padding = '0.25em 0.4em';
+            badge.style.display = 'none';
+            badge.style.right = '30px !important';
+            chatButton.appendChild(badge);
+        }
+
+        // Update badge content and visibility
+        if (totalUnread > 0) {
+            badge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
     }
 
-    // Unsubscribe from any existing channel first
-    if (this.currentChannel) {
-        Echo.leave(this.currentChannel);
+    // Set up global listener for all user's messages and unread counts
+    setupGlobalMessageListener() {
+        if (typeof Echo === 'undefined') return;
+
+        // Channel for unread count updates
+        const unreadCountChannel = `unread_message_count_for_user.${this.currentUserId}`;
+        
+        // Channel for new messages
+        const messageChannel = `user.${this.currentUserId}`;
+
+        // Leave previous channels if they exist
+        if (this.unreadCountChannel) {
+            Echo.leave(this.unreadCountChannel);
+        }
+        if (this.messageChannel) {
+            Echo.leave(this.messageChannel);
+        }
+
+        // Store channel references
+        this.unreadCountChannel = unreadCountChannel;
+        this.messageChannel = messageChannel;
+
+        // Listen for unread count updates
+        Echo.private(unreadCountChannel)
+            .listen('.unread_message_count_for_user.updated', (e) => {
+                console.log('Unread count updated:', e);
+                this.updateUnreadBadge(e.totalUnread);
+                // Update the chat in the list
+                const chat = this.chats.find(c => c.id == e.chatId);
+                if (chat) {
+                    // Update unread count for this chat
+                    chat.unread_count = e.unreadCount;
+                    chat.total_unread = e.totalUnread;
+                    console.log('Updating chat in list:', chat);
+                    // this.renderChats();
+                    this.updateChatInList(e.chatId, e.message , true);
+                }
+            })
+            .listen('pusher:subscription_succeeded', () => {
+                console.log('Successfully subscribed to unread count channel:', unreadCountChannel);
+            });
+
+        // Listen for new messages
+        // Echo.private(messageChannel)
+        //     .listen('.message.sent', (e) => {
+        //         console.log('New message received:', e);
+                
+        //         // Update the chat in the list
+        //         const chat = this.chats.find(c => c.id == e.chat_id);
+        //         if (chat) {
+        //             chat.latest_message = e.message;
+                    
+        //             // Increment unread count if not the current chat or if message is from another user
+        //             if (this.currentChatId != e.chat_id && e.message.user_id != this.currentUserId) {
+        //                 chat.unread_count = (chat.unread_count || 0) + 1;
+        //                 this.updateUnreadBadge();
+        //                 this.renderChats();
+        //             }
+        //         }
+        //     })
+        //     .listen('pusher:subscription_succeeded', () => {
+        //         console.log('Successfully subscribed to message channel:', messageChannel);
+        //     });
     }
 
-    // Store the current channel name
-    this.currentChannel = `chat.${this.currentChatId}`;
-    
-    console.log('Subscribing to channel:', this.currentChannel);
-    
-    // Subscribe to the private channel
-    Echo.private(this.currentChannel)
-        .listen('.message.sent', (e) => {
+    setupChatListener() {
+        // Check if we have a chat ID
+        if (!this.currentChatId) {
+            console.log('No active chat selected');
+            return;
+        }
+
+        // Unsubscribe from any existing channel first
+        if (this.currentChannel) {
+            Echo.leave(this.currentChannel);
+        }
+
+        // Store the current channel name
+        this.currentChannel = `chat.${this.currentChatId}`;
+        
+        console.log('Subscribing to channel:', this.currentChannel);
+        
+        // Subscribe to the private channel
+        Echo.private(this.currentChannel)
+            .listen('.message.sent', (e) => {
             console.log('New message received from Pusher:', e);
             this.handleNewMessage(e);
         })
@@ -293,15 +391,17 @@ setupGlobalChatListener() {
         }
     }
 
-    updateChatInList(chatId, latestMessage) {
+    updateChatInList(chatId, latestMessage , isFromSetupGlobalMessageListener = false) {
         // Find and update the chat in the list
         const chatIndex = this.chats.findIndex(c => c.id == chatId);
         if (chatIndex !== -1) {
             this.chats[chatIndex].latest_message = latestMessage;
             
             // Increment unread count if not current chat
-            if (this.currentChatId != chatId && latestMessage.user_id != this.currentUserId) {
-                this.chats[chatIndex].unread_count = (this.chats[chatIndex].unread_count || 0) + 1;
+            if(!isFromSetupGlobalMessageListener){
+                if (this.currentChatId != chatId && latestMessage.user_id != this.currentUserId) {
+                    this.chats[chatIndex].unread_count = (this.chats[chatIndex].unread_count || 0) + 1;
+                }
             }
             
             // Move chat to top
@@ -433,7 +533,7 @@ setupGlobalChatListener() {
 
     renderUserOptions() {
         const select = document.getElementById('selectedUser');
-        select.innerHTML = '<option value="">Choose a user...</option>';
+        select.innerHTML = '<option value="">{{__("dashboard.choose_user")}}</option>';
         
         this.users.forEach(user => {
             const option = document.createElement('option');
@@ -514,7 +614,7 @@ setupGlobalChatListener() {
             // Setup real-time channel for this chat
             this.setupChatChannel(chatId);
             
-            // Mark as active
+            // Mark as active and reset unread count
             document.querySelectorAll('.chat-item').forEach(item => {
                 item.style.backgroundColor = '';
             });
@@ -522,6 +622,14 @@ setupGlobalChatListener() {
             const chatItem = document.querySelector(`[data-chat-id="${chatId}"]`);
             if (chatItem) {
                 chatItem.style.backgroundColor = 'rgb(231 231 231 / 32%)';
+                
+                // Reset unread count for this chat
+                const chat = this.chats.find(c => c.id == chatId);
+                if (chat && chat.unread_count > 0) {
+                    chat.unread_count = 0;
+                    this.updateUnreadBadge();
+                    this.renderChats();
+                }
             }
             
             const response = await fetch(`/api/chat/${chatId}`, {

@@ -589,6 +589,9 @@ a.btn-primary{
 	.gap-25 {
 		gap: 7rem !important;
 	}
+	.unread-badge {
+		top: -6px !important;
+	}
 	.fs-12 {
 		font-size : 12px !important ; 
 	}

@@ -36,6 +36,19 @@ return [
     'welcome_to_chat' => 'په خبرو اترو کې ښه راغلاست',
     'select_chat_to_start' => 'د خبرو اترو د پیل لپاره د پاڼې له اړخي پینل څخه یوه خبره وټاکئ',
     'new_message' => 'نوی پیغام',
+    
+    // Chat Modal Translations
+    'chat_type' => 'د خبرو اترو ډول',
+    'private_chat' => 'شخصي خبرې اترې',
+    'group_chat' => 'ډلې خبرې اترې',
+    'select_user' => 'کارونکی وټاکئ',
+    'choose_user' => 'یو کارونکی وټاکئ...',
+    'enter_group_name' => 'د ډلې نوم ولیکئ',
+    'group_description' => 'د ډلې توضیحات',
+    'enter_group_description' => 'د ډلې توضیحات ولیکئ (اختیاري)',
+    'select_members' => 'غړي وټاکئ',
+    'create_chat' => 'خبرې اترې جوړې کړئ',
+    
     'mark_all_not_completed' => 'ټول نابشپړ په نښه کړئ',
     'the_insurance' => "بیمه",
     "Insurance forfeiture refund" => "د بیمې بیرته ورکړه / ضبط",

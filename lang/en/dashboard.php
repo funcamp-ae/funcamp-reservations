@@ -36,6 +36,18 @@ return [
     'welcome_to_chat' => 'Welcome to Chat',
     'select_chat_to_start' => 'Select a chat from the sidebar to start messaging',
     'new_message' => 'New message',
+    
+    // Chat Modal Translations
+    'chat_type' => 'Chat Type',
+    'private_chat' => 'Private Chat',
+    'group_chat' => 'Group Chat',
+    'select_user' => 'Select User',
+    'choose_user' => 'Choose a user...',
+    'enter_group_name' => 'Enter group name',
+    'group_description' => 'Group Description',
+    'enter_group_description' => 'Enter group description (optional)',
+    'select_members' => 'Select Members',
+    'create_chat' => 'Create Chat',
     'stock_report_title' => 'Stock Report',
     'mark_all_not_completed' => 'Mark all as not completed',
     'the_insurance' => 'Insurance',

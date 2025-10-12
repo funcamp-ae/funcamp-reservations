@@ -36,6 +36,19 @@ return [
     'welcome_to_chat' => 'مرحباً بك في الدردشة',
     'select_chat_to_start' => 'اختر محادثة من الشريط الجانبي لبدء المحادثة',
     'new_message' => 'رسالة جديدة',
+    
+    // Chat Modal Translations
+    'chat_type' => 'نوع الدردشة',
+    'private_chat' => 'دردشة خاصة',
+    'group_chat' => 'دردشة جماعية',
+    'select_user' => 'اختر مستخدم',
+    'choose_user' => 'اختر مستخدمًا...',
+    'enter_group_name' => 'أدخل اسم المجموعة',
+    'group_description' => 'وصف المجموعة',
+    'enter_group_description' => 'أدخل وصف المجموعة (اختياري)',
+    'select_members' => 'اختر الأعضاء',
+    'create_chat' => 'إنشاء دردشة',
+    
     'mark_all_not_completed' => 'تحديد الكل غير  مكتمل',
     'the_insurance' => "تأمين",
     "Insurance forfeiture refund" => "رد / مصادرة التأمين",

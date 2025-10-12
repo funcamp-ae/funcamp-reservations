@@ -2,16 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageRead;
+use App\Events\MessageSent;
+use App\Events\UnreadMessagesUpdated;
 use App\Models\Chat;
 use App\Models\Message;
 use App\Models\User;
-use App\Events\MessageSent;
+use App\Models\UserType;
+use App\Services\ChatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class ChatController extends Controller
 {
+    protected $chatService;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @param ChatService $chatService
+     * @return void
+     */
+    public function __construct(ChatService $chatService)
+    {
+        $this->chatService = $chatService;
+    }
+
     /**
      * Show the chat page.
      */
@@ -158,6 +176,9 @@ class ChatController extends Controller
         // Broadcast the message
         broadcast(new MessageSent($message))->toOthers();
 
+        // Update and broadcast unread counts for all participants except sender
+        $this->chatService->updateUnreadCounts($chat, $user->id, $message);
+
         return response()->json([
             'success' => true,
             'message' => $message
@@ -256,7 +277,7 @@ class ChatController extends Controller
             ], 403);
         }
 
-        $chat->messages()
+        $updated = $chat->messages()
             ->where('user_id', '!=', $user->id)
             ->where('is_read', false)
             ->update([
@@ -264,9 +285,15 @@ class ChatController extends Controller
                 'read_at' => now()
             ]);
 
+        if ($updated > 0) {
+            // Update and broadcast unread counts for all participants except current user
+            $this->chatService->updateUnreadCounts($chat, $user->id);
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Messages marked as read'
+            'message' => 'Messages marked as read',
+            'updated' => $updated
         ]);
     }
     /**

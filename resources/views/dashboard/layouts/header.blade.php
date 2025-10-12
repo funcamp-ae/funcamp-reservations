@@ -53,7 +53,7 @@
                         <i class="fas fa-bell fs-2"></i>
                         @auth
                             @if(auth()->user()->unreadNotifications->count() > 0)
-                                <span class="position-absolute top-0 start-100 translate-middle badge badge-circle badge-danger">
+                                <span class="unread-badge position-absolute end-0  unread-badge badge rounded-pill bg-danger" style="font-size: 0.6rem; padding: 0.25em 0.4em; display: flex;">
                                     {{ auth()->user()->unreadNotifications->count() }}
                                 </span>
                             @endif
@@ -149,9 +149,9 @@
                        class="btn btn-icon btn-active-light-primary position-relative w-30px h-30px w-md-40px h-md-40px" 
                        title="Open Chat">
                         <i class="fas fa-comments fs-2"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge badge-circle badge-danger" id="chat-notification-badge" style="display: none;">
-                            0
-                        </span>
+                        @if(App\Models\Message::getUnreadCount(auth()->user()->id) > 0)
+                        <span class="unread-badge position-absolute end-0  unread-badge badge rounded-pill bg-danger" style="font-size: 0.6rem; padding: 0.25em 0.4em; display: flex;">{{ App\Models\Message::getUnreadCount(auth()->user()->id) }}</span>
+                        @endif
                     </a>
                 </div>
                 <!--end::Chat-->
