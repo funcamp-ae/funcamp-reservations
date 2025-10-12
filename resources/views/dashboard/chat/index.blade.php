@@ -227,6 +227,7 @@ setupGlobalChatListener() {
             console.log('Subscribed to chat channel:', channelName);
         
     }
+}
 
     handleNewMessage(event) {
         const { message, chat_id, user } = event;
