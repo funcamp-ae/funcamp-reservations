@@ -1,6 +1,6 @@
 @extends('dashboard.layouts.app')
 
-@section('title', 'Chat')
+@section('title', __('dashboard.chat'))
 
 @section('content')
 <div class="container-fluid">
@@ -20,11 +20,11 @@
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="mb-0">
                                         <i class="fas fa-comments text-primary me-2"></i>
-                                        Messages
+                                        {{ __('dashboard.messages') }}
                                     </h5>
                                     <div>
                                         <button class="btn btn-sm btn-primary me-2" id="newChatBtn">
-                                            <i class="fas fa-plus"></i> New
+                                            {{ __('dashboard.start_new_chat') }}
                                         </button>
                                         <button class="btn btn-sm btn-outline-secondary d-md-none" id="closeSidebar">
                                             <i class="fas fa-times"></i>
@@ -35,13 +35,13 @@
                                     <span class="input-group-text">
                                         <i class="fas fa-search"></i>
                                     </span>
-                                    <input type="text" class="form-control" placeholder="Search chats..." id="chatSearch">
+                                    <input type="text" class="form-control" placeholder="{{ __('dashboard.search_chats') }}" id="chatSearch">
                                 </div>
                             </div>
-                            <div class="chat-list" id="chatList" style="height: calc(100vh - 180px); overflow-y: auto;">
+                            <div class="chat-list" id="chatList">
                                 <div class="text-center py-4">
                                     <div class="spinner-border spinner-border-sm" role="status"></div>
-                                    <p class="mt-2 text-muted">Loading chats...</p>
+                                    <p class="mt-2 text-muted">{{ __('dashboard.loading_chats') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -49,7 +49,6 @@
                         <!-- Chat Content -->
                         <div class="col-md-8 d-flex flex-column" id="chatContent" style="height: calc(100vh - 60px);">
                         <!-- Chat Window -->
-                        <div class="col-md-8">
                             <div class="d-flex flex-column h-100">
                                 <!-- Chat Header -->
                                 <div class="border-bottom p-3" id="chatHeader" style="display: none;">
@@ -62,8 +61,8 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <h5 class="mb-0" id="chatTitle">Select a chat</h5>
-                                                <small class="text-muted" id="chatSubtitle">Start a conversation</small>
+                                                <h5 class="mb-0" id="chatTitle">{{ __('dashboard.select_chat') }}</h5>
+                                                <small class="text-muted" id="chatSubtitle">{{ __('dashboard.start_conversation') }}</small>
                                             </div>
                                         </div>
                                         
@@ -74,22 +73,21 @@
                                 <div class="flex-grow-1 p-3" id="messagesArea" style="overflow-y: auto; ">
                                     <div class="text-center py-5">
                                         <i class="fas fa-comment text-muted" style="font-size: 4rem;"></i>
-                                        <h5 class="text-muted mt-3">Welcome to Chat</h5>
-                                        <p class="text-muted">Select a chat from the sidebar to start messaging</p>
+                                        <h5 class="text-muted mt-3">{{ __('dashboard.welcome_to_chat') }}</h5>
+                                        <p class="text-muted">{{ __('dashboard.select_chat_to_start') }}</p>
                                     </div>
                                 </div>
                                 
                                 <!-- Message Input -->
                                 <div class="border-top p-3 " id="messageInputArea" style="display: none;">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="Type a message..." id="messageInput">
+                                        <input type="text" class="form-control" placeholder="{{ __('dashboard.type_message') }}..." id="messageInput">
                                         <button class="btn btn-primary" id="sendBtn">
                                             <i class="fas fa-paper-plane"></i>
                                         </button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
                     </div>
                 </div>
             </div>
