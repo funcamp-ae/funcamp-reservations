@@ -220,8 +220,8 @@ setupGlobalChatListener() {
             Echo.private(channelName)
             .listen('.message.sent', (e) => {
               console.log('Message received in chat:', e);
-              
-              // Update the chat in the list with the new message and increment unread count
+              this.handleChatMessage(e);
+                // Update the chat in the list with the new message and increment unread count
               const chat = this.chats.find(c => c.id == e.chat_id);
               if (chat) {
                 chat.latest_message = e.message;
@@ -230,8 +230,6 @@ setupGlobalChatListener() {
                 }
                 this.renderChats();
               }
-              
-              this.handleChatMessage(e);
             })
             .listen('.message.read', (e) => {
             console.log('Message read status updated:', e);
