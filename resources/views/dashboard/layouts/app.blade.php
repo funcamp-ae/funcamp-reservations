@@ -235,7 +235,7 @@ a.btn-primary{
         .menu-item:hover .menu-link, 
         /* .menu-item.here .menu-link, */
         .menu-item.active .menu-link {
-            background-color: var(--primary-brown) !important;
+            background-color: #673c0942 !important;
             color: white !important;
         }
         
