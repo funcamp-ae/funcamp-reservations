@@ -117,10 +117,6 @@
         }
 	@endif
 
-        /*
-*/
-        
-        /* Apply theme colors */
         body {
             background-color: var(--bs-body-bg) !important ;
             color: var(--bs-body-color) !important ;
@@ -1000,31 +996,40 @@ a.btn-primary{
 
 	<!--begin::Chat Configuration-->
 	<script>
-		// Chat system configuration
-		window.currentUserId = {{ auth()->id() ?? 'null' }};
-		
-		// Chat translations
-		window.chatTranslations = {
-			no_chats_yet: "{{ __('dashboard.no_chats_yet') }}",
-			no_users_found: "{{ __('dashboard.no_users_found') }}",
-			no_messages_yet: "{{ __('dashboard.no_messages_yet') }}",
-			start_conversation: "{{ __('dashboard.start_conversation') }}",
-			online: "{{ __('dashboard.online') }}",
-			members: "{{ __('dashboard.members') }}",
-			yesterday: "{{ __('dashboard.yesterday') }}",
-			unknown_user: "{{ __('dashboard.unknown_user') }}",
-			group_name_required: "{{ __('dashboard.group_name_required') }}",
-			select_members_required: "{{ __('dashboard.select_members_required') }}"
-		};
-	</script>
-	<!--end::Chat Configuration-->
-	
-	<script src="{{ asset('js/chat.js') }}"></script>
-	<!--end::Pusher and Echo-->
+	$(document).ready(function() {
+        // Listen for unread count updates
+        Echo.private("unread_message_count_for_user."+{{auth()->user()->id}})
+            .listen('.unread_message_count_for_user.updated', (e) => {
+                updateUnreadBadge(e.totalUnread);
+            })
+		function updateUnreadBadge(totalUnread) {
+        const chatButton = document.querySelector('a[title="Open Chat"]');
+        
+        if (!chatButton) return;
 
-	<!--begin::Chat Sidebar-->
-	<!-- Chat is now a dedicated page at /chat -->
-	<!--end::Chat Sidebar-->
+        let badge = chatButton.querySelector('.unread-badge');
+        
+        // Create badge if it doesn't exist
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'unread-badge position-absolute end-0  unread-badge badge rounded-pill bg-danger';
+            badge.style.fontSize = '0.6rem';
+            badge.style.padding = '0.25em 0.4em';
+            badge.style.display = 'none';
+            badge.style.right = '30px !important';
+            chatButton.appendChild(badge);
+        }
+
+        // Update badge content and visibility
+        if (totalUnread > 0) {
+            badge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+});
+	</script>	
 </body>
 <!--end::Body-->
 

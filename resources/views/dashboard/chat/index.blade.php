@@ -162,7 +162,6 @@ class ChatSystem {
     }
 
     init() {
-        console.log('Initializing Chat System...');
         this.bindEvents();
         this.loadUsers();
         this.loadChats();
@@ -232,7 +231,6 @@ class ChatSystem {
         // Listen for unread count updates
         Echo.private(unreadCountChannel)
             .listen('.unread_message_count_for_user.updated', (e) => {
-                console.log('Unread count updated:', e);
                 this.updateUnreadBadge(e.totalUnread);
                 // Update the chat in the list
                 const chat = this.chats.find(c => c.id == e.chatId);
@@ -240,42 +238,15 @@ class ChatSystem {
                     // Update unread count for this chat
                     chat.unread_count = e.unreadCount;
                     chat.total_unread = e.totalUnread;
-                    console.log('Updating chat in list:', chat);
                     // this.renderChats();
                     this.updateChatInList(e.chatId, e.message , true);
                 }
             })
-            .listen('pusher:subscription_succeeded', () => {
-                console.log('Successfully subscribed to unread count channel:', unreadCountChannel);
-            });
-
-        // Listen for new messages
-        // Echo.private(messageChannel)
-        //     .listen('.message.sent', (e) => {
-        //         console.log('New message received:', e);
-                
-        //         // Update the chat in the list
-        //         const chat = this.chats.find(c => c.id == e.chat_id);
-        //         if (chat) {
-        //             chat.latest_message = e.message;
-                    
-        //             // Increment unread count if not the current chat or if message is from another user
-        //             if (this.currentChatId != e.chat_id && e.message.user_id != this.currentUserId) {
-        //                 chat.unread_count = (chat.unread_count || 0) + 1;
-        //                 this.updateUnreadBadge();
-        //                 this.renderChats();
-        //             }
-        //         }
-        //     })
-        //     .listen('pusher:subscription_succeeded', () => {
-        //         console.log('Successfully subscribed to message channel:', messageChannel);
-        //     });
     }
 
     setupChatListener() {
         // Check if we have a chat ID
         if (!this.currentChatId) {
-            console.log('No active chat selected');
             return;
         }
 
@@ -285,24 +256,13 @@ class ChatSystem {
         }
 
         // Store the current channel name
-        this.currentChannel = `chat.${this.currentChatId}`;
-        
-        console.log('Subscribing to channel:', this.currentChannel);
-        
+        this.currentChannel = `chat.${this.currentChatId}`;                
         // Subscribe to the private channel
         Echo.private(this.currentChannel)
             .listen('.message.sent', (e) => {
-            console.log('New message received from Pusher:', e);
             this.handleNewMessage(e);
         })
-        .listen('pusher:subscription_succeeded', () => {
-            console.log('Successfully subscribed to channel:', this.currentChannel);
-        })
-        .listen('pusher:subscription_error', (status) => {
-            console.error('Failed to subscribe to channel:', status);
-        });
-    
-    console.log('Global chat listener setup for chat:', this.currentChatId);
+
 }
     setupChatChannel(chatId) {
         // Unsubscribe from previous chat channel if exists
@@ -317,7 +277,6 @@ class ChatSystem {
             const channelName = `chat.${chatId}`;
             Echo.private(channelName)
             .listen('.message.sent', (e) => {
-              console.log('Message received in chat:', e);
               this.handleChatMessage(e);
                 // Update the chat in the list with the new message and increment unread count
               const chat = this.chats.find(c => c.id == e.chat_id);
@@ -330,11 +289,9 @@ class ChatSystem {
               }
             })
             .listen('.message.read', (e) => {
-            console.log('Message read status updated:', e);
             this.updateMessageReadStatus(e);
             });           
             this.activeChannels.set('chat', channelName);
-            console.log('Subscribed to chat channel:', channelName);
         
     }
 }
@@ -426,7 +383,7 @@ class ChatSystem {
                 }
             });
         } catch (error) {
-            console.error('Error marking message as read:', error);
+            // Error handling without console.log
         }
     }
 
@@ -487,7 +444,6 @@ class ChatSystem {
 
     async loadChats() {
         try {
-            console.log('Loading chats...');
             const response = await fetch('/api/chat', {
                 headers: {
                     'Content-Type': 'application/json',
@@ -496,7 +452,6 @@ class ChatSystem {
             });
 
             const data = await response.json();
-            console.log('Chats response:', data);
 
             if (data.success && data.chats) {
                 this.chats = data.chats;
@@ -520,8 +475,6 @@ class ChatSystem {
             });
 
             const data = await response.json();
-            console.log('Users response:', data);
-
             if (data.success && data.users) {
                 this.users = data.users;
                 this.renderUserOptions();
@@ -608,7 +561,6 @@ class ChatSystem {
 
     async openChat(chatId) {
         try {
-            console.log('Opening chat:', chatId);
             this.currentChatId = chatId;
             
             // Setup real-time channel for this chat
