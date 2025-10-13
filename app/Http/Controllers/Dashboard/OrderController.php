@@ -344,7 +344,6 @@ class OrderController extends Controller
         $orderInternalNote = OrderInternalNote::with('internalNote')
             ->where('order_id', $order->id)
             ->get();
-        $selectedInternalNote;
         foreach ($orderInternalNote as $orderInternalNote) {
             $selectedInternalNote[] = $orderInternalNote->internal_note_id;
         }
@@ -370,7 +369,7 @@ class OrderController extends Controller
             'addonsPrice' => $addonsPrice,
             'additionalNotesData' => $additionalNotesData,
             'internalNotes' => $internalNotes,
-            'selectedInternalNote' => $selectedInternalNote
+            'selectedInternalNote' => isset($selectedInternalNote) ? $selectedInternalNote : []
         ]);
     }
 
