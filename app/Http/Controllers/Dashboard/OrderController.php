@@ -208,7 +208,8 @@ class OrderController extends Controller
             'expired_price_offer' => 'required_if:status,pending_and_show_price',
             'created_by' => 'required|exists:users,id',
             'agree' => 'nullable|in:1,0',
-            'internal_note_id' => 'nullable|exists:internal_notes,id',
+            'internal_note_id' => 'nullable|array',
+            'internal_note_id.*' => 'exists:internal_notes,id',
             'delayed_reson' => 'nullable|string',
             'refunds' => 'nullable|in:1,0',
             'refunds_notes' => 'nullable',
@@ -260,18 +261,25 @@ class OrderController extends Controller
 
         $order = Order::create($validatedData);
 
-        // Create or update the internal note if one was selected
+        // Create or update the internal notes if any were selected
         if (!empty($validatedData['internal_note_id'])) {
-            $internalNote = InternalNote::find($validatedData['internal_note_id']);
-            if ($internalNote) {
-                OrderInternalNote::updateOrCreate(
-                    ['order_id' => $order->id],
-                    [
+            // First, remove any existing order-internal note relationships
+            OrderInternalNote::where('order_id', $order->id)->delete();
+            
+            // Create new relationships for each selected note
+            foreach ((array)$validatedData['internal_note_id'] as $noteId) {
+                $internalNote = InternalNote::find($noteId);
+                if ($internalNote) {
+                    OrderInternalNote::create([
+                        'order_id' => $order->id,
                         'content' => $validatedData['notes'] ?: $internalNote->note_content,
-                        'internal_note_id' => $validatedData['internal_note_id']
-                    ]
-                );
+                        'internal_note_id' => $noteId
+                    ]);
+                }
             }
+        } else {
+            // Remove all internal notes if none are selected
+            OrderInternalNote::where('order_id', $order->id)->delete();
         }
         // Distribute the provided total price evenly across selected services
         $servicesData = [];
@@ -335,18 +343,13 @@ class OrderController extends Controller
         // Get the order's internal note if it exists
         $orderInternalNote = OrderInternalNote::with('internalNote')
             ->where('order_id', $order->id)
-            ->first();
-
-        $selectedInternalNote = $orderInternalNote ? $orderInternalNote->internal_note_id : null;
+            ->get();
+        foreach ($orderInternalNote as $orderInternalNote) {
+            $selectedInternalNote[] = $orderInternalNote->internal_note_id;
+        }
 
         // If we have an internal note, use its content, otherwise use the order notes
         $notes = $order->notes;
-        if ($orderInternalNote && $orderInternalNote->content) {
-            $notes = $orderInternalNote->content;
-        } elseif ($orderInternalNote && $orderInternalNote->internalNote) {
-            $notes = $orderInternalNote->internalNote->note_content;
-        }
-
         $additionalNotesData = [
             'notes' => $order->additional_notes,
             'show_price' => $order->show_price,
@@ -446,24 +449,26 @@ class OrderController extends Controller
                     'price' => $perServicePrice,
                 ]);
             }
-
-            // Handle internal note update
-            if (!empty($validatedData['internal_note_id'])) {
-                $internalNote = InternalNote::find($validatedData['internal_note_id']);
-                if ($internalNote) {
-                    OrderInternalNote::updateOrCreate(
-                        ['order_id' => $order->id],
-                        [
-                            'content' => $validatedData['notes'] ?: $internalNote->note_content,
-                            'internal_note_id' => $validatedData['internal_note_id']
-                        ]
-                    );
+            
+            // Handle internal notes update
+            if (isset($validatedData['internal_note_id'])) {
+                // First, remove any existing order-internal note relationships
+                foreach (OrderInternalNote::where('order_id', $order->id)->get() as $orderInternalNote) {
+                    $orderInternalNote->delete();
                 }
-            } else {
-                // Remove the internal note if none is selected
-                OrderInternalNote::where('order_id', $order->id)->delete();
+                
+                // Create new relationships for each selected note
+                    foreach ((array)$validatedData['internal_note_id'] as $noteId) {
+                        $internalNote = InternalNote::find($noteId);
+                        if ($internalNote) {
+                            OrderInternalNote::create([
+                                'order_id' => $order->id,
+                                'content' => $validatedData['notes'] ?: $internalNote->note_content,
+                                'internal_note_id' => $noteId
+                            ]);
+                        }
+                    }
             }
-
             $order->save();
 
             // Send WhatsApp reservation data message if status changed to approved

@@ -135,7 +135,6 @@
                                            required>
                                 </div>
                             </div>
-
                             <div class="row mb-6">
                                 <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.internal_notes')</label>
                                 <div class="col-lg-8">
@@ -144,10 +143,10 @@
                                         <select id="internalNoteSelect" name="internal_note_id[]" class="form-select form-select-lg form-select-solid" data-placeholder="@lang('dashboard.choose')" multiple="multiple">
                                             @if(isset($internalNotes) && count($internalNotes))
                                                 @foreach($internalNotes as $in)
-                                                    <?php
+                                                    @php
                                                         $isSelected = (isset($selectedInternalNote) && (is_array($selectedInternalNote) ? in_array($in->id, $selectedInternalNote) : $selectedInternalNote == $in->id));
                                                         $selectedAttr = $isSelected ? 'selected="selected"' : '';
-                                                    ?>
+                                                    @endphp
                                                     <option value="{{ $in->id }}"
                                                         data-name="{{ $in->note_name }}"
                                                         data-content="{!! $in->note_content !!}"
@@ -628,125 +627,13 @@
         </div>
     </div>
     <!--end::Modal - Additional Notes-->
-
-    <!--begin::Modal - Edit Internal Note (Quill) -->
-    <div class="modal fade" id="internalNoteEditModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered mw-900px">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="fw-bolder">@lang('dashboard.edit_internal_note')</h2>
-                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
-                        <span class="svg-icon svg-icon-2x">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor"></rect>
-                                <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor"></rect>
-                            </svg>
-                        </span>
-                    </div>
-                </div>
-                <div class="modal-body py-10 px-lg-15">
-                    <div id="internalNoteQuillToolbar">
-                        <span class="ql-formats">
-                            <button type="button" id="toggleDirection" class="btn btn-sm btn-icon" title="Toggle Text Direction">
-                                <i class="fas fa-text-width"></i>
-                            </button>
-                            <select class="ql-font"></select>
-                            <select class="ql-size"></select>
-                        </span>
-                        <span class="ql-formats">
-                            <button class="ql-bold"></button>
-                            <button class="ql-italic"></button>
-                            <button class="ql-underline"></button>
-                            <button class="ql-strike"></button>
-                        </span>
-                        <span class="ql-formats">
-                            <select class="ql-color"></select>
-                            <select class="ql-background"></select>
-                        </span>
-                        <span class="ql-formats">
-                            <button class="ql-script" value="sub"></button>
-                            <button class="ql-script" value="super"></button>
-                        </span>
-                        <span class="ql-formats">
-                            <button class="ql-header" value="1"></button>
-                            <button class="ql-header" value="2"></button>
-                            <button class="ql-blockquote"></button>
-                            <button class="ql-code-block"></button>
-                        </span>
-                        <span class="ql-formats">
-                            <button class="ql-list" value="ordered"></button>
-                            <button class="ql-list" value="bullet"></button>
-                            <button class="ql-indent" value="-1"></button>
-                            <button class="ql-indent" value="+1"></button>
-                        </span>
-                        <span class="ql-formats">
-                            <button class="ql-direction" value="rtl"></button>
-                            <select class="ql-align"></select>
-                        </span>
-                        <span class="ql-formats">
-                            <button class="ql-link"></button>
-                            <button class="ql-clean"></button>
-                        </span>
-                    </div>
-                    <div id="internalNoteQuill" style="height:50vh;"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">@lang('dashboard.cancel')</button>
-                    <button type="button" id="updateInternalNoteBtn" class="btn btn-primary">@lang('dashboard.update_button')</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--end::Modal - Edit Internal Note (Quill) -->
-
-    <!-- Inline styles for internal note Select2 positioning and sizing -->
-    <style>
-        /* Allow the rendered content to define the height and wrap lines */
-        #internalNoteSelect + .select2 .select2-selection--single {
-            position: relative;
-            min-height: 56px; /* increase as needed to fit the badge comfortably */
-            height: auto;
-            padding-top: 6px;
-            padding-bottom: 6px;
-            display: flex;
-            align-items: center;
-        }
-        #internalNoteSelect + .select2 .select2-selection__rendered {
-            white-space: normal;
-            line-height: 1.2;
-            display: block;
-            padding-right: 32px; /* leave room for arrow */
-            overflow: visible; /* avoid clipping the badge */
-        }
-        #internalNoteSelect + .select2 .select2-selection__arrow {
-            height: 100%;
-        }
-        /* Render the content normally (no absolute positioning) so the container grows */
-        span#select2-internalNoteSelect-container {
-            position: static;
-            top: auto;
-            left: auto;
-            right: auto;
-        }
-    </style>
 @endsection
 
 @section('scripts')
-    <!-- Quill assets for Internal Note editor -->
-    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
     <script src="https://cdn.tiny.cloud/1/m181ycw0urzvmmzinvpzqn3nv10wxttgo7gvv77hf6ce6z89/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <script type="text/javascript">
     'use strict';
     document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the toggle state on page load
-    $(document).ready(function() {
-        const $toggle = $('#toggleInternalNote');
-        if ($toggle.length) {
-            // Trigger change event to set initial state
-            $toggle.trigger('change');
-        }
-    });
         (function(){
             const isRTL = "{{ app()->getLocale() }}" === "ar";
 
@@ -1389,374 +1276,47 @@
             });
 
             /////////////// Internal Note System (Merged) ///////////////
-            let internalNoteQuill = null;
-            let currentNoteContent = '';
-            let currentNoteDirection = 'ltr';
-            const isEditingOrder = "{{ isset($order) && $order->exists }}" === "1";
 
-            // Initialize internal note system
-            function initializeInternalNoteSystem() {
-                const $select = $('#internalNoteSelect');
-                const $hiddenNoteField = $('#internalNoteField');
-                const $noteIdField = $('#internal_note_id');
-
-                // Initialize Select2
-                initializeInternalNoteSelect2($select);
-
-                // Initialize Quill editor when modal opens
-                initializeQuillEditor();
-
-                // Set initial values if editing an order
-                if (isEditingOrder) {
-                    loadExistingOrderNote();
-                }
-
-                // Bind event handlers
-                bindInternalNoteEventHandlers();
-            }
-
-            // Initialize Select2 with custom templates for internal notes
-            function initializeInternalNoteSelect2($select) {
-                if ($select.data('select2')) {
-                    $select.select2('destroy');
-                }
-
-                $select.select2({
-                    width: '100%',
-                    placeholder: "{{ __('dashboard.choose') }}",
-                    allowClear: true,
-                    dir: isRTL ? 'rtl' : 'ltr',
-
-                    // Template for dropdown items
-                    templateResult: function(state) {
-                        if (!state.id) return state.text;
-                        return $('<span>').text(state.text);
-                    },
-
-                    // Template for selected item (with edit/delete buttons)
-                    templateSelection: function(state) {
-                        if (!state.id) {
-                            return $('<span>').text(state.text || "{{ __('dashboard.choose') }}");
-                        }
-
-                        const $element = $(state.element);
-                        const name = $element.data('name') || state.text;
-
-                        const $badge = $('<span class="d-inline-flex align-items-center gap-2">');
-                        $badge.html(`
-                            <span class="badge bg-secondary  px-2 py-1 d-inline-flex align-items-center gap-2">
-                                <span class="note-name">${escapeHtml(name)}</span>
-                                <span class="internal-note-actions d-inline-flex align-items-center">
-                                    <button type="button" class="btn-edit-internal p-0 border-0 bg-light" title="{{ __('dashboard.edit') }}">
-                                        <span class="btn btn-light"><i class="fas fa-edit"></i></span>
-                                    </button>
-                                    <button type="button" class="btn-remove-internal p-0 border-0 bg-light" title="{{ __('dashboard.remove') }}">
-                                        <span class="btn btn-danger"><i class="fas fa-times"></i></span>
-                                    </button>
-                                </span>
-                            </span>
-                        `);
-
-                        return $badge;
-                    },
-
-                    escapeMarkup: function(markup) {
-                        return markup;
-                    }
-                });
-            }
-
-            // Initialize Quill editor
-            function initializeQuillEditor() {
-                const modalEl = document.getElementById('internalNoteEditModal');
-                if (!modalEl) return;
-
-                const modal = new bootstrap.Modal(modalEl);
-
-                modalEl.addEventListener('shown.bs.modal', function() {
-                    if (!internalNoteQuill) {
-                        const quillEl = document.getElementById('internalNoteQuill');
-                        if (quillEl) {
-                            internalNoteQuill = new Quill(quillEl, {
-                                theme: 'snow',
-                                modules: {
-                                    toolbar: '#internalNoteQuillToolbar'
-                                },
-                                placeholder: "{{ __('dashboard.enter_note_content') }}",
-                                bounds: document.body
-                            });
-
-                            loadContentIntoQuill();
-                        }
-                    } else {
-                        loadContentIntoQuill();
-                    }
-                });
-            }
-
-            // Load content into Quill editor
-            function loadContentIntoQuill() {
-                if (!internalNoteQuill) return;
-
-                const editorEl = internalNoteQuill.root;
-
-                if (currentNoteContent) {
-                    internalNoteQuill.clipboard.dangerouslyPasteHTML(currentNoteContent);
-                } else {
-                    internalNoteQuill.setText('');
-                }
-
-                editorEl.style.direction = currentNoteDirection;
-                $('#toggleDirection').toggleClass('active', currentNoteDirection === 'rtl');
-            }
-
-            // Load existing order note if editing
-            function loadExistingOrderNote() {
-                @if(isset($order) && $order->exists && !empty($order->notes))
-                    currentNoteContent = `{!! addslashes($order->notes) !!}`;
-                    currentNoteDirection = "{{ $order->internal_note_direction ?? 'ltr' }}";
-
-                    $('#internalNoteField').val(currentNoteContent);
-
-                    @if(isset($order->internal_note_id))
-                        $('#internalNoteSelect').val("{{ $order->internal_note_id }}").trigger('change');
-                    @endif
-                @endif
-            }
-
-            // Bind all internal note event handlers
-            function bindInternalNoteEventHandlers() {
-                const $select = $('#internalNoteSelect');
-
-                // Handle selection change
-                $select.on('change', handleNoteSelectionChange);
-
-                // Function to handle edit/remove actions without opening dropdown
-                function handleActionButtonClick(e, isRemove = false) {
-                    // Prevent default and stop propagation
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-
-                    // Get the select2 instance
-                    const $select = $('#internalNoteSelect');
-                    const select2 = $select.data('select2');
-
-                    // If select2 is open, close it first
-                    if (select2 && select2.isOpen()) {
-                        $select.select2('close');
-                    }
-
-                    // Prevent the dropdown from opening
-                    const preventOpen = function(e) {
-                        e.preventDefault();
-                        $select.off('select2:opening', preventOpen);
-                    };
-
-                    $select.on('select2:opening', preventOpen);
-
-                    // Handle the action after a small delay
-                    setTimeout(() => {
-                        // Remove the event handler
-                        $select.off('select2:opening', preventOpen);
-
-                        if (isRemove) {
-                            // Handle remove action
-                            if (confirm("{{ __('dashboard.confirm_remove_note') }}")) {
-                                $select.val(null).trigger('change');
-                                currentNoteContent = '';
-                                currentNoteDirection = 'ltr';
-                                $('#internal_note_id').val('');
-                                $('#internalNoteField').val('');
-
-                                if (internalNoteQuill) {
-                                    internalNoteQuill.setText('');
-                                }
-                            }
-                        } else {
-                            // Handle edit action
-                            const modalEl = document.getElementById('internalNoteEditModal');
-                            if (modalEl) {
-                                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                                modal.show();
-                            }
-                        }
-                    }, 10);
-
-                    return false;
-                }
-
-                // Edit button handler
-                $(document).on('mousedown', '.btn-edit-internal', function(e) {
-                    return handleActionButtonClick(e, false);
-                });
-
-                // Remove button handler
-                $(document).on('mousedown', '.btn-remove-internal', function(e) {
-                    return handleActionButtonClick(e, true);
-                });
-
-                // Handle direction toggle
-                $(document).on('click', '#toggleDirection', handleDirectionToggle);
-
-                // Handle update button in modal
-                $('#updateInternalNoteBtn').on('click', handleUpdateNote);
-
-                // Handler for edit/remove buttons
-                $(document).on('mousedown', '.btn-edit-internal, .btn-remove-internal', function(e) {
-                    // Prevent default and stop propagation
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-
-                    // Get the action type (edit or remove)
-                    const isRemove = $(this).hasClass('btn-remove-internal');
-                    const $select = $('#internalNoteSelect');
-
-                    // Handle the action
-                    if (isRemove) {
-                        if (confirm("{{ __('dashboard.confirm_remove_note') }}")) {
-                            $select.val(null).trigger('change');
-                            currentNoteContent = '';
-                            currentNoteDirection = 'ltr';
-                            $('#internal_note_id').val('');
-                            $('#internalNoteField').val('');
-
-                            if (internalNoteQuill) {
-                                internalNoteQuill.setText('');
-                            }
-                        }
-                    } else {
-                        const modalEl = document.getElementById('internalNoteEditModal');
-                        if (modalEl) {
-                            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                            modal.show();
-                        }
-                    }
-
-                    return false;
-                });
-
-                // Prevent Select2 from opening when clicking on the badge
-                $(document).on('select2:opening', '#internalNoteSelect', function(e) {
-                    const target = e.originalEvent && e.originalEvent.target;
-                    if (target && target.closest('.btn-edit-internal, .btn-remove-internal')) {
-                        e.preventDefault();
-                        return false;
-                    }
-                });
-            }
-
+            const $internalNoteSelect = $('#internalNoteSelect');
+            $internalNoteSelect.select2();
+            
+            // Add change event listener
+            $internalNoteSelect.on('change', handleNoteSelectionChange);
             // Handle note selection change
+            let selectedIds = $internalNoteSelct.val(); // Initialize an empty array
             function handleNoteSelectionChange() {
-                const $select = $('#internalNoteSelect');
-                const selectedIds = $select.val() || [];
-                
+                const $select = $('#internalNoteSelect');   
+                selectedIds = [
+                    ...selectedIds.filter(id => $select.val().includes(id)),
+                    ...$select.val().filter(id => !selectedIds.includes(id))
+                ];
+                console.log(selectedIds);
                 // Update the hidden field with comma-separated IDs
                 $('#internal_note_id').val(selectedIds.join(','));
 
-                if (selectedIds.length > 0) {
-                    // Get current content from the textarea
-                    let currentContent = $('#internalNoteField').val();
-                    let newContent = '';
-                    let combinedDirection = currentNoteDirection || 'ltr';
-                    
-                    // Get the newly selected option (the last one in the array)
-                    const lastSelectedId = selectedIds[selectedIds.length - 1];
-                    const $lastSelectedOption = $select.find(`option[value="${lastSelectedId}"]`);
-                    const newContentToAdd = $lastSelectedOption.data('content') || '';
-                    
-                    // Trim current content and prepare for merge
-                    currentContent = (currentContent || '').trim();
-                    newContent = currentContent;
-                    
-                    // Add the new content with proper spacing
-                    if (newContentToAdd) {
+                let combinedContent = [];
+                
+                // Get content from all selected options
+                selectedIds.forEach(id => {
+                    const $option = $select.find(`option[value="${id}"]`);
+                    const content = $option.data('content') || '';
+                    if (content) {
                         const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = newContentToAdd;
-                        let plainText = (tempDiv.textContent || tempDiv.innerText || '').trim();
-                        
-                        // Add spacing between existing and new content if both exist
-                        if (newContent && plainText) {
-                            // Ensure there's exactly one blank line between contents
-                            newContent = newContent + ' ' + plainText;
-                        } else if (plainText) {
-                            newContent = plainText;
-                        }
-                        
-                        // Update the field with combined content
-                        $('#internalNoteField').val(newContent);
-                        
-                        // Update direction from the last selected option if available
-                        if ($lastSelectedOption.data('direction')) {
-                            combinedDirection = $lastSelectedOption.data('direction');
-                        }
-                        
-                        // Update global variables
-                        currentNoteContent = newContent;
-                        currentNoteDirection = combinedDirection;
-                        
-                        // Update direction if needed
-                        if (internalNoteQuill) {
-                            internalNoteQuill.root.style.direction = combinedDirection;
-                            $('.toggle-direction').toggleClass('active', combinedDirection === 'rtl');
+                        tempDiv.innerHTML = content;
+                        const plainText = (tempDiv.textContent || tempDiv.innerText || '').trim();
+                        if (plainText) {
+                            combinedContent.push(plainText);
                         }
                     }
-                } else {
-                    currentNoteContent = '';
-                    currentNoteDirection = 'ltr';
-                    $('#internalNoteField').val('');
-                }
+                });
+                
+                // Join all contents with a single space
+                const newContent = combinedContent.join(' ');
+                
+                // Update the textarea
+                $('#internalNoteField').val(newContent);
+                
             }
-
-            // Handle direction toggle
-            function handleDirectionToggle() {
-                if (!internalNoteQuill) return;
-
-                const editorEl = internalNoteQuill.root;
-                currentNoteDirection = (currentNoteDirection === 'ltr') ? 'rtl' : 'ltr';
-                editorEl.style.direction = currentNoteDirection;
-
-                $(this).toggleClass('active', currentNoteDirection === 'rtl');
-            }
-
-            // Handle update note from modal
-            function handleUpdateNote() {
-                if (!internalNoteQuill) return;
-
-                currentNoteContent = internalNoteQuill.root.innerHTML;
-                const plainText = internalNoteQuill.getText().trim();
-
-                $('#internalNoteField').val(plainText);
-
-                if (!$('#internal_note_html_content').length) {
-                    $('<input type="hidden" id="internal_note_html_content" name="internal_note_content">').appendTo('form');
-                }
-                $('#internal_note_html_content').val(currentNoteContent);
-
-                if (!$('#internal_note_direction').length) {
-                    $('<input type="hidden" id="internal_note_direction" name="internal_note_direction">').appendTo('form');
-                }
-                $('#internal_note_direction').val(currentNoteDirection);
-
-                const modalEl = document.getElementById('internalNoteEditModal');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                if (modal) {
-                    modal.hide();
-                }
-
-                if (window.Swal) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: "{{ __('dashboard.note_updated') }}",
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 3000
-                    });
-                }
-            }
-
             // Helper function to escape HTML
             function escapeHtml(text) {
                 const map = {
@@ -1772,23 +1332,7 @@
             // Initialize internal note system when ready
             $(document).ready(function() {
                 // Initialize internal note system only if the element exists
-                if ($('#internalNoteSelect').length > 0) {
-                    initializeInternalNoteSystem();
-                }
 
-
-            // function recalcPrice() {
-            //     let total = 0;
-            //     $('#service_id option:selected').each(function(){
-            //         total += parseFloat($(this).data('price')) || 0;
-            //     });
-            //     $('#price').val(total.toFixed(2));
-            // }
-            // // Recalculate only on user-initiated changes (ignore programmatic .trigger('change'))
-            // $('#service_id').on('change', function(e){
-            //     if (!e.originalEvent) return; // skip programmatic changes
-            //     recalcPrice();
-            // });
             $('#btnRetrieveRf').on('click', ()=>{
                 const el = document.getElementById('retrieveRfModal');
                 bootstrap.Modal.getOrCreateInstance(el).show();
