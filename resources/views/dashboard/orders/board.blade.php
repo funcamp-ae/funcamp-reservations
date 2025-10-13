@@ -349,28 +349,24 @@
       }
 
       // Update sign-in status
-      if (typeof order.signin_at !== 'undefined') {
+      if ( order.signin_at ) {
         const signinCell = document.querySelector(`.signin-status[data-order-id="${order.id}"]`);
         if (signinCell) {
-          if (order.signin_at) {
             signinCell.innerHTML = `
             <span class="badge bg-success">@lang('dashboard.logged_in')</span>
-            <div class="text-muted small signin-time">${formatDateTime(order.signin_at)}</div>
+            <div class="text-muted small signin-time">${order.signin_at}</div>
           `;
-          }
         }
       }
 
       // Update logout status
-      if (typeof order.logout_at !== 'undefined') {
+      if ( order.logout_at ) {
         const logoutCell = document.querySelector(`.logout-status[data-order-id="${order.id}"]`);
         if (logoutCell) {
-          if (order.logout_at) {
             logoutCell.innerHTML = `
             <span class="badge bg-success">@lang('dashboard.logged_out')</span>
-            <div class="text-muted small logout-time">${formatDateTime(order.logout_at)}</div>
+            <div class="text-muted small logout-time">${order.logout_at}</div>
           `;
-          }
         }
       }
     }

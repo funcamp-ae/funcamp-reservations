@@ -139,30 +139,14 @@
                             <div class="row mb-6">
                                 <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.internal_notes')</label>
                                 <div class="col-lg-8">
-                                    <!-- Toggle Switch -->
-                                    <div class="form-check form-switch form-check-custom form-check-solid mb-4">
-                                        <label class="form-check-label" for="toggleInternalNote">
-                                            @lang('dashboard.use_template')
-                                        </label>
-                                        <input class="form-check-input" type="checkbox" id="toggleInternalNote" checked>
-                                    </div>
-
                                     <input type="hidden" name="internal_note_id" id="internal_note_id" value="{{ $selectedInternalNote->id ?? '' }}">
-
-                                    <!-- Container for the selected note -->
                                     <div id="templateNoteContainer">
-                                        <select id="internalNoteSelect" name="internal_note_id" class="form-select form-select-lg form-select-solid" data-placeholder="@lang('dashboard.choose')">
-                                            <option value="">@lang('dashboard.choose')</option>
+                                        <select id="internalNoteSelect" name="internal_note_id[]" class="form-select form-select-lg form-select-solid" data-placeholder="@lang('dashboard.choose')" multiple="multiple">
                                             @if(isset($internalNotes) && count($internalNotes))
                                                 @foreach($internalNotes as $in)
                                                     <?php
-                                                        $isSelected = (isset($selectedInternalNote) && (is_object($selectedInternalNote) ? $selectedInternalNote->id : $selectedInternalNote) == $in->id);
-                                                        if ($isSelected) {
-                                                            $noteContent = $in->note_content;
-                                                            $selectedAttr = 'selected="selected"';
-                                                        } else {
-                                                            $selectedAttr = '';
-                                                        }
+                                                        $isSelected = (isset($selectedInternalNote) && (is_array($selectedInternalNote) ? in_array($in->id, $selectedInternalNote) : $selectedInternalNote == $in->id));
+                                                        $selectedAttr = $isSelected ? 'selected="selected"' : '';
                                                     ?>
                                                     <option value="{{ $in->id }}"
                                                         data-name="{{ $in->note_name }}"
@@ -174,7 +158,7 @@
                                             @endif
                                         </select>
                                     </div>
-                                    <textarea id="internalNoteField" name="notes" class="form-control d-none form-control-lg form-control-solid" placeholder="@lang('dashboard.notes')">{{ isset($order) ? $order->notes : old('notes', request('notes')) }}</textarea>
+                                    <textarea id="internalNoteField" name="notes" class="form-control  mt-4 form-control-lg form-control-solid" placeholder="@lang('dashboard.notes')">{{ isset($order) ? $order->notes : old('notes', request('notes')) }}</textarea>
                                 </div>
                             </div>
                             @php
@@ -755,23 +739,6 @@
     <script type="text/javascript">
     'use strict';
     document.addEventListener('DOMContentLoaded', function() {
-            // Toggle between template select and custom notes using jQuery
-    $(document).on('change', '#toggleInternalNote', function() {
-        const $templateContainer = $('#templateNoteContainer');
-        const $customContainer = $('#customNoteContainer');
-        const $notesTextarea = $('#internalNoteField');
-
-        if ($(this).is(':checked')) {
-            // Show template select, hide custom notes
-            $templateContainer.removeClass('d-none');
-            $notesTextarea.addClass('d-none');
-        } else {
-            // Hide template select, show custom notes
-            $templateContainer.addClass('d-none');
-            $notesTextarea.removeClass('d-none');
-        }
-    });
-
     // Initialize the toggle state on page load
     $(document).ready(function() {
         const $toggle = $('#toggleInternalNote');
@@ -1480,10 +1447,10 @@
                             <span class="badge bg-secondary  px-2 py-1 d-inline-flex align-items-center gap-2">
                                 <span class="note-name">${escapeHtml(name)}</span>
                                 <span class="internal-note-actions d-inline-flex align-items-center">
-                                    <button type="button" class="btn-edit-internal p-0 border-0" title="{{ __('dashboard.edit') }}">
+                                    <button type="button" class="btn-edit-internal p-0 border-0 bg-light" title="{{ __('dashboard.edit') }}">
                                         <span class="btn btn-light"><i class="fas fa-edit"></i></span>
                                     </button>
-                                    <button type="button" class="btn-remove-internal p-0 border-0" title="{{ __('dashboard.remove') }}">
+                                    <button type="button" class="btn-remove-internal p-0 border-0 bg-light" title="{{ __('dashboard.remove') }}">
                                         <span class="btn btn-danger"><i class="fas fa-times"></i></span>
                                     </button>
                                 </span>
@@ -1683,21 +1650,57 @@
             // Handle note selection change
             function handleNoteSelectionChange() {
                 const $select = $('#internalNoteSelect');
-                const noteId = $select.val();
+                const selectedIds = $select.val() || [];
+                
+                // Update the hidden field with comma-separated IDs
+                $('#internal_note_id').val(selectedIds.join(','));
 
-                $('#internal_note_id').val(noteId || '');
-
-                if (noteId) {
-                    const $option = $select.find('option:selected');
-
-                    if (!isEditingOrder || !currentNoteContent) {
-                        currentNoteContent = $option.data('content') || '';
-                        currentNoteDirection = $option.data('direction') || 'ltr';
-
+                if (selectedIds.length > 0) {
+                    // Get current content from the textarea
+                    let currentContent = $('#internalNoteField').val();
+                    let newContent = '';
+                    let combinedDirection = currentNoteDirection || 'ltr';
+                    
+                    // Get the newly selected option (the last one in the array)
+                    const lastSelectedId = selectedIds[selectedIds.length - 1];
+                    const $lastSelectedOption = $select.find(`option[value="${lastSelectedId}"]`);
+                    const newContentToAdd = $lastSelectedOption.data('content') || '';
+                    
+                    // Trim current content and prepare for merge
+                    currentContent = (currentContent || '').trim();
+                    newContent = currentContent;
+                    
+                    // Add the new content with proper spacing
+                    if (newContentToAdd) {
                         const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = currentNoteContent;
-                        const plainText = tempDiv.textContent || tempDiv.innerText || '';
-                        $('#internalNoteField').val(plainText);
+                        tempDiv.innerHTML = newContentToAdd;
+                        let plainText = (tempDiv.textContent || tempDiv.innerText || '').trim();
+                        
+                        // Add spacing between existing and new content if both exist
+                        if (newContent && plainText) {
+                            // Ensure there's exactly one blank line between contents
+                            newContent = newContent + ' ' + plainText;
+                        } else if (plainText) {
+                            newContent = plainText;
+                        }
+                        
+                        // Update the field with combined content
+                        $('#internalNoteField').val(newContent);
+                        
+                        // Update direction from the last selected option if available
+                        if ($lastSelectedOption.data('direction')) {
+                            combinedDirection = $lastSelectedOption.data('direction');
+                        }
+                        
+                        // Update global variables
+                        currentNoteContent = newContent;
+                        currentNoteDirection = combinedDirection;
+                        
+                        // Update direction if needed
+                        if (internalNoteQuill) {
+                            internalNoteQuill.root.style.direction = combinedDirection;
+                            $('.toggle-direction').toggleClass('active', combinedDirection === 'rtl');
+                        }
                     }
                 } else {
                     currentNoteContent = '';

@@ -16,7 +16,10 @@
         .main-container {
             min-height: 100vh;
         }
-
+        .modal-header , .modal-body{
+            background-color: var(--bs-card-bg);
+            color: var(--bs-card-color);
+        }
         /* Mobile sidebar - hidden by default, shown as overlay */
         .mobile-sidebar {
             position: fixed;
@@ -826,15 +829,23 @@
 <input type="hidden" id="surveyId" value="{{ $survey['id'] ?? '' }}">
 <input type="hidden" id="surveyData" value='{!! isset($survey) ? json_encode($survey) : '{}' !!}'>
 <!-- Toast for save confirmation -->
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-    <div id="saveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <i class="mdi mdi-check-circle text-success me-2"></i>
-            <strong class="me-auto">{{ __('dashboard.saved_successfully') }}</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="{{ __('dashboard.close') }}"></button>
-        </div>
-        <div class="toast-body">
-            {{ __('dashboard.survey_saved_successfully') }}
+<!-- Modal for save confirmation -->
+<div class="modal fade" id="saveModal" tabindex="-1" aria-labelledby="saveModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveModalLabel">
+                    <i class="mdi mdi-check-circle text-success me-2"></i>
+                    {{ __('dashboard.saved_successfully') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('dashboard.close') }}"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <p class="mb-0">{{ __('dashboard.survey_saved_successfully') }}</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">{{ __('dashboard.ok') }}</button>
+            </div>
         </div>
     </div>
 </div>
@@ -1863,9 +1874,8 @@
                     }
 
                     // Show success message
-                    const toast = new bootstrap.Toast(document.getElementById('saveToast'));
-                    toast.show();
-
+                   const saveModal = new bootstrap.Modal(document.getElementById('saveModal'));
+                   saveModal.show();
                     // Mark as saved
                     $(".unsaved-indicator").addClass("bg-success").removeClass("bg-warning");
                 },

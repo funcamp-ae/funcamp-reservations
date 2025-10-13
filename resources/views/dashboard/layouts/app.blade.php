@@ -176,7 +176,7 @@
             color: var(--bs-card-color) !important;
             border-color: var(--bs-border-color) !important;
         }
-	a  , .form-label{
+	a:not(.bg-primary)  , .form-label{
             color: var(--bs-card-color) !important;
 	}
 	.form-label{
@@ -227,35 +227,35 @@ a.btn-primary{
         }
         
         /* Navigation and Menu Items */
-        .menu-item, .menu-link, .menu-title {
+        /* .menu-item, .menu-link, .menu-title {
             color: var(--bs-card-color) !important;
             transition: all 0.3s ease;
-        }
+        } */
         
         .menu-item:hover .menu-link, 
-        .menu-item.here .menu-link,
+        /* .menu-item.here .menu-link, */
         .menu-item.active .menu-link {
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            color: var(--bs-primary) !important;
+            background-color: var(--primary-brown) !important;
+            color: white !important;
         }
         
         .menu-link.active {
-            background-color: rgba(54, 153, 255, 0.1) !important;
-            color: var(--bs-primary) !important;
+            background-color: var(--primary-brown) !important;
+            color: white !important;
         }
         
         .menu-sub {
-            background-color: var(--bs-card-bg) !important;
+            /* background-color: var(--primary-brown) !important; */
             border-left: 1px solid var(--bs-border-color) !important;
         }
         
         .menu-item .menu-link .menu-bullet > span {
-            background-color: var(--bs-card-color) !important;
+            background-color: var(--primary-brown) !important;
         }
         
         .menu-item.here > .menu-link .menu-title,
         .menu-item.active > .menu-link .menu-title {
-            color: var(--bs-primary) !important;
+            color: white !important;
         }
         
         /* Toolbar */
@@ -266,7 +266,7 @@ a.btn-primary{
         
         /* Sidebar/Menu */
         .aside {
-            background-color: var(--bs-card-bg) !important;
+            background-color: var(--primary-brown) !important;
             border-right: 1px solid var(--bs-border-color) !important;
         }
         
@@ -276,13 +276,13 @@ a.btn-primary{
         }
         
         .table {
-            --bs-table-bg: var(--bs-card-bg);
+            --bs-table-bg: var(--primary-brown);
             --bs-table-color: var(--bs-card-color);
             --bs-table-border-color: var(--bs-border-color);
         }
         
         .dropdown-menu {
-            --bs-dropdown-bg: var(--bs-card-bg);
+            --bs-dropdown-bg: var(--primary-brown);
             --bs-dropdown-color: var(--bs-card-color);
             --bs-dropdown-link-color: var(--bs-card-color);
             --bs-dropdown-link-hover-color: var(--bs-primary);
@@ -601,6 +601,9 @@ a.btn-primary{
 	.select2-container--open .select2-dropdown.country-select-dropdown {
 		min-width: 230px !important;
 	}
+	.menu-bg-dark {
+		background-color: #323248 !important;
+	}
 	</style>
 	
 	<!-- Theme Mode JS -->
@@ -672,7 +675,7 @@ a.btn-primary{
 				</div>
 				<!--end::Brand-->
 				<!--begin::Aside menu-->
-				<div class="aside-menu flex-column-fluid">
+				<div class="aside-menu flex-column-fluid @if(session('theme') == 'dark') menu-bg-dark @else bg-light @endif">
 					<!--begin::Aside Menu-->
 					<div class="hover-scroll-overlay-y my-5 my-lg-5" id="kt_aside_menu_wrapper" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_aside_logo, #kt_aside_footer" data-kt-scroll-wrappers="#kt_aside_menu" data-kt-scroll-offset="0">
 						<!--begin::Menu-->

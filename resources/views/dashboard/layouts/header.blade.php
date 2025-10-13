@@ -168,7 +168,7 @@
                             <img src="{{ auth()->user()->image ? auth()->user()->image : asset('images/logo.png') }}" alt="user" />
                         </div>
                         <!--begin::User account menu-->
-                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px" data-kt-menu="true">
+                        <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded  menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px" data-kt-menu="true">
                             <!--begin::Menu item-->
                             <div class="menu-item px-3">
                                 <div class="menu-content d-flex align-items-center px-3">
@@ -202,7 +202,7 @@
                                     <!--begin::Menu item-->
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-3 langauge-switcher">
-                                        <a  href="{{route('set-lang','ps')}}"  switchToLang="ps" class="menu-link d-flex px-5  {{ session()->get( 'lang' ) == "ps" ? "active" : ""}}">
+                                        <a  href="{{route('set-lang','ps')}}"  switchToLang="ps" class="py-3 d-flex px-5  {{ session()->get( 'lang' ) == "ps" ? "active" : ""}}">
                                         <span class="symbol symbol-20px me-4">
                                             <img class="rounded-1" src="{{asset('dashboard/assets/media/flags/afghanistan.svg')}}" alt="" />
                                         </span>البشتو </a>
@@ -210,14 +210,14 @@
                                     <!--end::Menu item-->
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-3 langauge-switcher">
-                                        <a  href="{{route('set-lang','ar')}}"  switchToLang="ar" class="menu-link d-flex px-5  {{ session()->get( 'lang' ) == "ar" ? "active" : ""}}">
+                                        <a  href="{{route('set-lang','ar')}}"  switchToLang="ar" class=" py-3 d-flex px-5  {{ session()->get( 'lang' ) == "ar" ? "active" : ""}}">
                                         <span class="symbol symbol-20px me-4">
                                             <img class="rounded-1" src="{{asset('dashboard/assets/media/flags/saudi-arabia.svg')}}" alt="" />
                                         </span>العربية</a>
                                     </div>
                                     <!--end::Menu item-->
                                     <div class="menu-item px-3 langauge-switcher">
-                                        <a  switchToLang="en" href="{{route('set-lang','en')}}" class="menu-link d-flex px-5 {{ session()->get( 'lang' ) == "en" ? "active" : ""}}">
+                                        <a  switchToLang="en" href="{{route('set-lang','en')}}" class="py-3 d-flex px-5 {{ session()->get( 'lang' ) == "en" ? "active" : ""}}">
                                         <span class="symbol symbol-20px me-4">
                                             <img class="rounded-1" src="{{asset('dashboard/assets/media/flags/united-states.svg')}}" alt="" />
                                         </span>English</a>

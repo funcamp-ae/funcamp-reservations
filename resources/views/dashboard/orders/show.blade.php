@@ -11,16 +11,16 @@
               <div class="pt-5 px-9 gap-2 gap-md-5">
                     <div class="row g-3 small">
                         <div class="col-md-1 text-center">
-                            <div class="fw-semibold text-muted">{{ __('dashboard.order_id') }}</div>
+                            <div class="fw-semibold ">{{ __('dashboard.order_id') }}</div>
                             <div class="fw-bold">{{ $order->id }}</div>
                         </div>
                         <div class="col-md-3 text-center">
-                            <div class="fw-semibold text-muted">{{ __('dashboard.customer_name') }}</div>
+                            <div class="fw-semibold ">{{ __('dashboard.customer_name') }}</div>
                             <div class="fw-bold">{{ $order->customer->name }}</div>
                         </div>
                         <div class="col-md-3 text-center">
-                            <div class="fw-semibold text-muted">{{ __('dashboard.customer_phone') }}</div>
-                            <div class="fw-bold">{{ $order->customer->phone }}</div>
+                            <div class="fw-semibold ">{{ __('dashboard.customer_phone') }}</div>
+                            <div class="fw-bold" dir="ltr">{{ $order->customer->phone }}</div>
                         </div>
                     </div>
                 </div>
@@ -50,13 +50,13 @@
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.the_first_and_last_name')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">{{ $order->customer->name }}</p>
+                            <p class="pt-4">{{ $order->customer->name }}</p>
                         </div>
                     </div>
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.people_count')</label>
                         <div class="col-lg-8">
-                        <p class="form-control-plaintext">{{ $order->people_count }}</p>
+                        <p class="pt-4">{{ $order->people_count }}</p>
                         </div>
                     </div>
 
@@ -74,66 +74,66 @@
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.price')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">{{ number_format($order->price, 2) }}</p>
+                            <p class="pt-4">{{ number_format($order->price, 2) }}</p>
                         </div>
                     </div>
 
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.addons')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">{{ number_format($order->addons()->sum('order_addon.price'), 2) }}</p>
+                            <p class="pt-4">{{ number_format($order->addons()->sum('order_addon.price'), 2) }}</p>
                         </div>
                     </div>
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.deposit')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">{{ number_format($order->deposit, 2) }}</p>
+                            <p class="pt-4">{{ number_format($order->deposit, 2) }}</p>
                         </div>
                     </div>
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.insurance_amount')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">{{ number_format($order->insurance_amount, 2) }}</p>
+                            <p class="pt-4">{{ number_format($order->insurance_amount, 2) }}</p>
                         </div>
                     </div>
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.internal_notes')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">{{ $order->notes }}</p>
+                            <p class="pt-4">{{ $order->notes }}</p>
                         </div>
                     </div>
 
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.date')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">{{ $order->date }}</p>
+                            <p class="pt-4">{{ $order->date }}</p>
                         </div>
                     </div>
 
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.time_from')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">{{ $order->time_from }}</p>
+                            <p class="pt-4">{{ $order->time_from }}</p>
                         </div>
                     </div>
 
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.time_to')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">{{ $order->time_to }}</p>
+                            <p class="pt-4">{{ $order->time_to }}</p>
                         </div>
                     </div>
 
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.time_of_receipt')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">{{ $order->time_of_receipt }}</p>
+                            <p class="pt-4">{{ $order->time_of_receipt }}</p>
                         </div>
                     </div>
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.image_before_receiving')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">
+                            <p class="pt-4">
                             @if($order->image_before_receiving)
                                 <a href="{{ asset($order->image_before_receiving) }}">
                                     <img src="{{ asset($order->image_before_receiving) }}" style="width:120px;height:120px">
@@ -145,13 +145,13 @@
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.delivery_time')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">{{ $order->delivery_time }}</p>
+                            <p class="pt-4">{{ $order->delivery_time }}</p>
                         </div>
                     </div>
                     <div class="row mb-6">
                         <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.image_after_delivery')</label>
                         <div class="col-lg-8">
-                            <p class="form-control-plaintext">
+                            <p class="pt-4">
                             @if($order->image_after_delivery)
                                 <a href="{{ asset($order->image_after_delivery) }}">
                                     <img src="{{ asset($order->image_after_delivery) }}" style="width:120px;height:120px">
