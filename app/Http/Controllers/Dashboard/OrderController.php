@@ -344,6 +344,7 @@ class OrderController extends Controller
         $orderInternalNote = OrderInternalNote::with('internalNote')
             ->where('order_id', $order->id)
             ->get();
+        $selectedInternalNote;
         foreach ($orderInternalNote as $orderInternalNote) {
             $selectedInternalNote[] = $orderInternalNote->internal_note_id;
         }
