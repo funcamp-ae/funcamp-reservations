@@ -1283,7 +1283,7 @@
             // Add change event listener
             $internalNoteSelect.on('change', handleNoteSelectionChange);
             // Handle note selection change
-            let selectedIds = $internalNoteSelct.val(); // Initialize an empty array
+            let selectedIds = $internalNoteSelect.val(); // Initialize an empty array
             function handleNoteSelectionChange() {
                 const $select = $('#internalNoteSelect');   
                 selectedIds = [
