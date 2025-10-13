@@ -176,7 +176,7 @@
             color: var(--bs-card-color) !important;
             border-color: var(--bs-border-color) !important;
         }
-	a:not(.bg-primary)  , .form-label{
+	a:not(.bg-primary , .text-white)  , .form-label{
             color: var(--bs-card-color) !important;
 	}
 	.form-label{
