@@ -317,3 +317,44 @@ function pushNotification($tokens, $data, $platforms)
 
     return response()->json();
 }
+
+/**
+ * Translate text to the target language
+ *
+ * @param string $text Text to translate
+ * @param string $targetLang Target language code (default: 'en')
+ * @param string|null $sourceLang Source language code (optional, auto-detect if not provided)
+ * @param bool $preserveParams Whether to preserve parameters in format :param
+ * @return string
+ */
+function translateText(string $text, string $targetLang = 'en', ?string $sourceLang = null, bool $preserveParams = true): string
+{
+    try {
+        return \App\Helpers\TranslationHelper::translate($text, $targetLang, $sourceLang, $preserveParams) ?? $text;
+    } catch (\Exception $e) {
+        \Log::error('Translation failed: ' . $e->getMessage());
+        return $text; // Return original text if translation fails
+    }
+}
+
+/**
+ * Get list of supported languages
+ *
+ * @param string|null $displayLang Language code to display names in (e.g., 'en')
+ * @return array
+ */
+function getSupportedLanguages(?string $displayLang = null): array
+{
+    return \App\Helpers\TranslationHelper::getSupportedLanguages($displayLang);
+}
+
+/**
+ * Detect language of the given text
+ *
+ * @param string $text
+ * @return string|null Language code if detected, null otherwise
+ */
+function detectLanguage(string $text): ?string
+{
+    return \App\Helpers\TranslationHelper::detectLanguage($text);
+}

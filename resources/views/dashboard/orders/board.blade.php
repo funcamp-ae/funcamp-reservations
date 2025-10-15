@@ -195,7 +195,7 @@
                     </td>
                     <td>
                       @if(!empty($order->notes))
-                      <button type="button" class="btn btn-sm btn-light-primary btn-notes" data-notes="{!! $order->notes !!}">
+                                            <button type="button" class="btn btn-sm btn-light-primary btn-notes" data-notes="{{ translateText(e($order->notes), session('lang') , 'ar') }}">
                         <i class="bi bi-eye"></i>
                       </button>
                       @endif
@@ -210,7 +210,6 @@
               </table>
             </div>
           </div>
-
           <!-- Tasks placeholder -->
           <div class="tab-pane fade" id="tab_tasks" role="tabpanel">
             <div class="alert alert-info mb-0">@lang('dashboard.coming_soon')</div>
