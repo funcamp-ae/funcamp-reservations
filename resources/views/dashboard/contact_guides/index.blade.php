@@ -102,7 +102,7 @@
                     <span class="text-muted">—</span>
                   @endif
                 </td>
-                <td>{{ Str::limit($c->notes, 60) }}</td>
+                <td>@translate($c->notes) </td>
                 <td class="d-flex  flex-nowrap border-0 py-10">
             @can('contact-guides.edit')
                   <a href="{{ route('contact-guides.edit', $c->id) }}" class="btn btn-sm btn-light-primary me-1">@lang('dashboard.edit')</a>

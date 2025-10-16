@@ -35,7 +35,7 @@
                             <option value="">@lang('dashboard.all')</option>
                             @foreach($types as $type)
                                 <option value="{{ $type->id }}" {{ request('violation_type_id') == $type->id ? 'selected' : '' }}>
-                                    {{ $type->name }}
+                                    @translate($type->name)
                                 </option>
                             @endforeach
                         </select>
@@ -78,7 +78,7 @@
                     @foreach($violations as $violation)
                         <tr>
                             <td>{{ $violation->employee->name }}</td>
-                            <td>{{ $violation->type->name }}</td>
+                            <td>@translate($violation->type->name)</td>
                             <td>{{ $violation->violation_date ? $violation->violation_date->format('Y-m-d') : '-' }}</td>
                             <td>{{ $violation->violation_time ?? '-' }}</td>
                             <td>{{ Str::limit($violation->violation_place, 30) ?? '-' }}</td>

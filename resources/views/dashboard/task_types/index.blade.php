@@ -59,9 +59,9 @@
                         @foreach ($taskTypes as $taskType)
                             <tr>
                                 <td>
-                                    <a href="{{ route('task-types.show', $taskType->id) }}" class="   text-hover-primary mb-1">{{ $taskType->name }}</a>
+                                    <a href="{{ route('task-types.show', $taskType->id) }}" class="   text-hover-primary mb-1">@translate($taskType->name)</a>
                                 </td>
-                                <td>{{ Str::limit($taskType->description, 50) }}</td>
+                                <td>@translate($taskType->description)</td>
                                 <td>
                                 <span class="badge badge-light-{{ $taskType->status == 'active' ? 'success' : 'danger' }}">
                                     @lang('dashboard.' . $taskType->status)

@@ -172,13 +172,13 @@
             color: var(--bs-card-color) !important;
             border-color: var(--bs-border-color) !important;
         }
-	a:not(.bg-primary , .text-white)  , .form-label{
+	a:not(.bg-primary , .text-white, .btn-info , .btn-success , .btn-danger , .page-link  , .text-white)  , .form-label {
             color: var(--bs-card-color) !important;
 	}
 	.form-label{
         color: var(--bs-card-color) !important;
     }
-	a.btn-secondary{
+	a.btn-secondary {
 	 color: black !important;
 	}
 a.btn-primary{
@@ -200,9 +200,9 @@ a.btn-primary{
 	.ck-content p {
   	  color: black;
 	}
-	.btn {
+	/* .btn {
 	color : white ; 
-	}
+	} */
 	.card-header .card-title h1 ,.card-header .card-title h2 , .card-header .card-title  h3 ,.card-header .card-title h4 , .card-header .card-title h5 {
 		color : white ;
 	}

@@ -17,12 +17,15 @@ class TranslationHelper
      * @return string|null
      */
     public static function translate(
-        string $text,
+        ?string $text = '',
         string $targetLang = 'en',
         ?string $sourceLang = null,
         bool $preserveParams = true
-    ): ?string {
+    ) : string | null {
         try {
+            if (!$text) {
+                return $text;
+            }
             $translator = new GoogleTranslate();
             
             if ($sourceLang) {
@@ -64,9 +67,12 @@ class TranslationHelper
      * @param string $text
      * @return string|null Language code if detected, null otherwise
      */
-    public static function detectLanguage(string $text): ?string
+    public static function detectLanguage(?string $text = ''): ?string
     {
         try {
+            if (!$text) {
+                return $text;
+            }
             $translator = new GoogleTranslate();
             $translator->translate($text); // This will auto-detect the language
             return $translator->getLastDetectedSource();

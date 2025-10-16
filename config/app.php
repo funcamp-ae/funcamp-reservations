@@ -197,6 +197,7 @@ return [
 
         App\Providers\BaseRepositoryServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
+        App\Providers\TranslationServiceProvider::class,
 
 
         Spatie\Permission\PermissionServiceProvider::class,

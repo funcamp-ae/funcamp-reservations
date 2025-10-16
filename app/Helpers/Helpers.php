@@ -327,7 +327,7 @@ function pushNotification($tokens, $data, $platforms)
  * @param bool $preserveParams Whether to preserve parameters in format :param
  * @return string
  */
-function translateText(string $text, string $targetLang = 'en', ?string $sourceLang = null, bool $preserveParams = true): string
+function translateText(?string $text = '', string $targetLang = 'en', ?string $sourceLang = null, bool $preserveParams = true): string | null
 {
     try {
         return \App\Helpers\TranslationHelper::translate($text, $targetLang, $sourceLang, $preserveParams) ?? $text;
@@ -354,7 +354,7 @@ function getSupportedLanguages(?string $displayLang = null): array
  * @param string $text
  * @return string|null Language code if detected, null otherwise
  */
-function detectLanguage(string $text): ?string
+function detectLanguage(?string $text = ''): ?string
 {
     return \App\Helpers\TranslationHelper::detectLanguage($text);
 }

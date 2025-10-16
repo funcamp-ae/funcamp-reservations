@@ -40,7 +40,7 @@
                     <tr>
                         <td>{{ $report->report_date->format('Y-m-d') }}</td>
                         <td>{{ $report->service->name ?? '' }}</td>
-                        <td>{{ $report->camp_name ?? '' }}</td>
+                        <td>@translate($report->camp_name)</td>
                         <td>{{ $report->creator->name }}</td>
                         <td>
                             @can('camp-reports.show')

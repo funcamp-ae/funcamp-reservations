@@ -29,8 +29,8 @@
                     <tbody>
                     @foreach($locations as $location)
                         <tr>
-                            <td>{{ $location->name }}</td>
-                            <td>{{ $location->address }}</td>
+                            <td>@translate($location->name)</td>
+                            <td>@translate($location->address)</td>
                             <td>
                             <span class="badge badge-light-{{ $location->is_active ? 'success' : 'danger' }}">
                                 {{ $location->is_active ? __('dashboard.active') : __('dashboard.inactive') }}

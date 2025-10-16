@@ -50,7 +50,7 @@
                                         @endif
                                     </td>
                                     <td>{{  $notice->type ? $notice->type->name : '-'  }}</td>
-                                    <td>{{ Str::limit($notice->notice, 70) }}</td>
+                                    <td>@translate($notice->notice)</td>
                                     <td>{{ $notice->creator->name }}</td>
                                     <td>{{ $notice->created_at->format('Y-m-d') }}</td>
                                     <td>{{ $notice->created_at->format('h:i A') }}</td>

@@ -39,7 +39,7 @@
                     <tr>
                         <td>
                             <div class="d-flex flex-column">
-                                <span class="fw-bold">{{ $send->title }}</span>
+                                <span class="fw-bold">@translate($send->title)</span>
                                 @if($send->custom_message)
                                 <span class="text-muted fs-7">{{ Str::limit($send->custom_message, 50) }}</span>
                                 @endif

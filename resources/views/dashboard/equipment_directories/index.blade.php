@@ -41,7 +41,7 @@
                     <tbody>
                     @foreach($directories as $directory)
                         <tr>
-                            <td>{{ $directory->name }}</td>
+                            <td>@translate($directory->name)</td>
                             <td>{{ $directory->items_count }}</td>
                             <td>{{ $directory->media_count }}</td>
                             <td>

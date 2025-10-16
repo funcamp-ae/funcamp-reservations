@@ -31,7 +31,7 @@
                     <tbody>
                     @foreach ($tasks as $task)
                         <tr>
-                            <td>{{ $task->title }}</td>
+                            <td>@translate($task->title)</td>
                             <td>{{ $task->creator->name }}</td>
                             <td>{{ $task->due_date->format('Y-m-d') }}</td>
                             <td>

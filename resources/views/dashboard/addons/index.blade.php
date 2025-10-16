@@ -93,7 +93,7 @@
                                                     <img src="{{ asset($addon->image) }}" style="width:50px;height:50px;border-radius: 50%;">
                                                     @endif 
 
-                                                    {{$addon->name}}
+                                                    @translate($addon->name)
                                                 </a>
                                             @else
                                                 <span class="   fs-5 fw-bolder mb-1">

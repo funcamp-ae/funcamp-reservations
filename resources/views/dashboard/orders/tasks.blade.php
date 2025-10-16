@@ -65,7 +65,7 @@
             <tbody class="fw-bold ">
               @forelse ($tasks as $task)
               <tr>
-                <td><a class=" text-hover-primary mb-1">{{ $task->title }}</a></td>
+                <td><a class=" text-hover-primary mb-1">@translate($task->title)</a></td>
                 <td>{{ optional($task->created_at)->format('Y-m-d | h:i A') }}</td>
                 <td>{{ optional($task->assignedUser)->name }}</td>
                 <td>

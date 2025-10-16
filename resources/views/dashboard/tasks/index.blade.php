@@ -63,11 +63,11 @@
                         @foreach ($tasks as $task)
                             <tr>
                                 <td>
-                                    <a class=" text-hover-primary mb-1">{{ $task->title }}</a>
+                                    <a class=" text-hover-primary mb-1">@translate($task->title)</a>
                                 </td>
                                 <td>
                                     @if($task->taskType)
-                                        <span class="badge badge-light-primary">{{ $task->taskType->name }}</span>
+                                        <span class="badge badge-light-primary">@translate($task->taskType->name)</span>
                                     @else
                                         <span class="text-muted">@lang('dashboard.no_type')</span>
                                     @endif

@@ -93,6 +93,8 @@ return [
     'Agree_to_the_terms' => 'Agree to Terms',
     'update_terms_setting' => 'Update Terms',
     'create_terms_setting' => 'Create Terms',
+    'create_item' => 'Create Item',
+    'update_item' => 'Update Item',
     'order_number' => 'Reservation Number (Optional)',
     'receipt' => 'Payment Receipt',
     'general_payments' => 'General Revenues',
@@ -1776,6 +1778,7 @@ return [
     'created_date' => 'Created Date',
     'created_time' => 'Created Time',
     'created_at' => 'Created At',
+    'created_date | created_time' => 'Created Date | Created Time',
     'updated_date' => 'Updated Date',
     'updated_time' => 'Updated Time',
     'date_time' => 'Date & Time',
@@ -2219,6 +2222,9 @@ return [
     'payment_not_found' => 'Payment not found',
     'payment_deleted_successfully' => 'Payment deleted successfully',
     'confiscated_amount' => 'Confiscated Amount',
-    "for_warehouse_sale" => "warehouse sales"
+    "for_warehouse_sale" => "warehouse sales",
+    'manual_item_withdrawal_show' => 'Manual Item Withdrawal',
+    'manual_item_return_show' => 'Manual Item Return',
+    'manual_item_return_history_heading' => 'Manual Item Return History'
 
 ];

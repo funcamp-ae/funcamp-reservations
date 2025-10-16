@@ -30,7 +30,7 @@
                 <tbody>
                 @foreach($types as $type)
                     <tr>
-                        <td>{{ $type->name }}</td>
+                        <td>@translate($type->name)</td>
                         <td>{{ Str::limit($type->description, 50) }}</td>
                         <td>
                             <span class="badge badge-light-{{ $type->is_active ? 'success' : 'danger' }}">

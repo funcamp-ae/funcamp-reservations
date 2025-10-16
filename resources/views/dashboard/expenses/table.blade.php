@@ -120,7 +120,7 @@
                                     </td>
                                 @endif
                             @endisset
-                                    <td>{{$expense->notes }} </td>
+                                    <td>@translate($expense->notes) </td>
 
                                 <!--begin::Action=-->
                                 <!--end::Action=-->

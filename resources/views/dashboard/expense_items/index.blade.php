@@ -90,12 +90,12 @@
                                 <td>
                                     <div class="d-flex">
                                         <div class="ms-5">
-                                            <span >{{$item->name}}</a>
+                                            <span >@translate($item->name)</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td>{{$item->expenses->count() }} </td>
-                                <td>{{$item->description}} </td>
+                                <td>@translate($item->description) </td>
                                 <td>{{ $item->created_at->format('Y-m-d') }}</td>
                                 <td>{{ $item->created_at->format('h:i A') }}</td>
 

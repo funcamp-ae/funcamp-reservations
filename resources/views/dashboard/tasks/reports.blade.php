@@ -62,7 +62,7 @@
                     <!-- Stats -->
                     <div class="row mb-10">
                         <div class="col-md-3">
-                            <div class="card bg-light-success">
+                            <div class="card">
                                 <div class="card-body">
                                     <h5>@lang('dashboard.total_tasks')</h5>
                                     <h2>{{ $completionStats['total'] }}</h2>
@@ -70,7 +70,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card bg-light-primary">
+                            <div class="card ">
                                 <div class="card-body">
                                     <h5>@lang('dashboard.completed')</h5>
                                     <h2>{{ $completionStats['completed'] }}</h2>
@@ -79,7 +79,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card bg-light-warning">
+                            <div class="card">
                                 <div class="card-body">
                                     <h5>@lang('dashboard.pending')</h5>
                                     <h2>{{ $completionStats['pending'] }}</h2>
@@ -87,7 +87,7 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="card bg-light-danger">
+                            <div class="card">
                                 <div class="card-body">
                                     <h5>@lang('dashboard.failed')</h5>
                                     <h2>{{ $completionStats['failed'] }}</h2>
@@ -110,7 +110,7 @@
                         <tbody>
                         @foreach($tasks as $task)
                             <tr>
-                                <td>{{ $task->title }}</td>
+                                <td>@translate($task->title)</td>
                                 <td>{{ $task->assignedUser->name }}</td>
                                 <td>{{ $task->due_date->format('Y-m-d') }}</td>
                                 <td>

@@ -150,6 +150,8 @@ return [
     'Agree_to_the_terms' => 'د شرطونو موافقه',
     'update_terms_setting' => 'د شرطونو تازه کول',
     'create_terms_setting' => 'د شرطونو جوړول',
+    'create_item' => 'توکی جوړول',
+    'update_item' => 'توکی تازه کول',
     'order_number' => 'د ریزرویشن شمیره (اختیاري)',
     'receipt' => 'رسید',
     'Customer_Signature' => 'د پیرودونکي لاسلیک',
@@ -1481,6 +1483,7 @@ return [
     'created_date' => 'د جوړولو نېټه',
     'created_time' => 'د جوړولو وخت',
     'created_at' => 'اضافه شو په',
+    'created_date | created_time' => 'د جوړیدو نېټه | د جوړیدو وخت',
     'updated_date' => 'د تازه کولو نېټه',
     'updated_time' => 'د تازه کولو وخت',
     'date_time' => 'نېټه او وخت',
@@ -1913,6 +1916,9 @@ return [
     'search_orders_placeholder' => 'د ID، نوم، تلیفون یا بریښنالیک په واسطه لټون',
     'form_code' => 'د فورم کوډ',
     'confiscated_amount' => 'ضبط شوې اندازه',
-    "for_warehouse_sale" => "د زيرمتون پلورل"
+    "for_warehouse_sale" => "د زيرمتون پلورل",
+    'manual_item_withdrawal_show' => 'د توکي د لاسي اخيستنه',
+    'manual_item_return_show' => 'د توکي د لاسي راستنیدل',
+    'manual_item_return_history_heading' => 'د توکو د لاسي راستنیدو تاریخچه'
 
 ];

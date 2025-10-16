@@ -28,7 +28,7 @@
                 <tbody>
                 @foreach($noticeTypes as $type)
                     <tr>
-                        <td>{{ $type->name }}</td>
+                        <td>@translate($type->name)</td>
                         <td>
                                 <span class="badge badge-{{ $type->is_active ? 'success' : 'danger' }}">
                                     {{ $type->is_active ? __('dashboard.active') : __('dashboard.inactive') }}

@@ -122,7 +122,7 @@
                             {{$payment->account ? $payment->account->name :""}}
                         </td>
                         <td  data-kt-ecommerce-category-filter="category_name" >
-                            {{$payment->notes}}
+                            @translate($payment->notes)
                         </td>
                         <td>
                             {{ $payment->verified ? __('dashboard.yes') : __('dashboard.no') }} <br>

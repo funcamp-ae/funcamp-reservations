@@ -64,7 +64,7 @@
                     <tbody>
                     @foreach($reports as $report)
                         <tr>
-                            <td>{{ $report->title }}</td>
+                            <td>@translate($report->title)</td>
                             <td>{{ $report->employee->name }}</td>
                             <td>{{ $report->created_at->format('Y-m-d H:i') }}</td>
                             <td>

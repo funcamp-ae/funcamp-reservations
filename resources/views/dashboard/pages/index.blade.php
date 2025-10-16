@@ -26,7 +26,7 @@
                         @if(isset($pages) && $pages->count())
                             @foreach($pages as $page)
                             <tr>
-                                <td data-kt-ecommerce-category-filter="category_name">{{ $page->name }}</td>
+                                <td data-kt-ecommerce-category-filter="category_name">@translate($page->name)</td>
                                 <td><code>{{ $page->url }}</code></td>
                                 <td>
                                     <span class="badge {{ $page->is_available ? 'bg-success' : 'bg-secondary' }}">

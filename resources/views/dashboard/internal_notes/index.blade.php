@@ -43,8 +43,9 @@
                     <tbody id="notes-table-body">
                         @forelse(isset($notes) ? $notes : [] as $note)
                             <tr data-id="{{ $note->id }}">
-                                <td class="note-name">{{ $note->note_name }}</td>
-                                <td class="note-content">{!! $note->note_content !!}</td>
+                                <td class="note-name">@translate($note->note_name)</td>
+                            
+                                <td class="note-content">@translate($note->note_content)</td>
                                 <td>
                                     @can('internal-notes.edit')
 

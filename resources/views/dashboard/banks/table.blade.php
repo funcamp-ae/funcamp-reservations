@@ -196,9 +196,9 @@
                         {{ __('dashboard.' . $transaction->source) }} - {{ __('dashboard.' . $transaction->reservation_expenses) }}
                     @else
                         @if($transaction->expense)
-                            {{ __('dashboard.' . $transaction->source) }} - {{ $transaction->expense->notes }}
+                            {{ __('dashboard.' . $transaction->source) }} - @translate($transaction->expense->notes)
                        @elseif($transaction->source  == "add_funds_page")
-                        {{ __('dashboard.' . $transaction->source) }} - {{ $transaction->description }}
+                        {{ __('dashboard.' . $transaction->source) }} - @translate($transaction->description)
                        @else
                             {{ __('dashboard.' . $transaction->source) }}
                         @endif
