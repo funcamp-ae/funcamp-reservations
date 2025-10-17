@@ -136,7 +136,16 @@ class ServicesController extends Controller
 
         return view('dashboard.services.create', compact('service', 'stocks', 'reports'));
     }
+    public function retrieveCamp(Service $service)
+    {
+        $retrievedService = $service;
+        $stocks = Stock::all();
+        $reports = ServiceReport::where('service_id', $service->id)
+        ->orderBy('ordered_count')
+        ->get();
+        return view('dashboard.services.create', compact('retrievedService', 'stocks', 'reports'));
 
+    }
     public function update(Request $request, $serviceId)
     {
         $service = Service::findOrFail($serviceId);

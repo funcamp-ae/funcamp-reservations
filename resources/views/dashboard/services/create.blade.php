@@ -98,10 +98,13 @@
                 <div class="card-header border-0 cursor-pointer" role="button" data-bs-toggle="collapse"
                      data-bs-target="#kt_account_profile_details" aria-expanded="true"
                      aria-controls="kt_account_profile_details">
-                    <div class="card-title m-0">
+                    <div class="card-title m-0 justify-content-between w-100">
                         <h3 class="fw-bolder m-0">
                             {{ isset($service) ? $service->name : __('dashboard.create_title', ['page_title' => __('dashboard.services')]) }}
                         </h3>
+                        <button type="button" class="btn btn-light-primary" data-bs-toggle="modal" data-bs-target="#serviceSelectionModal">
+                            <i class="bi bi-cloud-download"></i> {{ __('dashboard.retrieve_service' )}}
+                        </button>
                     </div>
                 </div>
 
@@ -114,7 +117,11 @@
                         @if (isset($service))
                             @method('PUT')
                         @endif
-
+                        @php 
+                        if(isset($retrievedService)){
+                            $service = $retrievedService;
+                        }
+                        @endphp
                         <div class="card-body border-top p-9">
                             <div class="row mb-6">
                                 <label class="col-lg-4 col-form-label required fw-bold fs-6">@lang('dashboard.name')</label>
@@ -274,6 +281,8 @@
 
                             <div id="stocks-section" class="table-responsive">
                                 @if (isset($service))
+                                    <!-- this to handle retrieved service -->
+
                                     @foreach ($service->stocks as $index => $serviceStock)                                        <div class="table-row d-flex align-items-center stock-item-row mb-2" data-index="{{ $index + 1 }}" style="display: flex; flex-wrap: nowrap; min-width: 100%;">
                                             <div class="table-cell" style="flex: 0 0 8.33%; padding: 0.5rem;">
                                             @if ($serviceStock->image )
@@ -324,6 +333,33 @@
             </div>
         </div>
     </div>
+    <!-- Service Selection Modal -->
+<div class="modal fade" id="serviceSelectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ __('dashboard.retrieve_service') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="serviceSelect" class="form-label">{{ __('dashboard.select_service') }}</label>
+                    <select class="form-select" id="serviceSelect">
+                        <option value="">{{ __('dashboard.select_service_placeholder') }}</option>
+                        @foreach(\App\Models\Service::all() as $service)
+                            <option value="{{ $service->id }}">{{ $service->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('dashboard.cancel') }}</button>
+                <button type="button" class="btn btn-primary" id="retrieveServiceBtn">{{ __('dashboard.ok') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -336,7 +372,19 @@
             $el.select2();
         });
     }
-
+  document.addEventListener('DOMContentLoaded', function() {
+        const retrieveBtn = document.getElementById('retrieveServiceBtn');
+        const serviceSelect = document.getElementById('serviceSelect');
+        
+        retrieveBtn.addEventListener('click', function() {
+            const selectedServiceId = serviceSelect.value;
+            if (selectedServiceId) {
+                window.location.href = `/services/${selectedServiceId}/retrieve`;
+            } else {
+                alert('{{ __("dashboard.please_select_service") }}');
+            }
+        });
+    });
     function attachProgressListeners() {
         document.querySelectorAll('.image-upload').forEach(input => {
             if (input._hasProgressListener) return;

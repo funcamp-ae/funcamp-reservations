@@ -1768,6 +1768,12 @@ return [
     'open_image' => 'Open Image',
     'reservation_number' => 'Reservation Number',
     'signature_date' => 'Signature Date',
+    'retrieve_service' => 'Retrieve Camp Data',
+    'select_service' => 'Select Camp',
+    'select_service_placeholder' => 'Select Camp',
+    'please_select_service' => 'Please select a camp',
+    'ok' => 'OK',
+    'cancel' => 'Cancel',
 
     // Language switcher translations
     'switch_to_arabic' => 'العربية',

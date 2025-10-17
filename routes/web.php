@@ -623,6 +623,13 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
         'title' => ['actions.move', 'dashboard.services']
     ]);
 
+    # services retrieve camp
+    Route::get('services/{service}/retrieve', [
+        'uses' => 'ServicesController@retrieveCamp',
+        'as' => 'services.retrieve',
+        'title' => ['actions.retrieve', 'dashboard.services']
+    ]);
+
     /*------------ end Of services ----------*/
     /*------------ start Of orders ----------*/
     Route::get('orders', [

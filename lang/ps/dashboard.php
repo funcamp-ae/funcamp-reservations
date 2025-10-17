@@ -1465,7 +1465,11 @@ return [
     'please_draw_signature' => 'مهرباني وکړئ لومړی خپل لاسلیک وکاږئ.',
     'warning' => 'خبرداری:',
     'notice' => 'یادونه:',
-
+    'select_service' => 'کمپ وټاکئ',
+    'select_service_placeholder' => '-- یو کمپ وټاکئ --',
+    'please_select_service' => 'لطفاً د دوام لپاره یو کمپ وټاکئ',
+    'ok' => 'هیله ده',
+    'cancel' => 'ردول',
     // Already signed page translations
     'signature_completed_title' => 'لاسلیک بشپړ شو - حجز :id',
     'signature_success' => 'لاسلیک بریالي بشپړ شو',
@@ -1473,6 +1477,7 @@ return [
     'open_image' => 'انځور خلاص کړئ',
     'reservation_number' => 'د حجز نمبر',
     'signature_date' => 'د لاسلیک نېټه',
+    'retrieve_service' => 'د کمپ څخه معلومات ترلاسه کول',
 
     // Language switcher translations
     'switch_to_arabic' => 'عربي',

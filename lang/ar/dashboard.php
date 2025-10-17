@@ -1469,7 +1469,11 @@ return [
     'please_draw_signature' => 'من فضلك ارسم توقيعك أولاً.',
     'warning' => 'تنبيه:',
     'notice' => 'Notice:',
-
+    'select_service' => 'اختر المخيم',
+    'select_service_placeholder' => '-- اختر مخيم --',
+    'please_select_service' => 'الرجاء اختيار مخيم للمتابعة',
+    'ok' => 'موافق',
+    'cancel' => 'إلغاء',
     // Already signed page translations
     'signature_completed_title' => 'تم التوقيع - حجز :id',
     'signature_success' => 'تم التوقيع بنجاح',
@@ -1477,6 +1481,7 @@ return [
     'open_image' => 'فتح الصورة',
     'reservation_number' => 'رقم الحجز',
     'signature_date' => 'تاريخ التوقيع',
+    'retrieve_service' => 'استرجاع بيانات من مخيم',
 
     // Language switcher translations
     'switch_to_arabic' => 'العربية',
