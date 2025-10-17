@@ -503,10 +503,10 @@ class ChatSystem {
             chatList.innerHTML = `
                 <div class="text-center py-4">
                     <i class="fas fa-comments text-muted" style="font-size: 3rem;"></i>
-                    <h6 class="text-muted mt-3">No chats yet</h6>
-                    <p class="text-muted">Start a conversation with someone</p>
+                    <h6 class="text-muted mt-3">@lang('dashboard.no_chats')</h6>
+                    <p class="text-muted">@lang('dashboard.start_conversation')</p>
                     <button class="btn btn-primary" onclick="document.getElementById('newChatBtn').click()">
-                        <i class="fas fa-plus me-1"></i> Start New Chat
+                        <i class="fas fa-plus me-1"></i> @lang('dashboard.start_new_chat')
                     </button>
                 </div>
             `;
@@ -535,7 +535,7 @@ class ChatSystem {
                                 <div>
                                     <h6 class="mb-1">${chatName}</h6>
                                     <small class="text-muted">
-                                        ${latestMessage ? this.truncateMessage(latestMessage.message, 40) : 'No messages yet'}
+                                        ${latestMessage ? this.truncateMessage(latestMessage.message, 40) : '@lang('dashboard.no_messages_yet')'}
                                     </small>
                                 </div>
                                 <div class="text-end">
