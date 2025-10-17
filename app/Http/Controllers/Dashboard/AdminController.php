@@ -129,18 +129,23 @@ class AdminController extends Controller
 
         $user = $this->usersRepository->findOne($id);
         $data['is_active'] = $request->is_active == 'on' ? '1' : '0';
-            if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $path = 'dashboard/uploads';
-                
-                // Ensure the directory exists
-                if (!\Storage::disk('public')->exists($path)) {
-                    \Storage::disk('public')->makeDirectory($path, 0755, true);
-                }
-                
-                // Store the file
-                $data['image'] = $file->store($path, 'public');
-            } 
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = 'dashboard/uploads';
+            
+            // Ensure the directory exists
+            if (!\Storage::disk('public')->exists($path)) {
+                \Storage::disk('public')->makeDirectory($path, 0755, true);
+            }
+            
+            // Delete old image if it exists
+            if ($user->image) {
+                \Storage::disk('public')->delete($user->image);
+            }
+            
+            // Store the new image
+            $data['image'] = $file->store($path, 'public');
+        }
 
         $updated = $this->usersRepository->update($data, $id);
 
@@ -209,6 +214,23 @@ class AdminController extends Controller
     {
         $user = Auth::user();
         $requestData = $request->all();
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = 'dashboard/uploads';
+            
+            // Ensure the directory exists
+            if (!\Storage::disk('public')->exists($path)) {
+                \Storage::disk('public')->makeDirectory($path, 0755, true);
+            }
+            
+            // Delete old image if it exists
+            if ($user->image) {
+                \Storage::disk('public')->delete($user->image);
+            }
+            
+            // Store the new image
+            $requestData['image'] = $file->store($path, 'public');
+        }
         if ($request->password === null || trim($request->password) === '') {
             unset($requestData['password']);
             unset($requestData['password_confirmation']);
