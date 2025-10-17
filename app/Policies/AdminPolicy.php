@@ -15,7 +15,7 @@ class AdminPolicy
         return $user->hasPermissionTo('admins.index');
     }
 
-    public function view(User $user, User $admin): bool
+    public function view(User $user): bool
     {
         return $user->hasPermissionTo('admins.show');
     }
@@ -25,12 +25,12 @@ class AdminPolicy
         return $user->hasPermissionTo('admins.create');
     }
 
-    public function update(User $user, User $admin): bool
+    public function update(User $user): bool
     {
         return $user->hasPermissionTo('admins.edit');
     }
 
-    public function delete(User $user, User $admin): bool
+    public function delete(User $user): bool
     {
         return $user->hasPermissionTo('admins.destroy');
     }
