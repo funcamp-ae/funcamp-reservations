@@ -81,7 +81,7 @@
                                     @if(isset($ordersCountByStatus[$status]))
                                     <h5 class="fs-2x fw-bolder {{ getStatusBadgeColor($status) ? 'text-' . getStatusBadgeColor($status) : '' }}">{{ number_format($ordersCountByStatus[$status]) ?? "0" }}</h5>
                                     @else
-                                    <h5 class="fs-2x fw-bolder text-muted">0</h5>
+                                    <h5 class="fs-2x fw-bolder">0</h5>
                                     @endif
                                 </div>
                             </div>
