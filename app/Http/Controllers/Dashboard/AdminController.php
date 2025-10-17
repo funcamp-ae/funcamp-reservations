@@ -106,7 +106,7 @@ class AdminController extends Controller
 
     public function edit($id)
     {
-        $this->authorize('update', User::class);
+        $this->authorize('update', User::class , $id);
 
         $roles = $this->rolesRepository->getAll();
         $user = $this->usersRepository->findWith($id, ['roles']);
