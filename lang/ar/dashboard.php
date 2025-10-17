@@ -25,6 +25,7 @@ return [
     'members' => 'أعضاء',
     'type_message' => 'اكتب رسالة...',
     'start_conversation' => 'ابدأ محادثة',
+    'no_chats' => 'لا توجد محادثات بعد',
     'no_messages_yet' => 'لا توجد رسائل بعد',
     'yesterday' => 'أمس',
     'chat_title' => 'عنوان الدردشة',

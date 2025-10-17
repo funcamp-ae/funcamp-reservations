@@ -26,6 +26,7 @@ return [
     'type_message' => 'Type a message...',
     'start_conversation' => 'Start a conversation',
     'no_messages_yet' => 'No messages yet',
+    'no_chats' => 'No chats yet',
     'yesterday' => 'Yesterday',
     'chat_title' => 'Chat Title',
     'unknown_user' => 'Unknown User',
