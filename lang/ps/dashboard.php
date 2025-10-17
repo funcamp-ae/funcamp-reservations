@@ -61,6 +61,12 @@ return [
     'bank_transfer' => 'بانکي لیږد',
     'expense-items' => 'د لګښت توکي',
     'expense-item' => 'توکی',
+    'item_name' => 'د توکی نوم',
+    'item_name_required' => 'د توکی نوم اړین دی',
+    'notes' => 'یادښتونه',
+    'expense_item_created' => 'د لګښت توکی په بریالیتوب سره جوړ شو',
+    'expense_item_updated' => 'د لګښت توکی په بریالیتوب سره تازه شو',
+    'expense_item_deleted' => 'د لګښت توکی په بریالیتوب سره ړنګ شو',
     "name" => "د حساب نوم",
     "balance" => "بیلانس",
     "user_answers" => "د پیرودونکو ځوابونه",
@@ -1919,6 +1925,8 @@ return [
     "for_warehouse_sale" => "د زيرمتون پلورل",
     'manual_item_withdrawal_show' => 'د توکي د لاسي اخيستنه',
     'manual_item_return_show' => 'د توکي د لاسي راستنیدل',
-    'manual_item_return_history_heading' => 'د توکو د لاسي راستنیدو تاریخچه'
+    'manual_item_return_history_heading' => 'د توکو د لاسي راستنیدو تاریخچه',
+    'no_upcoming_reservations' => 'هیڅ راتلونکي ریزرویشنونه نشته',
+    'no_survey_responses_found' => 'هیڅ د پوښتنلیک ځوابونه ونه موندل شول'
 
 ];

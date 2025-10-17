@@ -47,7 +47,6 @@
 
             <div class="row">
                 <!-- Customers Count -->
-                @can('bookings.index')
                 <div class="col-md-4 mb-4">
                     <a href="{{route('customers.index') }}">
                         <div class="card h-100">
@@ -58,9 +57,8 @@
                         </div>
                     </a>
                 </div>
-                @endcan
 
-                @can('bookings.index')
+
                     <!-- Total Orders Card -->
                     <div class="col-md-4 mb-4">
                         <a href="{{ route('orders.index') }}">
@@ -88,13 +86,11 @@
                         </a>
                     </div>
                     @endforeach
-                @endcan
             </div>
 
              <div class="row mt-10">
 
 
-                @can('bookings.index')
                 <div class="col-12 mb-xl-10">
                     <!--begin::List widget for Orders-->
                     <div class="card card-flush h-xl-100">
@@ -168,10 +164,8 @@
                     <!--end::List widget for Orders-->
                 </div>
                 <!--end::Col-->
-                @endcan
 
 
-                @can('payments.index')
                 <div class="col-12 mb-xl-10">
                     <!--begin::Card-->
                     <div class="card card-flush">
@@ -288,10 +282,8 @@
                     </div>
                     <!--end::Card-->
                 </div>
-                @endcan
 
                 <!-- Begin Survey Responses Table -->
-                @can('survey_responses.view')
                 <div class="col-12 mb-10">
                     <div class="card card-flush">
                         <div class="card-header pt-7">
@@ -355,10 +347,8 @@
                         </div>
                     </div>
                 </div>
-                @endcan
 
                 <!-- Begin Low Stock Items Table -->
-                @can('inventory.view')
                 <div class="col-12 mb-10">
                     <div class="card card-flush">
                         <div class="card-header pt-7">
@@ -412,10 +402,8 @@
                         </div>
                     </div>
                 </div>
-                @endcan
 
                 <!-- Begin Recent Expenses Table -->
-                @can('expenses.view')
                 <div class="col-12 mb-10">
                     <div class="card card-flush">
                         <div class="card-header pt-7">
@@ -487,7 +475,6 @@
                         </div>
                     </div>
                 </div>
-                @endcan
 
                 <!-- Begin Recent Add Funds Table -->
                 <!-- @can('transactions.view') -->

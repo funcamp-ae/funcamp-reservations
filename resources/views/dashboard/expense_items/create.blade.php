@@ -44,18 +44,24 @@
                                             <div class="card-body pt-10 row">
                                                 <!--begin::Input group-->
                                                 <div class="mb-5 fv-row col-md-12">
-                                                    <label class="required form-label">أسم البند</label>
+                                                    <label class="required form-label">@lang('dashboard.item_name')</label>
                                                     <input type="text" name="name" value="{{ isset($expenseItem) ? $expenseItem->name :  old('name') }}"
                                                         class="form-control mb-2" required  />
+                                                    @error('name')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 <!--end::Input group-->
 
 
                                                 <!--begin::Input group-->
                                                 <div class="mb-5 fv-row col-md-12">
-                                                    <label class=" form-label">ملاحظات</label>
-                                                    <input type="text" name="description" value="{{ isset($expenseItem) ? $expenseItem->notes :  old('notes') }}"
+                                                    <label class="form-label">@lang('dashboard.notes')</label>
+                                                    <input type="text" name="notes" value="{{ isset($expenseItem) ? $expenseItem->notes :  old('notes') }}"
                                                         class="form-control mb-2" placeholder="" />
+                                                    @error('notes')
+                                                        <div class="text-danger">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                                 <!--end::Input group-->
 
