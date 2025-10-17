@@ -95,11 +95,19 @@ class ServicesController extends Controller
                         $newReport->update([
                             'image' => $path
                         ]);
+                        // handle image upload from retrieved service
+                        
+                    }else if($request->custom_reports_images[$index]){
+                        Storage::copy($request->custom_reports_images[$index], 'reports');
+                        $newReport->update([
+                            'image' => substr($request->custom_reports_images[$index], strrpos($request->custom_reports_images[$index], 'reports/') , strlen($request->custom_reports_images[$index]))
+                        ]);
                     }
                     
                 }
             }
             \DB::commit();
+            \Log::info($request->all());
             return response()->json([
                 'message' => __('dashboard.service_created_successfully'),
                 'redirect' => route('services.index')

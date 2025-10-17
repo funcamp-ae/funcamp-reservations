@@ -242,6 +242,7 @@
                                                             <div class="progress-bar progress-bar-striped progress-bar-animated w-100" role="progressbar"
                                                                  style="width:0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
                                                         </div>
+                                                        <input type="hidden" name="custom_reports_images[{{ $index }}]" value="{{ $report->image }}">
                                                     </td>
                                                     <td class="text-nowrap" data-label="@lang('dashboard.edit_sort')">
                                                         <div class="btn-group" role="group">
@@ -480,7 +481,7 @@
                 </div>
             </div>`;
             const $row = $(newRowHtml);
-            $('#stocks-section').append($row);
+            $('#stocks-section tbody').append($row);
             initSelect2($row);
             renumberStockRows();
         });
