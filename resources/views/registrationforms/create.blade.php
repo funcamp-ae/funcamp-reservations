@@ -357,10 +357,10 @@
       </div>
       <div class="modal-body">
         <div class="rtl-text" dir="rtl" style="text-align: right;">
-            {!! (\App\Models\TermsSittng::first()->commercial_license_ar) !!}
+            {!! (\App\Models\TermsSittng::first()?->commercial_license_ar) !!}
         </div>
         <div class="ltr-text" dir="ltr" style="text-align: left;">
-            {!! (\App\Models\TermsSittng::first()->commercial_license_en) !!}
+            {!! (\App\Models\TermsSittng::first()?->commercial_license_en) !!}
         </div>
       </div>
       <div class="modal-footer">
