@@ -346,7 +346,7 @@
                     <label for="serviceSelect" class="form-label">{{ __('dashboard.select_service') }}</label>
                     <select class="form-select" id="serviceSelect">
                         <option value="">{{ __('dashboard.select_service_placeholder') }}</option>
-                        @foreach(\App\Models\Service::all() as $service)
+                        @foreach(\App\Models\Service::latest()->get() as $service)
                             <option value="{{ $service->id }}">{{ $service->name }}</option>
                         @endforeach
                     </select>
