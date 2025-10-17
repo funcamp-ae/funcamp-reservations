@@ -100,10 +100,10 @@ class ServicesController extends Controller
                 }
             }
             \DB::commit();
-            // return response()->json([
-            //     'message' => __('dashboard.service_created_successfully'),
-            //     'redirect' => route('services.index')
-            // ], 201);
+            return response()->json([
+                'message' => __('dashboard.service_created_successfully'),
+                'redirect' => route('services.index')
+            ], 201);
 
         } catch (\Exception $e) {
             \DB::rollBack();
