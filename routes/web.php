@@ -49,8 +49,6 @@ Route::get('order-rate/{order}', "VisitorsController@rate")->name('rate');
 Route::post('orders/rate_orders', "VisitorsController@rateStore")->name('rate.save');
 # orders rate
 
-Route::get('orders/rate_orders', [rateOrderController::class, 'rate_orders'])->name('orders.rate');
-
 Route::get('/sign/{order}', [OrderSignatureController::class, 'show'])
     ->name('signature.show'); // public page to draw
 

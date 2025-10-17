@@ -1061,30 +1061,6 @@
             </div>
 
             @endcan
-
-            <!--end::Menu item-->
-
-            <div class="menu-item">
-
-                <a href="{{route('orders.rate')}}" class="menu-link py-3 {{ isActiveRoute('orders.rate') }}">
-
-                    <span class="menu-bullet">
-
-                        <span class="bullet bullet-dot"></span>
-
-                    </span>
-
-                    <span
-
-                        class="menu-title">@lang('dashboard.Questionnaires', ['page_title' => __('dashboard.orders')])</span>
-
-                </a>
-
-            </div>
-
-
-
-
             @can('bookings.pending')
 
             <div class="menu-item">
