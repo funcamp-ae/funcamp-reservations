@@ -102,7 +102,7 @@
                                     </div>
                                     <!--end::Badges-->
                                 </td>
-                                <td>{{$user->phone}}</td>
+                                <td dir="ltr">{{$user->phone}}</td>
                               
                                 <!--begin::Action=-->
                                 <td class="text-end">
