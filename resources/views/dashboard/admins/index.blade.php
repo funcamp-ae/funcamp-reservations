@@ -59,6 +59,7 @@
                                     <input class="form-check-input" id="checkedAll"  type="checkbox" data-kt-check="true" data-kt-check-target="#kt_ecommerce_category_table .form-check-input" value="1" />
                                 </div>
                             </th>
+                            <th class="">@lang('dashboard.image')</th>                                
                             <th class="">@lang('dashboard.name')</th>
                             <th class="">@lang('dashboard.email')</th>
                             <th class="">@lang('dashboard.phone')</th>
@@ -80,6 +81,11 @@
                                 </td>
                                 <!--end::Checkbox-->
                                 <!--begin::Category=-->
+                                <td>
+                                    <div class="symbol symbol-50px me-5">
+                                        <img alt="Logo" src="{{ $user->image ? $user->image : asset('images/logo.png') }}" />
+                                    </div>
+                                </td>
                                 <td>
                                     <div class="d-flex">
                                         <div class="ms-5">
