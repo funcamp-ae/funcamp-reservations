@@ -58,9 +58,18 @@ class AdminController extends Controller
             $data['user_type'] = 1;
             $data['is_active'] = $request->is_active == 'on' ? '1' : '0';
 
-            if ($request->has('image')) {
-                $data['image'] = $request->file('image')->store('dashboard/uploads');
-            }
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $path = 'dashboard/uploads';
+                
+                // Ensure the directory exists
+                if (!\Storage::disk('public')->exists($path)) {
+                    \Storage::disk('public')->makeDirectory($path, 0755, true);
+                }
+                
+                // Store the file
+                $data['image'] = $file->store($path, 'public');
+            } 
             $user = $this->usersRepository->create($data);
 
             if ($user && $request->role_id) {
@@ -75,6 +84,7 @@ class AdminController extends Controller
                 //  $updateRole = $this->usersRepository->update(['user_type' =>  $request->role_id], $user->id);
             }
             \DB::commit();
+            \Log::info($data);
             return response()->json();
         } catch (\Exception $e) {
             \DB::rollBack();
@@ -119,9 +129,18 @@ class AdminController extends Controller
 
         $user = $this->usersRepository->findOne($id);
         $data['is_active'] = $request->is_active == 'on' ? '1' : '0';
-        if ($request->has('image')) {
-            $data['image'] = $request->file('image')->store('dashboard/uploads');
-        }
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $path = 'dashboard/uploads';
+                
+                // Ensure the directory exists
+                if (!\Storage::disk('public')->exists($path)) {
+                    \Storage::disk('public')->makeDirectory($path, 0755, true);
+                }
+                
+                // Store the file
+                $data['image'] = $file->store($path, 'public');
+            } 
 
         $updated = $this->usersRepository->update($data, $id);
 
