@@ -481,7 +481,7 @@
                 </div>
             </div>`;
             const $row = $(newRowHtml);
-            $('#stocks-section tbody').append($row);
+            $('#stocks-section').append($row);
             initSelect2($row);
             renumberStockRows();
         });
