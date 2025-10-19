@@ -1,18 +1,8 @@
 <!doctype html>
-<html lang="{{ app()->getLocale() }}" id="htmlElement" dir="{{ app()->getLocale()==='ar' ? 'rtl' : 'ltr' }}">
+<html lang="en" id="htmlElement" dir="ltr">>
 <head>
     <meta charset="utf-8">
-    <title>{{ __('booking.meta_title') }} |
-        @switch(app()->getLocale())
-            @case('en')
-                    {{ settings('app_name_en') }}
-                @break
-            @case('ar')
-                    {{ settings('app_name_ar') }}
-                @break
-            @default
-                    {{ settings('app_name_en') }}
-        @endswitch
+    <title>Booking Form | {{ settings('app_name_en') }}
     </title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -92,13 +82,6 @@
    		 margin-right: 8px;
 	}
 	</style>
-    @if(app()->getLocale() == "en")
-    <style>
-        .country-select-wrap{
-            direction: rtl;
-        }
-    </style>
-    @endif
 </head>
 <body>
 <div class="container container-narrow py-3">
@@ -109,27 +92,9 @@
             <img src="{{ asset('images/logo.png') }}" class="logo" alt="Logo"
                  onerror="this.replaceWith(Object.assign(document.createElement('div'),{textContent:'Company',className:'fw-bold fs-4'}));">
             <div>
-                <div class="fw-bold">
-                    @switch(app()->getLocale())
-                        @case('en')
-                                {{ settings('app_name_en') }}
-                            @break
-                        @case('ar')
-                                {{ settings('app_name_ar') }}
-                            @break
-                        @default
-                                {{ settings('app_name_en') }}
-                    @endswitch
-                </div>
-                <div class="text-muted">{{ __('booking.brand_sub') }}</div>
+                <div class="fw-bold">{{ settings('app_name_en') }}</div>
+                <div class="text-muted">Book your appointment in seconds</div>
             </div>
-        </div>
-        <div class="lang-switch btn-group" role="group" aria-label="Language">
-            @if(app()->getLocale()==='ar')
-                <a href="{{ route('set-lang' , 'registrationforms-en') }}" class=" @if(app()->getLocale()==='en') active @endif"><span class="badge bg-primary">EN</span></a>
-            @else
-                <a href="{{ route('set-lang' , 'registrationforms-ar') }}" class="@if(app()->getLocale()==='ar') active @endif"><span class="badge bg-primary">عربي</span></a>
-            @endif
         </div>
     </div>
 
@@ -137,10 +102,10 @@
     <div class="glass hero mb-3">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
             <div class="stepper">
-                <span class="step"><i class="bi bi-geo-alt"></i> {{ __('booking.step_camp') }}</span>
-                <span class="step"><i class="bi bi-calendar3"></i> {{ __('booking.step_date') }}</span>
-                <span class="step"><i class="bi bi-person-vcard"></i> {{ __('booking.step_details') }}</span>
-                <span class="step"><i class="bi bi-check2-circle"></i> {{ __('booking.step_confirm') }}</span>
+                <span class="step"><i class="bi bi-geo-alt"></i> Choose Service</span>
+                <span class="step"><i class="bi bi-calendar3"></i> Date & Time</span>
+                <span class="step"><i class="bi bi-person-vcard"></i> Your Details</span>
+                <span class="step"><i class="bi bi-check2-circle"></i> Confirm Request</span>
             </div>
             <div class="progress-wrap flex-fill" style="max-width:300px">
                 <div class="progress" role="progressbar" aria-label="progress">
@@ -155,19 +120,19 @@
         <div class="success-card p-3 mb-3">
             <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
                 <div>
-                    <div class="fw-bold mb-1">{{ __('booking.success_title') }}</div>
-                    <div class="mb-1">{{ __('booking.success_body') }}</div>
-                    <div class="mt-3">{{ __('booking.success_code') }}
+                    <div class="fw-bold mb-1">Your request has been received</div>
+                    <div class="mb-1">We saved your request and will contact you soon.</div>
+                    <div class="mt-3">Request code:
                         <span class="code-box">{{ session('request_code') }}</span>
                     </div>
                     <div class="divider"></div>
                 </div>
                 <div class="d-flex flex-column align-items-stretch gap-2">
                     <button class="btn btn-outline-secondary copy-btn" data-code="{{ session('request_code') }}">
-                        <i class="bi bi-clipboard"></i> {{ __('booking.copy_code') }}
+                        <i class="bi bi-clipboard"></i> Copy code
                     </button>
                     <a target="_blank" rel="noopener" class="btn btn-outline-success"
-                       href="https://wa.me/?text={{ urlencode(__('booking.whatsapp_msg').': '.session('request_code')) }}">
+                       href="https://wa.me/?text={{ urlencode('My booking request code: '.session('request_code')) }}">
                         <i class="bi bi-whatsapp"></i> WhatsApp
                     </a>
                 </div>
@@ -178,7 +143,7 @@
     {{-- Errors --}}
     @if ($errors->any())
         <div class="alert alert-danger">
-            <div class="mb-1"><i class="bi bi-exclamation-octagon"></i> {{ __('booking.errors_title') }}</div>
+            <div class="mb-1"><i class="bi bi-exclamation-octagon"></i> Please fix the following:</div>
             <ul class="mb-0">
                 @foreach ($errors->all() as $e)
                     <li>{{ $e }}</li>
@@ -190,20 +155,20 @@
     {{-- Form --}}
     <div class="card-form">
         <div class="d-flex justify-content-between align-items-center mb-2">
-            <h4 class="mb-0"><i class="bi bi-journal-text"></i> {{ __('booking.form_title') }}</h4>
-            <span class="badge bg-light text-muted border">{{ __('booking.form_hint') }}</span>
+            <h4 class="mb-0"><i class="bi bi-journal-text"></i> Booking Details</h4>
+            <span class="badge bg-light text-muted border">All fields marked * are required</span>
         </div>
 
         <form method="POST" action="{{ route('registrationforms.store') }}" novalidate id="bookingForm">
             @csrf
 
             {{-- Section: Camp & Date --}}
-            <div class="form-section-title"><i class="bi bi-geo-alt"></i> {{ __('booking.section_when_where') }}</div>
+            <div class="form-section-title"><i class="bi bi-geo-alt"></i> When & Where</div>
             <div class="row g-3">
 
                 {{-- Booking Date --}}
                 <div class="col-md-6">
-                    <label class="form-label required">{{ __('booking.date_label') }}</label>
+                    <label class="form-label required">Booking date</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
                         <input type="date" name="booking_date" class="form-control @error('booking_date') is-invalid @enderror"
@@ -214,9 +179,9 @@
 
                 {{-- Service --}}
                 <div class="col-md-6">
-                    <label class="form-label required">{{ __('booking.camp_label') }}</label>
+                    <label class="form-label required">Service / Camp</label>
                     <select name="service_id" id="service_id" class="form-select @error('service_id') is-invalid @enderror" required>
-                        <option value="" disabled selected>{{ __('booking.camp_placeholder') }}</option>
+                        <option value="" disabled selected>Select a service</option>
                         @foreach($services as $s)
                             <option value="{{ $s->id }}"
                                     data-hour-from="{{ $s->hour_from }}"
@@ -232,7 +197,7 @@
 
                 {{-- Time Slot --}}
                 <div class="col-12">
-                    <label class="form-label required">{{ __('booking.slot_label') }}</label>
+                    <label class="form-label required">Time slot</label>
                     <div class="d-flex gap-2 flex-wrap" id="slotGroup">
                         @foreach(['4-12','5-1','other'] as $val)
                             @php $checked = old('time_slot')===$val; @endphp
@@ -241,7 +206,9 @@
                                 @if($val==='4-12') <i class="bi bi-moon-stars me-1"></i> @endif
                                 @if($val==='5-1')  <i class="bi bi-alarm me-1"></i> @endif
                                 @if($val==='other')<i class="bi bi-sliders me-1"></i> @endif
-                                @lang("booking.slots.$val")
+                                @if($val==='4-12') 4 PM – 12 AM @endif
+                                @if($val==='5-1') 5 PM – 1 AM @endif
+                                @if($val==='other') Other (custom times) @endif
                             </label>
                         @endforeach
                     </div>
@@ -252,7 +219,7 @@
                 <div class="col-12" id="otherTimesWrap" style="display:none;">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label required">{{ __('booking.checkin_label') }}</label>
+                            <label class="form-label required">Check-in time</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-box-arrow-in-right"></i></span>
                                 <input type="time" name="checkin_time" class="form-control @error('checkin_time') is-invalid @enderror" value="{{ old('checkin_time') }}">
@@ -260,7 +227,7 @@
                             @error('checkin_time') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label required">{{ __('booking.checkout_label') }}</label>
+                            <label class="form-label required">Check-out time</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-box-arrow-left"></i></span>
                                 <input type="time" name="checkout_time" class="form-control @error('checkout_time') is-invalid @enderror" value="{{ old('checkout_time') }}">
@@ -268,46 +235,46 @@
                             @error('checkout_time') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
-                    <small class="help text-danger">{{ __('booking.time_note') }}</small>
+                    <small class="help text-danger">Custom times must be within the default service hours.</small>
                 </div>
             </div>
 
             <div class="divider"></div>
 
             {{-- Personal --}}
-            <div class="form-section-title"><i class="bi bi-person-vcard"></i> {{ __('booking.section_personal') }}</div>
+            <div class="form-section-title"><i class="bi bi-person-vcard"></i> Personal Information</div>
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label class="form-label required">{{ __('booking.fname_label') }}</label>
+                    <label class="form-label required">First name</label>
                     <input type="text" name="first_name" class="form-control @error('first_name') is-invalid @enderror"
                            value="{{ old('first_name') }}" required>
                     @error('first_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label required">{{ __('booking.lname_label') }}</label>
+                    <label class="form-label required">Last name</label>
                     <input type="text" name="last_name" class="form-control @error('last_name') is-invalid @enderror"
                            value="{{ old('last_name') }}" required>
                     @error('last_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label required">{{ __('booking.persons_label') }}</label>
+                    <label class="form-label required">Number of persons</label>
                     <input type="number" min="1" name="persons" class="form-control @error('persons') is-invalid @enderror"
                            value="{{ old('persons') }}" required>
                     @error('persons') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label required">{{ __('booking.phone_label') }}</label>
+                    <label class="form-label required">Mobile phone</label>
                     <div class="input-group">
                         <span class="input-group-text mr-2"><i class="bi bi-telephone"></i></span>
                         <input type="tel" name="mobile_phone" class="form-control @error('mobile_phone') is-invalid @enderror"
-                               placeholder="{{ __('booking.phone_ph') }}" value="{{ old('mobile_phone') }}" required>
+                               placeholder="e.g., +971010123467" value="{{ old('mobile_phone') }}" required>
                     </div>
                     @error('mobile_phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label required">{{ __('booking.email_label') }}</label>
+                    <label class="form-label required">Email</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                         <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
@@ -317,32 +284,32 @@
                 </div>
 
                 <div class="col-12">
-                    <label class="form-label">{{ __('booking.notes_label') }}</label>
+                    <label class="form-label">Notes</label>
                     <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3"
-                              placeholder="{{ __('booking.notes_ph') }}">{{ old('notes') }}</textarea>
+                              placeholder="Any special requests or notes">{{ old('notes') }}</textarea>
                     @error('notes') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     <div class="help mt-1" id="notesCount"></div>
                 </div>
 
                 <div class="col-12 form-check mt-2">
                     <input class=" @error('terms_accepted') is-invalid @enderror" type="checkbox" id="terms" name="terms_accepted" value="1" {{ old('terms_accepted') ? 'checked' : '' }} required>
-                    <label class="form-check-label" for="terms">{{ __('booking.terms_label') }}</label>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="ms-2">{{ __('booking.view_terms') }}</a>
+                    <label class="form-check-label" for="terms">I agree to the terms and conditions</label>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="ms-2">View terms</a>
                     @error('terms_accepted') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-12 d-flex gap-2 mt-3">
                     <button type="submit" class="btn btn-primary px-4">
-                        <i class="bi bi-send"></i> {{ __('booking.btn_submit') }}
+                        <i class="bi bi-send"></i> Submit request
                     </button>
                     <button type="reset" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-counterclockwise"></i> {{ __('booking.btn_reset') }}
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
                     </button>
                 </div>
             </div>
 
             <div class="footer-note mt-3">
-                <i class="bi bi-info-circle"></i> {{ __('booking.footer_note') }}
+                <i class="bi bi-info-circle"></i> We respect your privacy. Your data is used only to process this request.
             </div>
         </form>
     </div>
@@ -353,7 +320,7 @@
   <div class="modal-dialog modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
-        <h6 class="modal-title">{{ __('booking.terms_title') }}</h6>
+        <h6 class="modal-title">Terms and Conditions</h6>
       </div>
       <div class="modal-body">
         <div class="rtl-text" dir="rtl" style="text-align: right;">
@@ -364,7 +331,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('booking.close') }}</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -397,13 +364,11 @@
 
         const sel = document.getElementById('service_id');
         const hint = document.getElementById('serviceHoursHint');
-        const HINT = { ar:"{{ __('booking.hint_hours_ar') }}", en:"{{ __('booking.hint_hours_en') }}" };
         function updateHint(){
-            const lang = document.documentElement.lang || 'ar';
             const opt = sel.options[sel.selectedIndex];
             const from = opt?.dataset?.hourFrom || '';
             const to   = opt?.dataset?.hourTo || '';
-            hint.textContent = (from && to) ? HINT[lang].replace('{from}', from).replace('{to}', to) : '';
+            hint.textContent = (from && to) ? `Service hours: ${from} - ${to}` : '';
         }
         sel.addEventListener('change', updateHint); updateHint();
 
@@ -411,8 +376,8 @@
             btn.addEventListener('click', ()=>{
                 const code = btn.getAttribute('data-code');
                 navigator.clipboard.writeText(code).then(()=>{
-                    btn.innerHTML = '<i class="bi bi-check2"></i> {{ __('booking.copied') }}';
-                    setTimeout(()=>btn.innerHTML = '<i class="bi bi-clipboard"></i> {{ __('booking.copy_code') }}',1400);
+                    btn.innerHTML = '<i class="bi bi-check2"></i> Copied';
+                    setTimeout(()=>btn.innerHTML = '<i class="bi bi-clipboard"></i> Copy code',1400);
                 });
             });
         });
@@ -460,11 +425,10 @@
 
         // Phone merging is handled by country-select.js which prefixes the selected dial code
 
-        const dir = document.documentElement.getAttribute('dir') || 'rtl';
-        const placeholder = @json(__('booking.camp_placeholder'));
+        const placeholder = "Select a service";
         $('#service_id').select2({
             theme: 'bootstrap-5',
-            dir: dir,
+            dir: 'ltr',
             placeholder: placeholder,
             allowClear: true,
             width: '100%',
@@ -477,14 +441,16 @@
         const dateEl = document.querySelector('input[name="booking_date"]');
         if(dateEl){
             try { dateEl.type = 'text'; } catch(e) {}
-            const lang = document.documentElement.lang || 'ar';
+        const dateEl = document.querySelector('input[name="booking_date"]');
+        if(dateEl){
+            try { dateEl.type = 'text'; } catch(e) {}
             const opts = {
                 dateFormat: 'Y-m-d',
                 altInput: true,
-                altFormat: lang === 'ar' ? 'j F Y' : 'F j, Y',
+                altFormat: 'F j, Y',
                 minDate: 'today',
                 disableMobile: true,
-                locale: (lang === 'ar' ? flatpickr.l10ns.ar : flatpickr.l10ns.default),
+                locale: flatpickr.l10ns.default,
                 onChange: function(){
                     document.getElementById('bookingForm').dispatchEvent(new Event('input', { bubbles: true }));
                 }
