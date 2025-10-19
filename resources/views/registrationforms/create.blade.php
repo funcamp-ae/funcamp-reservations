@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" id="htmlElement" dir="ltr">>
+<html lang="en" id="htmlElement" dir="ltr">
 <head>
     <meta charset="utf-8">
     <title>Booking Form | {{ settings('app_name_en') }}
@@ -342,7 +342,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/ar.js"></script>
 <script src="{{ asset('js/country-select.js') }}"></script>
 
 
@@ -438,9 +437,6 @@
             document.getElementById('bookingForm').dispatchEvent(new Event('input', { bubbles: true }));
         });
 
-        const dateEl = document.querySelector('input[name="booking_date"]');
-        if(dateEl){
-            try { dateEl.type = 'text'; } catch(e) {}
         const dateEl = document.querySelector('input[name="booking_date"]');
         if(dateEl){
             try { dateEl.type = 'text'; } catch(e) {}
