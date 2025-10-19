@@ -85,6 +85,14 @@
         gap: 10px;
         flex-direction: row-reverse;
     }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 26px;
+    position: absolute;
+    top: 50%;
+    right: -10px;
+    width: 20px;
+    transform: translateY(-50%);
+}
 	</style>
 </head>
 <body>
