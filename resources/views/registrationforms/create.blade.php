@@ -81,6 +81,10 @@
 	.mr-2 {
    		 margin-right: 8px;
 	}
+    .country-select-wrap{
+        gap: 10px;
+        flex-direction: row-reverse;
+    }
 	</style>
 </head>
 <body>
