@@ -277,11 +277,8 @@
 
                 <div class="col-md-6">
                     <label class="form-label required">Mobile phone</label>
-                    <div class="input-group">
-                        <span class="input-group-text mr-2"><i class="bi bi-telephone"></i></span>
-                        <input type="tel" name="mobile_phone" class="form-control @error('mobile_phone') is-invalid @enderror"
-                               placeholder="e.g., +971010123467" value="{{ old('mobile_phone') }}" required>
-                    </div>
+                    <input type="tel" name="mobile_phone" class="form-control @error('mobile_phone') is-invalid @enderror"
+                           placeholder="e.g., +971010123467" value="{{ old('mobile_phone') }}" required>
                     @error('mobile_phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
 
