@@ -12,6 +12,19 @@
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.5.95/css/materialdesignicons.min.css" rel="stylesheet">
 
     <style>
+    :root {
+		--primary-brown: #8B4513 !important;
+		--secondary-brown: #A0522D !important;
+		--light-brown: #D2B48C !important;
+		--dark-brown: #644220ff !important;
+		--cream: #F5F5DC !important;
+	}
+    .btn-primary{
+        color: white !important;
+        background-color: var(--primary-brown) !important;
+        border : none !important;
+    }
+
         body {
             font-family: "Cairo", sans-serif;
             background-color: #f2f2f2;
@@ -46,7 +59,7 @@
         }
 
         .rating-form-header {
-            background-color: #007bff;
+            background-color:var(--primary-brown);
             color: #fff;
             padding: 15px;
             border-radius: 8px 8px 0 0;
@@ -90,7 +103,7 @@
         }
 
         .rating-form-submit {
-            background-color: #28a745;
+            background-color:var(--secondary-brown);
             color: #fff;
             border: none;
             padding: 10px 20px;
@@ -182,9 +195,9 @@
     {{-- Switch lang to ar and en  --}}
     <div>
         @if (app()->getLocale() == 'ar')
-            <a href="{{ route('set-lang', 'en') }}" >English</a>
+            <a class="btn btn-primary" href="{{ route('set-lang', 'en') }}" >English</a>
         @else
-            <a href="{{route('set-lang','ar')}}">العربية</a>
+            <a class="btn btn-primary" href="{{route('set-lang','ar')}}">العربية</a>
         @endif
     </div>
 
