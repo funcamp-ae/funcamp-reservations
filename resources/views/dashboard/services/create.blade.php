@@ -201,7 +201,7 @@
                             <h3>@lang('dashboard.report')</h3>
 
                             <div id="reports-section" style="overflow-x: auto;">
-                                <div class="table-responsive" style="overflow-x: auto; width: max-content">
+                                <div class="table-responsive" style="overflow-x: auto;">
                                     <table class="table table-bordered table-responsive">
                                         <thead >
                                             <tr>
