@@ -135,7 +135,7 @@
                                 <td>{{ $stock->description }}</td>
                                 <td>
                                     <img src="{{ $stock->image ? asset($stock->image) : asset('dashboard/assets/media/avatars/blank.png') }}"
-                                        style="width:50px;height:50px;border-radius: 50%;">
+                                        style="width:50px;height:50px">
                                 </td>
                                 <!-- <td> Display image </td> -->
                                 <td>{{ $stock->quantity }}</td>

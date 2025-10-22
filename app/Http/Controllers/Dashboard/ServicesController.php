@@ -97,7 +97,7 @@ class ServicesController extends Controller
                         ]);
                         // handle image upload from retrieved service
                         
-                    }else if($request->custom_reports_images[$index]){
+                    }else if(isset($request->custom_reports_images) && isset($request->custom_reports_images[$index])){
                         Storage::copy($request->custom_reports_images[$index], 'reports');
                         $newReport->update([
                             'image' => substr($request->custom_reports_images[$index], strrpos($request->custom_reports_images[$index], 'reports/') , strlen($request->custom_reports_images[$index]))
