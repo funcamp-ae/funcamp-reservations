@@ -65,7 +65,7 @@ Route::get('dashboard/stocks/{stock}/report', [StockController::class, 'stockRep
 // Google OAuth Routes
 Route::get('auth/google', [App\Http\Controllers\Auth\GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('auth/google/link', [App\Http\Controllers\Auth\GoogleAuthController::class, 'linkGoogleAccount'])->name('auth.google.link')->middleware('auth');
-Route::get('auth/google/callback', [App\Http\Controllers\Auth\GoogleAuthController::class, 'handleGoogleLinkCallback'])->middleware('auth');
+Route::get('auth/google/callback', [App\Http\Controllers\Auth\GoogleAuthController::class, 'handleGoogleLinkCallback']);
 Route::post('auth/google/unlink', [App\Http\Controllers\Auth\GoogleAuthController::class, 'unlinkGoogleAccount'])->name('auth.google.unlink')->middleware('auth');
 
 Route::group(['middleware' => ['web']], function () {
