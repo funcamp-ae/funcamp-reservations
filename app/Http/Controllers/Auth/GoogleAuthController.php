@@ -37,84 +37,140 @@ class GoogleAuthController extends Controller
     }
 
     /**
-     * Handle Google account linking callback
+     * Handle Google OAuth callback - handles both login and account linking
      */
-    public function handleGoogleLinkCallback()
+    public function handleGoogleCallback()
     {
         try {
-            // Get the user ID from session (stored during the link initiation)
-            $linkingUserId = session('linking_user_id');
-            
-            // Check if we have a linking user ID or if the user is still authenticated
-            if (!$linkingUserId && !Auth::check()) {
-                session()->forget('linking_user_id');
-                return redirect('/login')->withErrors(['error' => 'Session expired. Please try again.']);
-            }
-
-            // Get the current user (either from session or current auth)
-            $currentUser = $linkingUserId ? User::find($linkingUserId) : Auth::user();
-            
-            if (!$currentUser) {
-                session()->forget('linking_user_id');
-                return redirect('/login')->withErrors(['error' => 'User not found. Please try again.']);
-            }
-
             // Get the Google user data
             $googleUser = Socialite::driver('google')->user();
 
             // Validate that we got the Google user data
             if (!$googleUser || !$googleUser->id) {
-                session()->forget('linking_user_id');
-                return redirect()->route('edit-profile')
-                    ->withErrors(['google' => 'Failed to retrieve Google account information.']);
+                return redirect('/login')
+                    ->withErrors(['error' => 'Failed to retrieve Google account information.']);
             }
 
-            // Check if Google account is already linked to another user
-            $existingUser = User::where('google_id', $googleUser->id)
-                                ->where('id', '!=', $currentUser->id)
-                                ->first();
-
-            if ($existingUser) {
-                session()->forget('linking_user_id');
-                return redirect()->route('edit-profile')
-                    ->withErrors(['google' => 'This Google account is already linked to another user.']);
+            // Check if this is a linking request (user was already logged in)
+            $linkingUserId = session('linking_user_id');
+            
+            if ($linkingUserId) {
+                // This is an account linking request
+                return $this->handleAccountLinking($googleUser, $linkingUserId);
+            } else {
+                // This is a regular Google login request
+                return $this->handleGoogleLogin($googleUser);
             }
 
-            // Link Google account to current user
-            $currentUser->update([
+        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+            Log::error('Google OAuth Invalid State Exception: ' . $e->getMessage());
+            session()->forget('linking_user_id');
+            return redirect('/login')
+                ->withErrors(['error' => 'Invalid OAuth state. Please try again.']);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            Log::error('Google OAuth Client Exception: ' . $e->getMessage());
+            session()->forget('linking_user_id');
+            return redirect('/login')
+                ->withErrors(['error' => 'Failed to communicate with Google. Please try again.']);
+        } catch (Exception $e) {
+            Log::error('Google OAuth Exception: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            session()->forget('linking_user_id');
+            return redirect('/login')
+                ->withErrors(['error' => 'Something went wrong with Google authentication: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Handle regular Google login
+     */
+    private function handleGoogleLogin($googleUser)
+    {
+        // Check if user already exists with this Google ID
+        $existingUser = User::where('google_id', $googleUser->id)->first();
+
+        if ($existingUser) {
+            // User exists, update their Google token and log them in
+            $existingUser->update([
+                'google_token' => $googleUser->token,
+                'google_refresh_token' => $googleUser->refreshToken,
+            ]);
+
+            Auth::login($existingUser);
+            return redirect()->intended('/home');
+        }
+
+        // Check if user exists with the same email
+        $userWithEmail = User::where('email', $googleUser->email)->first();
+
+        if ($userWithEmail) {
+            // User exists with same email but no Google ID - link the account
+            $userWithEmail->update([
                 'google_id' => $googleUser->id,
                 'google_token' => $googleUser->token,
                 'google_refresh_token' => $googleUser->refreshToken,
             ]);
 
-            // Clear the session data
-            session()->forget('linking_user_id');
-
-            // Ensure the user is logged in
-            if (!Auth::check()) {
-                Auth::login($currentUser);
-            }
-
-            return redirect()->route('edit-profile')
-                ->with('success', 'Google account linked successfully!');
-
-        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
-            Log::error('Google OAuth Invalid State Exception: ' . $e->getMessage());
-            session()->forget('linking_user_id');
-            return redirect()->route('edit-profile')
-                ->withErrors(['google' => 'Invalid OAuth state. Please try again.']);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            Log::error('Google OAuth Client Exception: ' . $e->getMessage());
-            session()->forget('linking_user_id');
-            return redirect()->route('edit-profile')
-                ->withErrors(['google' => 'Failed to communicate with Google. Please try again.']);
-        } catch (Exception $e) {
-            Log::error('Google OAuth Exception: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
-            session()->forget('linking_user_id');
-            return redirect()->route('edit-profile')
-                ->withErrors(['google' => 'Something went wrong with Google account linking: ' . $e->getMessage()]);
+            Auth::login($userWithEmail);
+            return redirect()->intended('/home');
         }
+
+        // Create new user
+        $newUser = User::create([
+            'name' => $googleUser->name,
+            'email' => $googleUser->email,
+            'google_id' => $googleUser->id,
+            'google_token' => $googleUser->token,
+            'google_refresh_token' => $googleUser->refreshToken,
+            'email_verified_at' => now(),
+            'password' => Hash::make(\Illuminate\Support\Str::random(24)), // Random password since they'll use Google
+        ]);
+
+        Auth::login($newUser);
+        return redirect()->intended('/home');
+    }
+
+    /**
+     * Handle account linking for already logged-in users
+     */
+    private function handleAccountLinking($googleUser, $linkingUserId)
+    {
+        // Get the current user who wants to link their account
+        $currentUser = User::find($linkingUserId);
+        
+        if (!$currentUser) {
+            session()->forget('linking_user_id');
+            return redirect('/login')->withErrors(['error' => 'User not found. Please try again.']);
+        }
+
+        // Check if Google account is already linked to another user
+        $existingUser = User::where('google_id', $googleUser->id)
+                            ->where('id', '!=', $currentUser->id)
+                            ->first();
+
+        if ($existingUser) {
+            session()->forget('linking_user_id');
+            return redirect()->route('edit-profile')
+                ->withErrors(['google' => 'This Google account is already linked to another user.']);
+        }
+
+        // Link Google account to current user
+        $currentUser->update([
+            'google_id' => $googleUser->id,
+            'google_token' => $googleUser->token,
+            'google_refresh_token' => $googleUser->refreshToken,
+        ]);
+
+        // Clear the session data
+        session()->forget('linking_user_id');
+
+        // Ensure the user is logged in
+        if (!Auth::check()) {
+            Auth::login($currentUser);
+        }
+
+        return redirect()->route('edit-profile')
+            ->with('success', 'Google account linked successfully!');
     }
 
     /**
