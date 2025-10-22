@@ -227,15 +227,15 @@
                                                             <img src="{{ asset('images/logo.png') }}" class="preview-image" style="width:50px;height:50px;object-fit:cover;">
                                                         @endif
                                                     </td>
-                                                    <td class="text-nowrap w-50" data-label="@lang('dashboard.item_name')">
+                                                    <td class="text-nowrap" style = "min-width: 200px;" data-label="@lang('dashboard.item_name')">
                                                         <input type="text" name="reports[]" class="form-control form-control-lg form-control-solid w-100"
                                                                value="{{ $report->name }}" placeholder="@lang('dashboard.name')" required>
                                                     </td>
-                                                    <td class="text-nowrap" data-label="@lang('dashboard.required_qty')">
+                                                    <td class="text-nowrap" style = "min-width: 100px;" data-label="@lang('dashboard.required_qty')">
                                                         <input type="number" name="reports_counts[]" min="1" class="form-control form-control-lg form-control-solid w-100"
                                                                value="{{ $report->count }}" placeholder="@lang('dashboard.count')" required style="min-width: 100px;">
                                                     </td>
-                                                    <td class="text-nowrap w-100" data-label="@lang('dashboard.upload_image')">
+                                                    <td class="text-nowrap w-100" style = "min-width: 200px;" data-label="@lang('dashboard.upload_image')">
                                                         <input type="file" name="reports_images[{{ $index }}]" accept="image/*"
                                                                class="form-control form-control-lg form-control-solid image-upload w-100">
                                                         <div class="progress mt-2 d-none">
