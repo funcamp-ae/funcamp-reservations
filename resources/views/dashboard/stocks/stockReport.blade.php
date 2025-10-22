@@ -11,11 +11,6 @@
 	</style>
 @endpush
 <div class="container">
-	<!-- Table Scroll Arrows -->
-	<div class="d-flex justify-content-between align-items-center mb-2">
-		<button type="button" class="btn btn-light scroll-left-btn" title="Scroll Left" style="min-width:32px;font-size:1.5rem;">&lt;</button>
-		<button type="button" class="btn btn-light scroll-right-btn" title="Scroll Right" style="min-width:32px;font-size:1.5rem;">&gt;</button>
-	</div>
 	<!-- Stock Card -->
 	<div class="card mb-4" style="max-width: 420px; margin: auto;">
 		<img src="{{asset($stock->image) }}" class="card-img-top" alt="{{ $stock->name }}" style="max-height: 220px; object-fit: contain;">
