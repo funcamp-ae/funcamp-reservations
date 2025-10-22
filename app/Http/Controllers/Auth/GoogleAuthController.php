@@ -18,7 +18,7 @@ class GoogleAuthController extends Controller
      */
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')->with(["prompt" => "select_account"])->redirect();
     }
 
     /**
@@ -33,7 +33,7 @@ class GoogleAuthController extends Controller
         // Store the current user ID in the session so we can retrieve it in the callback
         session(['linking_user_id' => Auth::id()]);
 
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')->with(["prompt" => "select_account"])->redirect();
     }
 
     /**
