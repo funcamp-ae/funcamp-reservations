@@ -1944,6 +1944,10 @@ return [
     'confirm_unlink_google' => 'هل أنت متأكد من إلغاء ربط حساب Google؟',
     'link_google_account' => 'ربط حساب Google',
     'google_account_benefits' => 'يمكنك تسجيل الدخول باستخدام Google بعد ربط حسابك',
+    'connecting' => 'جاري الاتصال',
+    'unlinking' => 'جاري إلغاء الربط',
+    'google_unlinked_successfully' => 'تم إلغاء ربط حساب Google بنجاح!',
+    'error_unlinking_google' => 'خطأ في إلغاء ربط حساب Google. حاول مرة أخرى.',
 
 ];
 

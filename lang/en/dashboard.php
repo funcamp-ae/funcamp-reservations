@@ -2249,5 +2249,9 @@ return [
     'confirm_unlink_google' => 'Are you sure you want to unlink your Google account?',
     'link_google_account' => 'Link Google Account',
     'google_account_benefits' => 'You can log in using Google after linking your account',
+    'connecting' => 'Connecting',
+    'unlinking' => 'Unlinking',
+    'google_unlinked_successfully' => 'Google account unlinked successfully!',
+    'error_unlinking_google' => 'Error unlinking Google account. Please try again.',
 
 ];

@@ -240,35 +240,37 @@
                                 <!--end::Label-->
                                 <!--begin::Col-->
                                 <div class="col-lg-8">
-                                    @if(auth()->user()->google_id)
-                                        <!--begin::Connected Account-->
-                                        <div class="d-flex align-items-center">
-                                            <div class="symbol symbol-35px me-4">
-                                                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" />
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class="fw-bold text-gray-800">@lang('dashboard.google_connected')</div>
-                                                <div class="text-muted fs-7">{{ auth()->user()->email }}</div>
-                                            </div>
-                                            <form method="POST" action="{{ route('auth.google.unlink') }}" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm btn-light-danger" 
-                                                        onclick="return confirm('@lang('dashboard.confirm_unlink_google')')">
+                                    <div id="google-account-section">
+                                        @if(auth()->user()->google_id)
+                                            <!--begin::Connected Account-->
+                                            <div class="d-flex align-items-center" id="google-connected">
+                                                <div class="symbol symbol-35px me-4">
+                                                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" />
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="fw-bold text-gray-800">@lang('dashboard.google_connected')</div>
+                                                    <div class="text-muted fs-7">{{ auth()->user()->email }}</div>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-light-danger" id="unlink-google-btn">
                                                     <i class="fas fa-unlink"></i>
-                                                    @lang('dashboard.unlink')
+                                                    <span class="btn-text">@lang('dashboard.unlink')</span>
+                                                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
                                                 </button>
-                                            </form>
-                                        </div>
-                                        <!--end::Connected Account-->
-                                    @else
-                                        <!--begin::Link Account-->
-                                        <a href="{{ route('auth.google.link') }}" class="btn btn-light-primary">
-                                            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="me-2" style="width: 20px; height: 20px;">
-                                            @lang('dashboard.link_google_account')
-                                        </a>
-                                        <div class="form-text">@lang('dashboard.google_account_benefits')</div>
-                                        <!--end::Link Account-->
-                                    @endif
+                                            </div>
+                                            <!--end::Connected Account-->
+                                        @else
+                                            <!--begin::Link Account-->
+                                            <div id="google-not-connected">
+                                                <button type="button" class="btn btn-light-primary" id="link-google-btn">
+                                                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="me-2" style="width: 20px; height: 20px;">
+                                                    <span class="btn-text">@lang('dashboard.link_google_account')</span>
+                                                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                                </button>
+                                                <div class="form-text">@lang('dashboard.google_account_benefits')</div>
+                                            </div>
+                                            <!--end::Link Account-->
+                                        @endif
+                                    </div>
 
                                     @if($errors->has('google'))
                                         <div class="fv-plugins-message-container invalid-feedback d-block">{{ $errors->first('google')}}</div>
@@ -328,6 +330,137 @@
                     required: true
                 }
             }
-        })
+        });
+
+        // Google Account Linking
+        $(document).ready(function() {
+            // Handle Link Google Account
+            $('#link-google-btn').on('click', function() {
+                const btn = $(this);
+                const btnText = btn.find('.btn-text');
+                const spinner = btn.find('.spinner-border');
+                
+                // Show loading state
+                btn.prop('disabled', true);
+                btnText.text('@lang('dashboard.connecting')...');
+                spinner.removeClass('d-none');
+                
+                // Redirect to Google OAuth
+                window.location.href = '{{ route('auth.google.link') }}';
+            });
+
+            // Handle Unlink Google Account
+            $('#unlink-google-btn').on('click', function() {
+                const btn = $(this);
+                const btnText = btn.find('.btn-text');
+                const spinner = btn.find('.spinner-border');
+                
+                // Show confirmation dialog
+                if (!confirm('@lang('dashboard.confirm_unlink_google')')) {
+                    return;
+                }
+                
+                // Show loading state
+                btn.prop('disabled', true);
+                btnText.text('@lang('dashboard.unlinking')...');
+                spinner.removeClass('d-none');
+                
+                // Make AJAX request
+                $.ajax({
+                    url: '{{ route('auth.google.unlink') }}',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        // Show success message
+                        showAlert('success', '@lang('dashboard.google_unlinked_successfully')');
+                        
+                        // Update the UI to show unlinked state
+                        $('#google-account-section').html(`
+                            <div id="google-not-connected">
+                                <button type="button" class="btn btn-light-primary" id="link-google-btn">
+                                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="me-2" style="width: 20px; height: 20px;">
+                                    <span class="btn-text">@lang('dashboard.link_google_account')</span>
+                                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                </button>
+                                <div class="form-text">@lang('dashboard.google_account_benefits')</div>
+                            </div>
+                        `);
+                        
+                        // Re-attach event listener for the new link button
+                        attachLinkGoogleHandler();
+                    },
+                    error: function(xhr) {
+                        console.error('Error unlinking Google account:', xhr);
+                        let errorMessage = '@lang('dashboard.error_unlinking_google')';
+                        
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        
+                        showAlert('error', errorMessage);
+                        
+                        // Reset button state
+                        btn.prop('disabled', false);
+                        btnText.text('@lang('dashboard.unlink')');
+                        spinner.addClass('d-none');
+                    }
+                });
+            });
+
+            // Function to attach link google handler (for dynamic content)
+            function attachLinkGoogleHandler() {
+                $('#link-google-btn').on('click', function() {
+                    const btn = $(this);
+                    const btnText = btn.find('.btn-text');
+                    const spinner = btn.find('.spinner-border');
+                    
+                    // Show loading state
+                    btn.prop('disabled', true);
+                    btnText.text('@lang('dashboard.connecting')...');
+                    spinner.removeClass('d-none');
+                    
+                    // Redirect to Google OAuth
+                    window.location.href = '{{ route('auth.google.link') }}';
+                });
+            }
+
+            // Function to show alerts
+            function showAlert(type, message) {
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
+                
+                const alertHtml = `
+                    <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                        <i class="${iconClass} me-2"></i>
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                
+                // Remove existing alerts
+                $('.alert').remove();
+                
+                // Add new alert before the card
+                $('.card').first().before(alertHtml);
+                
+                // Auto remove after 5 seconds
+                setTimeout(function() {
+                    $('.alert').fadeOut(function() {
+                        $(this).remove();
+                    });
+                }, 5000);
+            }
+
+            // Check for success/error messages from server (for page redirects)
+            @if(session('success'))
+                showAlert('success', '{{ session('success') }}');
+            @endif
+
+            @if($errors->has('google'))
+                showAlert('error', '{{ $errors->first('google') }}');
+            @endif
+        });
     </script>
 @endsection

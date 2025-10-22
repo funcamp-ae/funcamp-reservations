@@ -98,12 +98,7 @@ class GoogleAuthController extends Controller
 
             Auth::login($existingUser);
             return redirect()->intended('/home');
-        }
-
-        // Check if user exists with the same email
-        $userWithEmail = User::where('email', $googleUser->email)->first();
-
-        if ($userWithEmail) {
+        }else if ($userWithEmail = User::where('email', $googleUser->email)->first()) {
             // User exists with same email but no Google ID - link the account
             $userWithEmail->update([
                 'google_id' => $googleUser->id,
@@ -115,19 +110,10 @@ class GoogleAuthController extends Controller
             return redirect()->intended('/home');
         }
 
-        // Create new user
-        $newUser = User::create([
-            'name' => $googleUser->name,
-            'email' => $googleUser->email,
-            'google_id' => $googleUser->id,
-            'google_token' => $googleUser->token,
-            'google_refresh_token' => $googleUser->refreshToken,
-            'email_verified_at' => now(),
-            'password' => Hash::make(\Illuminate\Support\Str::random(24)), // Random password since they'll use Google
-        ]);
-
-        Auth::login($newUser);
-        return redirect()->intended('/home');
+        else {
+            // User does not exist, proceed to registration or linking
+            return redirect('/login')->withErrors(['error' => 'You must link your Google account first.']);
+        }
     }
 
     /**
@@ -176,20 +162,44 @@ class GoogleAuthController extends Controller
     /**
      * Unlink Google account from current user
      */
-    public function unlinkGoogleAccount()
+    public function unlinkGoogleAccount(Request $request)
     {
         if (!Auth::check()) {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'You must be logged in.'], 401);
+            }
             return redirect('/login');
         }
 
-        $user = Auth::user();
-        $user->update([
-            'google_id' => null,
-            'google_token' => null,
-            'google_refresh_token' => null,
-        ]);
+        try {
+            $user = Auth::user();
+            $user->update([
+                'google_id' => null,
+                'google_token' => null,
+                'google_refresh_token' => null,
+            ]);
 
-        return redirect()->route('edit-profile')
-            ->with('success', 'Google account unlinked successfully!');
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Google account unlinked successfully!'
+                ]);
+            }
+
+            return redirect()->route('edit-profile')
+                ->with('success', 'Google account unlinked successfully!');
+
+        } catch (Exception $e) {
+            Log::error('Error unlinking Google account: ' . $e->getMessage());
+            
+            if ($request->ajax()) {
+                return response()->json([
+                    'error' => 'Failed to unlink Google account. Please try again.'
+                ], 500);
+            }
+
+            return redirect()->route('edit-profile')
+                ->withErrors(['google' => 'Failed to unlink Google account. Please try again.']);
+        }
     }
 }
