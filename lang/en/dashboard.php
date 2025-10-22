@@ -2239,6 +2239,15 @@ return [
     "for_warehouse_sale" => "warehouse sales",
     'manual_item_withdrawal_show' => 'Manual Item Withdrawal',
     'manual_item_return_show' => 'Manual Item Return',
-    'manual_item_return_history_heading' => 'Manual Item Return History'
+    'manual_item_return_history_heading' => 'Manual Item Return History',
+
+    // Google OAuth translations
+    'google_account' => 'Google Account',
+    'google_account_help' => 'Linking your Google account allows for quick login',
+    'google_connected' => 'Connected to Google',
+    'unlink' => 'Unlink',
+    'confirm_unlink_google' => 'Are you sure you want to unlink your Google account?',
+    'link_google_account' => 'Link Google Account',
+    'google_account_benefits' => 'You can log in using Google after linking your account',
 
 ];

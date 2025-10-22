@@ -42,6 +42,16 @@
                             <span class="indicator-progress">جاري التسجيل...
                             <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
                         </button>
+                        
+                        <!-- Google OAuth Button -->
+                        <div class="separator separator-content my-6">
+                            <span class="text-muted fs-7">أو</span>
+                        </div>
+                        
+                        <a href="{{ route('auth.google') }}" class="btn btn-light btn-lg w-100">
+                            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="me-2" style="width: 20px; height: 20px;">
+                            تسجيل الدخول بحساب Google
+                        </a>
                     </div>
                 </form>
             </div>

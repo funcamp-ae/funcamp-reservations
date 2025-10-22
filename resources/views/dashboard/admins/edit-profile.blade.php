@@ -228,6 +228,56 @@
                             </div>
                             <!--end::Input group-->
 
+                            <!--begin::Google Account Section-->
+                            <div class="row mb-6">
+                                <!--begin::Label-->
+                                <label class="col-lg-4 col-form-label fw-bold fs-6">
+                                    <span>@lang('dashboard.google_account')</span>
+                                    <i class="fas fa-exclamation-circle ms-1 fs-7" data-bs-toggle="tooltip"
+                                        title="@lang('dashboard.google_account_help')" 
+                                        aria-label="@lang('dashboard.google_account_help')"></i>
+                                </label>
+                                <!--end::Label-->
+                                <!--begin::Col-->
+                                <div class="col-lg-8">
+                                    @if(auth()->user()->google_id)
+                                        <!--begin::Connected Account-->
+                                        <div class="d-flex align-items-center">
+                                            <div class="symbol symbol-35px me-4">
+                                                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" />
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="fw-bold text-gray-800">@lang('dashboard.google_connected')</div>
+                                                <div class="text-muted fs-7">{{ auth()->user()->email }}</div>
+                                            </div>
+                                            <form method="POST" action="{{ route('auth.google.unlink') }}" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-light-danger" 
+                                                        onclick="return confirm('@lang('dashboard.confirm_unlink_google')')">
+                                                    <i class="fas fa-unlink"></i>
+                                                    @lang('dashboard.unlink')
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <!--end::Connected Account-->
+                                    @else
+                                        <!--begin::Link Account-->
+                                        <a href="{{ route('auth.google.link') }}" class="btn btn-light-primary">
+                                            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" class="me-2" style="width: 20px; height: 20px;">
+                                            @lang('dashboard.link_google_account')
+                                        </a>
+                                        <div class="form-text">@lang('dashboard.google_account_benefits')</div>
+                                        <!--end::Link Account-->
+                                    @endif
+
+                                    @if($errors->has('google'))
+                                        <div class="fv-plugins-message-container invalid-feedback d-block">{{ $errors->first('google')}}</div>
+                                    @endif
+                                </div>
+                                <!--end::Col-->
+                            </div>
+                            <!--end::Google Account Section-->
+
 
                         </div>
                         <!--end::Basic info-->

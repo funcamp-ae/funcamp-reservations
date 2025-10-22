@@ -1936,5 +1936,14 @@ return [
     'form_code' => 'كود الاستمارة',
     'confiscated_amount' => 'المبلغ المصادر',
 
+    // Google OAuth translations
+    'google_account' => 'حساب Google',
+    'google_account_help' => 'ربط حساب Google يسمح لك بتسجيل الدخول السريع',
+    'google_connected' => 'متصل بـ Google',
+    'unlink' => 'إلغاء الربط',
+    'confirm_unlink_google' => 'هل أنت متأكد من إلغاء ربط حساب Google؟',
+    'link_google_account' => 'ربط حساب Google',
+    'google_account_benefits' => 'يمكنك تسجيل الدخول باستخدام Google بعد ربط حسابك',
+
 ];
 

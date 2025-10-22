@@ -52,7 +52,10 @@ class User extends Authenticatable
         'university',
         'graduation_year',
         'qualification',
-        'job'
+        'job',
+        'google_id',
+        'google_token',
+        'google_refresh_token'
     ];
 
     /**

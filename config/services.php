@@ -45,4 +45,10 @@ return [
         'token' => env('HYPERSENDER_TOKEN', '613|XQMaOgnZNTRrrxB5CMR77WDscYAHSTodIe8vQp6K663e00ee'),
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('APP_URL').'/auth/google/callback',
+    ],
+
 ];
