@@ -90,7 +90,7 @@ class ServicesController extends Controller
                         'report_orders' => $order,
                         'set_qty' => 0
                     ]);
-                    if ($files = $request->file("reports_images")[$count] ?? null) {
+                    if ($files = $request->file("reports_images")[$order] ?? null) {
                         $path = $files->store('reports', 'public');
                         $newReport->update([
                             'image' => $path
