@@ -690,6 +690,7 @@
     .progress { height: 10px; }
     img.preview-image:hover {
     transform: scale(1.6);
+    transition: transform 0.3s;
 }
 </style>
 @endpush
