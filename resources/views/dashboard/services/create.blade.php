@@ -593,7 +593,6 @@
 
 
             if (!url) { toast('error', 'Missing delete URL'); return; }
-            console.log('Deleting stock/report at URL:', url);
             confirmTop({
                 title: "{{ __('dashboard.confirm_delete') }}",
                 confirmText: "{{ __('dashboard.delete') }}",

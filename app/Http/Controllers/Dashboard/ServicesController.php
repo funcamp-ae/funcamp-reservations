@@ -239,18 +239,20 @@ class ServicesController extends Controller
                 foreach ($request->reports as $index => $reportName) {
                     $count    = (int) ($request->reports_counts[$index] ?? 0);
                     $reportId = $request->report_ids[$index] ?? null;
+                    $order    = $request->report_orders[$index];
                     $reportData = [
                         'name'       => $reportName,
                         'count'      => $count,
                         'service_id' => $service->id,
-                        'set_qty' => 0
+                        'set_qty'    => 0
                     ];
 
                     if ($reportId && isset($existingReports[$reportId])) {
                         $report = ServiceReport::findOrFail($reportId);
                         $report->update($reportData);
 
-                        $file = $request->file('reports_images')[$index] ?? null;
+                        // Handle file upload using order-based indexing like in store method
+                        $file = $request->file('reports_images')[$order] ?? null;
                         if ($file instanceof \Illuminate\Http\UploadedFile) {
                             if ($report->image && Storage::disk('public')->exists($report->image)) {
                                 Storage::disk('public')->delete($report->image);
@@ -262,7 +264,8 @@ class ServicesController extends Controller
                         $updatedReports[] = $reportId;
                         unset($existingReports[$reportId]);
                     } else {
-                        $file = $request->file('reports_images')[$index] ?? null;
+                        // Creating new report
+                        $file = $request->file('reports_images')[$order] ?? null;
                         if ($file instanceof \Illuminate\Http\UploadedFile) {
                             $reportData['image'] = $file->store('reports', 'public');
                         }
