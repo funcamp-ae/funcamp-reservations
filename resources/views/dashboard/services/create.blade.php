@@ -81,12 +81,6 @@
         width: 100% !important;
     }
     
-    /* Make images responsive */
-    .preview-image {
-        max-width: 100%;
-        height: auto;
-        object-fit: cover;
-    }
 </style>
 @endpush
 @section('pageTitle', __('dashboard.services'))
@@ -222,9 +216,9 @@
                                                     </td>
                                                     <td class="text-nowrap" data-label="@lang('dashboard.image')">
                                                         @if ($report->image)
-                                                            <img src="{{ asset($report->image) }}" class="preview-image" style="width:75px;height:75px;object-fit:cover;">
+                                                            <img src="{{ asset($report->image) }}" class="preview-image" style="width:75px;height:75px;">
                                                         @else
-                                                            <img src="{{ asset('images/logo.png') }}" class="preview-image" style="width:50px;height:50px;object-fit:cover;">
+                                                            <img src="{{ asset('images/logo.png') }}" class="preview-image" style="width:50px;height:50px;">
                                                         @endif
                                                     </td>
                                                     <td class="text-nowrap" style = "min-width: 200px;" data-label="@lang('dashboard.item_name')">
@@ -287,7 +281,7 @@
                                     @foreach ($service->stocks as $index => $serviceStock)                                        <div class="table-row d-flex align-items-center stock-item-row mb-2" data-index="{{ $index + 1 }}" style="display: flex; flex-wrap: nowrap; min-width: 100%;">
                                             <div class="table-cell" style="flex: 0 0 8.33%; padding: 0.5rem;">
                                             @if ($serviceStock->image )
-                                            <img src="{{$serviceStock->image }}" alt="preview-image" class="preview-image img-fluid" style="width:50px;height:50px;object-fit:cover;">
+                                            <img src="{{$serviceStock->image }}" alt="preview-image" class="preview-image img-fluid" style="width:50px;height:50px;">
                                             @endif
                                             </div>
                                             <div class="table-cell" style="flex: 0 0 8.33%; padding: 0.5rem;">
@@ -694,6 +688,8 @@
 <style>
     .form-select-solid,
     .progress { height: 10px; }
-    .preview-image { object-fit: cover; border-radius: 5px; }
+    img.preview-image:hover {
+    transform: scale(1.6);
+}
 </style>
 @endpush
