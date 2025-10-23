@@ -82,15 +82,15 @@ class ServicesController extends Controller
             }
             if (isset($request->reports) && isset($request->reports_counts)) {
                 foreach ($request->reports as $index => $reportName) {
-                    $count = $request->reports_counts[$index];
-                    $order = $request->report_orders[$index] ?? $index;
+                    $count = $request->reports_counts[$index]; // the count for each report record
+                    $order = $request->report_orders[$index] ?? $index; // the order for each report record
                     $newReport = $service->reports()->create([
                         'name' => $reportName,
                         'count' => $count,
                         'report_orders' => $order,
                         'set_qty' => 0
                     ]);
-                    if ($files = $request->file("reports_images.{$index}")) {
+                    if ($files = $request->file("reports_images")[$count] ?? null) {
                         $path = $files->store('reports', 'public');
                         $newReport->update([
                             'image' => $path
