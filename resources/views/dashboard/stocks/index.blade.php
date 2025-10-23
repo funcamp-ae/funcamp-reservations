@@ -1,6 +1,18 @@
 @section('pageTitle', __('dashboard.stocks'))
 
 @extends('dashboard.layouts.app')
+
+@push('css')
+<style>
+    img.preview-image {
+        transition: transform 0.3s;
+    }
+    img.preview-image:hover {
+        transform: scale(1.6);
+    }
+</style>
+@endpush
+
 @section('content')
 
 @if($lowStock->count() > 0)
@@ -134,7 +146,7 @@
                                 </td>
                                 <td>{{ $stock->description }}</td>
                                 <td>
-                                    <img src="{{ $stock->image ? asset($stock->image) : asset('dashboard/assets/media/avatars/blank.png') }}"
+                                    <img class="preview-image" src="{{ $stock->image ? asset($stock->image) : asset('dashboard/assets/media/avatars/blank.png') }}"
                                         style="width:50px;height:50px">
                                 </td>
                                 <!-- <td> Display image </td> -->
