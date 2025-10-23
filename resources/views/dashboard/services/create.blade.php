@@ -584,10 +584,16 @@
 
             const $link = $(this);
             const url   = $link.data('url');
-            const $row  = $link.closest('.stock-item-row');
+            
+            // Try to find either stock-item-row (div) or reports-item-row (tr)
+            let $row = $link.closest('.stock-item-row');
+            if ($row.length === 0) {
+                $row = $link.closest('.reports-item-row');
+            }
+
 
             if (!url) { toast('error', 'Missing delete URL'); return; }
-
+            console.log('Deleting stock/report at URL:', url);
             confirmTop({
                 title: "{{ __('dashboard.confirm_delete') }}",
                 confirmText: "{{ __('dashboard.delete') }}",
