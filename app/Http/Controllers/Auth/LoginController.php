@@ -51,13 +51,14 @@ class LoginController extends Controller
 
         $request->validate([
             'email' => 'required',
-            'password' => 'required'
+            'password' => 'required',
+            'remember_me' => 'sometimes|boolean',
         ]);
 
 
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials , $request->filled('remember_me'))) {
             $user = Auth::user();
 
             session() -> put( 'lang', $user->lang );

@@ -35,6 +35,17 @@
                         </div>
                         <input class="form-control form-control-lg form-control-solid" type="password" name="password" autocomplete="off" />
                     </div>
+
+                    <!--begin::Remember Me-->
+                    <div class="fv-row mb-10">
+                        <div class="form-check form-check-custom form-check-solid">
+                            <input class="form-check-input" type="checkbox" value="1" name="remember_me" id="remember_me" {{ old('remember_me') ? 'checked' : '' }} />
+                            <label class="form-check-label fs-6 fw-bolder" for="remember_me">
+                                تذكرني
+                            </label>
+                        </div>
+                    </div>
+                    <!--end::Remember Me-->
                    
                     <div class="text-center">
                         <button type="submit" id="" class="btn btn-lg btn-primary w-100 mb-5">
