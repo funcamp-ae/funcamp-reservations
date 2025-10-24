@@ -26,7 +26,10 @@ class RegistrationformController extends Controller
      */
     public function create()
     {
-        $services = Service::select('id','name','hour_from','hour_to')->where('registeration_forms',1)->orderBy('name')->get();
+        $services = Service::select('id','name','hour_from','hour_to')
+            ->where('registeration_forms', 1)
+            ->latest() // orders by created_at desc
+            ->get();
         return view('registrationforms.create', compact('services'));
     }
 
