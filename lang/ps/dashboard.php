@@ -131,6 +131,7 @@ return [
     'service' => 'خدمت',
     'booking_date' => 'د ریزرویشن نیټه',
     'time_slot' => 'د وخت دوره',
+    'custom_times' => 'ځانګړي وختونه',
     'persons' => 'د خلکو شمیر',
     'internal_notes' => 'داخلي یادښتونه',
 

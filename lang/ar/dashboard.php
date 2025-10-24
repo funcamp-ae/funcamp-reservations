@@ -124,6 +124,7 @@ return [
     'service'                   => 'الخدمة',
     'booking_date'              => 'تاريخ الحجز',
     'time_slot'                 => 'الفترة الزمنية',
+    'custom_times'              => 'أوقات مخصصة',
     'persons'                   => 'عدد الأفراد',
     'internal_notes'                     => 'ملاحظات داخلية',
 

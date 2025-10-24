@@ -594,6 +594,7 @@ return [
     'service'                   => 'Service',
     'booking_date'              => 'Booking Date',
     'time_slot'                 => 'Time Slot',
+    'custom_times'              => 'Custom Times',
     'persons'                   => 'Persons',
     'notes'                     => 'Notes',
     'confirm'                   => 'Confirm',
