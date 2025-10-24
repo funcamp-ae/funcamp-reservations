@@ -7,6 +7,7 @@ use App\Models\Service;
 use App\Models\ServiceReport;
 use App\Models\Stock;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Models\StockAdjustment;
 
 class StockController extends Controller
@@ -154,6 +155,9 @@ class StockController extends Controller
 
     public function destroyServiceReport(ServiceReport $report)
     {
+        if ($report->image && Storage::disk('public')->exists($report->image)) {
+            Storage::disk('public')->delete($report->image);
+        }
         $report->delete();
         return response()->json(['message' => __('dashboard.success')], 200);
     }

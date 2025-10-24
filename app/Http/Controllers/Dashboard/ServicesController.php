@@ -360,8 +360,10 @@ class ServicesController extends Controller
                 }
             }
 
+            // Properly swap the ordered_count values
+            $tempOrder = $current->ordered_count;
             $current->ordered_count = $neighbor->ordered_count;
-            $neighbor->ordered_count = $current->ordered_count;
+            $neighbor->ordered_count = $tempOrder;
 
             $current->save();
             $neighbor->save();
