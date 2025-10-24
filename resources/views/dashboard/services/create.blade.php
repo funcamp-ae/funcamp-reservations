@@ -243,12 +243,14 @@
                                                             <button type="button" class="btn btn-sm btn-light-primary js-report-move"
                                                                     data-direction="up"
                                                                     data-url="{{ route('services.reports.move', [$service->id, $report->id]) }}"
+                                                                    @isset($retrievedService) data-isretrieved="true"@endisset
                                                                     {{ $index == 0 ? 'disabled' : '' }}>
                                                                 <i class="fa fa-arrow-up"></i>
                                                             </button>
                                                             <button type="button" class="btn btn-sm btn-light-primary js-report-move"
                                                                     data-direction="down"
                                                                     data-url="{{ route('services.reports.move', [$service->id, $report->id]) }}"
+                                                                    @isset($retrievedService) data-isretrieved="true"@endisset
                                                                     {{ $index == count($reports) - 1 ? 'disabled' : '' }}>
                                                                 <i class="fa fa-arrow-down"></i>
                                                             </button>
@@ -258,7 +260,8 @@
                                                         @can('services.delete.internal')
                                                             <a href="#"
                                                                class="btn btn-danger btn-sm js-delete-stock"
-                                                               data-url="{{ route('stocks.destroyServiceReport', ['report' => $report->id]) }}">
+                                                               data-url="{{ route('stocks.destroyServiceReport', ['report' => $report->id]) }}"
+                                                               @isset($retrievedService) data-isretrieved="true"@endisset>
                                                                 @lang('dashboard.delete')
                                                             </a>
                                                         @endcan
@@ -305,7 +308,9 @@
                                             <div class="table-cell" style="flex: 0 0 16.66%; padding: 0.5rem;">
                                                 @can('services.delete.internal')
                                                     <a href="#" class="btn btn-danger btn-sm js-delete-stock"
-                                                       data-url="{{ route('stocks.destroyServiceStock', ['service' => $service->id, 'stock' => $serviceStock->id]) }}">
+                                                       data-url="{{ route('stocks.destroyServiceStock', ['service' => $service->id, 'stock' => $serviceStock->id]) }}"
+                                                       @isset($retrievedService) data-isRetrieved="true"@endisset
+                                                       >
                                                         @lang('dashboard.delete')
                                                     </a>
                                                 @endcan
@@ -575,7 +580,17 @@
         $(document).on('click', '.js-delete-stock', function (e) {
             e.preventDefault();
             e.stopPropagation();
-
+            if ($(this).data('isretrieved')) {
+                // For retrieved service stocks, just remove the row without AJAX
+                if ($(this).closest('.stock-item-row').length === 0) {
+                    $(this).closest('.reports-item-row').remove();
+                } else {
+                    $(this).closest('.stock-item-row').remove();
+                }
+                renumberStockRows();
+                toast('success', "{{ __('dashboard.success') }}");
+                return;
+            }
             const $link = $(this);
             const url   = $link.data('url');
             
@@ -635,6 +650,22 @@
             const url = $btn.data('url');
             const dir = $btn.data('direction');
             const $row = $btn.closest('.reports-item-row');
+            const isretrieved = $btn.data('isretrieved');
+
+            if (isretrieved) {
+                if (dir === 'up') {
+                    const $prev = $row.prev('.reports-item-row');
+                    if ($prev.length) $row.insertBefore($prev);
+                } else {
+                    const $next = $row.next('.reports-item-row');
+                    if ($next.length) $row.insertAfter($next);
+                }
+                renumberReportRows();
+                refreshReportMoveButtons();
+                toast('success', "{{ __('dashboard.success') }}");
+                $btn.prop('disabled', false);
+                return;
+            }
 
             if (!url || !dir) return;
 
