@@ -31,7 +31,7 @@ class ServicePolicy
         return $user->hasPermissionTo('services.edit') || $user->hasPermissionTo('camp-types.edit');
     }
 
-    public function delete(User $user, Service $service): bool
+    public function delete(User $user): bool
     {
         return $user->hasPermissionTo('services.destroy') || $user->hasPermissionTo('camp-types.destroy');
     }
