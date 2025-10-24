@@ -217,14 +217,14 @@
                 const $ = (s, r = document) => r.querySelector(s);
 
                 const detailsModal = new bootstrap.Modal('#rfDetailsModal');
-                $$('#rfTableBody .rf-view').forEach(btn => {
+                $$('.rf-view').forEach(btn => {
                     btn.addEventListener('click', () => {
                         let obj = {}; try { obj = JSON.parse(btn.getAttribute('data-details')); } catch (e) { }
                         const tbody = document.querySelector('#rfDetailsBody tbody');
                         tbody.innerHTML = '';
                         Object.entries(obj).forEach(([k, v]) => {
                             const tr = document.createElement('tr');
-                            tr.innerHTML = `<th class="fw-bolder   dth: 40%">${k}</th><td>${v ?? '—'}</td>`;
+                            tr.innerHTML = `<th class="fw-bolder" style="width: 40%">${k}</th><td>${v ?? '—'}</td>`;
                             tbody.appendChild(tr);
                         });
                         detailsModal.show();
@@ -240,14 +240,14 @@
                     onConfirm = cb; confirmModal.show();
                 }
 
-                $$('#rfTableBody .rf-book').forEach(btn => {
+                $$('.rf-book').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const href = btn.getAttribute('data-href');
                         askConfirm('{{ __('dashboard.confirm_reservation_title') }}', '{{ __('dashboard.confirm_reservation_body') }}', () => { window.location.href = href; });
                     });
                 });
 
-                $$('#rfTableBody .rf-delete').forEach(btn => {
+                $$('.rf-delete').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const form = btn.closest('form.rf-delete-form');
                         askConfirm('{{ __('dashboard.confirm_delete_title') }}', '{{ __('dashboard.confirm_delete_body') }}', () => { form.submit(); });
