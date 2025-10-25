@@ -80,7 +80,16 @@
                       @if($timeFrom || $timeTo)
                       @php
                         $timeFromFormatted = $timeFrom ? \Carbon\Carbon::parse($timeFrom)->format('g:i A') : '';
-                        $timeToFormatted = $timeTo ? \Carbon\Carbon::parse($timeTo)->format('g:i A') : '';
+                        $timeToFormatted = '';
+                        if ($timeTo) {
+                            $timeToCarbon = \Carbon\Carbon::parse($timeTo);
+                            // If checkout time is less than check-in time, it's next day
+                            if ($timeFrom && $timeTo && \Carbon\Carbon::parse($timeTo)->format('H:i') < \Carbon\Carbon::parse($timeFrom)->format('H:i')) {
+                                $timeToFormatted = $timeToCarbon->format('g:i A') . ' (+1)';
+                            } else {
+                                $timeToFormatted = $timeToCarbon->format('g:i A');
+                            }
+                        }
                       @endphp
                       <span class="badge bg-light "><span dir="ltr">{{ $timeFromFormatted }}</span> - <span dir="ltr">{{ $timeToFormatted }}</span></span>
                       @endif
@@ -119,7 +128,14 @@
                     </td>
                     <td class="logout-status" data-order-id="{{ $order->id }}">
                       @php
-                      $logoutTime = $dateStr && $timeTo ? \Carbon\Carbon::parse($dateStr.' '.$timeTo) : null;
+                      $logoutTime = null;
+                      if ($dateStr && $timeTo) {
+                          $logoutTime = \Carbon\Carbon::parse($dateStr.' '.$timeTo);
+                          // If checkout time is less than check-in time, add one day to checkout
+                          if ($timeFrom && $timeTo && \Carbon\Carbon::parse($timeTo)->format('H:i') < \Carbon\Carbon::parse($timeFrom)->format('H:i')) {
+                              $logoutTime->addDay();
+                          }
+                      }
                       $isPastLogout = $logoutTime ? $now->gt($logoutTime) : false;
                       @endphp
                       @if($logoutAt)
@@ -188,7 +204,16 @@
                       @if($order->time_from || $order->time_to)
                       @php
                         $timeFromFormatted = $order->time_from ? \Carbon\Carbon::parse($order->time_from)->format('g:i A') : '';
-                        $timeToFormatted = $order->time_to ? \Carbon\Carbon::parse($order->time_to)->format('g:i A') : '';
+                        $timeToFormatted = '';
+                        if ($order->time_to) {
+                            $timeToCarbon = \Carbon\Carbon::parse($order->time_to);
+                            // If checkout time is less than check-in time, it's next day
+                            if ($order->time_from && $order->time_to && \Carbon\Carbon::parse($order->time_to)->format('H:i') < \Carbon\Carbon::parse($order->time_from)->format('H:i')) {
+                                $timeToFormatted = $timeToCarbon->format('g:i A') . ' (+1)';
+                            } else {
+                                $timeToFormatted = $timeToCarbon->format('g:i A');
+                            }
+                        }
                       @endphp
                       <span class="badge bg-light"><span dir="ltr">{{ $timeFromFormatted }}</span> - <span dir="ltr">{{ $timeToFormatted }}</span></span>
                       @endif
