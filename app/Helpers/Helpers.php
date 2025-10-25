@@ -10,6 +10,7 @@
     */
 
 use App\Models\Setting;
+use Illuminate\Support\Facades\Session;
 
 /**
  * Check if current user is Super Admin (ID = 1 only)
@@ -334,7 +335,7 @@ function translateText(?string $text = '', string $targetLang = 'en', ?string $s
         if ($targetLang === 'en' && session('lang')) {
             $targetLang = session('lang');
         }
-        
+        return Session::get('lang');
         return \App\Helpers\TranslationHelper::translate($text, $targetLang, $sourceLang, $preserveParams) ?? $text;
     } catch (\Exception $e) {
         \Log::error('Translation failed: ' . $e->getMessage());
