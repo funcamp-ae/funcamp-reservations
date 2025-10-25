@@ -85,13 +85,13 @@
                             $timeToCarbon = \Carbon\Carbon::parse($timeTo);
                             // If checkout time is less than check-in time, it's next day
                             if ($timeFrom && $timeTo && \Carbon\Carbon::parse($timeTo)->format('H:i') < \Carbon\Carbon::parse($timeFrom)->format('H:i')) {
-                                $timeToFormatted = $timeToCarbon->format('g:i A') . ' (+1)';
+                                $timeToFormatted = $timeToCarbon->format('g:i A');
                             } else {
                                 $timeToFormatted = $timeToCarbon->format('g:i A');
                             }
                         }
                       @endphp
-                      <span class="badge bg-light "><span dir="ltr">{{ $timeFromFormatted }}</span> - <span dir="ltr">{{ $timeToFormatted }}</span></span>
+                      <span class="badge bg-light "><span dir="ltr">{{ $timeFromFormatted }}</span> -> <span dir="ltr">{{ $timeToFormatted }}</span></span>
                       @endif
                     </td>
                     <td class="payment-status" data-order-id="{{ $order->id }}">
@@ -209,13 +209,13 @@
                             $timeToCarbon = \Carbon\Carbon::parse($order->time_to);
                             // If checkout time is less than check-in time, it's next day
                             if ($order->time_from && $order->time_to && \Carbon\Carbon::parse($order->time_to)->format('H:i') < \Carbon\Carbon::parse($order->time_from)->format('H:i')) {
-                                $timeToFormatted = $timeToCarbon->format('g:i A') . ' (+1)';
+                                $timeToFormatted = $timeToCarbon->format('g:i A');
                             } else {
                                 $timeToFormatted = $timeToCarbon->format('g:i A');
                             }
                         }
                       @endphp
-                      <span class="badge bg-light"><span dir="ltr">{{ $timeFromFormatted }}</span> - <span dir="ltr">{{ $timeToFormatted }}</span></span>
+                      <span class="badge bg-light"><span dir="ltr">{{ $timeFromFormatted }}</span> -> <span dir="ltr">{{ $timeToFormatted }}</span></span>
                       @endif
                     </td>
                     <td>
