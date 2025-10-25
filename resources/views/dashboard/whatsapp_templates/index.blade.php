@@ -61,9 +61,9 @@
                     <tr>
                         <td>
                             <div class="d-flex flex-column">
-                                <span class=" fw-bold">@translate($template->name, session('lang'))</span>
+                                <span class=" fw-bold">@translate($template->name)</span>
                                 @if($template->description)
-                                <span class="text-muted fs-7">@translate($template->description, session('lang'))</span>
+                                <span class="text-muted fs-7">@translate($template->description)</span>
                                 @endif
                             </div>
                         </td>
