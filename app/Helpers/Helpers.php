@@ -331,11 +331,19 @@ function pushNotification($tokens, $data, $platforms)
 function translateText(?string $text = '', string $targetLang = 'en', ?string $sourceLang = null, bool $preserveParams = true): string | null
 {
     try {
-        // Use session language if targetLang is 'en' (default) and session has a language set
-        if ($targetLang === 'en' && session('lang')) {
-            $targetLang = session('lang');
+        // Use session language if available, otherwise use app locale, finally fallback to 'en'
+        if ($targetLang === 'en') {
+            $sessionLang = session('lang');
+            $appLocale = app()->getLocale();
+            
+            if ($sessionLang && in_array($sessionLang, ['ar', 'en', 'ps'])) {
+                $targetLang = $sessionLang;
+            } elseif ($appLocale && in_array($appLocale, ['ar', 'en', 'ps'])) {
+                $targetLang = $appLocale;
+            }
+            // Otherwise keep 'en' as default
         }
-        return Session::get('lang');
+        
         return \App\Helpers\TranslationHelper::translate($text, $targetLang, $sourceLang, $preserveParams) ?? $text;
     } catch (\Exception $e) {
         \Log::error('Translation failed: ' . $e->getMessage());
