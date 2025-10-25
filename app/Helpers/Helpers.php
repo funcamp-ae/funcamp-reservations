@@ -334,14 +334,34 @@ function translateText(?string $text = '', ?string $targetLang = null, ?string $
         // If no target language specified, try to get from session, fallback to default
         if (!$targetLang) {
             $targetLang = 'en'; // Default fallback
+            \Log::info('TranslateText: No target language provided, using default: ' . $targetLang);
             
             // Try to get language from session if available
-            if (function_exists('session') && session()->isStarted()) {
-                $sessionLang = session('lang');
-                if ($sessionLang && in_array($sessionLang, languages())) {
-                    $targetLang = $sessionLang;
+            if (function_exists('session')) {
+                \Log::info('TranslateText: Session function exists');
+                
+                if (session()->isStarted()) {
+                    \Log::info('TranslateText: Session is started');
+                    
+                    $sessionLang = session('lang');
+                    \Log::info('TranslateText: Session lang value: ' . ($sessionLang ?? 'null'));
+                    
+                    if ($sessionLang && in_array($sessionLang, languages())) {
+                        $targetLang = $sessionLang;
+                        \Log::info('TranslateText: Using session language: ' . $targetLang);
+                    } else {
+                        \Log::info('TranslateText: Session lang invalid or not in languages array. Available languages: ' . implode(', ', languages()));
+                    }
+                } else {
+                    \Log::info('TranslateText: Session is not started yet');
                 }
+            } else {
+                \Log::info('TranslateText: Session function does not exist');
             }
+            
+            \Log::info('TranslateText: Final target language: ' . $targetLang);
+        } else {
+            \Log::info('TranslateText: Target language provided: ' . $targetLang);
         }
         
         return \App\Helpers\TranslationHelper::translate($text, $targetLang, $sourceLang, $preserveParams) ?? $text;
