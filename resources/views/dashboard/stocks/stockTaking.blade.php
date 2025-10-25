@@ -112,8 +112,8 @@
             </div>
         </div>
         <h2>{{ __('dashboard.stockTakingReport') }}</h2>
-        <div class="scrollable-table-wrapper">
-            <table class="table table-responsive" id="stock-table">
+        <div class="table-responsive">
+            <table class="table" id="stock-table">
                 <thead>
                     <tr>
                     <th class="min-w-200">{{ __('dashboard.stockTaking.item') }}</th>
@@ -197,8 +197,8 @@
             <form method="POST" action="{{ route('stocks.adjustments.store') }}" enctype="multipart/form-data" class="update" data-success-message="{{ __('dashboard.stock_updated_successfully') }}" data-kt-redirect="{{ url()->current() }}">
                 @csrf
                 <input type="hidden" name="type" value="item_decrement">
-                <div class="scrollable-table-wrapper">
-                    <table class="table table-responsive">
+                <div class="table-responsive">
+                    <table class="table">
                     <thead>
                         <tr>
                             <th class="min-w-200">{{ __('dashboard.stockTaking.item') }}</th>
@@ -296,8 +296,8 @@
 
 
                 <h2 class="my-2">{{ __('dashboard.stockTakingReport') }}</h2>
-                <div class="scrollable-table-wrapper">
-                    <table class="table table-responsive" id="stock-table">
+                <div class="table-responsive">
+                    <table class="table" id="stock-table">
                         <thead>
                             <tr>
                                 <th class="min-w-200">{{ __('dashboard.stockTaking.item') }}</th>

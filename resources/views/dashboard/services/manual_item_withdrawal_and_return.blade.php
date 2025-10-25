@@ -76,8 +76,8 @@
     </div>
     @if(isset($issuedStocks))
     <h2>{{ __('dashboard.manual_item_withdrawal_history_heading') }}</h2>
-    <div class="scrollable-table-wrapper">
-    <table class="table table-responsive" id="stock-table">
+    <div class="table-responsive">
+    <table class="table" id="stock-table">
             <thead>
                 <tr>
                     <th class="min-w-200">{{ __('dashboard.manual_item_withdrawal_and_return.item') }}</th>
@@ -156,8 +156,8 @@
         </div>
     @elseif(isset($returnedStocks))
     <h3 class="my-2">{{ __('dashboard.manual_item_return_history_heading') }}</h3>
-        <div class="scrollable-table-wrapper">
-        <table class="table table-responsive">
+        <div class="table-responsive">
+        <table class="table">
             <thead>
                 <tr>
                     <th class="min-w-200">{{ __('dashboard.manual_item_withdrawal_and_return.item') }}</th>
@@ -239,8 +239,8 @@
     <form method="POST" action="{{ route('stocks.adjustments.store') }}" enctype="multipart/form-data" class="update" data-success-message="{{ __('dashboard.stock_updated_successfully') }}" data-kt-redirect="{{ url()->current() }}">
         @csrf
         <input type="hidden" name="type" value="item_decrement">
-        <div class="scrollable-table-wrapper">
-        <table class="table table-responsive">
+        <div class="table-responsive">
+        <table class="table">
             <thead>
                 <tr>
                     <th class="min-w-200">{{ __('dashboard.manual_item_withdrawal_and_return.item') }}</th>
