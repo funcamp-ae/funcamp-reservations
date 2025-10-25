@@ -323,47 +323,19 @@ function pushNotification($tokens, $data, $platforms)
  * Translate text to the target language
  *
  * @param string $text Text to translate
- * @param string $targetLang Target language code (default: gets from session or 'en')
+ * @param string $targetLang Target language code (default: 'en')
  * @param string|null $sourceLang Source language code (optional, auto-detect if not provided)
  * @param bool $preserveParams Whether to preserve parameters in format :param
  * @return string
  */
-function translateText(?string $text = '', ?string $targetLang = null, ?string $sourceLang = null, bool $preserveParams = true): string | null
+function translateText(?string $text = '', string $targetLang = 'ar', ?string $sourceLang = null, bool $preserveParams = true): string | null
 {
     try {
-        // If no target language specified, try to get from session, fallback to default
-        if (!$targetLang) {
-            $targetLang = 'en'; // Default fallback
-            \Log::info('TranslateText: No target language provided, using default: ' . $targetLang);
-            
-            // Try to get language from session if available
-            if (function_exists('session')) {
-                \Log::info('TranslateText: Session function exists');
-                
-                if (session()->isStarted()) {
-                    \Log::info('TranslateText: Session is started');
-                    
-                    $sessionLang = session('lang');
-                    \Log::info('TranslateText: Session lang value: ' . ($sessionLang ?? 'null'));
-                    
-                    if ($sessionLang && in_array($sessionLang, languages())) {
-                        $targetLang = $sessionLang;
-                        \Log::info('TranslateText: Using session language: ' . $targetLang);
-                    } else {
-                        \Log::info('TranslateText: Session lang invalid or not in languages array. Available languages: ' . implode(', ', languages()));
-                    }
-                } else {
-                    \Log::info('TranslateText: Session is not started yet');
-                }
-            } else {
-                \Log::info('TranslateText: Session function does not exist');
-            }
-            
-            \Log::info('TranslateText: Final target language: ' . $targetLang);
+        if (session()->has('lang')) {
+           $targetLang = session()->get('lang');
         } else {
-            \Log::info('TranslateText: Target language provided: ' . $targetLang);
+            $targetLang = defaultLang();
         }
-        
         return \App\Helpers\TranslationHelper::translate($text, $targetLang, $sourceLang, $preserveParams) ?? $text;
     } catch (\Exception $e) {
         \Log::error('Translation failed: ' . $e->getMessage());

@@ -18,7 +18,7 @@ class TranslationHelper
      */
     public static function translate(
         ?string $text = '',
-        string $targetLang = 'en',
+        string $targetLang = 'ar',
         ?string $sourceLang = null,
         bool $preserveParams = true
     ) : string | null {
