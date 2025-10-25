@@ -25,7 +25,7 @@ class TranslationServiceProvider extends ServiceProvider
         Blade::directive('translate', function ($expression) {
             // Remove parentheses and split the expression
             $expression = trim($expression, "()'\" ");
-            return "<?php echo translateText($expression, session('lang', 'ps')); ?>";
+            return "<?php echo translateText($expression); ?>";
         });
     }
 }

@@ -228,7 +228,7 @@
                     </td>
                     <td>
                       @if(!empty($order->notes))
-                                            <button type="button" class="btn btn-sm btn-light-primary btn-notes" data-notes="{{ translateText(e($order->notes), session('lang') ?? 'en') }}">
+                                            <button type="button" class="btn btn-sm btn-light-primary btn-notes" data-notes="{{ translateText(e($order->notes), session('lang') ?? 'ar') }}">
                         <i class="bi bi-eye"></i>
                       </button>
                       @endif
