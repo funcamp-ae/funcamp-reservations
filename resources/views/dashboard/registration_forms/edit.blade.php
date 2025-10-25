@@ -303,7 +303,27 @@
                 dateFormat: "H:i",
                 time_24hr: true,
                 locale: isRTL ? 'ar' : 'default',
-                allowInput: true
+                allowInput: true,
+                parseDate: function(datestr, format) {
+                    // Handle various time formats
+                    if (datestr.includes(':')) {
+                        const timePart = datestr.split(' ').pop(); // Get last part (time)
+                        const [hours, minutes] = timePart.split(':');
+                        if (hours && minutes) {
+                            const date = new Date();
+                            date.setHours(parseInt(hours, 10));
+                            date.setMinutes(parseInt(minutes, 10));
+                            date.setSeconds(0);
+                            return date;
+                        }
+                    }
+                    return null;
+                },
+                formatDate: function(date, format) {
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                    return `${hours}:${minutes}`;
+                }
             };
             flatpickr("#checkin_time", timeOpts);
             flatpickr("#checkout_time", timeOpts);

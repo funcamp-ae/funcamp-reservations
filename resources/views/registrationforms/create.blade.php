@@ -247,7 +247,7 @@
                             @error('checkout_time') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
-                    <small class="help text-danger">Custom times must be within the default service hours.</small>
+                    <small class="help text-danger">Subject to terms and conditions regarding price differences.</small>
                 </div>
             </div>
 

@@ -52,8 +52,8 @@
                                             [$from, $to] = [null, null];
 
                                             if ($rf->time_slot === 'other') {
-                                                $from = $rf->checkin_time;
-                                                $to   = $rf->checkout_time;
+                                                $from = $rf->checkin_time ? $rf->checkin_time->format('H:i') : null;
+                                                $to   = $rf->checkout_time ? $rf->checkout_time->format('H:i') : null;
                                             } elseif (isset($slotToTimes[$rf->time_slot])) {
                                                 [$from, $to] = $slotToTimes[$rf->time_slot];
                                             }

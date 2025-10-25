@@ -232,12 +232,12 @@
         </div>
 
         @if ($terms)
-            <div class="alert alert-warning justify-content-between align-items-center  d-flex" style="direction: rtl;">
+            <div class="alert alert-warning justify-content-between d-flex" style="direction: rtl;">
                 <div style="margin-bottom: 8px;">
                     <strong>الشروط والأحكام</strong> {!! $terms?->commercial_license_ar !!}
                 </div>
                 @if($terms?->commercial_license_en)
-                    <div class = "t-left" >
+                    <div class = "t-left" dir="ltr">
                         <strong>:Terms and Conditions</strong> {!! $terms?->commercial_license_en !!}
                     </div>
                 @endif

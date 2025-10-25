@@ -78,7 +78,11 @@
                     <td>{{ optional($order->customer)->name }}</td>
                     <td>
                       @if($timeFrom || $timeTo)
-                      <span class="badge bg-light ">{{ $timeFrom }} - {{ $timeTo }}</span>
+                      @php
+                        $timeFromFormatted = $timeFrom ? \Carbon\Carbon::parse($timeFrom)->format('g:i A') : '';
+                        $timeToFormatted = $timeTo ? \Carbon\Carbon::parse($timeTo)->format('g:i A') : '';
+                      @endphp
+                      <span class="badge bg-light ">{{ $timeFromFormatted }} - {{ $timeToFormatted }}</span>
                       @endif
                     </td>
                     <td class="payment-status" data-order-id="{{ $order->id }}">
@@ -182,7 +186,11 @@
                     <td>{{ optional($order->customer)->name }}</td>
                     <td>
                       @if($order->time_from || $order->time_to)
-                      <span class="badge bg-light ">{{ $order->time_from }} - {{ $order->time_to }}</span>
+                      @php
+                        $timeFromFormatted = $order->time_from ? \Carbon\Carbon::parse($order->time_from)->format('g:i A') : '';
+                        $timeToFormatted = $order->time_to ? \Carbon\Carbon::parse($order->time_to)->format('g:i A') : '';
+                      @endphp
+                      <span class="badge bg-light "><span dir="ltr">{{ $timeFromFormatted }}</span> - <span dir="ltr">{{ $timeToFormatted }}</span></span>
                       @endif
                     </td>
                     <td>
@@ -195,7 +203,7 @@
                     </td>
                     <td>
                       @if(!empty($order->notes))
-                                            <button type="button" class="btn btn-sm btn-light-primary btn-notes" data-notes="{{ translateText(e($order->notes), session('lang')) }}">
+                                            <button type="button" class="btn btn-sm btn-light-primary btn-notes" data-notes="{{ translateText(e($order->notes), session('lang') ?? 'en') }}">
                         <i class="bi bi-eye"></i>
                       </button>
                       @endif

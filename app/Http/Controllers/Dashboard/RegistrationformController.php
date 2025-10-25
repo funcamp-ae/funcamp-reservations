@@ -91,8 +91,11 @@ class RegistrationformController extends Controller
     {
         $rf = Registrationform::findOrFail($id);
         $validated = $request->validate([
+            'service_id'     => 'required|exists:services,id',
             'booking_date' => 'required|date',
             'time_slot'    => 'required|string|max:50',
+            'checkin_time'  => 'required',
+            'checkout_time' => 'required',
             'persons'      => 'required|integer|min:1',
             'first_name'   => 'required|string|max:100',
             'last_name'    => 'required|string|max:100',

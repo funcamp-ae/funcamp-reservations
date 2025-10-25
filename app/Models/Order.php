@@ -75,6 +75,12 @@ class Order extends Model
         if ($this->time_from && $this->time_to) {
             $timeFrom = Carbon::parse($this->time_from);
             $timeTo = Carbon::parse($this->time_to);
+            
+            // If end time is earlier than start time, it means it's the next day
+            if ($timeTo->lt($timeFrom)) {
+                $timeTo->addDay();
+            }
+            
             return $timeTo->diffInHours($timeFrom);
         }
         return null;
