@@ -82,7 +82,7 @@
                         $timeFromFormatted = $timeFrom ? \Carbon\Carbon::parse($timeFrom)->format('g:i A') : '';
                         $timeToFormatted = $timeTo ? \Carbon\Carbon::parse($timeTo)->format('g:i A') : '';
                       @endphp
-                      <span class="badge bg-light ">{{ $timeFromFormatted }} - {{ $timeToFormatted }}</span>
+                      <span class="badge bg-light "><span dir="ltr">{{ $timeFromFormatted }}</span> - <span dir="ltr">{{ $timeToFormatted }}</span></span>
                       @endif
                     </td>
                     <td class="payment-status" data-order-id="{{ $order->id }}">
@@ -190,7 +190,7 @@
                         $timeFromFormatted = $order->time_from ? \Carbon\Carbon::parse($order->time_from)->format('g:i A') : '';
                         $timeToFormatted = $order->time_to ? \Carbon\Carbon::parse($order->time_to)->format('g:i A') : '';
                       @endphp
-                      <span class="badge bg-light "><span dir="ltr">{{ $timeFromFormatted }}</span> - <span dir="ltr">{{ $timeToFormatted }}</span></span>
+                      <span class="badge bg-light"><span dir="ltr">{{ $timeFromFormatted }}</span> - <span dir="ltr">{{ $timeToFormatted }}</span></span>
                       @endif
                     </td>
                     <td>
