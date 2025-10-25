@@ -28,7 +28,7 @@ class CustomersController extends Controller
             $query->where('phone', 'like', '%' . $request->phone . '%');
         }
 
-        $customers = $query->paginate(100);
+        $customers = $query->latest()->paginate(100);
 
         return view('dashboard.customers.index', compact('customers'));
     }
