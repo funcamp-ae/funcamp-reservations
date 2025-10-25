@@ -87,16 +87,17 @@
             <!--begin::Card body-->
             <div class="card-body pt-0">
                 <!--begin::Table-->
-                <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_category_table">
+                <div class="table-responsive">
+                    <table class="table align-middle table-row-dashed fs-6 gy-5 table-responsive" id="kt_ecommerce_category_table">
                     <thead>
-                        <tr class="text-center    fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
-                            <th class="text-nowrap fw-bolder">{{ __('dashboard.orders') }}</th>
-                            <th class="text-nowrap fw-bolder">{{ __('dashboard.Insurance') }}</th>
-                            <th class="text-nowrap fw-bolder">{{ __('dashboard.addons') }}</th>
-                            <th class="text-nowrap fw-bolder">{{ __('dashboard.warehouse_sales') }}</th>
-                            <th class="text-nowrap fw-bolder">{{ __('dashboard.total') }}</th>
-                            <th class="text-nowrap fw-bolder">@lang('dashboard.created_date')</th>
-                            <th class="text-nowrap fw-bolder">@lang('dashboard.created_time')</th>
+                        <tr class="text-center fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+                            <th class="text-nowrap fw-bolder min-w-100px">{{ __('dashboard.orders') }}</th>
+                            <th class="text-nowrap fw-bolder min-w-125px">{{ __('dashboard.Insurance') }}</th>
+                            <th class="text-nowrap fw-bolder min-w-125px">{{ __('dashboard.addons') }}</th>
+                            <th class="text-nowrap fw-bolder min-w-125px">{{ __('dashboard.warehouse_sales') }}</th>
+                            <th class="text-nowrap fw-bolder min-w-100px">{{ __('dashboard.total') }}</th>
+                            <th class="text-nowrap fw-bolder min-w-125px">@lang('dashboard.created_date')</th>
+                            <th class="text-nowrap fw-bolder min-w-125px">@lang('dashboard.created_time')</th>
                         </tr>
                     </thead>
 
@@ -171,6 +172,7 @@
                     @endforelse
                     </tbody>
                 </table>
+                </div>
                 <!--end::Table-->
             </div>
             <!--end::Card body-->
