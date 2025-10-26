@@ -935,7 +935,7 @@ a.btn-primary{
 				// Only apply if table is wider than container
 				if ($table[0].scrollWidth > $tableContainer[0].clientWidth) {
 					// Remove existing wheel event to prevent duplicates
-					$tableContainer.off('wheel.tableScroll');
+					$tableContainer.off('wheel.tableScroll'); 
 					
 					$tableContainer.on('wheel.tableScroll', function(e) {
 						// Check if mouse is over the table container

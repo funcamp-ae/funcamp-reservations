@@ -295,7 +295,7 @@
         // inject compact CSS for inline selects and wide dropdown
         
     var css = `
-    .country-select-wrap .country-select{ width:65px !important; height:37px !important;padding: 9px 0 0 0; }
+    .country-select-wrap .country-select{border: none !important; box-shadow: none !important; }
     .country-select-wrap .select2-container{ width:82px !important; }
     .country-select-wrap + .select2-container--open .select2-dropdown--below {
         width: 256px !important;
