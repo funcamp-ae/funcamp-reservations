@@ -193,7 +193,7 @@
     @endif
 
     {{-- Switch lang to ar and en  --}}
-    <div>
+    <div class="mb-2" dir="rtl">
         @if (app()->getLocale() == 'ar')
             <a class="btn btn-primary" href="{{ route('set-lang', 'en') }}" >English</a>
         @else
