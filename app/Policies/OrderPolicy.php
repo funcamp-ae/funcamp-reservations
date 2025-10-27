@@ -67,4 +67,12 @@ class OrderPolicy
     {
         return $user->hasPermissionTo('bookings.quote');
     }
+
+    /**
+     * Determine whether the user can approve insurance.
+     */
+    public function approveInsurance(User $user): bool
+    {
+        return $user->hasPermissionTo('bookings.insurance.approve');
+    }
 }

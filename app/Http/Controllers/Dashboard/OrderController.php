@@ -1093,6 +1093,7 @@ $request->validate($rules);
             } elseif ($type == 'stockTaking') {
                 $item = StockAdjustment::findOrFail($id);
             } elseif ($type == 'insurance') {
+                $this->authorize('approveInsurance',Order::class);
                 $item = Order::findOrFail($id);
 
                 // If insurance is being approved, trigger the verification process
