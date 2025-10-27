@@ -138,7 +138,7 @@
         .rating-form-stars input:checked ~ label,
         .rating-form-stars input:hover ~ label,
         .rating-form-stars label:hover ~ label , .checked {
-            color: #f5c518  !important
+            color: var(--primary-brown) !important
         }
 
         .alert {
