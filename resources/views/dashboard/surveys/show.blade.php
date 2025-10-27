@@ -193,13 +193,15 @@
     @endif
 
     {{-- Switch lang to ar and en  --}}
-    <div class="mb-2" dir="rtl">
-        @if (app()->getLocale() == 'ar')
+    @if (app()->getLocale() == 'ar')
+        <div class="mb-2" dir="ltr">
             <a class="btn btn-primary" href="{{ route('set-lang', 'en') }}" >English</a>
-        @else
+        </div>
+    @else
+        <div class="mb-2" dir="rtl">
             <a class="btn btn-primary" href="{{route('set-lang','ar')}}">العربية</a>
-        @endif
-    </div>
+        </div>
+    @endif
 
 
     <div class="order-details">
