@@ -1951,8 +1951,7 @@ return [
     'pending' => 'Pending',
     'sending' => 'Sending',
     'completed' => 'Completed',
-    'unknown' => 'Unknown',
-
+    'unknown' => 'Unknown', 
 
     // Manual item withdrawal translations
     // 'manual_item_withdrawal_and_return' => [
@@ -2254,5 +2253,10 @@ return [
     'unlinking' => 'Unlinking',
     'google_unlinked_successfully' => 'Google account unlinked successfully!',
     'error_unlinking_google' => 'Error unlinking Google account. Please try again.',
+
+    // URL and authentication translations
+    'url' => 'URL',
+    'is_available' => 'Is the page available',
+    'is_authenticated' => 'Does it require login',
 
 ];

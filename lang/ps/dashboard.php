@@ -1785,6 +1785,12 @@ return [
     'sending' => 'لېږي',
     'completed' => 'بشپړ',
     'unknown' => 'نامعلوم',
+
+    // URL and authentication translations
+    'url' => 'لینک',
+    'is_available' => 'آیا پاڼه شته',
+    'is_authenticated' => 'آیا د ننوتلو ته اړتیا شته',
+
     'enter_quantity_or_percentage' => 'مهرباني وکړئ مقدار یا سلنه وليکئ',
     'service_site_customer_service' => 'د کمپ ځای او د استقبال دفتر ',
     'service_site' => 'د خدماتو ځای',

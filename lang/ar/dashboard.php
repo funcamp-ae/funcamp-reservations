@@ -1794,6 +1794,12 @@ return [
     'sending' => 'جاري الإرسال',
     'completed' => 'مكتمل',
     'unknown' => 'غير معروف',
+
+    // URL and authentication translations
+    'url' => 'الرابط',
+    'is_available' => 'هل الصفحة متاحة',
+    'is_authenticated' => 'هل يلزم تسجيل الدخول',
+
     'enter_quantity_or_percentage' => 'يرجى إدخال الكمية أو النسبة',
     'service_site_customer_service' => 'موقع المخيم و مكتب الإستقبال ',
     'service_site' => 'موقع الخدمة',
