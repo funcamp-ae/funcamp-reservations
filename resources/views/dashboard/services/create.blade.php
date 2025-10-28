@@ -260,7 +260,7 @@
                                                         @can('services.delete.internal')
                                                             <a href="#"
                                                                class="btn btn-danger btn-sm js-delete-stock"
-                                                               data-url="{{ route('stocks.destroyServiceReport', ['report' => $report->id]) }}"
+                                                               data-url="{{ route('services.delete.internal', ['report' => $report->id]) }}"
                                                                @isset($retrievedService) data-isretrieved="true"@endisset>
                                                                 @lang('dashboard.delete')
                                                             </a>

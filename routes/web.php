@@ -292,7 +292,7 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
         'as' => 'stocks.index',
         'title' => 'dashboard.stocks',
         'type' => 'parent',
-        'child' => ['stocks.store', 'stocks.edit', 'stocks.show', 'stocks.update', 'stocks.destroy', 'stocks.deleteAll', 'stocks.destroyServiceStock', 'stocks.destroyServiceReport', 'stock.decrement']
+        'child' => ['stocks.store', 'stocks.edit', 'stocks.show', 'stocks.update', 'stocks.destroy', 'stocks.deleteAll', 'stocks.destroyServiceStock', 'services.delete.internal', 'stock.decrement']
     ]);
 
     # stocks storexa
@@ -381,7 +381,7 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
 
     Route::delete('service-reports/{report}', [
         'uses' => 'StockController@destroyServiceReport',
-        'as' => 'stocks.destroyServiceReport',
+        'as' => 'services.delete.internal',
         'title' => ['actions.delete', 'dashboard.stocks']
     ]);
 

@@ -604,6 +604,7 @@ return [
     'nickname_en' => 'الصلاحية بالانجليزي',
     'select_all' => 'تحديد الكل',
     'select_all_permissions' => 'تحديد كل الصلاحيات',
+    'choose_permissions_for_role' => 'اختيار الصلاحيات للدور',
     'user_attachments' => ' ملحقات المستخدمين',
 
     'update_settings' => 'تحديث الاعدادات',

@@ -19,7 +19,7 @@ trait Roles
         $allPermissions = Permission::all();
         $permissionGroups = [];
 
-        // Define group mappings
+        // Define categories for grouping permissions
         $groupMappings = [
             'customers' => ['title_ar' => 'العملاء', 'title_en' => 'Customers'],
             'strategies' => ['title_ar' => 'الاستراتيجيات', 'title_en' => 'Strategies'],
@@ -114,18 +114,25 @@ trait Roles
                 $groupKey = $specialMappings[$permissionName];
             } else {
                 // Find the appropriate group based on permission name prefix
+                // this function can be further optimized if needed so instead of looping through all mappings each time, we can index them better such as
+                // if (groupMappings[explode('.', $permissionName)[0]]) {
+                //     $groupKey = explode('.', $permissionName)[0];
+                // }
+                // mohamedNote
                 foreach ($groupMappings as $key => $mapping) {
                     if (strpos($permissionName, $key . '.') === 0) {
                         $groupKey = $key;
                         break;
                     }
                 }
-
+                // this can be also added in the groupMappings directly if needed later
+                // mohamedNote
                 // Special handling for questions - move to surveys group
                 if (strpos($permissionName, 'questions.') === 0) {
                     $groupKey = 'surveys';
                 }
-
+                // icant see any permission arabic in database check anothere if true you can 
+                // mohamedNote
                 // Additional pattern matching for Arabic permissions
                 if ($groupKey === 'other') {
                     // Check for booking-related Arabic text

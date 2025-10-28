@@ -613,6 +613,7 @@ return [
     'nickname_en' => 'اجازه په انګلیسي',
     'select_all' => 'ټول وټاکئ',
     'select_all_permissions' => 'ټولې اجازې وټاکئ',
+    'choose_permissions_for_role' => 'د رول لپاره اجازې وټاکئ',
     'user_attachments' => 'د کارونکو ضمیمې',
 
     'update_settings' => 'تنظیمات بدلول',

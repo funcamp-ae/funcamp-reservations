@@ -512,6 +512,7 @@ return [
     'nickname_en' => 'Role in English',
     'select_all' => 'Select All',
     'select_all_permissions' => 'Select All Permissions',
+    'choose_permissions_for_role' => 'Choose Permissions for Role',
     'user_attachments' => 'User Attachments',
     'update_settings' => 'Update Settings',
     'set_lang' => 'Change Language',
