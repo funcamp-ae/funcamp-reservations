@@ -1165,7 +1165,7 @@
             @endcan
             @can('bookings.service-site-customer-service.create')
             <div class="menu-item">
-                <a href="{{ route('bookings.service_site_customer_service.create') }}" class="menu-link py-3 {{ isActiveRoute('bookings.service_site_customer_service.create') }}">
+                <a href="{{ route('bookings.service-site-customer-service.create') }}" class="menu-link py-3 {{ isActiveRoute('bookings.service-site-customer-service.create') }}">
                     <span class="menu-bullet">
                         <span class="bullet bullet-dot"></span>
                     </span>
