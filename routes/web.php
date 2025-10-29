@@ -120,7 +120,6 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
     // Internal notes CRUD (dashboard)
     Route::resource('internal-notes', InternalNoteController::class)->names([
         'index' => 'bookings.internal-notes.index',
-        'create' => 'bookings.internal-notes.create',
         'store' => 'bookings.internal-notes.store',
         'edit' => 'bookings.internal-notes.edit',
         'update' => 'bookings.internal-notes.update',
