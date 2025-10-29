@@ -86,14 +86,14 @@
                                 <td>
                                     @can('bookings.internal-notes.edit')
 
-                                    <a href="{{ route('internal-notes.edit', $note->id) }}" class="btn btn-sm btn-secondary">{{ __('dashboard.edit') }}</a>
+                                    <a href="{{ route('bookings.internal-notes.edit', $note->id) }}" class="btn btn-sm btn-secondary">{{ __('dashboard.edit') }}</a>
                                     @endcan
                                     @can('bookings.internal-notes.destroy')
                                     <button
                                         type="button"
                                         class="btn btn-sm btn-danger delete-note-btn"
                                         data-id="{{ $note->id }}"
-                                        data-url="{{ route('internal-notes.destroy', $note->id) }}"
+                                        data-url="{{ route('bookings.internal-notes.destroy', $note->id) }}"
                                         data-name="{{ $note->note_name }}"
                                     >{{ __('dashboard.delete') }}</button>
                                     @endcan
