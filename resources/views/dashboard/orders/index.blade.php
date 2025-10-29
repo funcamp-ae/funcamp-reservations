@@ -211,7 +211,9 @@
                                                 @elseif($order->insurance_status === null && $order->payments()->where('statement', 'the_insurance')->sum("price") > 1)
                                                     {{ __('dashboard.insurance_not_returned') }}
                                                 @endif
-                                                {{__("dashboard.by")}} {{" " . $order->insuranceHandledBy?->name}}
+                                                @isset($order->insuranceHandledBy)
+                                                    {{__("dashboard.by")}} {{" " . $order->insuranceHandledBy?->name}}
+                                                @endisset
                                             @else
                                                 {{ __('dashboard.no_insurance_payment_verified') }}
                                             @endif

@@ -111,7 +111,6 @@ class OrderController extends Controller
         // Just update the order with the new status and amounts
         // The actual processing will happen when the insurance is verified
         $order->update([
-            'insurance_handled_by' => auth()->id(),
             'insurance_status' => $insuranceStatus,
             'confiscation_description' => $confiscationDescription,
             'partial_confiscation_amount' => $insuranceStatus === 'confiscated_partial' ? $insuranceAmount : null,
