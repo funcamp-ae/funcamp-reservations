@@ -2153,6 +2153,15 @@ return [
     'no_data_found' => 'No data found',
     'create_internal_note' => 'Create Internal Note',
     'edit_internal_note' => 'Edit Internal Note',
+    'payment_image' => 'Payment Image',
+    'supported_formats' => 'Supported formats',
+    'max_size' => 'Max size',
+    'current_image' => 'Current Image',
+    'view_full_image' => 'View Full Image',
+    'no_image' => 'No Image',
+    'upcoming_tasks' => 'Upcoming Tasks',
+    'download' => 'Download',
+    'close' => 'Close',
 
     // Reservations Board (new)
     'reservations_board' => 'Reservations Board',

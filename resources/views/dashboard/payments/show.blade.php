@@ -80,6 +80,7 @@
                     <th>{{ __('dashboard.price') }}</th>
                     <th class="">{{ __('dashboard.payment_method') }}</th>
                     <th class="">{{ __('dashboard.bank_account') }}</th>
+                    <th class="">{{ __('dashboard.payment_image') }}</th>
                     @if($order->insurance_status !== 'returned'  || $order->is_insurance_verified == "1")
                         <th class="">{{ __('dashboard.verified') }}</th>
                     @endif
@@ -132,6 +133,24 @@
                             <td>{{__($bankAccount->name )}}</td>
                             @endif
                         @endforeach
+                        
+                        <!-- Payment Image Column -->
+                        <td>
+                            @if($payment->image)
+                                <div class="d-flex align-items-center">
+                                    <button type="button" class="btn btn-sm btn-light view-image-btn" 
+                                            data-toggle="modal" 
+                                            data-target="#imageModal" 
+                                            data-image-url="{{ $payment->getImageUrlAttribute() }}"
+                                            data-payment-id="{{ $payment->id }}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            @else
+                                <span class="text-muted">{{ __('dashboard.no_image') }}</span>
+                            @endif
+                        </td>
+                        
                         @if($order->insurance_status !== 'returned'  || $order->is_insurance_verified == "1")
                             <td>
                                 {{ $payment->verified ? __('dashboard.yes') : __('dashboard.no') }} <br>
@@ -227,7 +246,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="{{ route('payments.update',$payment->id) }}" id="editCountForm{{$payment->id}}" method="POST">
+                            <form action="{{ route('payments.update',$payment->id) }}" id="editCountForm{{$payment->id}}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
                                 <div class="mb-5 fv-row col-md-12">
@@ -267,6 +286,27 @@
                                         @endforeach
                                     </select>
                                  </div>
+
+                                <!-- Image Upload Field -->
+                                <div class="mb-5 fv-row col-md-12">
+                                    <label class="form-label">{{ __('dashboard.payment_image') }}</label>
+                                    <input type="file" name="image" class="form-control mb-2" accept="image/*">
+                                    <div class="form-text">{{ __('dashboard.supported_formats') }}: JPG, JPEG, PNG, GIF, WEBP ({{ __('dashboard.max_size') }}: 2MB)</div>
+                                    @if($payment->image)
+                                        <div class="mt-3">
+                                            <label class="form-label">{{ __('dashboard.current_image') }}:</label>
+                                            <div class="d-flex align-items-center">
+                                                <button type="button" class="btn btn-sm btn-light view-image-btn" 
+                                                        data-toggle="modal" 
+                                                        data-target="#imageModal" 
+                                                        data-image-url="{{ $payment->getImageUrlAttribute() }}"
+                                                        data-payment-id="{{ $payment->id }}">
+                                                    <i class="fas fa-eye"></i> {{ __('dashboard.view_full_image') }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
 
                                 <!--begin::Input group-->
                                 <div class="mb-5 fv-row col-md-12">
@@ -341,6 +381,13 @@
                 </select>
             </div>
 
+            <!-- Image Upload Field -->
+            <div class="mb-5 fv-row col-md-12">
+                <label class="form-label">{{ __('dashboard.payment_image') }}</label>
+                <input type="file" name="image" class="form-control mb-2" accept="image/*">
+                <div class="form-text">{{ __('dashboard.supported_formats') }}: JPG, JPEG, PNG, GIF, WEBP ({{ __('dashboard.max_size') }}: 2MB)</div>
+            </div>
+
             <!--begin::Input group-->
             <div class="mb-5 fv-row col-md-12">
                 <label class=" form-label">{{ __('dashboard.notes') }}</label>
@@ -353,6 +400,29 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">{{ __('dashboard.payment_image') }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Payment Image" class="img-fluid" style="max-height: 70vh;">
+            </div>
+            <div class="modal-footer">
+                <a id="downloadImageBtn" href="" download class="btn btn-primary">
+                    <i class="fas fa-download"></i> {{ __('dashboard.download') }}
+                </a>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('dashboard.close') }}</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -463,6 +533,27 @@
              if (this.value && this.value !== '') {
                  this.setCustomValidity('');
              }
+         });
+
+         // Handle image modal
+         $(document).on('click', '.view-image-btn', function() {
+             const imageUrl = $(this).data('image-url');
+             const paymentId = $(this).data('payment-id');
+             console.log(imageUrl);
+             // Set the image source
+             $('#modalImage').attr('src', imageUrl);
+             
+             // Set the download link
+             $('#downloadImageBtn').attr('href', imageUrl);
+             
+             // Update modal title
+             $('#imageModalLabel').text('{{ __("dashboard.payment_image") }} - Payment #' + paymentId);
+         });
+
+         // Clear modal content when closed
+         $('#imageModal').on('hidden.bs.modal', function () {
+             $('#modalImage').attr('src', '');
+             $('#downloadImageBtn').attr('href', '');
          });
 
     </script>

@@ -12,6 +12,7 @@ use App\Models\BankAccount;
 use App\Models\Expense;
 use App\Models\GeneralPayment;
 use App\Services\InsuranceVerificationService;
+use App\Traits\ImageUploadTrait;
 use Illuminate\Http\Request;
 use PDF;
 use DB;
@@ -23,6 +24,7 @@ use Illuminate\Support\Collection;
 
 class PaymentsController extends Controller
 {
+    use ImageUploadTrait;
 
 
     public function transactions()
@@ -332,12 +334,19 @@ public function moneyTransfer(Request $request)
             'payment_method' => 'required|string',
             'statement' => 'required',
             'notes' => 'nullable|string',
-
+            'image' => 'nullable|image'
         ]);
 
         DB::beginTransaction();
 
         try {
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                $validatedData['image'] = $this->uploadImage(
+                    $request->file('image'), 
+                    'payments'
+                );
+            }
 
             // Add handled_by to the validated data
             $validatedData['handled_by'] = auth()->id();

@@ -2,14 +2,30 @@
 
 namespace App\Models;
 
+use App\Traits\ImageUploadTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    use HasFactory;
+    use HasFactory, ImageUploadTrait;
+    
     protected $guarded = [];
-    protected $fillable = ["order_id",'account_id' , 'price' ,"insurance_status" ,'payment_method','statement','notes', "verified","account_id", "image_path", "handled_by" , "insurance_handled_by"];
+    protected $fillable = [
+        "order_id",
+        'account_id',
+        'price',
+        "insurance_status",
+        'payment_method',
+        'statement',
+        'notes',
+        "verified",
+        "account_id",
+        "image_path",
+        "handled_by",
+        "insurance_handled_by",
+        'image' // Add the new image field
+    ];
 
     public function order()
     {
@@ -45,5 +61,27 @@ class Payment extends Model
     public function isInsuranceReturned()
     {
         return $this->insurance_status === 'returned' && $this->order && $this->order->insurance_approved;
+    }
+
+    /**
+     * Get the full URL for the payment image
+     *
+     * @return string|null
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->getImageUrl($this->image);
+    }
+
+    /**
+     * Delete the payment image when the model is deleted
+     */
+    protected static function booted()
+    {
+        static::deleting(function ($payment) {
+            if ($payment->image) {
+                $payment->deleteImage($payment->image);
+            }
+        });
     }
 }

@@ -75,4 +75,8 @@ class OrderPolicy
     {
         return $user->hasPermissionTo('bookings.insurance.approve');
     }
+    public function approveInventorySales(User $user): bool
+    {
+        return $user->hasPermissionTo('bookings.inventory.sales.approve');
+    }
 }

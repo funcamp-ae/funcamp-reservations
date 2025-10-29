@@ -75,11 +75,14 @@
                             <td>{{ $item?->account->name }}</td>
                             <td>
                                 {{ $item->verified ? __('dashboard.yes') : __('dashboard.no') }} <br>
-                                @if($item->verified)
-                                <a href="{{ route('order.verified' , [$item->id , 'warehouse_sales']) }}" class="btn btn-sm btn-danger">{{ __('dashboard.mark') }} {{ __('dashboard.unverifyed') }}</a>
-                                @else
-                                <a href="{{ route('order.verified' , [$item->id , 'warehouse_sales']) }}" class="btn btn-sm btn-success">{{ __('dashboard.mark') }} {{ __('dashboard.verified') }}</a>
-                                @endif
+                                @can('bookings.inventory.sales.approve')
+                                    @if($item->verified)
+                                    <a href="{{ route('order.verified' , [$item->id , 'warehouse_sales']) }}" class="btn btn-sm btn-danger">{{ __('dashboard.mark') }} {{ __('dashboard.unverifyed') }}</a>
+                                    
+                                    @else
+                                    <a href="{{ route('order.verified' , [$item->id , 'warehouse_sales']) }}" class="btn btn-sm btn-success">{{ __('dashboard.mark') }} {{ __('dashboard.verified') }}</a>
+                                    @endif
+                                @endcan
                             </td>
                             <td>{{ $item->handledBy?->name?? '-' }}</td>
                             <td>{{ $item?->notes }}</td>

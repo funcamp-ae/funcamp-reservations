@@ -1119,6 +1119,7 @@ $request->validate($rules);
                 $item = Expense::findOrFail($id);
                 $transaction = $item->transaction()->first();
             } elseif ($type == 'warehouse_sales') {
+                $this->authorize('approveInventorySales',Order::class);
                 $item = OrderItem::findOrFail($id);
                 $transaction = Transaction::where('order_item_id', $item->id)->first();
                 $stockAdjustment = $item->stockAdjustment();
