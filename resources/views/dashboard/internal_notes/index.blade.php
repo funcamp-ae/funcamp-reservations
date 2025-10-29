@@ -67,7 +67,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="table-responsive">
-                <table id="kt_ecommerce_category_table" class="table">
+                <table class="table table-striped">
                     <thead>
                         <tr>
                             <th>{{ __('dashboard.note_name') }}</th>
@@ -89,10 +89,10 @@
                                     @can('bookings.internal-notes.destroy')
                                     <button
                                         type="button"
-                                        class="btn btn-sm btn-danger"
-                                        data-kt-ecommerce-category-filter="delete_row"
+                                        class="btn btn-sm btn-danger delete-note-btn"
                                         data-id="{{ $note->id }}"
                                         data-url="{{ route('internal-notes.destroy', $note->id) }}"
+                                        data-name="{{ $note->note_name }}"
                                     >{{ __('dashboard.delete') }}</button>
                                     @endcan
                                 </td>
@@ -173,6 +173,102 @@
                 });
             }
         }
+
+        // Custom delete functionality with SweetAlert
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-note-btn')) {
+                e.preventDefault();
+                
+                const button = e.target;
+                const noteId = button.getAttribute('data-id');
+                const deleteUrl = button.getAttribute('data-url');
+                const noteName = button.getAttribute('data-name');
+                
+                console.log('Delete URL:', deleteUrl); // Debug log
+                console.log('Note ID:', noteId); // Debug log
+                
+                // Show SweetAlert confirmation
+                Swal.fire({
+                    title: '{{ __("dashboard.are_you_sure") }}',
+                    text: `{{ __("dashboard.confirm_delete_note") }}: "${noteName}"`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#8e4716',
+                    cancelButtonColor: 'gray',
+                    confirmButtonText: '{{ __("dashboard.yes_delete") }}',
+                    cancelButtonText: '{{ __("dashboard.cancel") }}',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Disable button and show loading
+                        button.disabled = true;
+                        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {{ __("dashboard.deleting") }}...';
+                        
+                        // Perform AJAX delete request
+                        fetch(deleteUrl, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Success - show success message and remove row
+                                Swal.fire({
+                                    title: '{{ __("dashboard.deleted") }}!',
+                                    text: data.message || '{{ __("dashboard.item_deleted_successfully") }}',
+                                    icon: 'success',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                
+                                // Remove the row from table
+                                const row = button.closest('tr');
+                                row.style.transition = 'opacity 0.3s';
+                                row.style.opacity = '0';
+                                setTimeout(() => {
+                                    row.remove();
+                                    
+                                    // Check if table is empty and show "no data" message
+                                    const tbody = document.getElementById('notes-table-body');
+                                    if (tbody.children.length === 0) {
+                                        tbody.innerHTML = '<tr><td colspan="3" class="text-center">{{ __("dashboard.no_data_found") }}</td></tr>';
+                                    }
+                                }, 300);
+                            } else {
+                                // Error from server
+                                Swal.fire({
+                                    title: '{{ __("dashboard.error") }}!',
+                                    text: data.message || '{{ __("dashboard.something_went_wrong") }}',
+                                    icon: 'error'
+                                });
+                                
+                                // Re-enable button
+                                button.disabled = false;
+                                button.innerHTML = '{{ __("dashboard.delete") }}';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Delete error:', error);
+                            
+                            // Network or other error
+                            Swal.fire({
+                                title: '{{ __("dashboard.error") }}!',
+                                text: '{{ __("dashboard.network_error") }}',
+                                icon: 'error'
+                            });
+                            
+                            // Re-enable button
+                            button.disabled = false;
+                            button.innerHTML = '{{ __("dashboard.delete") }}';
+                        });
+                    }
+                });
+            }
+        });
     });
     </script>
 @endsection

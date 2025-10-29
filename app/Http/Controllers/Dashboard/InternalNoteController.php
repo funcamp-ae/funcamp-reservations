@@ -63,9 +63,13 @@ class InternalNoteController extends Controller
     public function destroy(Request $request, InternalNote $internalNote)
     {
         $internalNote->delete();
-        if ($request->ajax()) {
-            return response()->json(['success' => true]);
+        
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('dashboard.item_deleted_successfully')
+            ]);
         }
-        return redirect()->back()->with('success', __('dashboard.delete'));
+        return redirect()->back()->with('success', __('dashboard.item_deleted_successfully'));
     }
 }

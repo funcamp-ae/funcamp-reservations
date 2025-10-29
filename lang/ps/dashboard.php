@@ -1806,6 +1806,18 @@ return [
     'item_updated_successfully' => 'توکی بریالي تازه شو',
     'item_created_successfully' => 'توکی بریالي جوړ شو',
     'item_deleted_successfully' => 'توکی بریالي ړنګ شو ',
+    
+    // د SweetAlert ګفتګو ژباړې
+    'are_you_sure' => 'ایا تاسو ډاډه یاست؟',
+    'confirm_delete_note' => 'تاسو د یادښت د ړنګولو په حال کې یاست',
+    'deleted' => 'ړنګ شو',
+    'deleting' => 'ړنګول کیږي',
+    'error' => 'تېروتنه',
+    'something_went_wrong' => 'یو څه سمه نه وه، مهرباني وکړئ بیا هڅه وکړئ',
+    'network_error' => 'د شبکې تېروتنه، مهرباني وکړئ خپل اتصال وګورئ',
+    'no_data_found' => 'هیڅ ډیټا و نه موندل شوه',
+    'create_internal_note' => 'کورني یادښت جوړول',
+    'edit_internal_note' => 'کورني یادښت سمول',
     'update_item' => 'توکی تازه کول',
     'create_item' => 'توکی جوړول',
 
@@ -1905,7 +1917,6 @@ return [
     'paid_totaly' => 'په بشپړ ډول تادیه شوی',
     'note_name' => 'د یادونې نوم',
     'note_content' => 'د یادونې مینځپانګه',
-    'create_internal_note' => 'داخلي یادونه جوړول',
     "edit_internal_note" => 'داخلي یادونه سمول',
     "note_updated" => 'یادونه بریالي تازه شوه',
     "confirm_delete_note" => 'آیا تاسو د دې یادونې د ړنګولو څخه ډاټر یاست؟',

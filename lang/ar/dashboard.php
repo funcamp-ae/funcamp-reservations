@@ -1815,6 +1815,18 @@ return [
     'item_updated_successfully' => 'تم تحديث العنصر بنجاح',
     'item_created_successfully' => 'تم إنشاء العنصر بنجاح',
     'item_deleted_successfully' => 'تم حذف العنصر بنجاح ',
+    
+    // ترجمات حوارات SweetAlert
+    'are_you_sure' => 'هل أنت متأكد؟',
+    'confirm_delete_note' => 'أنت على وشك حذف الملاحظة',
+    'deleted' => 'تم الحذف',
+    'deleting' => 'جاري الحذف',
+    'error' => 'خطأ',
+    'something_went_wrong' => 'حدث خطأ ما، يرجى المحاولة مرة أخرى',
+    'network_error' => 'خطأ في الشبكة، يرجى التحقق من الاتصال',
+    'no_data_found' => 'لم يتم العثور على بيانات',
+    'create_internal_note' => 'إنشاء ملاحظة داخلية',
+    'edit_internal_note' => 'تعديل ملاحظة داخلية',
     'update_item' => 'تحديث العنصر',
     'create_item' => 'إنشاء العنصر',
 
@@ -1895,7 +1907,6 @@ return [
     'paid_totaly' => 'مدفوع بالكامل',
     'note_name' => 'اسم الملاحظة',
     'note_content' => 'محتوى الملاحظة',
-    'create_internal_note' => 'إنشاء ملاحظة داخلية',
     "edit_internal_note" => 'تعديل الملاحظة الداخلية',
     "note_updated" => 'تم تحديث الملاحظة بنجاح',
     "confirm_delete_note" => 'هل أنت متأكد من رغبتك في حذف هذه الملاحظة؟',

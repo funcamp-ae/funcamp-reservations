@@ -2141,6 +2141,18 @@ return [
     'please_wait' => 'Please wait...',
     'item_updated_successfully' => 'Item updated successfully',
     'item_deleted_successfully' => 'Item deleted successfully',
+    
+    // SweetAlert dialog translations
+    'are_you_sure' => 'Are you sure?',
+    'confirm_delete_note' => 'You are about to delete the note',
+    'deleted' => 'Deleted',
+    'deleting' => 'Deleting',
+    'error' => 'Error',
+    'something_went_wrong' => 'Something went wrong, please try again',
+    'network_error' => 'Network error, please check your connection',
+    'no_data_found' => 'No data found',
+    'create_internal_note' => 'Create Internal Note',
+    'edit_internal_note' => 'Edit Internal Note',
 
     // Reservations Board (new)
     'reservations_board' => 'Reservations Board',
@@ -2188,7 +2200,6 @@ return [
     'paid_totaly' => 'paid totally',
     'note_name' => 'Note Name',
     'note_content' => 'Note Content',
-    'create_internal_note' => 'Create Internal Note',
     "edit_internal_note" => 'Edit Internal Note',
     "note_updated" => 'Note Updated Successfully',
     "confirm_delete_note" => 'Are you sure you want to delete this note?',
