@@ -1100,6 +1100,8 @@ $request->validate($rules);
                 if($item->insurance_status && $item->is_insurance_verified){
                     $item->update(["insurance_status" => null]);
                     $item->update(["insurance_handled_by" => null]);
+                    $item->update(['is_insurance_verified' => false]);
+
                 }
                 else if ($item->insurance_status && !$item->is_insurance_verified) {
                     $item->update(['is_insurance_verified' => true]);
@@ -1110,7 +1112,7 @@ $request->validate($rules);
                     $item->update(["insurance_handled_by" => null]);
                 }elseif(!$item->is_insurance_verified){
                     $item->update(['is_insurance_verified' => true]);
-
+                    $item->update(["insurance_handled_by" => auth()->user()->id]);
                 }
                 return redirect()->back()->with('success', __('dashboard.success'));
             } elseif ($type == 'expense') {
