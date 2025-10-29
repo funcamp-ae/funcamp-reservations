@@ -121,7 +121,7 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
     Route::resource('internal-notes', InternalNoteController::class)->names([
         'index' => 'bookings.internal-notes.index',
         'create' => 'bookings.internal-notes.create',
-        'store' => 'orders.internal-notes.store',
+        'store' => 'bookings.internal-notes.store',
         'edit' => 'bookings.internal-notes.edit',
         'update' => 'bookings.internal-notes.update',
         'destroy' => 'bookings.internal-notes.destroy',
@@ -1884,17 +1884,17 @@ Route::post('orders/status', [OrderStatusController::class, 'getOrderStatuses'])
     ->name('orders.status');
 
 // Order Internal Notes Routes
-Route::post('orders/{order}/internal-notes', [OrderController::class, 'updateInternalNote'])
-    ->name('bookings.internal-notes.store')
-    ->middleware(['auth']);
+// Route::post('orders/{order}/internal-notes', [OrderController::class, 'updateInternalNote'])
+//     ->name('bookings.internal-notes.store')
+//     ->middleware(['auth']);
 
-Route::get('orders/{order}/internal-notes', [OrderController::class, 'getInternalNotes'])
-    ->name('bookings.internal-notes.index')
-    ->middleware(['auth']);
+// Route::get('orders/{order}/internal-notes', [OrderController::class, 'getInternalNotes'])
+//     ->name('bookings.internal-notes.index')
+//     ->middleware(['auth']);
 
-Route::delete('orders/{order}/internal-notes/{note}', [OrderController::class, 'deleteInternalNote'])
-    ->name('bookings.internal-notes.destroy')
-    ->middleware(['auth']);
+// Route::delete('orders/{order}/internal-notes/{note}', [OrderController::class, 'deleteInternalNote'])
+//     ->name('bookings.internal-notes.destroy')
+//     ->middleware(['auth']);
 
 Route::resource('meetings', MeetingController::class)
     ->middleware(['auth']);
