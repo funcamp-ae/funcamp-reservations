@@ -1163,6 +1163,7 @@
 
             </div>
             @endcan
+            @dd(auth()->user()->permissions->pluck('name')->toArray())
             @can('bookings.service-site-customer-service.create')
             <div class="menu-item">
                 <a href="{{ route('bookings.service-site-customer-service.create') }}" class="menu-link py-3 {{ isActiveRoute('bookings.service-site-customer-service.create') }}">
