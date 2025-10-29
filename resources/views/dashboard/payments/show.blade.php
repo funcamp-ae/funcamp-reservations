@@ -130,7 +130,6 @@
                         @foreach($bankAccounts as $bankAccount)
                             @if($payment->account_id == $bankAccount->id)
                             <td>{{__($bankAccount->name )}}</td>
-
                             @endif
                         @endforeach
                         @if($order->insurance_status !== 'returned'  || $order->is_insurance_verified == "1")
