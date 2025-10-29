@@ -1163,7 +1163,7 @@
 
             </div>
             @endcan
-            @can('bookings.service-site-customer-service.create')
+            @can('bookings.service_site_customer_service.create')
             <div class="menu-item">
                 <a href="{{ route('bookings.service-site-customer-service.create') }}" class="menu-link py-3 {{ isActiveRoute('bookings.service-site-customer-service.create') }}">
                     <span class="menu-bullet">
@@ -1173,7 +1173,7 @@
                 </a>
             </div>
             @endcan
-            @can('bookings.internal-notes.create')
+            @can('bookings.internal_notes.create')
             <div class="menu-item">
                 <a href="{{ route('internal-notes.index') }}#internal-note-form" class="menu-link py-3">
                     <span class="menu-bullet">
@@ -1183,7 +1183,7 @@
                 </a>
             </div>
             @endcan
-            @can('bookings.internal-notes.index')
+            @can('bookings.internal_notes.index')
             <div class="menu-item">
                 <a href="{{ route('internal-notes.index') }}" class="menu-link py-3 {{ isActiveRoute('internal-notes.index') }}">
                     <span class="menu-bullet">
