@@ -1099,6 +1099,7 @@ $request->validate($rules);
                 // If insurance is being approved, trigger the verification process
                 if($item->insurance_status && $item->is_insurance_verified){
                     $item->update(["insurance_status" => null]);
+                    $item->update(["insurance_handled_by" => null]);
                 }
                 else if ($item->insurance_status && !$item->is_insurance_verified) {
                     $item->update(['is_insurance_verified' => true]);
@@ -1106,6 +1107,7 @@ $request->validate($rules);
                 }elseif ($item->is_insurance_verified) {
                     $item->update(['is_insurance_verified' => false]);
                     $item->update(["insurance_status" => null]);
+                    $item->update(["insurance_handled_by" => null]);
                 }elseif(!$item->is_insurance_verified){
                     $item->update(['is_insurance_verified' => true]);
 
@@ -1556,11 +1558,24 @@ $request->validate($rules);
 
                     if ($success) {
                         $messagesCount++;
+                        Log::info("Successfully sent {$templateType} message", [
+                            'order_id' => $order->id,
+                            'customer_phone' => $order->customer->phone
+                        ]);
                     } else {
                         $errors[] = "Failed to send {$templateType} message";
+                        Log::error("Failed to send {$templateType} message", [
+                            'order_id' => $order->id,
+                            'customer_phone' => $order->customer->phone,
+                            'success' => $success
+                        ]);
                     }
                 } catch (\Exception $e) {
                     $errors[] = "Error sending {$templateType}: " . $e->getMessage();
+                    Log::error("Error from excesending {$templateType} message", [
+                        'order_id' => $order->id,
+                        'error_message' => $e->getMessage()
+                    ]);
                 }
             }
         }
