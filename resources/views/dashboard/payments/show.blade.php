@@ -539,7 +539,6 @@
          $(document).on('click', '.view-image-btn', function() {
              const imageUrl = $(this).data('image-url');
              const paymentId = $(this).data('payment-id');
-             console.log(imageUrl);
              // Set the image source
              $('#modalImage').attr('src', imageUrl);
              
