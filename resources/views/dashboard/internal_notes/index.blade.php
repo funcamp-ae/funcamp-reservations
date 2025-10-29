@@ -40,7 +40,7 @@
     @can('bookings.internal-notes.create')
     <div class="row mb-4">
         <div class="col-md-6">
-            <form class="form store" id="internal-note-form" action="{{ isset($internalNote) ? route('internal-notes.update', $internalNote->id) : route('internal-notes.store') }}" method="POST" enctype="multipart/form-data" data-kt-redirect="{{ url()->current() }}">
+            <form class="form store" id="internal-note-form" action="{{ isset($internalNote) ? route('bookings.internal-notes.update', $internalNote->id) : route('bookings.internal-notes.store') }}" method="POST" enctype="multipart/form-data" data-kt-redirect="{{ url()->current() }}">
                 @csrf
                 @if(isset($internalNote))
                     @method('PUT')
