@@ -1118,7 +1118,7 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
     # payment-links store
     Route::post('payment-links', [
         'uses' => 'PaymentLinkController@store',
-        'as' => 'bookings.payment-links.store',
+        'as' => 'bookings.payment-links.create',
         'title' => ['actions.add', 'dashboard.payment-links']
     ]);
 

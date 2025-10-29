@@ -38,7 +38,7 @@
             </div>
             @endif
 
-            <form action="{{ route('bookings.payment-links.store') }}" method="POST">
+            <form action="{{ route('bookings.payment-links.create') }}" method="POST">
                 @csrf
 
                 <!-- Hidden fields for order_id if passed via URL -->
