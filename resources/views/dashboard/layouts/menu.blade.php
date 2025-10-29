@@ -1173,7 +1173,7 @@
                 </a>
             </div>
             @endcan
-            @can('internal-notes.create')
+            @can('bookings.internal-notes.create')
             <div class="menu-item">
                 <a href="{{ route('internal-notes.index') }}#internal-note-form" class="menu-link py-3">
                     <span class="menu-bullet">

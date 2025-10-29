@@ -112,10 +112,10 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
 //     Route::put('service-site-customer-service/{id}', [ServiceSiteAndCustomerServiceController::class, 'update'])->name('bookings.service-site-customer-service.update');
 
     Route::post('service_site_customer_service', [ServiceSiteAndCustomerServiceController::class, 'store'])->name('bookings.service_site_customer_service.store');
-    Route::get('service_site_customer_service/{id}/edit', [ServiceSiteAndCustomerServiceController::class, 'edit'])->name('bookings.service_site_customer_service.edit');
-    Route::get('service_site_customer_service/create', [ServiceSiteAndCustomerServiceController::class, 'create'])->name('bookings.service_site_customer_service.create');
-    Route::delete('service_site_customer_service/{id}', [ServiceSiteAndCustomerServiceController::class, 'destroy'])->name('bookings.service_site_customer_service.destroy');
-    Route::put('service_site_customer_service/{id}', [ServiceSiteAndCustomerServiceController::class, 'update'])->name('bookings.service_site_customer_service.update');
+    Route::get('service_site_customer_service/{id}/edit', [ServiceSiteAndCustomerServiceController::class, 'edit'])->name('bookings.service-site-customer-service.edit');
+    Route::get('service_site_customer_service/create', [ServiceSiteAndCustomerServiceController::class, 'create'])->name('bookings.service-site-customer-service.create');
+    Route::delete('service_site_customer_service/{id}', [ServiceSiteAndCustomerServiceController::class, 'destroy'])->name('bookings.service-site-customer-service.destroy');
+    Route::put('service_site_customer_service/{id}', [ServiceSiteAndCustomerServiceController::class, 'update'])->name('bookings.service-site-customer-service.update');
 
     // Internal notes CRUD (dashboard)
     Route::resource('internal-notes', InternalNoteController::class)->names([
