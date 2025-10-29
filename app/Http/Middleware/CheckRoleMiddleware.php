@@ -136,23 +136,6 @@ class CheckRoleMiddleware
 
         if (!in_array($permissionToCheck, $permissions) and !in_array($currunt_route, $excpetions) and !$isWildcardException) {
 
-            // Log unauthorized access attempts for specific routes
-            if (str_contains($currunt_route, 'service-site-customer-service') || str_contains($currunt_route, 'service_site_customer_service')) {
-                \Log::warning('Unauthorized access attempt to service-site-customer-service route', [
-                    'user_id' => auth()->user()->id ?? 'guest',
-                    'user_email' => auth()->user()->email ?? 'no-email',
-                    'route_name' => $currunt_route,
-                    'original_route' => Route::currentRouteName(),
-                    'permission_to_check' => $permissionToCheck,
-                    'user_permissions' => $permissions,
-                    'url' => $request->url(),
-                    'method' => $request->method(),
-                    'ip' => $request->ip(),
-                    'user_agent' => $request->userAgent(),
-                    'timestamp' => now()->toDateTimeString()
-                ]);
-            }
-
             $msg = trans('auth.not_authorized');
             if ($request->ajax()) {
                 return $this->unauthorizedReturn(['type' => 'notAuth']);
