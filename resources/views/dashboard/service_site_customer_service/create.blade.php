@@ -21,7 +21,7 @@
 
                 <div class="form-group mb-25">
                     <label for="serviceSite">{{ __('dashboard.service_site') }}</label>
-                    <div id="editor-serviceSite" dir="rtl" style="min-height:150px; direction: rtl; text-align: right;">{!! old('serviceSite', isset($item) ? $item->serviceSite : '') !!}</div>
+                    <div id="editor-serviceSite" dir="rtl" style="min-height:150px; direction: rtl; text-align: right;">{!! old('serviceSite', isset($item) ? $item->service_site : '') !!}</div>
                     <input type="hidden" name="serviceSite" id="input-serviceSite" value="{!! old('serviceSite', isset($item) ? $item->service_site : '') !!}">
                 </div>
                     <div class="d-flex flex-row flex-wrap w-100 justify-content-between overflow-hidden mb-25">
