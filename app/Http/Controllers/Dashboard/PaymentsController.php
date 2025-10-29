@@ -422,7 +422,16 @@ public function moneyTransfer(Request $request)
             'payment_method' => 'required|string',
             'statement' => 'required',
             'notes' => 'nullable|string',
+             'image' => 'nullable|image'
         ]);
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                $validatedData['image'] = $this->uploadImage(
+                    $request->file('image'), 
+                    'payments',
+                    $payment->image
+                );
+            }
         $validatedData['verified'] = 0;
         if ($payment->verified) {
             $bankAccount = BankAccount::find($payment->account_id);
