@@ -1905,6 +1905,7 @@ return [
     'paid_totaly' => 'په بشپړ ډول تادیه شوی',
     'note_name' => 'د یادونې نوم',
     'note_content' => 'د یادونې مینځپانګه',
+    'create_internal_note' => 'داخلي یادونه جوړول',
     "edit_internal_note" => 'داخلي یادونه سمول',
     "note_updated" => 'یادونه بریالي تازه شوه',
     "confirm_delete_note" => 'آیا تاسو د دې یادونې د ړنګولو څخه ډاټر یاست؟',

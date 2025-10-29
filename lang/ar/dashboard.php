@@ -1895,6 +1895,7 @@ return [
     'paid_totaly' => 'مدفوع بالكامل',
     'note_name' => 'اسم الملاحظة',
     'note_content' => 'محتوى الملاحظة',
+    'create_internal_note' => 'إنشاء ملاحظة داخلية',
     "edit_internal_note" => 'تعديل الملاحظة الداخلية',
     "note_updated" => 'تم تحديث الملاحظة بنجاح',
     "confirm_delete_note" => 'هل أنت متأكد من رغبتك في حذف هذه الملاحظة؟',

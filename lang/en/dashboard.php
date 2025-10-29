@@ -2188,6 +2188,7 @@ return [
     'paid_totaly' => 'paid totally',
     'note_name' => 'Note Name',
     'note_content' => 'Note Content',
+    'create_internal_note' => 'Create Internal Note',
     "edit_internal_note" => 'Edit Internal Note',
     "note_updated" => 'Note Updated Successfully',
     "confirm_delete_note" => 'Are you sure you want to delete this note?',

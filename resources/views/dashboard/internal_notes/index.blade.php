@@ -36,7 +36,7 @@
         </div>
     @endcan
 @else
-@can('bookings.internal-notes.create')
+    @can('bookings.internal-notes.create')
     <div class="row mb-4">
         <div class="col-md-6">
             <form class="form store" id="internal-note-form" action="{{ isset($internalNote) ? route('internal-notes.update', $internalNote->id) : route('internal-notes.store') }}" method="POST" enctype="multipart/form-data" data-kt-redirect="{{ url()->current() }}">
@@ -61,8 +61,9 @@
             </form>
         </div>
     </div>
-@endcan
+    @endcan
 @endif
+@if(isset($internalNote))
     <div class="row">
         <div class="col-md-12">
             <div class="table-responsive">
@@ -107,7 +108,7 @@
         </div>
     </div>
 </div>
-
+@endif
 @endsection
 
 @section('scripts')
