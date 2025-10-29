@@ -426,6 +426,7 @@
     }
     .report-image:hover {
         transform: scale(1.5);
+        transition: 0.3s;
     }
     @media (max-width: 788px) {
         .single-item .row>div {
