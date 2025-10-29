@@ -46,14 +46,6 @@ class CheckRoleMiddleware
         $route = Route::current();
         $actAs = $route->action['act-as'] ?? null;
 
-        // Add logging for debugging
-        \Log::info('CheckRoleMiddleware Debug', [
-            'original_route' => $currunt_route,
-            'user_id' => auth()->user()->id ?? 'guest',
-            'user_permissions' => $permissions,
-            'act_as' => $actAs
-        ]);
-
         // Check if current route matches any wildcard exceptions
         $isWildcardException = false;
         foreach ($excpetions as $exception) {
@@ -61,24 +53,12 @@ class CheckRoleMiddleware
                 $prefix = str_replace('.*', '', $exception);
                 if (str_starts_with($currunt_route, $prefix . '.')) {
                     $isWildcardException = true;
-                    \Log::info('Wildcard exception matched', [
-                        'route' => $currunt_route,
-                        'matched_pattern' => $exception,
-                        'prefix' => $prefix
-                    ]);
                     break;
                 }
             }
         }
 
-        \Log::info('Exception check results', [
-            'route' => $currunt_route,
-            'in_direct_exceptions' => in_array($currunt_route, $excpetions),
-            'is_wildcard_exception' => $isWildcardException
-        ]);
-
         if (!in_array($currunt_route, $excpetions) && !$isWildcardException) {
-            $original_route = $currunt_route; // Store original for logging
             $currunt_route = str_replace('update-settings', 'settings', $currunt_route);
             $currunt_route = str_replace('store', 'create', $currunt_route);
             $currunt_route = str_replace('adminsfile.destroy', 'admins.destroy', $currunt_route);
@@ -105,23 +85,9 @@ class CheckRoleMiddleware
             if ($actAs) {
                 $currunt_route = str_replace($currunt_route, $actAs, $currunt_route);
             }
-            
-            \Log::info('Route transformations applied', [
-                'original_route' => $original_route,
-                'transformed_route' => $currunt_route,
-                'act_as' => $actAs
-            ]);
         }
         if (!str_contains($currunt_route, 'settings') and !\str_contains($currunt_route, 'sms') and !in_array($currunt_route, $excpetions)) {
-            $before_update_replace = $currunt_route;
             $currunt_route = str_replace('update', 'edit', $currunt_route);
-            
-            if ($before_update_replace !== $currunt_route) {
-                \Log::info('Update to edit transformation', [
-                    'before' => $before_update_replace,
-                    'after' => $currunt_route
-                ]);
-            }
         }
 
         // Route to Permission mapping - for cases where route name differs from permission name
@@ -166,24 +132,9 @@ class CheckRoleMiddleware
         // Check if current route has a permission mapping
         $permissionToCheck = $routePermissionMapping[$currunt_route] ?? $currunt_route;
 
-        \Log::info('Final permission check', [
-            'final_route' => $currunt_route,
-            'permission_to_check' => $permissionToCheck,
-            'user_has_permission' => in_array($permissionToCheck, $permissions),
-            'is_in_direct_exceptions' => in_array($currunt_route, $excpetions),
-            'is_wildcard_exception' => $isWildcardException
-        ]);
-
 
 
         if (!in_array($permissionToCheck, $permissions) and !in_array($currunt_route, $excpetions) and !$isWildcardException) {
-
-            \Log::warning('Access denied', [
-                'route' => $currunt_route,
-                'permission_needed' => $permissionToCheck,
-                'user_permissions' => $permissions,
-                'reason' => 'User does not have required permission'
-            ]);
 
             $msg = trans('auth.not_authorized');
             if ($request->ajax()) {

@@ -45,7 +45,7 @@
     @endphp
 
     <div class="card mb-5 mb-xl-10">
-        <form method="POST" id="media-form" action="{{ route('orders.updatesignout', $order->id) }}"
+        <form method="POST" id="media-form" action="{{ route('orders.updatelogout', $order->id) }}"
             enctype="multipart/form-data">
             @csrf
             @method('PUT')

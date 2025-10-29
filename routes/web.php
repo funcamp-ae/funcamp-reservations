@@ -760,7 +760,7 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
     # orders store
     Route::put('orders/{id}/updatesignout', [
     'uses' => 'OrderCheckinController@updateSignout',
-    'as'   => 'orders.updatesignout',
+    'as'   => 'orders.updatelogout',
     'title'=> ['actions.add', 'dashboard.logout']
 ]);
 
