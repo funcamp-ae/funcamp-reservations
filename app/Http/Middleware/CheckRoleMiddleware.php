@@ -17,7 +17,6 @@ class CheckRoleMiddleware
 
     public function handle($request, Closure $next)
     {
-        \Log::info(auth()->user()->permissions->pluck('name')->toArray());
         $page = Page::where('url', $request->url())->first();
         // Super Admin bypass - User ID 1 only has all permissions
         if ((isset(auth()->user()->id) && auth()->user()->id == 1) || ($page ? !$page->is_authenticated : false)) {

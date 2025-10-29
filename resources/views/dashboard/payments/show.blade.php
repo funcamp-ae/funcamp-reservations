@@ -66,8 +66,6 @@
             <div class="card-body pt-0">
 
  <!--begin::Table-->
-             @dd(auth()->user()->permissions->pluck('name')->toArray())
-
  <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_category_table">
             <!--begin::Table head-->
             <thead>
