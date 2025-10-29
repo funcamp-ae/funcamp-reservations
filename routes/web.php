@@ -1995,7 +1995,14 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'dashboard'], function () {
     Route::put('service_site_customer_service/{id}', [ServiceSiteAndCustomerServiceController::class, 'update'])->name('bookings.service_site_customer_service.update');
 
     // Internal notes CRUD (dashboard)
-    Route::resource('internal-notes', InternalNoteController::class)->only(['index', 'store', 'edit', 'update', 'destroy']);
+    Route::resource('internal-notes', InternalNoteController::class)->names([
+        'index' => 'internal-notes.index',
+        'create' => 'internal-notes.create',
+        'store' => 'internal-notes.store',
+        'edit' => 'internal-notes.edit',
+        'update' => 'internal-notes.update',
+        'destroy' => 'internal-notes.destroy',
+    ]);
 });
 
 Route::middleware(['web', 'auth'])->group(function () {

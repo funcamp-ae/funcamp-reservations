@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h1>{{ __('dashboard.internal_notes') }}</h1>
-@can('internal-notes.create')
+@can('bookings.internal-notes.create')
     <div class="row mb-4">
         <div class="col-md-6">
             <form class="form store" id="internal-note-form" action="{{ isset($internalNote) ? route('internal-notes.update', $internalNote->id) : route('internal-notes.store') }}" method="POST" enctype="multipart/form-data" data-kt-redirect="{{ url()->current() }}">
