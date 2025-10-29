@@ -121,7 +121,7 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
     Route::resource('internal-notes', InternalNoteController::class)->names([
         'index' => 'bookings.internal-notes.index',
         'create' => 'bookings.internal-notes.create',
-        'store' => 'bookings.internal-notes.store',
+        'store' => 'orders.internal-notes.store',
         'edit' => 'bookings.internal-notes.edit',
         'update' => 'bookings.internal-notes.update',
         'destroy' => 'bookings.internal-notes.destroy',

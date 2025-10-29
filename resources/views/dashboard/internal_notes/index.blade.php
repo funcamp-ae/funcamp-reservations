@@ -12,7 +12,7 @@
     @can('bookings.internal-notes.edit')
         <div class="row mb-4">
             <div class="col-md-6">
-                <form class="form store" id="internal-note-form" action="{{ isset($internalNote) ? route('bookings.internal-notes.update', $internalNote->id) : route('bookings.internal-notes.store') }}" method="POST" enctype="multipart/form-data" data-kt-redirect="{{ url()->current() }}">
+                <form class="form store" id="internal-note-form" action="{{ isset($internalNote) ? route('bookings.internal-notes.update', $internalNote->id) : route('orders.internal-notes.store') }}" method="POST" enctype="multipart/form-data" data-kt-redirect="{{ url()->current() }}">
                     @csrf
                     @if(isset($internalNote))
                         @method('PUT')
@@ -40,7 +40,7 @@
     @can('bookings.internal-notes.create')
     <div class="row mb-4">
         <div class="col-md-6">
-            <form class="form store" id="internal-note-form" action="{{ isset($internalNote) ? route('bookings.internal-notes.update', $internalNote->id) : route('bookings.internal-notes.store') }}" method="POST" enctype="multipart/form-data" data-kt-redirect="{{ url()->current() }}">
+            <form class="form store" id="internal-note-form" action="{{ isset($internalNote) ? route('bookings.internal-notes.update', $internalNote->id) : route('orders.internal-notes.store') }}" method="POST" enctype="multipart/form-data" data-kt-redirect="{{ url()->current() }}">
                 @csrf
                 @if(isset($internalNote))
                     @method('PUT')
@@ -57,8 +57,9 @@
                     <!-- Hidden textarea that will receive HTML from Quill on submit -->
                     <textarea name="note_content" id="note-content" class="d-none">{{ old('note_content', isset($internalNote) ? $internalNote->note_content : '') }}</textarea>
                 </div>
-
-                <button type="submit" class="btn btn-primary" id="kt_ecommerce_add_product_submit">{{ isset($internalNote) ? __('dashboard.update_item') : __('dashboard.create_item') }}</button>
+                @can('orders.internal-notes.store')
+                    <button type="submit" class="btn btn-primary" id="kt_ecommerce_add_product_submit">{{ isset($internalNote) ? __('dashboard.update_item') : __('dashboard.create_item') }}</button>
+                @endcan
             </form>
         </div>
     </div>
