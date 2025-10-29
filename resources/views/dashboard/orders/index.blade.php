@@ -200,21 +200,21 @@
                                             ])
                                             >
                                             @if($order->payments()->where('statement', 'the_insurance')->where('verified', "1")->exists())
-                                            @if($order->insurance_status === 'returned')
-                                            {{ __('dashboard.insurance_returned_note') }}
-                                            @elseif($order->insurance_status === 'confiscated_full')
-                                            {{ __('dashboard.insurance_confiscated_full') }}
-                                            @elseif($order->insurance_status === 'confiscated_partial')
-                                            {{ __('dashboard.insurance_confiscated_partial') }}
-                                            @elseif($order->insurance_status === null && $order->payments()->where('statement', 'the_insurance')->sum("price") < 1)
-                                                {{ __('dashboard.insurance_null') }}
+                                                @if($order->insurance_status === 'returned')
+                                                {{ __('dashboard.insurance_returned_note') }}
+                                                @elseif($order->insurance_status === 'confiscated_full')
+                                                {{ __('dashboard.insurance_confiscated_full') }}
+                                                @elseif($order->insurance_status === 'confiscated_partial')
+                                                {{ __('dashboard.insurance_confiscated_partial') }}
+                                                @elseif($order->insurance_status === null && $order->payments()->where('statement', 'the_insurance')->sum("price") < 1)
+                                                    {{ __('dashboard.insurance_null') }}
                                                 @elseif($order->insurance_status === null && $order->payments()->where('statement', 'the_insurance')->sum("price") > 1)
-                                                {{ __('dashboard.insurance_not_returned') }}
+                                                    {{ __('dashboard.insurance_not_returned') }}
                                                 @endif
                                                 {{__("dashboard.by")}} {{" " . $order->insuranceHandledBy?->name}}
-                                                @else
+                                            @else
                                                 {{ __('dashboard.no_insurance_payment_verified') }}
-                                                @endif
+                                            @endif
                                     </span>
                                 </td>
                                 <!--begin::Order Status-->

@@ -419,13 +419,14 @@
     }
 
     .report-image {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
+        width: 80px;
+        height: 80px;
         display: block;
         margin: 0 auto;
     }
-
+    .report-image:hover {
+        transform: scale(1.5);
+    }
     @media (max-width: 788px) {
         .single-item .row>div {
             margin-bottom: 5px;
