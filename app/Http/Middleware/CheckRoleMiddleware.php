@@ -46,17 +46,6 @@ class CheckRoleMiddleware
         $route = Route::current();
         $actAs = $route->action['act-as'] ?? null;
 
-        // Special logging for orders.updatelogout route
-        if ($currunt_route === 'orders.updatelogout') {
-            \Log::info('ORDERS.UPDATELOGOUT ROUTE DEBUG', [
-                'original_route' => $currunt_route,
-                'user_id' => auth()->user()->id ?? 'guest',
-                'user_permissions' => $permissions,
-                'act_as' => $actAs,
-                'route_in_exceptions' => in_array($currunt_route, $excpetions)
-            ]);
-        }
-
         // Check if current route matches any wildcard exceptions
         $isWildcardException = false;
         foreach ($excpetions as $exception) {
@@ -70,7 +59,6 @@ class CheckRoleMiddleware
         }
 
         if (!in_array($currunt_route, $excpetions) && !$isWildcardException) {
-            $original_route_for_logging = $currunt_route; // Store original for logging
             $currunt_route = str_replace('update-settings', 'settings', $currunt_route);
             $currunt_route = str_replace('store', 'create', $currunt_route);
             $currunt_route = str_replace('adminsfile.destroy', 'admins.destroy', $currunt_route);
@@ -88,16 +76,6 @@ class CheckRoleMiddleware
             $currunt_route = str_replace('orders.removeImage', 'orders.signin', $currunt_route);
             $currunt_route = str_replace('payments.verified', 'payments.show', $currunt_route);
             $currunt_route = str_replace('payments.verified', 'payments.index', $currunt_route);
-
-            // Special logging for orders.updatelogout transformations
-            if ($original_route_for_logging === 'orders.updatelogout') {
-                \Log::info('ORDERS.UPDATELOGOUT TRANSFORMATIONS', [
-                    'original_route' => $original_route_for_logging,
-                    'after_basic_transformations' => $currunt_route,
-                    'in_exceptions' => in_array($original_route_for_logging, $excpetions),
-                    'is_wildcard_exception' => $isWildcardException
-                ]);
-            }
 
             $currunt_route = str_replace('warehouse_sales.show', 'warehouse_sales.show', $currunt_route);
             $currunt_route = str_replace('warehouse_sales.store', 'warehouse_sales.store', $currunt_route);
@@ -154,30 +132,9 @@ class CheckRoleMiddleware
         // Check if current route has a permission mapping
         $permissionToCheck = $routePermissionMapping[$currunt_route] ?? $currunt_route;
 
-        // Special logging for orders.updatelogout final check
-        if ($currunt_route === 'orders.updatelogout' || $permissionToCheck === 'orders.updatelogout') {
-            \Log::info('ORDERS.UPDATELOGOUT FINAL CHECK', [
-                'final_route' => $currunt_route,
-                'permission_to_check' => $permissionToCheck,
-                'user_has_permission' => in_array($permissionToCheck, $permissions),
-                'is_in_direct_exceptions' => in_array($currunt_route, $excpetions),
-                'is_wildcard_exception' => $isWildcardException,
-                'user_permissions_contain_updatelogout' => in_array('orders.updatelogout', $permissions),
-                'user_permissions_contain_logout' => in_array('bookings.logout', $permissions)
-            ]);
-        }
+
 
         if (!in_array($permissionToCheck, $permissions) and !in_array($currunt_route, $excpetions) and !$isWildcardException) {
-
-            // Special logging for orders.updatelogout access denied
-            if ($currunt_route === 'orders.updatelogout' || $permissionToCheck === 'orders.updatelogout') {
-                \Log::warning('ORDERS.UPDATELOGOUT ACCESS DENIED', [
-                    'route' => $currunt_route,
-                    'permission_needed' => $permissionToCheck,
-                    'user_permissions' => $permissions,
-                    'reason' => 'User does not have required permission'
-                ]);
-            }
 
             $msg = trans('auth.not_authorized');
             if ($request->ajax()) {

@@ -47,11 +47,11 @@
                             
                                 <td class="note-content">@translate($note->note_content)</td>
                                 <td>
-                                    @can('internal-notes.edit')
+                                    @can('bookings.internal-notes.edit')
 
                                     <a href="{{ route('internal-notes.edit', $note->id) }}" class="btn btn-sm btn-secondary">{{ __('dashboard.edit') }}</a>
                                     @endcan
-                                    @can('internal-notes.destroy')
+                                    @can('bookings.internal-notes.destroy')
                                     <button
                                         type="button"
                                         class="btn btn-sm btn-danger"
