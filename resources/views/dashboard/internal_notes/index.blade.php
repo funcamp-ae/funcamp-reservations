@@ -29,8 +29,9 @@
                         <!-- Hidden textarea that will receive HTML from Quill on submit -->
                         <textarea name="note_content" id="note-content" class="d-none">{{ old('note_content', isset($internalNote) ? $internalNote->note_content : '') }}</textarea>
                     </div>
-
-                    <button type="submit" class="btn btn-primary" id="kt_ecommerce_add_product_submit">{{ isset($internalNote) ? __('dashboard.update_item') : __('dashboard.create_item') }}</button>
+                    @can('bookings.internal-notes.update')
+                        <button type="submit" class="btn btn-primary" id="kt_ecommerce_add_product_submit">{{ isset($internalNote) ? __('dashboard.update_item') : __('dashboard.create_item') }}</button>
+                    @endcan 
                 </form>
             </div>
         </div>

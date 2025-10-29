@@ -119,12 +119,12 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
 
     // Internal notes CRUD (dashboard)
     Route::resource('internal-notes', InternalNoteController::class)->names([
-        'index' => 'internal-notes.index',
-        'create' => 'internal-notes.create',
-        'store' => 'internal-notes.store',
-        'edit' => 'internal-notes.edit',
-        'update' => 'internal-notes.update',
-        'destroy' => 'internal-notes.destroy',
+        'index' => 'bookings.internal-notes.index',
+        'create' => 'bookings.internal-notes.create',
+        'store' => 'bookings.internal-notes.store',
+        'edit' => 'bookings.internal-notes.edit',
+        'update' => 'bookings.internal-notes.update',
+        'destroy' => 'bookings.internal-notes.destroy',
     ]);
     Route::get('logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('edit-profile', [AdminController::class, 'editProfile'])->name('edit-profile');

@@ -1175,7 +1175,7 @@
             @endcan
             @can('bookings.internal-notes.create')
             <div class="menu-item">
-                <a href="{{ route('internal-notes.index') }}#internal-note-form" class="menu-link py-3">
+                <a href="{{ route('bookings.internal-notes.create') }}" class="menu-link py-3">
                     <span class="menu-bullet">
                         <span class="bullet bullet-dot"></span>
                     </span>
@@ -1185,7 +1185,7 @@
             @endcan
             @can('bookings.internal-notes.index')
             <div class="menu-item">
-                <a href="{{ route('internal-notes.index') }}" class="menu-link py-3 {{ isActiveRoute('internal-notes.index') }}">
+                <a href="{{ route('bookings.internal-notes.index') }}" class="menu-link py-3 {{ isActiveRoute('bookings.internal-notes.index') }}">
                     <span class="menu-bullet">
                         <span class="bullet bullet-dot"></span>
                     </span>
