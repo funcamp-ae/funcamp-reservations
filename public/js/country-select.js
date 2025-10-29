@@ -310,7 +310,7 @@
         border-radius: 6px;
     }
     .select2-container--bootstrap5 .select2-selection--single .select2-selection__rendered {
-        margin-left: 10px;
+        margin: 10px;
     }
     .country-select-wrap .select2-selection__rendered{ 
         font-size:12px; 
