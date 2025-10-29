@@ -103,10 +103,10 @@ class ServiceSiteAndCustomerServiceController extends Controller
         if (request()->ajax() || request()->wantsJson()) {
             return response()->json([
             'success' => true,
-            'message' => __('item_deleted_successfully'),
+            'message' => __('dashboard.item_deleted_successfully'),
             ]);
         }
 
-        return redirect()->route('bookings.service-site-customer-service.create')->with('success', __('item_deleted_successfully'));
+        return redirect()->route('bookings.service-site-customer-service.create')->with('success', __('dashboard.item_deleted_successfully'));
     }
 }
