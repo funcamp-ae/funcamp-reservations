@@ -150,18 +150,18 @@
                                 @if($payment->statement == 'the_insurance' && $payment->verified == "1")
                                     @if($order->insurance_status === 'returned')
                                         <br><span class="badge badge-success">{{ __('dashboard.insurance_returned_note') }}</span>
-                                            @isset($payment->insuranceHandledBy)
-                                                        {{__("dashboard.by")}} {{" " . $payment->insuranceHandledBy?->name}}
+                                            @isset($order->insuranceHandledBy)
+                                                        {{__("dashboard.by")}} {{" " . $order->insuranceHandledBy?->name}}
                                             @endisset
                                     @elseif($order->insurance_status === 'confiscated_full' )
                                         <br><span class="badge badge-dark">{{ __('dashboard.insurance_confiscated_full') }}</span>
-                                        @isset($payment->insuranceHandledBy)
-                                                        {{__("dashboard.by")}} {{" " . $payment->insuranceHandledBy?->name}}
+                                        @isset($order->insuranceHandledBy)
+                                                        {{__("dashboard.by")}} {{" " . $order->insuranceHandledBy?->name}}
                                             @endisset
                                     @elseif($payment->insurance_status == 'confiscated_partial')
                                         <br><span class="badge badge-warning">{{ __('dashboard.insurance_confiscated_partial') }}</span>
-                                            @isset($payment->insuranceHandledBy)
-                                                        {{__("dashboard.by")}} {{" " . $payment->insuranceHandledBy?->name}}
+                                            @isset($order->insuranceHandledBy)
+                                                        {{__("dashboard.by")}} {{" " . $order->insuranceHandledBy?->name}}
                                             @endisset
                                     @elseif($order->insurance_status === null && $order->payments()->where('statement', 'the_insurance')->sum("price") < 1)
                                         <br><span class="badge badge-danger">{{ __('dashboard.insurance_null') }}</span>
