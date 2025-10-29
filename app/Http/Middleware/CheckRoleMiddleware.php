@@ -136,7 +136,7 @@ class CheckRoleMiddleware
 
         if (!in_array($permissionToCheck, $permissions) and !in_array($currunt_route, $excpetions) and !$isWildcardException) {
 
-            $msg = 'yes';
+            $msg = trans('auth.not_authorized');
             if ($request->ajax()) {
                 return $this->unauthorizedReturn(['type' => 'notAuth']);
             }
