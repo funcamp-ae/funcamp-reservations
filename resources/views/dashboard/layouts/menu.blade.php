@@ -842,23 +842,6 @@
                 </a>
 
             </div>
-
-            <!-- Orders -> Tasks -->
-            <div class="menu-item">
-
-                <a href="{{ route('pages.tasks.index') }}" class="menu-link py-3 {{ request()->routeIs('bookings.tasks.*') ? 'active' : '' }}">
-
-                    <span class="menu-bullet">
-
-                        <span class="bullet bullet-dot"></span>
-
-                    </span>
-
-                    <span class="menu-title">@lang('dashboard.tasks')</span>
-
-                </a>
-
-            </div>
             @endif
             <!--end::Menu item-->
 
