@@ -37,7 +37,7 @@ class OrderCheckinController extends Controller
         $order = Order::findOrFail($id);
 
         $request->validate([
-            'time_of_receipt'          => 'required|regex:/^\d{2}:\d{2}(:\d{2})?$/',
+            'time_of_receipt'          => 'nullable|regex:/^\d{2}:\d{2}(:\d{2})?$/',
             'time_of_receipt_notes'    => 'nullable|string',
 
             'image_before_receiving'   => 'nullable|array',
