@@ -304,8 +304,8 @@
                 </tr>
                 </thead>
                 <tbody>
+                @php $totalPrice += $order->price; @endphp
                 @foreach ($order->services as $index => $service)
-                    @php $totalPrice += $service->price; @endphp
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $service->name }}</td>
