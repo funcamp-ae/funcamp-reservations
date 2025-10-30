@@ -2489,7 +2489,6 @@
     </div>
 
     @endcan
-    @dd(auth()->user()->can('pages.index'))
     @can('pages.index')
     <!--begin::Menu item-->
     <div class="menu-item menu-sub-indention menu-accordion {{areActiveRoutes(['pages.index', 'pages.create', 'pages.edit'])}}"
