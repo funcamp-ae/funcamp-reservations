@@ -92,12 +92,22 @@ class RoleController extends Controller
             $role->permissions()->detach();
         }
 
+        // Clear permission cache to ensure users get updated permissions immediately
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        
+        // Force reload role relationships to ensure fresh data
+        $role->load('permissions');
+
         return response()->json(['message' => 'Role updated successfully']);
     }
 
     public function destroy($id)
     {
         $this->rolesRepository->forceDelete($id);
+        
+        // Clear permission cache since role deletion affects permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        
         return response()->json(['message' => 'Role deleted successfully']);
     }
 
@@ -111,6 +121,9 @@ class RoleController extends Controller
         }
 
         if ($this->rolesRepository->deleteForceWhereIn('id', $ids)) {
+            // Clear permission cache since roles deletion affects permissions
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+            
             return response()->json(['message' => 'Roles deleted successfully']);
         } else {
             return response()->json(['message' => 'Failed to delete roles'], 500);
