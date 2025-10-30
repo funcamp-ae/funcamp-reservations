@@ -310,7 +310,7 @@
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $service->name }}</td>
                         <td>1</td>
-                        <td>{{ $service->price }} @lang('dashboard.RS')</td>
+                        <td>{{ $order->price }} @lang('dashboard.RS')</td>
                     </tr>
                 @endforeach
                 </tbody>

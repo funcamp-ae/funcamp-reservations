@@ -1082,13 +1082,11 @@ $request->validate($rules);
                 $item = OrderAddon::findOrFail($id);
                 $transaction = Transaction::where('order_addon_id', $item->id)->first();
             } elseif ($type == 'payment') {
-                \Log::info($id);
                 $item = Payment::findOrFail($id);
                 $transaction = Transaction::where('payment_id', $item->id)->first();
             } elseif ($type == 'general_revenue_deposit') {
                 $item = GeneralPayment::findOrFail($id);
                 $transaction = $item->transaction()->first();
-                \Log::info($item);
             } elseif ($type == 'stockTaking') {
                 $item = StockAdjustment::findOrFail($id);
             } elseif ($type == 'insurance') {
