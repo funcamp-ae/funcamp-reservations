@@ -2490,50 +2490,51 @@
 
     @endcan
 
-    @can('pages.index')
-    <!--begin::Menu item-->
-    <div class="menu-item menu-sub-indention menu-accordion {{areActiveRoutes(['pages.index', 'pages.create', 'pages.edit'])}}"
-        data-kt-menu-trigger="click">
-        <!--begin::Menu link-->
-        <a href="#" class="menu-link py-3 {{areActiveRoutes(['pages.index', 'pages.create', 'pages.edit'])}}">
-            <span class="menu-icon">
-                <img src="https://cdn-icons-png.flaticon.com/512/2098/2098402.png" style="width:25px;height:25px" alt="Settings">
-            </span>
-            <span class="menu-title">@lang('dashboard.pages_display_settings')</span>
-            <span class="menu-arrow"></span>
-        </a>
-        <!--end::Menu link-->
+    @if(Gate::allows('pages.index'))
+        <!--begin::Menu item-->
+        <div class="menu-item menu-sub-indention menu-accordion {{areActiveRoutes(['pages.index', 'pages.create', 'pages.edit'])}}"
+            data-kt-menu-trigger="click">
+            <!--begin::Menu link-->
+            <a href="#" class="menu-link py-3 {{areActiveRoutes(['pages.index', 'pages.create', 'pages.edit'])}}">
+                <span class="menu-icon">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2098/2098402.png" style="width:25px;height:25px" alt="Settings">
+                </span>
+                <span class="menu-title">@lang('dashboard.pages_display_settings')</span>
+                <span class="menu-arrow"></span>
+            </a>
+            <!--end::Menu link-->
+            <!--begin::Menu sub-->
+            <div class="menu-sub menu-sub-accordion pt-3">
+                @can('pages.index')
+                    <!--begin::Menu item-->
+                    <div class="menu-item">
+                        <a href="{{ route('pages.index') }}" class="menu-link py-3 {{ isActiveRoute('pages.index') }}">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">@lang('dashboard.all_pages')</span>
+                        </a>
+                    </div>
+                @endcan
 
-        <!--begin::Menu sub-->
-        <div class="menu-sub menu-sub-accordion pt-3">
-            <!--begin::Menu item-->
-            <div class="menu-item">
-                <a href="{{ route('pages.index') }}" class="menu-link py-3 {{ isActiveRoute('pages.index') }}">
-                    <span class="menu-bullet">
-                        <span class="bullet bullet-dot"></span>
-                    </span>
-                    <span class="menu-title">@lang('dashboard.all_pages')</span>
-                </a>
+                <!--end::Menu item-->
+                @can('pages.create')
+                <!--begin::Menu item-->
+                <div class="menu-item">
+                    <a href="{{ route('pages.create') }}" class="menu-link py-3 {{ isActiveRoute('pages.create') }}">
+                        <span class="menu-bullet">
+                            <span class="bullet bullet-dot"></span>
+                        </span>
+                        <span class="menu-title">@lang('dashboard.create_new_page_display_settings')</span>
+                    </a>
+                </div>
+                <!--end::Menu item-->
+                @endcan
             </div>
-
-            <!--end::Menu item-->
-            @can('pages.create')
-            <!--begin::Menu item-->
-            <div class="menu-item">
-                <a href="{{ route('pages.create') }}" class="menu-link py-3 {{ isActiveRoute('pages.create') }}">
-                    <span class="menu-bullet">
-                        <span class="bullet bullet-dot"></span>
-                    </span>
-                    <span class="menu-title">@lang('dashboard.create_new_page_display_settings')</span>
-                </a>
-            </div>
-            <!--end::Menu item-->
-            @endcan
+            <!--end::Menu sub-->
         </div>
-        <!--end::Menu sub-->
-    </div>
-    <!--end::Menu item-->
-    @endcan
+        <!--end::Menu item-->
+    @endif
     @can('pages.reservations.board.today')
         <div class="menu-item">
 
