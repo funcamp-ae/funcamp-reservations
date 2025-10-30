@@ -2517,7 +2517,7 @@
             </div>
 
             <!--end::Menu item-->
-            <!-- @can('pages.create') -->
+            @can('pages.create')
             <!--begin::Menu item-->
             <div class="menu-item">
                 <a href="{{ route('pages.create') }}" class="menu-link py-3 {{ isActiveRoute('pages.create') }}">
@@ -2528,7 +2528,7 @@
                 </a>
             </div>
             <!--end::Menu item-->
-            <!-- @endcan -->
+            @endcan
         </div>
         <!--end::Menu sub-->
     </div>
