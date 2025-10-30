@@ -86,7 +86,7 @@ class CheckRoleMiddleware
                 $currunt_route = str_replace($currunt_route, $actAs, $currunt_route);
             }
         }
-        if (!str_contains($currunt_route, 'settings') and !\str_contains($currunt_route, 'sms') and !in_array($currunt_route, $excpetions)) {
+        if (!str_contains($currunt_route, 'settings') and !\str_contains($currunt_route, 'sms') and !in_array($currunt_route, $excpetions) and $currunt_route !== 'orders.updatesignin') {
             $currunt_route = str_replace('update', 'edit', $currunt_route);
         }
 
@@ -135,30 +135,6 @@ class CheckRoleMiddleware
 
 
         if (!in_array($permissionToCheck, $permissions) and !in_array($currunt_route, $excpetions) and !$isWildcardException) {
-  \Log::warning('User access denied - Missing permission', [
-                'user_id' => auth()->user()->id ?? 'guest',
-                'user_email' => auth()->user()->email ?? 'no-email',
-                'user_name' => auth()->user()->name ?? 'no-name',
-                'current_route' => $currunt_route,
-                'original_route' => Route::currentRouteName(),
-                'permission_required' => $permissionToCheck,
-                'user_permissions' => $permissions,
-                'user_permissions_count' => count($permissions),
-                'url' => $request->url(),
-                'method' => $request->method(),
-                'ip' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'referer' => $request->header('referer'),
-                'is_ajax' => $request->ajax(),
-                'timestamp' => now()->toDateTimeString(),
-                'route_exceptions' => $excpetions,
-                'is_wildcard_exception' => $isWildcardException,
-                'route_transformations_applied' => [
-                    'original' => Route::currentRouteName(),
-                    'transformed' => $currunt_route,
-                    'permission_check' => $permissionToCheck
-                ]
-            ]);
             $msg = trans('auth.not_authorized');
             if ($request->ajax()) {
                 return $this->unauthorizedReturn(['type' => 'notAuth']);
