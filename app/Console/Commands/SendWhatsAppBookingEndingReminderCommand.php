@@ -49,11 +49,13 @@ class SendWhatsAppBookingEndingReminderCommand extends Command
             $oneHourFromNow = $currentTime->copy()->addHour();
 
             // Find approved orders with end time around 1 hour from now (within 5 minutes tolerance)
+            // Only select orders that haven't received the ending reminder yet
             $orders = Order::with(['customer'])
                 ->where('status', 'approved')
                 ->whereNotNull('time_to')
                 ->whereTime('time_to', '>=', $oneHourFromNow->copy()->subMinutes(5)->format('H:i:s'))
                 ->whereTime('time_to', '<=', $oneHourFromNow->copy()->addMinutes(5)->format('H:i:s'))
+                ->where('is_endBookingreminder_sent', false)
                 ->get();
 
             $this->info("Found {$orders->count()} orders with end time around {$oneHourFromNow->format('H:i')}.");

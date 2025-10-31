@@ -56,7 +56,7 @@ class SendWhatsAppBookingEndingReminderJob implements ShouldQueue
 
             // Prepare template data
             $customerName = $this->order->customer->name;
-            $reservationNumber = $this->order->order_number;
+            $reservationNumber = $this->order->id;
             $checkoutTime = $this->order->time_to ?: '[وقت الخروج]';
             
             // Get worker phone from service site data
@@ -79,6 +79,10 @@ class SendWhatsAppBookingEndingReminderJob implements ShouldQueue
             );
 
             if ($success) {
+                // Mark the order as having received the ending reminder
+                $this->order->is_endBookingreminder_sent = true;
+                $this->order->save();
+                
                 Log::info('WhatsApp booking ending reminder message sent successfully', [
                     'order_id' => $this->order->id,
                     'customer_phone' => $this->order->customer->phone,
