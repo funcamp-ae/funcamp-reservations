@@ -36,8 +36,8 @@ class TranslationHelper
             if ($preserveParams) {
                 $translator->preserveParameters();
             }
-            
-            return $translator->translate($text);
+            return $text ;
+            // return $translator->translate($text);
         } catch (Exception $e) {
             // Log the error or handle it as needed
             \Log::error('Translation error: ' . $e->getMessage());
