@@ -233,7 +233,7 @@ return [
     'stop_camera' => 'کمره بنده کړئ',
     'Insurance' => 'بیمې',
     'take_picture' => 'انځور واخلئ',
-    'The_following_products_contain_less_than_6_of:' => 'لاندې محصولات د 6 څخه لږ مقدار لري: ',
+    'The_following_products_contain_less_than_10_of:' => 'لاندې محصولات د 10 څخه لږ مقدار لري: ',
     'open_camera_to_scan_qr' => 'د QR سکین لپاره کمره خلاصه کړئ',
     'copy_for_ios' => 'د تادیې لینک کاپي کړئ',
     'ios_copy_instructions' => 'پورته متن اوږد فشار ورکړئ، بیا د څرګندیدونکي مینو څخه "کاپي" وټاکئ.',

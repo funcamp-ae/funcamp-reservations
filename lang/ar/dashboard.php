@@ -224,7 +224,7 @@ return [
     'stop_camera' => 'ايقاف الكاميرا',
     'Insurance' => 'التأمينات',
     'take_picture' => 'التقاط صورة',
-    'The_following_products_contain_less_than_6_of:' => 'المنتجات التالية تحتوي على كميات أقل من 6 : ',
+    'The_following_products_contain_less_than_10_of:' => 'المنتجات التالية تحتوي على كميات أقل من 10 : ',
     'open_camera_to_scan_qr' => 'افتح الكاميرا لمسح QR',
     'copy_for_ios' => 'نسخ رابط الدفع',
     'ios_copy_instructions' => 'اضغط مطولاً على النص أعلاه، ثم اختر "نسخ" من القائمة التي تظهر.',

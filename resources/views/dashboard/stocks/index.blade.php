@@ -17,7 +17,7 @@
 
 @if($lowStock->count() > 0)
     <div class="alert alert-warning">
-        <strong>@lang('dashboard.warning'):</strong> @lang('dashboard.The_following_products_contain_less_than_6_of:')</strong>
+        <strong>@lang('dashboard.warning'):</strong> @lang('dashboard.The_following_products_contain_less_than_10_of:')</strong>
         <ul>
             @foreach($lowStock as $stock)
                 <li class="mt-3">
