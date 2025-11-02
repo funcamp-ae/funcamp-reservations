@@ -251,7 +251,7 @@
                                     <div class="mb-5 fv-row col-md-12">
                                         <label class="required form-label">{{ __('dashboard.payment_method') }}</label>
                                         <select name="payment_method" id="" class="form-select" required>
-                                            <option value="">{{ __('dashboard.choose_account') }}</option>
+                                            <option value="">{{ __('dashboard.payment_method') }}</option>
                                             @foreach(paymentMethod() as $paymentSelect)
                                             <option value="{{$paymentSelect}}">{{__('dashboard.'. $paymentSelect )}}</option>
                                             @endforeach
