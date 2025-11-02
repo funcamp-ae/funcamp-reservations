@@ -852,7 +852,7 @@
             <span class="badge bg-light text-muted border">All fields marked * are required</span>
         </div>
 
-        <form method="POST" action="{{ route('bookings.registrationforms.store') }}" novalidate id="bookingForm">
+        <form method="POST" action="{{ route('registrationforms.store') }}" novalidate id="bookingForm">
             @csrf
 
             {{-- Section: Camp & Date --}}

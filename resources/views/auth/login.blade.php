@@ -248,7 +248,7 @@
                 <!-- Login Card -->
                 <div class="card border-0 shadow-lg login-card animate-entrance" style="border-radius: 24px; animation-delay: 0.1s;">
                     <div class="card-body p-4 p-lg-5">
-                        <form class="form w-100" novalidate="novalidate" method="POST" action="{{ route('auth.admin-login')}}">
+                        <form class="form w-100" novalidate="novalidate" method="POST" action="{{ route('admin-login')}}">
                             @csrf
                             
                             <!-- Email Field -->
