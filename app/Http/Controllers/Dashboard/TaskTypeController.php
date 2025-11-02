@@ -43,8 +43,17 @@ class TaskTypeController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        TaskType::create($validated);
+        $taskType = TaskType::create($validated);
 
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'id' => $taskType->id,
+                'name' => $taskType->name,
+                'description' => $taskType->description,
+                'status' => $taskType->status
+            ], 201);
+        }
         return redirect()
             ->route('task-types.index')
             ->with('success', __('dashboard.task_type_created_successfully'));

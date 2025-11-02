@@ -594,6 +594,7 @@ a.btn-primary{
 	}
 	.select2-container .select2-selection--single {
 		height: unset !important;
+		padding: 0;
 	}
 	.select2-container--open .select2-dropdown.country-select-dropdown {
 		min-width: 230px !important;
