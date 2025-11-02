@@ -186,8 +186,7 @@
                         <div class="col-md-6">
                             <label class="form-label required">@lang('dashboard.action_taken')</label>
                             <select name="action_taken" id="action-taken" class="form-select form-select-solid" required>
-                                <option value="warning" {{ old('action_taken') == 'warning' ? 'selected' : '' }}>
-                                    @lang('dashboard.warning')</option>
+                                <option value=""  selected>@lang('dashboard.choose')</option>
                                 <option value="allowance"{{ old('action_taken') == 'allowance' ? 'selected' : '' }}>
                                     @lang('dashboard.allowance')</option>
                                 <option value="deduction"{{ old('action_taken') == 'deduction' ? 'selected' : '' }}>
@@ -699,6 +698,15 @@
             const CSRF = '{{ csrf_token() }}';
             const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
             const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+            // Initialize Select2 for multi-select dropdowns
+            if (typeof $.fn.select2 !== 'undefined') {
+                $('.select2-multiple').select2({
+                    placeholder: '@lang('dashboard.select_one_or_more_employees')',
+                    allowClear: true,
+                    width: '100%'
+                });
+            }
 
             const ACCEPTED_VIDEOS = [
                 'video/mp4', 'video/quicktime', 'video/hevc', 'video/webm', 'video/avi',

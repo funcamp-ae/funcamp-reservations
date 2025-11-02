@@ -779,7 +779,8 @@ class OrderController extends Controller
         $dateTo = $request->query('to');
 
         $upcomingQuery = Order::with(['customer', 'services', 'payments'])
-            ->whereDate('date', '>', $dateFrom);
+            ->whereDate('date', '>', $dateFrom)
+            ->where('status', 'approved');
         if (!empty($dateTo)) {
             $upcomingQuery->whereDate('date', '<=', $dateTo);
         }

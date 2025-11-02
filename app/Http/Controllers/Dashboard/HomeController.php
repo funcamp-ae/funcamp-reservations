@@ -47,6 +47,7 @@ class HomeController extends Controller
 
         // Get upcoming reservations
         $upcomingReservations = Order::whereDate('date', '>=', now()->addDay()->startOfDay())
+            ->where('status', 'approved')
             ->with('customer')
             ->latest('created_at')
             ->take(20)

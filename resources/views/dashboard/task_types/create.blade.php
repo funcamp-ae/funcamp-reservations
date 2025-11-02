@@ -87,7 +87,7 @@
                                 <!--begin::Input group-->
                                 <div class="row mb-6">
                                     <!--begin::Label-->
-                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">@lang('dashboard.task_type_name')</label>
+                                    <label class="col-lg-4 col-form-label required fw-bold fs-6">@lang('dashboard.task_title')</label>
                                     <!--end::Label-->
                                     <!--begin::Col-->
                                     <div class="col-lg-8 fv-row fv-plugins-icon-container">
@@ -107,7 +107,7 @@
                                 <!--begin::Input group-->
                                 <div class="row mb-6">
                                     <!--begin::Label-->
-                                    <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.task_type_description')</label>
+                                    <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.detailed_task_description')</label>
                                     <!--end::Label-->
                                     <!--begin::Col-->
                                     <div class="col-lg-8 fv-row fv-plugins-icon-container">

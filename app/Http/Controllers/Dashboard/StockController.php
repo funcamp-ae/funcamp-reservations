@@ -28,7 +28,7 @@ class StockController extends Controller
             ->get();
 
         $lowStock = $stocks->filter(function ($stock) {
-            return $stock->quantity < 6;
+            return $stock->quantity < 10;
         });
         return view('dashboard.stocks.index', compact('stocks', 'lowStock'));
     }

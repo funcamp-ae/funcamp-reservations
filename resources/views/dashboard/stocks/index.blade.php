@@ -225,4 +225,27 @@
 </div>
 <!--end::Post-->
 
+@push('js')
+<script>
+$(document).ready(function() {    
+    // Check if DataTable is already initialized and destroy it
+    if ($.fn.DataTable.isDataTable('#kt_ecommerce_category_table')) {
+        $('#kt_ecommerce_category_table').DataTable().destroy();
+    }
+    
+    // Initialize DataTable with pageLength 50
+    var table = $('#kt_ecommerce_category_table').DataTable({
+        "order": [],
+        "pageLength": 50,
+        "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+        "info": false
+    });
+
+    // Custom search functionality
+    $('input[data-kt-ecommerce-category-filter="search"]').on('keyup', function() {
+        table.search(this.value).draw();
+    });
+});
+</script>
+@endpush
 @endsection
