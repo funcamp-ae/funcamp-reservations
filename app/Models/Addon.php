@@ -15,4 +15,12 @@ class Addon extends Model
         return $this->belongsTo(Order::class);
     }
 
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class, 'order_addon')
+            ->using(OrderAddon::class)
+            ->withPivot('verified', 'count', 'price', 'handled_by', 'description', 'id', 'account_id', 'payment_method')
+            ->withTimestamps();
+    }
+
 }

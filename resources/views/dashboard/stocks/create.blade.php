@@ -23,9 +23,7 @@
                 aria-controls="kt_account_profile_details">
                 <!--begin::Card title-->
                 <div class="card-title m-0">
-                    <h3 class="fw-bolder m-0">
-                        {{ isset($stock) ? $stock->name : __('dashboard.create_title', ['page_title' => __('dashboard.stocks')]) }}
-                    </h3>
+                   @include('dashboard.stocks.nav')
                 </div>
                 <!--end::Card title-->
             </div>
