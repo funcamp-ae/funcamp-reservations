@@ -1001,6 +1001,7 @@ return [
     'all_payment_links' => 'All Payment Links',
     'payment_link_status' => 'Payment Link Status',
     'payment_link_amount' => 'Amount',
+    'currency_aed' => 'AED',
     'payment_link_description' => 'Description',
     'payment_link_expires_at' => 'Expires At',
     'payment_link_checkout_id' => 'Checkout ID',

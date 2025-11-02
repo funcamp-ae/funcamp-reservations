@@ -1034,6 +1034,7 @@ return [
     'payment_link_deleted' => 'د تادیې لینک بریالیتوب سره ړنګ شو',
 
     // Payment Link Fields
+    'currency_aed' => 'د متحده عربي اماراتو درهم',
     'checkout_id' => 'د تادیې پیژندنه',
     'checkout_key' => 'د تادیې کیلي',
     'payment_url' => 'د تادیې لینک',
@@ -1079,6 +1080,7 @@ return [
         'customer_email' => 'customer@example.com',
         'customer_phone' => '+971500000000',
     ],
+    'payment_link_amount' => 'مقدار',
     'payment_link_amount_placeholder' => 'مهرباني د تادیې پیسې ولیکئ',
     'payment_link_example' => 'بیلګه: لینک دلته: http://system.funcamp.ae',
     'payment_link_description_placeholder' => 'د تادیې لنډ تشریح',

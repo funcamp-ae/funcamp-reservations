@@ -1033,6 +1033,7 @@ return [
     'payment_link_deleted' => 'تم حذف رابط الدفع بنجاح',
 
     // Payment Link Fields
+    'currency_aed' => 'درهم إماراتي',
     'checkout_id' => 'معرف الدفع',
     'checkout_key' => 'مفتاح الدفع',
     'payment_url' => 'رابط الدفع',
@@ -1078,6 +1079,7 @@ return [
         'customer_email' => 'customer@example.com',
         'customer_phone' => '+971500000000',
     ],
+    'payment_link_amount' => 'المبلغ',
     'payment_link_amount_placeholder' => 'يرجى إدخال المبلغ المراد دفعه',
     'payment_link_example' => 'مثال: الرابط هنا: http://system.funcamp.ae',
     'payment_link_description_placeholder' => 'وصف مختصر للدفع',
