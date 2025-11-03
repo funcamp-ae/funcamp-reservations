@@ -785,7 +785,7 @@
             <img src="{{ asset('images/logo.png') }}" class="logo" alt="Logo"
                  onerror="this.replaceWith(Object.assign(document.createElement('div'),{textContent:'Company',className:'fw-bold fs-4'}));">
             <div class="brand-text">
-                <div class="company-name">{{ settings('app_name_en') }}</div>
+                <div class="company-name">{{ env('APP_NAME') }}</div>
                 <div class="tagline">Book your appointment in seconds</div>
             </div>
         </div>
