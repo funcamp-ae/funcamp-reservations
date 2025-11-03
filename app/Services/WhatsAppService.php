@@ -113,7 +113,7 @@ class WhatsAppService
                     'text' => $message,
                     'preview_title' => "funcamp",
                     'preview_description' => "rate us , this help us to improve our services",
-                    'preview_image_url' => env("APP_URL") . "/image.jpg",
+                    'preview_image_url' => "https://system.funcamp.ae/images/logo.png",
                     'high_quality' => true,
                     // 'title' => $message
                 ]);
