@@ -47,7 +47,7 @@
                         </td>
                         <td>
                             <span class="badge badge-light-info">
-                                {{ $send->template->name }}
+                                {{ $send->template?->name }}
                             </span>
                         </td>
                         <td>
