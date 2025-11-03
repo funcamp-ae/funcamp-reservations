@@ -110,7 +110,7 @@ class WhatsAppService
                 ->post($this->apiUrl . '/api/whatsapp/v1/' . $this->instanceId . '/send-link-custom-preview', [
                     'chatId' => $this->formatPhoneNumber($phoneNumber),
                     'preview_url' => $url,
-                    'text' => $url,
+                    'text' => $message,
                     'preview_title' => "funcamp",
                     'preview_description' => "rate us , this help us to improve our services",
                     'preview_image_url' => "https://system.funcamp.ae/images/logo.png",
