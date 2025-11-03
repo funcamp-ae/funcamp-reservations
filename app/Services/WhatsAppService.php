@@ -107,7 +107,7 @@ class WhatsAppService
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
                 ])
-                ->post($this->apiUrl . '/api/whatsapp/v1/' . $this->instanceId . '/send-link-preview', [
+                ->post($this->apiUrl . '/api/whatsapp/v1/' . $this->instanceId . '/send-link-custom-preview', [
                     'chatId' => $this->formatPhoneNumber($phoneNumber),
                     'url' => $url,
                     'title' => $message
