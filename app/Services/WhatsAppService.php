@@ -109,8 +109,13 @@ class WhatsAppService
                 ])
                 ->post($this->apiUrl . '/api/whatsapp/v1/' . $this->instanceId . '/send-link-custom-preview', [
                     'chatId' => $this->formatPhoneNumber($phoneNumber),
-                    'url' => $url,
-                    'title' => $message
+                    'preview_url' => $url,
+                    'text' => $message,
+                    'preview_title' => "funcamp",
+                    'preview_description' => "rate us , this help us to improve our services",
+                    'preview_image_url' => env("APP_URL") . "/image.jpg",
+                    'high_quality' => true,
+                    // 'title' => $message
                 ]);
 
             Log::info('WhatsApp link preview sent', [
