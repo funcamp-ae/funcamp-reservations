@@ -16,7 +16,19 @@ class Service extends Model
     public function stocks()
     {
         return $this->belongsToMany(Stock::class, 'service_stock')
-                ->withPivot(['count', 'placed_qty' , 'is_completed', 'not_completed_reason' , 'required_qty','id','latest_activity']);
+                ->withPivot([
+                    'count', 
+                    'placed_qty', 
+                    'is_completed', 
+                    'not_completed_reason', 
+                    'required_qty',
+                    'id',
+                    'latest_activity',
+                    'is_from_old_reservation',
+                    'discount_from_old_reservation',
+                    'discount_from_inventory',
+                    'discount_note'
+                ]);
     }
 
     public function orders()
