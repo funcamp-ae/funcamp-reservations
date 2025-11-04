@@ -251,18 +251,28 @@
                         <form class="form w-100" novalidate="novalidate" method="POST" action="{{ route('admin-login')}}">
                             @csrf
                             
-                            <!-- Email Field -->
+                            <!-- Error Message -->
+                            @if(session('error'))
+                                <div class="alert alert-danger d-flex align-items-center mb-4" style="border-radius: 14px; background: rgba(220, 53, 69, 0.15) !important; border: 2px solid rgba(220, 53, 69, 0.3); color: white !important; backdrop-filter: blur(10px);">
+                                    <i class="fas fa-exclamation-triangle me-3" style="font-size: 20px;"></i>
+                                    <div>
+                                        <strong>{{ session('error') }}</strong>
+                                    </div>
+                                </div>
+                            @endif
+                            
+                            <!-- Email or Phone Field -->
                             <div class="mb-4">
                                 <label class="form-label mb-2">
-                                    البريد الالكتروني
+                                    البريد الإلكتروني أو رقم الهاتف
                                 </label>
                                 <input 
                                     class="form-control form-control-lg @error('email') is-invalid @enderror" 
-                                    type="email" 
+                                    type="text" 
                                     name="email" 
                                     value="{{ old('email') }}"
                                     autocomplete="off" 
-                                    placeholder="أدخل بريدك الإلكتروني"
+                                    placeholder="أدخل بريدك الإلكتروني أو رقم الهاتف"
                                     style="border-radius: 14px; padding: 14px 18px;"
                                 />
                                 @error('email')
@@ -327,7 +337,7 @@
                                 </span>
                                 <span class="indicator-progress" style="display: none;">
                                     <span class="spinner-border spinner-border-sm align-middle me-2"></span>
-                                    جاري التسجيل...
+                                    جاري تسجيل الدخول...
                                 </span>
                             </button>
 
