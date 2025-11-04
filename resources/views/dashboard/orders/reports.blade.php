@@ -93,28 +93,6 @@
                                         <td class="text-center">
                                             <div class="d-flex flex-column gap-2 align-items-center">
                                                 <input type="number" name="set_qty[{{ $report->id }}]" min="0" max="{{ $report->count }}" class="form-control" style="padding:12px 40px !important" value="{{ ($report->set_qty == 0) ? $report->count : $report->set_qty }}">
-                                                
-                                                <!-- Discount Section -->
-                                                <div class="mt-2 w-100">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input from-old-reservation-check" type="checkbox" name="is_from_old_reservation[{{ $report->id }}]" id="from-old-{{ $report->id }}" value="1" {{ $report && $report->is_from_old_reservation ? 'checked' : '' }} data-report-id="{{ $report->id }}">
-                                                        <label class="form-check-label fw-bold" for="from-old-{{ $report->id }}">
-                                                            @lang('dashboard.from_old_reservation')
-                                                        </label>
-                                                    </div>
-                                                    <div class="discount-fields mt-2" id="discount-fields-{{ $report->id }}" style="display: {{ $report && $report->is_from_old_reservation ? 'block' : 'none' }};">
-                                                        <div class="row g-2">
-                                                            <div class="col-6">
-                                                                <label class="form-label small">@lang('dashboard.discount_from_old_reservation')</label>
-                                                                <input type="number" step="0.01" min="0" class="form-control form-control-sm" name="discount_from_old_reservation[{{ $report->id }}]" value="{{ $report ? $report->discount_from_old_reservation : '' }}" placeholder="0.00">
-                                                            </div>
-                                                            <div class="col-6">
-                                                                <label class="form-label small">@lang('dashboard.discount_from_inventory')</label>
-                                                                <input type="number" step="0.01" min="0" class="form-control form-control-sm" name="discount_from_inventory[{{ $report->id }}]" value="{{ $report ? $report->discount_from_inventory : '' }}" placeholder="0.00">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </div>
                                         </td>
                                         <td class="text-center">
@@ -139,18 +117,6 @@
                                         <td class="text-center">
                                             <div class="d-flex flex-column gap-2 align-items-center">
                                                 <input  type="number" name="set_qty[{{ $report->id }}]" min="0" max="{{ $report->count }}" class="form-control" value="{{ ($report->set_qty == 0) ? $report->count : $report->set_qty }}">
-                                                
-                                                <!-- Discount Section (Disabled) -->
-                                                @if($report && $report->is_from_old_reservation)
-                                                <div class="mt-2 w-100">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" disabled checked>
-                                                        <label class="form-check-label fw-bold">
-                                                            @lang('dashboard.from_old_reservation')
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                @endif
                                             </div>
                                         </td>
                                         <td class="text-center">
@@ -264,6 +230,11 @@
                                     <div class="alert alert-info small mb-0">
                                         <i class="fa fa-info-circle me-1"></i> 
                                         {{__("dashboard.".$stock->pivot->discount_note, ['old_discount' => number_format($stock->pivot->discount_from_old_reservation, 2), 'inventory_discount' => number_format($stock->pivot->discount_from_inventory, 2)]) }}
+                                    </div>
+                                    @elseif ($stock->pivot && $stock->pivot->is_from_old_reservation)
+                                    <div class="alert alert-info small mb-0">
+                                         <i class="fa fa-info-circle me-1"></i> 
+                                         {{ __("dashboard.from_old_reservation") }}
                                     </div>
                                     @else
                                     —
