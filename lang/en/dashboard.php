@@ -1351,6 +1351,7 @@ return [
     'fixed_phone' => 'Fixed Phone',
     'no_contacts_found' => 'No contacts found',
     'page' => 'Page',
+    'serial' => 'Serial',
     'serial_number' => 'Serial Number',
     'answers_count' => 'Answers Count',
     'actions' => 'Actions',

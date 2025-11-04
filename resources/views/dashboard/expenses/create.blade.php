@@ -579,68 +579,132 @@
     }
 
     // Preview selected images before upload (main form)
+    let selectedFiles = [];
+    
     document.getElementById('image').addEventListener('change', function(e) {
         const previewContainer = document.getElementById('imagePreviewContainer');
         const previewList = document.getElementById('imagePreviewList');
+        
+        // Add new files to the existing array
+        Array.from(this.files).forEach(file => {
+            selectedFiles.push(file);
+        });
+        
+        // Clear input to allow selecting same files again
+        this.value = '';
+        
+        // Update preview
+        updateMainImagePreview();
+    });
+    
+    function updateMainImagePreview() {
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        const previewList = document.getElementById('imagePreviewList');
+        const imageInput = document.getElementById('image');
+        
         previewList.innerHTML = '';
         
-        if (this.files.length > 0) {
+        if (selectedFiles.length > 0) {
             previewContainer.classList.remove('d-none');
             
-            // Create placeholder divs first to maintain order
-            const placeholders = [];
-            Array.from(this.files).forEach((file, index) => {
+            selectedFiles.forEach((file, index) => {
                 const div = document.createElement('div');
                 div.className = 'position-relative';
                 div.setAttribute('data-index', index);
                 previewList.appendChild(div);
-                placeholders.push(div);
                 
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    placeholders[index].innerHTML = `
+                    div.innerHTML = `
                         <img src="${e.target.result}" class="img-thumbnail" style="max-width: 150px; max-height: 100px; object-fit: cover;">
                         <span class="badge bg-primary position-absolute top-0 start-0 m-1">${index + 1}</span>
+                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1" onclick="removeMainImage(${index})" style="padding: 2px 6px; font-size: 12px;">
+                            <i class="fas fa-times"></i>
+                        </button>
                     `;
                 };
                 reader.readAsDataURL(file);
             });
+            
+            // Update the file input with current files
+            updateFileInput(imageInput, selectedFiles);
         } else {
             previewContainer.classList.add('d-none');
         }
-    });
+    }
+    
+    function removeMainImage(index) {
+        selectedFiles.splice(index, 1);
+        updateMainImagePreview();
+    }
+    
+    function updateFileInput(input, files) {
+        const dataTransfer = new DataTransfer();
+        files.forEach(file => {
+            dataTransfer.items.add(file);
+        });
+        input.files = dataTransfer.files;
+    }
 
     // Preview selected images before upload (edit modal)
+    let editSelectedFiles = [];
+    
     document.getElementById('editImage').addEventListener('change', function(e) {
         const previewContainer = document.getElementById('editImagePreviewContainer');
         const previewList = document.getElementById('editImagePreviewList');
+        
+        // Add new files to the existing array
+        Array.from(this.files).forEach(file => {
+            editSelectedFiles.push(file);
+        });
+        
+        // Clear input to allow selecting same files again
+        this.value = '';
+        
+        // Update preview
+        updateEditImagePreview();
+    });
+    
+    function updateEditImagePreview() {
+        const previewContainer = document.getElementById('editImagePreviewContainer');
+        const previewList = document.getElementById('editImagePreviewList');
+        const imageInput = document.getElementById('editImage');
+        
         previewList.innerHTML = '';
         
-        if (this.files.length > 0) {
+        if (editSelectedFiles.length > 0) {
             previewContainer.classList.remove('d-none');
             
-            // Create placeholder divs first to maintain order
-            const placeholders = [];
-            Array.from(this.files).forEach((file, index) => {
+            editSelectedFiles.forEach((file, index) => {
                 const div = document.createElement('div');
                 div.className = 'position-relative';
                 div.setAttribute('data-index', index);
                 previewList.appendChild(div);
-                placeholders.push(div);
                 
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    placeholders[index].innerHTML = `
+                    div.innerHTML = `
                         <img src="${e.target.result}" class="img-thumbnail" style="max-width: 150px; max-height: 100px; object-fit: cover;">
                         <span class="badge bg-primary position-absolute top-0 start-0 m-1">${index + 1}</span>
+                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1" onclick="removeEditImage(${index})" style="padding: 2px 6px; font-size: 12px;">
+                            <i class="fas fa-times"></i>
+                        </button>
                     `;
                 };
                 reader.readAsDataURL(file);
             });
+            
+            // Update the file input with current files
+            updateFileInput(imageInput, editSelectedFiles);
         } else {
             previewContainer.classList.add('d-none');
         }
-    });
+    }
+    
+    function removeEditImage(index) {
+        editSelectedFiles.splice(index, 1);
+        updateEditImagePreview();
+    }
 
     // Open Edit Modal and populate fields
     window.openEditModal = function(expenseId, accountId, expenseItemId, paymentMethod, date, price, notes) {
@@ -653,6 +717,12 @@
         document.getElementById('editDate').value = date;
         document.getElementById('editPrice').value = price;
         document.getElementById('editNotes').value = notes || '';
+
+        // Reset edit image selection
+        editSelectedFiles = [];
+        document.getElementById('editImagePreviewContainer').classList.add('d-none');
+        document.getElementById('editImagePreviewList').innerHTML = '';
+        document.getElementById('editImage').value = '';
 
         const modal = new bootstrap.Modal(document.getElementById('editExpenseModal'));
         modal.show();
