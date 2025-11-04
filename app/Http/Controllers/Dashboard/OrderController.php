@@ -664,7 +664,10 @@ class OrderController extends Controller
             'set_qty.*' => 'nullable|integer|min:0|max:100',
             'not_completed_reason' => 'nullable|array',
             'reports' => 'nullable|array',
-            'report_text' => 'nullable|string'
+            'report_text' => 'nullable|string',
+            'is_from_old_reservation' => 'nullable|array',
+            'discount_from_old_reservation' => 'nullable|array',
+            'discount_from_inventory' => 'nullable|array',
         ]);
         FacadesDB::transaction(function () use ($data) {
             foreach ($data['reports'] as $id => $status) {
@@ -688,12 +691,32 @@ class OrderController extends Controller
         if (isset($data['stock'])) {
             foreach ($data['stock'] as $stockId => $status) {
                 $pivot = FacadesDB::table('service_stock')->whereId($stockId);
+                
+                $isFromOld = isset($data['is_from_old_reservation_stock'][$stockId]) && $data['is_from_old_reservation_stock'][$stockId] == '1';
+                $discountOld = $data['discount_from_old_reservation_stock'][$stockId] ?? 0;
+                $discountInv = $data['discount_from_inventory_stock'][$stockId] ?? 0;
+                $quantity = $data['placed_qty'][$stockId] ?? 0;
+                
+                // Generate discount note
+                $discountNote = null;
+                if ($isFromOld && ($discountOld > 0 || $discountInv > 0)) {
+                    $discountNote = __('dashboard.stock_count_note', [
+                        'count' => $quantity,
+                        'old_discount' => number_format($discountOld, 2),
+                        'inventory_discount' => number_format($discountInv, 2)
+                    ]);
+                }
+                
                 $pivot->update([
                     'is_completed' => ($status === 'completed') ? true : false,
                     'not_completed_reason' => $data['not_completed_reason_stock'][$stockId] ?? null,
                     //'required_qty' => $data['required_qty_stock'][$stockId] ?? null,
                     //'count' => $data['count_stock'][$stockId] ?? null,
-                    'placed_qty' => $data['placed_qty'][$stockId] ?? null,
+                    'placed_qty' => $quantity,
+                    'is_from_old_reservation' => $isFromOld,
+                    'discount_from_old_reservation' => $isFromOld ? $discountOld : null,
+                    'discount_from_inventory' => $isFromOld ? $discountInv : null,
+                    'discount_note' => $discountNote,
                 ]);
             }
         }

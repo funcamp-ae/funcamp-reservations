@@ -91,7 +91,36 @@
                                             <input type="number" name="ordered_count[{{ $report->id }}]" min="0" max="{{ $report->count }}" class="form-control text-muted" style="padding:12px 40px !important" value="{{ $report->count }}" readonly>
                                         </td>
                                         <td class="text-center">
-                                            <input type="number" name="set_qty[{{ $report->id }}]" min="0" max="{{ $report->count }}" class="form-control" style="padding:12px 40px !important" value="{{ ($report->set_qty == 0) ? $report->count : $report->set_qty }}">
+                                            <div class="d-flex flex-column gap-2 align-items-center">
+                                                <input type="number" name="set_qty[{{ $report->id }}]" min="0" max="{{ $report->count }}" class="form-control" style="padding:12px 40px !important" value="{{ ($report->set_qty == 0) ? $report->count : $report->set_qty }}">
+                                                
+                                                <!-- Discount Section -->
+                                                <div class="mt-2 w-100">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input from-old-reservation-check" type="checkbox" name="is_from_old_reservation[{{ $report->id }}]" id="from-old-{{ $report->id }}" value="1" {{ $report && $report->is_from_old_reservation ? 'checked' : '' }} data-report-id="{{ $report->id }}">
+                                                        <label class="form-check-label fw-bold" for="from-old-{{ $report->id }}">
+                                                            @lang('dashboard.from_old_reservation')
+                                                        </label>
+                                                    </div>
+                                                    <div class="discount-fields mt-2" id="discount-fields-{{ $report->id }}" style="display: {{ $report && $report->is_from_old_reservation ? 'block' : 'none' }};">
+                                                        <div class="row g-2">
+                                                            <div class="col-6">
+                                                                <label class="form-label small">@lang('dashboard.discount_from_old_reservation')</label>
+                                                                <input type="number" step="0.01" min="0" class="form-control form-control-sm" name="discount_from_old_reservation[{{ $report->id }}]" value="{{ $report ? $report->discount_from_old_reservation : '' }}" placeholder="0.00">
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <label class="form-label small">@lang('dashboard.discount_from_inventory')</label>
+                                                                <input type="number" step="0.01" min="0" class="form-control form-control-sm" name="discount_from_inventory[{{ $report->id }}]" value="{{ $report ? $report->discount_from_inventory : '' }}" placeholder="0.00">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @if($report && $report->discount_note)
+                                                    <div class="alert alert-info mt-2 small mb-0">
+                                                        <i class="fa fa-info-circle me-1"></i> {{ $report->discount_note }}
+                                                    </div>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="text-center">
                                             <div class="d-flex flex-column gap-2 align-items-center">
@@ -107,25 +136,45 @@
                                                     <label class="form-label small">@lang('dashboard.not_completed_reason')</label>
                                                     <textarea class="form-control" rows="2" name="not_completed_reason[{{ $report->id }}]">{{ $report ? $report->not_completed_reason : '' }}</textarea>
                                                 </div>
+                                            </div>
                                                 @else
                                         <td class="text-center">
-                                            <input disabled type="number" name="ordered_count[{{ $report->id }}]" min="0" max="{{ $report->count }}" class="form-control text-muted" value="{{ $report->count }}" readonly>
+                                            <input  type="number" name="ordered_count[{{ $report->id }}]" min="0" max="{{ $report->count }}" class="form-control text-muted" value="{{ $report->count }}" readonly>
                                         </td>
                                         <td class="text-center">
-                                            <input disabled type="number" name="set_qty[{{ $report->id }}]" min="0" max="{{ $report->count }}" class="form-control" value="{{ ($report->set_qty == 0) ? $report->count : $report->set_qty }}">
+                                            <div class="d-flex flex-column gap-2 align-items-center">
+                                                <input  type="number" name="set_qty[{{ $report->id }}]" min="0" max="{{ $report->count }}" class="form-control" value="{{ ($report->set_qty == 0) ? $report->count : $report->set_qty }}">
+                                                
+                                                <!-- Discount Section (Disabled) -->
+                                                @if($report && $report->is_from_old_reservation)
+                                                <div class="mt-2 w-100">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" disabled checked>
+                                                        <label class="form-check-label fw-bold">
+                                                            @lang('dashboard.from_old_reservation')
+                                                        </label>
+                                                    </div>
+                                                    @if($report->discount_note)
+                                                    <div class="alert alert-info mt-2 small mb-0">
+                                                        <i class="fa fa-info-circle me-1"></i> {{ $report->discount_note }}
+                                                    </div>
+                                                    @endif
+                                                </div>
+                                                @endif
+                                            </div>
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group w-100 justify-content-center" role="group" aria-label="Report Status">
-                                                <input disabled type="radio" class="btn-check reports-check" name="reports[{{ $report->id }}]" id="completed-{{ $report->id }}" value="completed" data-report="{{ $report->id }}" {{ $report && $report->is_completed ? 'checked' : '' }}>
+                                                <input  type="radio" class="btn-check reports-check" name="reports[{{ $report->id }}]" id="completed-{{ $report->id }}" value="completed" data-report="{{ $report->id }}" {{ $report && $report->is_completed ? 'checked' : '' }}>
                                                 <label class="btn btn-outline-success" for="completed-{{ $report->id }}"><i class="fa fa-check me-1"></i> @lang('dashboard.completed')</label>
 
-                                                <input disabled type="radio" class="btn-check reports-check-not" name="reports[{{ $report->id }}]" id="not-completed-{{ $report->id }}" value="not_completed" data-report="{{ $report->id }}" {{ $report && !$report->is_completed ? 'checked' : '' }}>
+                                                <input  type="radio" class="btn-check reports-check-not" name="reports[{{ $report->id }}]" id="not-completed-{{ $report->id }}" value="not_completed" data-report="{{ $report->id }}" {{ $report && !$report->is_completed ? 'checked' : '' }}>
                                                 <label class="btn btn-outline-danger" for="not-completed-{{ $report->id }}"><i class="fa fa-times me-1"></i> @lang('dashboard.not_completed')</label>
                                             </div>
 
                                             <div class="incomplete-reason mt-2" data-report="{{ $report->id }}" @if($report && $report->is_completed) style="display:none" @endif>
                                                 <label class="form-label small">@lang('dashboard.not_completed_reason')</label>
-                                                <textarea disabled class="form-control" rows="2" name="not_completed_reason[{{ $report->id }}]">{{ $report ? $report->not_completed_reason : '' }}</textarea>
+                                                <textarea  class="form-control" rows="2" name="not_completed_reason[{{ $report->id }}]">{{ $report ? $report->not_completed_reason : '' }}</textarea>
                                             </div>
                                             @endcan
                                         </td>
@@ -164,18 +213,47 @@
                                     <!-- <input type="hidden" class="form-control text-muted" value="{{ $stock->pivot->count ?? '' }}"> -->
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-flex justify-content-center align-items-center gap-2">
-                                        <input type="number" value="{{ $stock->pivot->placed_qty ? $stock->pivot->placed_qty : $stock->pivot->count }}" name="placed_qty[{{ $stock->pivot->id }}]" class="form-control" >
-                                        <div class="d-flex flex-column">
-                                            <button type="button" class="btn btn-sm btn-danger btn-decrement" data-order-id="{{ $order->id }}" data-pivot-id="{{ $stock->pivot->id }}" data-stock-id="{{ $stock->id }}" data-stock-name="{{ $stock->name }}" data-status="decrement"><i class="fa fa-minus"></i></button>
-                                            @if ($stock->pivot->latest_activity)
-                                            <small class="d-block mt-1 text-center">
-                                                <span class="badge rounded-pill {{ $stock->pivot->latest_activity === 'increment' ? 'bg-success' : ($stock->pivot->latest_activity === 'decrement' ? 'bg-danger' : 'bg-secondary') }}">
-                                                    {{ $stock->pivot->latest_activity ? __('dashboard.'.$stock->pivot->latest_activity) : '—' }}
-                                                </span>
-                                            </small>
+                                    <div class="d-flex flex-column gap-2 align-items-center">
+                                        <div class="d-flex justify-content-center align-items-center gap-2 w-100">
+                                            <input type="number" value="{{ $stock->pivot->placed_qty ? $stock->pivot->placed_qty : $stock->pivot->count }}" name="placed_qty[{{ $stock->pivot->id }}]" class="form-control" >
+                                            <div class="d-flex flex-column">
+                                                <button type="button" class="btn btn-sm btn-danger btn-decrement" data-order-id="{{ $order->id }}" data-pivot-id="{{ $stock->pivot->id }}" data-stock-id="{{ $stock->id }}" data-stock-name="{{ $stock->name }}" data-status="decrement"><i class="fa fa-minus"></i></button>
+                                                @if ($stock->pivot->latest_activity)
+                                                <small class="d-block mt-1 text-center">
+                                                    <span class="badge rounded-pill {{ $stock->pivot->latest_activity === 'increment' ? 'bg-success' : ($stock->pivot->latest_activity === 'decrement' ? 'bg-danger' : 'bg-secondary') }}">
+                                                        {{ $stock->pivot->latest_activity ? __('dashboard.'.$stock->pivot->latest_activity) : '—' }}
+                                                    </span>
+                                                </small>
+                                                @endif
+                                                <button type="button" class="btn btn-sm btn-success btn-decrement mt-1" data-order-id="{{ $order->id }}" data-pivot-id="{{ $stock->pivot->id }}" data-stock-id="{{ $stock->id }}" data-stock-name="{{ $stock->name }}" data-status="increment"><i class="fa fa-plus"></i></button>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Discount Section for Stock -->
+                                        <div class="mt-2 w-100">
+                                            <div class="form-check">
+                                                <input class="form-check-input from-old-reservation-check-stock" type="checkbox" name="is_from_old_reservation_stock[{{ $stock->pivot->id }}]" id="from-old-stock-{{ $stock->pivot->id }}" value="1" {{ $stock->pivot && $stock->pivot->is_from_old_reservation ? 'checked' : '' }} data-stock-id="{{ $stock->pivot->id }}">
+                                                <label class="form-check-label fw-bold" for="from-old-stock-{{ $stock->pivot->id }}">
+                                                    @lang('dashboard.from_old_reservation')
+                                                </label>
+                                            </div>
+                                            <div class="discount-fields-stock mt-2" id="discount-fields-stock-{{ $stock->pivot->id }}" style="display: {{ $stock->pivot && $stock->pivot->is_from_old_reservation ? 'block' : 'none' }};">
+                                                <div class="row g-2">
+                                                    <div class="col-6">
+                                                        <label class="form-label small">@lang('dashboard.discount_from_old_reservation')</label>
+                                                        <input type="number" step="0.01" min="0" class="form-control form-control-sm" name="discount_from_old_reservation_stock[{{ $stock->pivot->id }}]" value="{{ $stock->pivot ? $stock->pivot->discount_from_old_reservation : '' }}" placeholder="0.00">
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="form-label small">@lang('dashboard.discount_from_inventory')</label>
+                                                        <input type="number" step="0.01" min="0" class="form-control form-control-sm" name="discount_from_inventory_stock[{{ $stock->pivot->id }}]" value="{{ $stock->pivot ? $stock->pivot->discount_from_inventory : '' }}" placeholder="0.00">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @if($stock->pivot && $stock->pivot->discount_note)
+                                            <div class="alert alert-info mt-2 small mb-0">
+                                                <i class="fa fa-info-circle me-1"></i> {{ $stock->pivot->discount_note }}
+                                            </div>
                                             @endif
-                                            <button type="button" class="btn btn-sm btn-success btn-decrement mt-1" data-order-id="{{ $order->id }}" data-pivot-id="{{ $stock->pivot->id }}" data-stock-id="{{ $stock->id }}" data-stock-name="{{ $stock->name }}" data-status="increment"><i class="fa fa-plus"></i></button>
                                         </div>
                                     </div>
                                 </td>
@@ -372,6 +450,32 @@
                     text: "@lang('dashboard.please_fill_reason')",
                     confirmButtonText: "@lang('dashboard.confirm')"
                 });
+            }
+        });
+
+        // Toggle discount fields for reports
+        $('.from-old-reservation-check').on('change', function() {
+            var reportId = $(this).data('report-id');
+            var discountFields = $('#discount-fields-' + reportId);
+            if ($(this).is(':checked')) {
+                discountFields.slideDown();
+            } else {
+                discountFields.slideUp();
+                // Clear values when unchecked
+                discountFields.find('input').val('');
+            }
+        });
+
+        // Toggle discount fields for stocks
+        $('.from-old-reservation-check-stock').on('change', function() {
+            var stockId = $(this).data('stock-id');
+            var discountFields = $('#discount-fields-stock-' + stockId);
+            if ($(this).is(':checked')) {
+                discountFields.slideDown();
+            } else {
+                discountFields.slideUp();
+                // Clear values when unchecked
+                discountFields.find('input').val('');
             }
         });
     });
