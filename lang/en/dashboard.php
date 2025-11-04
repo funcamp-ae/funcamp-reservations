@@ -975,7 +975,7 @@ return [
     'discount_from_old_reservation' => 'Discount from Old Reservation',
     'discount_from_inventory' => 'Discount from Inventory',
     'discount_note' => 'Discount Note',
-    'stock_count_note' => 'The discounted count/percentage from the old reservation is :old_discount and the discounted from the inventory is :inventory_discount',
+    'discount_note' => 'The discounted count/percentage from the old reservation is :old_discount and the discounted from the inventory is :inventory_discount',
     'orders_payments' => 'Orders Payments',
     'rows' => 'Rows',
     'total' => 'Total',
