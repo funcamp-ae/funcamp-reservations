@@ -665,6 +665,9 @@ class OrderController extends Controller
             'not_completed_reason' => 'nullable|array',
             'reports' => 'nullable|array',
             'report_text' => 'nullable|string',
+            'is_from_old_reservation_stock' => 'nullable|array',
+            'discount_from_old_reservation_stock' => 'nullable|array',
+            'discount_from_inventory_stock' => 'nullable|array',
         ]);
         FacadesDB::transaction(function () use ($data) {
             foreach ($data['reports'] as $id => $status) {
@@ -707,8 +710,6 @@ class OrderController extends Controller
                 $pivot->update([
                     'is_completed' => ($status === 'completed') ? true : false,
                     'not_completed_reason' => $data['not_completed_reason_stock'][$stockId] ?? null,
-                    //'required_qty' => $data['required_qty_stock'][$stockId] ?? null,
-                    //'count' => $data['count_stock'][$stockId] ?? null,
                     'placed_qty' => $quantity,
                     'is_from_old_reservation' => $isFromOld,
                     'discount_from_old_reservation' => $isFromOld ? $discountOld : null,
