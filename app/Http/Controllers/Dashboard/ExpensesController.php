@@ -139,7 +139,8 @@ class ExpensesController extends Controller
             'account_id' => 'required|exists:bank_accounts,id',
             'price' => 'required|numeric|min:0',
             'payment_method' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+            'image' => 'nullable|array',
+            'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
             'date' => 'nullable|date',
             'order_id' => 'nullable|exists:orders,id',
             'notes' => 'nullable|string|max:1000',
@@ -151,11 +152,11 @@ class ExpensesController extends Controller
 
         try {
             $date = $request->date ? $request->date : date('Y-m-d');
-            // Handle image upload
-            $imagePath = null;
+            
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('expenses', 'public');
-             }
+                $expense = new Expense();
+                $imagePaths = $expense->uploadMultipleImages($request->file('image'), 'expenses');
+            }
 
             $expense = Expense::create([
                 'expense_item_id' => $request->expense_item_id,
@@ -165,8 +166,8 @@ class ExpensesController extends Controller
                 'date' => $date,
                 'statement' => $request->statement ?? 'general_expenses',
                 'notes' => $request->notes,
-                'image' => $imagePath, // Store as 'image' field
-                'image_path' => $imagePath, // Also store as 'image_path' for compatibility
+                'images' => $imagePaths, // Store multiple images as array
+                'image' => !empty($imagePaths) ? $imagePaths[0] : null, // First image for backward compatibility
                 'order_id' => $request->order_id,
                 'source' => $request->source,
                 'handled_by' => auth()->id()
@@ -249,7 +250,8 @@ class ExpensesController extends Controller
             'source' => 'required|string',
             'statement' => 'nullable|string',
             'date' => 'nullable|date',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+            'image' => 'nullable|array',
+            'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
             'notes' => 'nullable|string|max:1000',
         ]);
 
@@ -267,20 +269,23 @@ class ExpensesController extends Controller
                 ]);
             }
 
-            // Handle image upload
+            // Handle multiple images upload
             if ($request->hasFile('image')) {
-                // Delete old image if exists
-                if ($expense->image && \Storage::disk('public')->exists($expense->image)) {
-                    \Storage::disk('public')->delete($expense->image);
+                // Delete old images if exist
+                if ($expense->images && is_array($expense->images)) {
+                    $expense->deleteMultipleImages($expense->images);
                 }
-                if ($expense->image_path && \Storage::disk('public')->exists($expense->image_path)) {
-                    \Storage::disk('public')->delete($expense->image_path);
-                }
+                // Delete old single images for backward compatibility
+                // if ($expense->image && \Storage::disk('public')->exists($expense->image)) {
+                //     \Storage::disk('public')->delete($expense->image);
+                // }
+                // if ($expense->image_path && \Storage::disk('public')->exists($expense->image_path)) {
+                //     \Storage::disk('public')->delete($expense->image_path);
+                // }
 
-                // Store new image
-                $imagePath = $request->file('image')->store('expenses', 'public');
-                $data['image'] = $imagePath;
-                $data['image_path'] = $imagePath;
+                // Store new images
+                $imagePaths = $expense->uploadMultipleImages($request->file('image'), 'expenses');
+                $data['images'] = $imagePaths;
             }
             $data["verified"] = 0 ; // Reset verified status on update
             $data['handled_by'] = auth()->id();
@@ -340,7 +345,12 @@ class ExpensesController extends Controller
                     $bankAccount->increment('balance', $expense->price);
             }
 
-            // Delete image files if they exist
+            // Delete multiple images if they exist
+            if ($expense->images && is_array($expense->images)) {
+                $expense->deleteMultipleImages($expense->images);
+            }
+            
+            // Delete old single images for backward compatibility
             if ($expense->image && \Storage::disk('public')->exists($expense->image)) {
                 \Storage::disk('public')->delete($expense->image);
             }

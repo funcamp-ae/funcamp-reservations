@@ -178,4 +178,46 @@ trait ImageUploadTrait
         
         return $imagePath;
     }
+
+    /**
+     * Upload multiple images and return array of paths
+     *
+     * @param array $images Array of UploadedFile objects
+     * @param string $directory
+     * @return array
+     */
+    public function uploadMultipleImages(array $images, string $directory = 'images'): array
+    {
+        $uploadedPaths = [];
+
+        foreach ($images as $image) {
+            if ($image instanceof UploadedFile) {
+                $uploadedPaths[] = $this->uploadImage($image, $directory);
+            }
+        }
+
+        return $uploadedPaths;
+    }
+
+    /**
+     * Delete multiple images from storage
+     *
+     * @param array|null $imagePaths
+     * @return bool
+     */
+    public function deleteMultipleImages(array $imagePaths = null): bool
+    {
+        if (!$imagePaths || empty($imagePaths)) {
+            return false;
+        }
+
+        $allDeleted = true;
+        foreach ($imagePaths as $imagePath) {
+            if (!$this->deleteImage($imagePath)) {
+                $allDeleted = false;
+            }
+        }
+
+        return $allDeleted;
+    }
 }

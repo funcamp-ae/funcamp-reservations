@@ -969,6 +969,8 @@ return [
     'terms' => 'Terms and Conditions',
     'old_date_vs_new_date' => 'Old date / New date',
     'upload_or_take_image' => 'Upload Or take image',
+    'you_can_upload_multiple_images' => 'You can upload multiple images',
+    'selected_images' => 'Selected Images',
     'orders_payments' => 'Orders Payments',
     'rows' => 'Rows',
     'total' => 'Total',

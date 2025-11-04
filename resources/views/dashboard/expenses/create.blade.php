@@ -103,26 +103,49 @@
 
                                     <div class="form-group col-6 mt-5">
                                         <label for="image">@lang('dashboard.upload_or_take_image')</label>
-                                        <input type="file" name="image" id="image"
+                                        <input type="file" name="image[]" id="image"
                                             class="form-control"
                                             accept="image/*"
-                                            capture="environment">
-                                        @if(isset($expense) && ($expense->image_path || $expense->image))
-                                            <div class="mt-2">
-                                                <p class="text-muted">@lang('dashboard.existing_attachments'):</p>
-                                                @php
-                                                    $imagePath = $expense->image_path ?? $expense->image;
-                                                @endphp
-                                                <img src="{{ asset('storage/' . $imagePath) }}" alt="@lang('dashboard.attached')" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
-                                                <br>
-                                                <button type="button" class="btn btn-sm btn-primary mt-2" onclick="previewImage('{{ asset('storage/' . $imagePath) }}', '{{ $expense->id }}')">
-                                                    <i class="fas fa-eye"></i> @lang('dashboard.view')
-                                                </button>
-                                                <a href="{{ route('expenses.download_image', $expense->id) }}" class="btn btn-sm btn-success mt-2" target="_blank">
-                                                    <i class="fas fa-download"></i> @lang('dashboard.download')
-                                                </a>
+                                            capture="environment"
+                                            multiple>
+                                        <small class="form-text text-muted">@lang('dashboard.you_can_upload_multiple_images')</small>
+                                        
+                                        @if(isset($expense) && (($expense->images && count($expense->images) > 0) || $expense->image_path || $expense->image))
+                                            <div class="mt-3">
+                                                <p class="text-muted fw-bold">@lang('dashboard.existing_attachments'):</p>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @php
+                                                        $images = [];
+                                                        if($expense->images && is_array($expense->images) && count($expense->images) > 0) {
+                                                            $images = $expense->images;
+                                                        } elseif($expense->image_path || $expense->image) {
+                                                            $images[] = $expense->image_path ?? $expense->image;
+                                                        }
+                                                    @endphp
+                                                    
+                                                    @foreach($images as $index => $imagePath)
+                                                        <div class="position-relative">
+                                                            <img src="{{ asset('storage/' . $imagePath) }}" 
+                                                                 alt="@lang('dashboard.attached')" 
+                                                                 class="img-thumbnail" 
+                                                                 style="max-width: 150px; max-height: 100px; cursor: pointer;"
+                                                                 onclick="previewImage('{{ asset('storage/' . $imagePath) }}', '{{ $expense->id }}', {{ $index }})">
+                                                            <div class="mt-1">
+                                                                <button type="button" class="btn btn-sm btn-primary" onclick="previewImage('{{ asset('storage/' . $imagePath) }}', '{{ $expense->id }}', {{ $index }})">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
                                             </div>
                                         @endif
+                                        
+                                        <!-- Image Preview Container -->
+                                        <div id="imagePreviewContainer" class="mt-3 d-none">
+                                            <p class="text-muted fw-bold">@lang('dashboard.selected_images'):</p>
+                                            <div id="imagePreviewList" class="d-flex flex-wrap gap-2"></div>
+                                        </div>
                                     </div>                                                    <div class="form-group col-6 mt-5">
                                                         <label for="price" class="required">{{ __('dashboard.amount') }}</label>
                                                         <input type="number" step="any" name="price" id="price" class="form-control" required value="{{ isset($expense) ? $expense->price : old('price') }}">
@@ -239,16 +262,22 @@
                                         @endcan
                                     </td>
                                     <td>
-                                        @if($expense->image_path || $expense->image)
                                             @php
-                                                $imagePath = $expense->image_path ?? $expense->image;
+                                                $images = [];
+                                                if($expense->images && is_array($expense->images) && count($expense->images) > 0) {
+                                                    $images = $expense->images;
+                                                } elseif($expense->image_path || $expense->image) {
+                                                    $images[] = $expense->image_path ?? $expense->image;
+                                                }
                                             @endphp
-                                            <button type="button" class="btn btn-sm btn-primary" onclick="previewImage('{{ asset('storage/' . $imagePath) }}', '{{ $expense->id }}')">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        @else
-                                            <span class="text-muted">{{ __('dashboard.no_data') }}</span>
-                                        @endif
+                                            
+                                            @if(count($images) > 0)
+                                                <button type="button" class="btn btn-sm btn-primary d-flex gap-2 align-items-center justify-content-center" onclick="previewMultipleImages({{ json_encode(array_map(fn($img) => asset('storage/' . $img), $images)) }}, '{{ $expense->id }}')">
+                                                    <span> {{ count($images) }}</span><i class="fas fa-eye"></i> 
+                                                </button>
+                                            @else
+                                                <span class="text-muted">{{ __('dashboard.no_data') }}</span>
+                                            @endif
                                     </td>
                                     <!--begin::By-->
                                     <td>
@@ -313,19 +342,36 @@
 
 <!-- Image Preview Modal -->
 <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="imagePreviewModalLabel">@lang('dashboard.attached')</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center">
-                <img id="previewImage" src="" alt="@lang('dashboard.attached')" class="img-fluid" style="max-height: 500px;">
+            <div class="modal-body">
+                <!-- Image Carousel for multiple images -->
+                <div id="imageCarousel" class="carousel slide" data-bs-ride="false">
+                    <div class="carousel-inner text-center" id="carouselInner">
+                        <!-- Images will be injected here -->
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev" id="carouselPrevBtn" style="display: none;">
+                        <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next" id="carouselNextBtn" style="display: none;">
+                        <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                <!-- Thumbnails -->
+                <div id="imageThumbnails" class="d-flex justify-content-center flex-wrap gap-2 mt-3" style="display: none !important;">
+                    <!-- Thumbnails will be injected here -->
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@lang('dashboard.close')</button>
                 <a id="downloadImageBtn" href="" download class="btn btn-primary">
-                    <i class="fas fa-download"></i> @lang('dashboard.save_changes')
+                    <i class="fas fa-download"></i> @lang('dashboard.download')
                 </a>
             </div>
         </div>
@@ -400,7 +446,15 @@
                     <div class="row mb-3">
                         <label class="col-lg-12 col-form-label fw-bold fs-6">{{ __('dashboard.upload_or_take_image') }}</label>
                         <div class="col-lg-12">
-                            <input type="file" name="image" id="editImage" class="form-control form-control-lg form-control-solid" accept="image/*" capture="environment">
+                            <input type="file" name="image[]" id="editImage" class="form-control form-control-lg form-control-solid" accept="image/*" capture="environment" multiple>
+                            <small class="form-text text-muted">@lang('dashboard.you_can_upload_multiple_images')</small>
+                        </div>
+                        <!-- Preview container for edit modal -->
+                        <div class="col-lg-12 mt-2">
+                            <div id="editImagePreviewContainer" class="d-none">
+                                <p class="text-muted fw-bold">@lang('dashboard.selected_images'):</p>
+                                <div id="editImagePreviewList" class="d-flex flex-wrap gap-2"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -465,15 +519,128 @@
 
     $("#expense_item_id").select2();
 
-    // Image preview function
-    function previewImage(imageSrc, expenseId) {
-        document.getElementById('previewImage').src = imageSrc;
-        document.getElementById('downloadImageBtn').href = imageSrc;
+    // Image preview function for single image (backward compatibility)
+    function previewImage(imageSrc, expenseId, index = 0) {
+        previewMultipleImages([imageSrc], expenseId, index);
+    }
 
+    // Image preview function for multiple images
+    function previewMultipleImages(imageSources, expenseId, startIndex = 0) {
+        const carouselInner = document.getElementById('carouselInner');
+        const thumbnailsContainer = document.getElementById('imageThumbnails');
+        const carouselPrevBtn = document.getElementById('carouselPrevBtn');
+        const carouselNextBtn = document.getElementById('carouselNextBtn');
+        
+        // Clear previous content
+        carouselInner.innerHTML = '';
+        thumbnailsContainer.innerHTML = '';
+        
+        // Create carousel items
+        imageSources.forEach((src, index) => {
+            const item = document.createElement('div');
+            item.className = 'carousel-item' + (index === startIndex ? ' active' : '');
+            item.innerHTML = `<img src="${src}" class="d-block img-fluid mx-auto" style="max-height: 600px;" alt="Image ${index + 1}">`;
+            carouselInner.appendChild(item);
+            
+            // Create thumbnail
+            const thumb = document.createElement('img');
+            thumb.src = src;
+            thumb.className = 'img-thumbnail' + (index === startIndex ? ' border-primary' : '');
+            thumb.style.cssText = 'width: 80px; height: 80px; object-fit: cover; cursor: pointer;';
+            thumb.onclick = () => {
+                const carousel = new bootstrap.Carousel(document.getElementById('imageCarousel'));
+                carousel.to(index);
+            };
+            thumbnailsContainer.appendChild(thumb);
+        });
+        
+        // Show/hide carousel controls based on number of images
+        if (imageSources.length > 1) {
+            carouselPrevBtn.style.display = 'block';
+            carouselNextBtn.style.display = 'block';
+            thumbnailsContainer.style.display = 'flex';
+        } else {
+            carouselPrevBtn.style.display = 'none';
+            carouselNextBtn.style.display = 'none';
+            thumbnailsContainer.style.display = 'none';
+        }
+        
+        // Set download button to first image
+        document.getElementById('downloadImageBtn').href = imageSources[startIndex];
+        
+        // Update download button when carousel slides
+        document.getElementById('imageCarousel').addEventListener('slid.bs.carousel', function (e) {
+            document.getElementById('downloadImageBtn').href = imageSources[e.to];
+        });
+        
         // Show the modal
         var modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
         modal.show();
     }
+
+    // Preview selected images before upload (main form)
+    document.getElementById('image').addEventListener('change', function(e) {
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        const previewList = document.getElementById('imagePreviewList');
+        previewList.innerHTML = '';
+        
+        if (this.files.length > 0) {
+            previewContainer.classList.remove('d-none');
+            
+            // Create placeholder divs first to maintain order
+            const placeholders = [];
+            Array.from(this.files).forEach((file, index) => {
+                const div = document.createElement('div');
+                div.className = 'position-relative';
+                div.setAttribute('data-index', index);
+                previewList.appendChild(div);
+                placeholders.push(div);
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    placeholders[index].innerHTML = `
+                        <img src="${e.target.result}" class="img-thumbnail" style="max-width: 150px; max-height: 100px; object-fit: cover;">
+                        <span class="badge bg-primary position-absolute top-0 start-0 m-1">${index + 1}</span>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            });
+        } else {
+            previewContainer.classList.add('d-none');
+        }
+    });
+
+    // Preview selected images before upload (edit modal)
+    document.getElementById('editImage').addEventListener('change', function(e) {
+        const previewContainer = document.getElementById('editImagePreviewContainer');
+        const previewList = document.getElementById('editImagePreviewList');
+        previewList.innerHTML = '';
+        
+        if (this.files.length > 0) {
+            previewContainer.classList.remove('d-none');
+            
+            // Create placeholder divs first to maintain order
+            const placeholders = [];
+            Array.from(this.files).forEach((file, index) => {
+                const div = document.createElement('div');
+                div.className = 'position-relative';
+                div.setAttribute('data-index', index);
+                previewList.appendChild(div);
+                placeholders.push(div);
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    placeholders[index].innerHTML = `
+                        <img src="${e.target.result}" class="img-thumbnail" style="max-width: 150px; max-height: 100px; object-fit: cover;">
+                        <span class="badge bg-primary position-absolute top-0 start-0 m-1">${index + 1}</span>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            });
+        } else {
+            previewContainer.classList.add('d-none');
+        }
+    });
 
     // Open Edit Modal and populate fields
     window.openEditModal = function(expenseId, accountId, expenseItemId, paymentMethod, date, price, notes) {

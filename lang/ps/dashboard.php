@@ -325,6 +325,8 @@ return [
     'items_from_stocks' => 'د ذخیرې څخه توکي',
     'image_before_receiving' => 'د ترلاسه کولو څخه مخکې انځور',
     'upload_or_take_image' => 'انځور ضمیمه کړئ (پورته کول/اخیستل)',
+    'you_can_upload_multiple_images' => 'تاسو کولی شئ ډیر انځورونه پورته کړئ',
+    'selected_images' => 'ټاکل شوي انځورونه',
     'orders_payments' => 'د ریزرویشن عواید',
     'full_price' => 'ټولیز د پیرودلو مبلغ',
     "verified_orders" => 'تایید شوي ریزرویشنونه',

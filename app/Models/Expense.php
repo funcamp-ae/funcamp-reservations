@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\ImageUploadTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Expense extends Model
 {
-    use HasFactory;
+    use HasFactory, ImageUploadTrait;
+    
     protected $guarded = [];
     protected $fillable = [
         'expense_item_id', 
@@ -20,8 +22,12 @@ class Expense extends Model
         'account_id', 
         'order_id', 
         'verified', 
-        'image_path',
+        'images',
         'handled_by'
+    ];
+
+    protected $casts = [
+        'images' => 'array',
     ];
 
     public function expenseItem()

@@ -316,6 +316,8 @@ return [
     'items_from_stocks' => 'عناصر من المخزن',
     'image_before_receiving' => 'صورة قبل التسليم',
     'upload_or_take_image' => 'إرفاق صورة (رفع/التقاط)',
+    'you_can_upload_multiple_images' => 'يمكنك رفع عدة صور',
+    'selected_images' => 'الصور المختارة',
     'orders_payments' => 'إيرادات الحجوزات',
     'full_price' => 'مبلغ الشراء اإلجمالي',
     "verified_orders" => 'الحجوزات المعتمدة',
