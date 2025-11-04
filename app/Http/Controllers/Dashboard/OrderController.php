@@ -702,6 +702,7 @@ class OrderController extends Controller
                 $discountNote = null;
                 if ($isFromOld && ($discountOld > 0 || $discountInv > 0)) {
                     $discountNote = __('dashboard.stock_count_note', [
+                        'count' => $quantity,
                         'old_discount' => number_format($discountOld, 2),
                         'inventory_discount' => number_format($discountInv, 2)
                     ]);
@@ -714,7 +715,7 @@ class OrderController extends Controller
                     'is_from_old_reservation' => $isFromOld,
                     'discount_from_old_reservation' => $isFromOld ? $discountOld : null,
                     'discount_from_inventory' => $isFromOld ? $discountInv : null,
-                    'discount_note' => $discountNote,
+                    'discount_note' => "discount_note",
                 ];
                 
                 // Use Query Builder directly to ensure all columns are updated
