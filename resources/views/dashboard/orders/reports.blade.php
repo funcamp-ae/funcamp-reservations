@@ -194,6 +194,7 @@
                                                     @lang('dashboard.from_old_reservation')
                                                 </label>
                                             </div>
+                                            @can("bookings.reports.old_reservation_stock_option")
                                             <div class="discount-fields-stock mt-2" id="discount-fields-stock-{{ $stock->pivot->id }}" style="display: {{ $stock->pivot && $stock->pivot->is_from_old_reservation ? 'block' : 'none' }};">
                                                 <div class="row g-2">
                                                     <div class="col-6">
@@ -206,6 +207,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            @endcan
                                         </div>
                                     </div>
                                 </td>
@@ -420,33 +422,37 @@
             }
         });
 
-        // Toggle discount fields for reports
-        $('.from-old-reservation-check').on('change', function() {
-            var reportId = $(this).data('report-id');
-            var discountFields = $('#discount-fields-' + reportId);
-            if ($(this).is(':checked')) {
-                discountFields.slideDown();
-            } else {
-                discountFields.slideUp();
-                // Clear values when unchecked
-                discountFields.find('input').val('');
-            }
-        });
-
-        // Toggle discount fields for stocks
-        $('.from-old-reservation-check-stock').on('change', function() {
-            var stockId = $(this).data('stock-id');
-            var discountFields = $('#discount-fields-stock-' + stockId);
-            if ($(this).is(':checked')) {
-                discountFields.slideDown();
-            } else {
-                discountFields.slideUp();
-                // Clear values when unchecked
-                discountFields.find('input').val('');
-            }
-        });
     });
 </script>
+@can("bookings.reports.old_reservation_stock_option")
+<script>
+// Toggle discount fields for reports
+$('.from-old-reservation-check').on('change', function() {
+    var reportId = $(this).data('report-id');
+    var discountFields = $('#discount-fields-' + reportId);
+    if ($(this).is(':checked')) {
+        discountFields.slideDown();
+    } else {
+        discountFields.slideUp();
+        // Clear values when unchecked
+        discountFields.find('input').val('');
+    }
+});
+
+// Toggle discount fields for stocks
+$('.from-old-reservation-check-stock').on('change', function() {
+    var stockId = $(this).data('stock-id');
+    var discountFields = $('#discount-fields-stock-' + stockId);
+    if ($(this).is(':checked')) {
+        discountFields.slideDown();
+    } else {
+        discountFields.slideUp();
+        // Clear values when unchecked
+        discountFields.find('input').val('');
+    }
+});
+</script>
+@endcan
 @endpush
 
 @push('css')
