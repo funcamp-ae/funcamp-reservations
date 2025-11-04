@@ -656,6 +656,7 @@ class OrderController extends Controller
 
     public function updateReports(Request $request, $id)
     {
+        \Log::info('Request all', $request->all());
         $this->updateStock($request->all());
         $data = $request->validate([
             'ordered_count.*' => 'nullable|numeric|min:1',
@@ -688,6 +689,15 @@ class OrderController extends Controller
 
     private function updateStock(array $data): void
     {
+        // Log incoming data
+        \Log::info('updateStock called', [
+            'has_stock' => isset($data['stock']),
+            'stock_ids' => isset($data['stock']) ? array_keys($data['stock']) : [],
+            'has_is_from_old_reservation_stock' => isset($data['is_from_old_reservation_stock']),
+            'has_discount_from_old_reservation_stock' => isset($data['discount_from_old_reservation_stock']),
+            'has_discount_from_inventory_stock' => isset($data['discount_from_inventory_stock']),
+        ]);
+        
         if (isset($data['stock'])) {
             foreach ($data['stock'] as $stockId => $status) {
                 $pivot = FacadesDB::table('service_stock')->whereId($stockId);
@@ -707,7 +717,7 @@ class OrderController extends Controller
                     ]);
                 }
                 
-                $pivot->update([
+                $updateData = [
                     'is_completed' => ($status === 'completed') ? true : false,
                     'not_completed_reason' => $data['not_completed_reason_stock'][$stockId] ?? null,
                     'placed_qty' => $quantity,
@@ -715,6 +725,34 @@ class OrderController extends Controller
                     'discount_from_old_reservation' => $isFromOld ? $discountOld : null,
                     'discount_from_inventory' => $isFromOld ? $discountInv : null,
                     'discount_note' => $discountNote,
+                ];
+                
+                // Log before update
+                \Log::info("Updating stock ID: {$stockId}", [
+                    'status' => $status,
+                    'isFromOld' => $isFromOld,
+                    'discountOld' => $discountOld,
+                    'discountInv' => $discountInv,
+                    'quantity' => $quantity,
+                    'discountNote' => $discountNote,
+                    'updateData' => $updateData,
+                ]);
+                
+                $result = $pivot->update($updateData);
+                
+                // Log after update
+                \Log::info("Stock update result for ID: {$stockId}", [
+                    'affected_rows' => $result,
+                    'updated_data' => $updateData,
+                ]);
+                
+                // Verify the update
+                $updated = FacadesDB::table('service_stock')->where('id', $stockId)->first();
+                \Log::info("Verified stock ID: {$stockId}", [
+                    'is_from_old_reservation' => $updated->is_from_old_reservation ?? 'NOT FOUND',
+                    'discount_from_old_reservation' => $updated->discount_from_old_reservation ?? 'NOT FOUND',
+                    'discount_from_inventory' => $updated->discount_from_inventory ?? 'NOT FOUND',
+                    'discount_note' => $updated->discount_note ?? 'NOT FOUND',
                 ]);
             }
         }
