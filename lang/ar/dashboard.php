@@ -322,7 +322,7 @@ return [
     'discount_from_old_reservation' => 'الخصم من الحجز السابق',
     'discount_from_inventory' => 'الخصم من المخزون',
     'discount_note' => 'ملاحظة الخصم',
-    'stock_count_note' => 'عدد المخزون هو :count والعدد/النسبة المخصومة من الحجز السابق هو :old_discount والمخصوم من المخزون هو :inventory_discount',
+    'stock_count_note' => 'النسبة/العدد المخصوم من الحجز السابق هو :old_discount والمخصوم من المخزون هو :inventory_discount',
     'orders_payments' => 'إيرادات الحجوزات',
     'full_price' => 'مبلغ الشراء اإلجمالي',
     "verified_orders" => 'الحجوزات المعتمدة',

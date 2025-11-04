@@ -203,7 +203,7 @@
                                     {{ $stock->pivot->count }}
                                     <!-- <input type="hidden" class="form-control text-muted" value="{{ $stock->pivot->count ?? '' }}"> -->
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center w-300">
                                     <div class="d-flex flex-column gap-2 align-items-center">
                                         <div class="d-flex justify-content-center align-items-center gap-2 w-100">
                                             <input type="number" value="{{ $stock->pivot->placed_qty ? $stock->pivot->placed_qty : $stock->pivot->count }}" name="placed_qty[{{ $stock->pivot->id }}]" class="form-control" >
