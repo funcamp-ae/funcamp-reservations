@@ -111,15 +111,9 @@
                                     <!--end::Label-->
                                     <!--begin::Col-->
                                     <div class="col-lg-8 fv-row fv-plugins-icon-container">
-                                    <textarea name="description" rows="3"
-                                              class="form-control form-control-lg form-control-solid"
-                                              placeholder="@lang('dashboard.task_type_description')">{{
-                                                preg_replace('/\R+/', "\n",
-                                                    isset($taskType) ?
-                                                    strip_tags($taskType->description) :
-                                                    strip_tags(old('description'))
-                                                )
-                                             }}</textarea>
+                                        <textarea name="description" rows="3"
+                                                  class="form-control form-control-lg form-control-solid"
+                                                  placeholder="@lang('dashboard.task_type_description')">{{ isset($taskType) ? $taskType->description : old('description') }}</textarea>
                                         <div class="fv-plugins-message-container invalid-feedback"></div>
                                         @error('description')
                                             <div class="invalid-feedback d-block">{{ $message }}</div>
