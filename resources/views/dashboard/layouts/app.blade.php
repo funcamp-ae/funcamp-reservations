@@ -583,8 +583,8 @@ a.btn-primary{
 	.w-fit {
 		width : fit-content ;
 	}
-	.w-300 {
-		width : 300px !important ;
+	.w-350 {
+		width : 350px !important ;
 	}
 	.gap-25 {
 		gap: 7rem !important;

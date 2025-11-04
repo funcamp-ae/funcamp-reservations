@@ -203,7 +203,7 @@
                                     {{ $stock->pivot->count }}
                                     <!-- <input type="hidden" class="form-control text-muted" value="{{ $stock->pivot->count ?? '' }}"> -->
                                 </td>
-                                <td class="text-center w-300">
+                                <td class="text-center w-350">
                                     <div class="d-flex flex-column gap-2 align-items-center">
                                         <div class="d-flex justify-content-center align-items-center gap-2 w-100">
                                             <input type="number" value="{{ $stock->pivot->placed_qty ? $stock->pivot->placed_qty : $stock->pivot->count }}" name="placed_qty[{{ $stock->pivot->id }}]" class="form-control" >
@@ -221,7 +221,7 @@
                                         </div>
                                         
                                         <!-- Discount Section for Stock -->
-                                        <div class="mt-2 w-100">
+                                        <div class="mt-2 w-350">
                                             <div class="form-check">
                                                 <input class="form-check-input from-old-reservation-check-stock" type="checkbox" name="is_from_old_reservation_stock[{{ $stock->pivot->id }}]" id="from-old-stock-{{ $stock->pivot->id }}" value="1" {{ $stock->pivot && $stock->pivot->is_from_old_reservation ? 'checked' : '' }} data-stock-id="{{ $stock->pivot->id }}">
                                                 <label class="form-check-label fw-bold" for="from-old-stock-{{ $stock->pivot->id }}">
