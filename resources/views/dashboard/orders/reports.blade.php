@@ -114,11 +114,6 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    @if($report && $report->discount_note)
-                                                    <div class="alert alert-info mt-2 small mb-0">
-                                                        <i class="fa fa-info-circle me-1"></i> {{ $report->discount_note }}
-                                                    </div>
-                                                    @endif
                                                 </div>
                                             </div>
                                         </td>
@@ -154,11 +149,6 @@
                                                             @lang('dashboard.from_old_reservation')
                                                         </label>
                                                     </div>
-                                                    @if($report->discount_note)
-                                                    <div class="alert alert-info mt-2 small mb-0">
-                                                        <i class="fa fa-info-circle me-1"></i> {{ $report->discount_note }}
-                                                    </div>
-                                                    @endif
                                                 </div>
                                                 @endif
                                             </div>
@@ -196,6 +186,7 @@
                                 <th class="text-center">@lang('dashboard.required_qty')</th>
                                 <th class="text-center">@lang('dashboard.placed_qty')</th>
                                 <th class="text-center">@lang('dashboard.completion_status')</th>
+                                <th class="text-center">@lang('dashboard.discount_note')</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -249,11 +240,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            @if($stock->pivot && $stock->pivot->discount_note)
-                                            <div class="alert alert-info mt-2 small mb-0">
-                                                <i class="fa fa-info-circle me-1"></i> {{ $stock->pivot->discount_note }}
-                                            </div>
-                                            @endif
                                         </div>
                                     </div>
                                 </td>
@@ -272,6 +258,15 @@
                                             <textarea class="form-control incomplete-reason" rows="2" name="not_completed_reason_stock[{{ $stock->pivot->id }}]" data-report="{{ $stock->pivot->id }}">{{ $stock ? $stock->pivot->not_completed_reason : '' }}</textarea>
                                         </div>
                                     </div>
+                                </td>
+                                <td class="text-center">
+                                    @if($stock->pivot && $stock->pivot->discount_note)
+                                    <div class="alert alert-info small mb-0">
+                                        <i class="fa fa-info-circle me-1"></i> {{ $stock->pivot->discount_note }}
+                                    </div>
+                                    @else
+                                    —
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach

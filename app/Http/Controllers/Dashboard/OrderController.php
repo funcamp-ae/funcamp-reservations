@@ -665,9 +665,6 @@ class OrderController extends Controller
             'not_completed_reason' => 'nullable|array',
             'reports' => 'nullable|array',
             'report_text' => 'nullable|string',
-            'is_from_old_reservation' => 'nullable|array',
-            'discount_from_old_reservation' => 'nullable|array',
-            'discount_from_inventory' => 'nullable|array',
         ]);
         FacadesDB::transaction(function () use ($data) {
             foreach ($data['reports'] as $id => $status) {
