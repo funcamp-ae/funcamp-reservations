@@ -702,7 +702,6 @@ class OrderController extends Controller
                 $discountNote = null;
                 if ($isFromOld && ($discountOld > 0 || $discountInv > 0)) {
                     $discountNote = __('dashboard.stock_count_note', [
-                        'count' => $quantity,
                         'old_discount' => number_format($discountOld, 2),
                         'inventory_discount' => number_format($discountInv, 2)
                     ]);
