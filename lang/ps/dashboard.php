@@ -331,7 +331,7 @@ return [
     'discount_from_old_reservation' => 'د زاړه ریزرویشن څخه تخفیف',
     'discount_from_inventory' => 'د انوینټري څخه تخفیف',
     'discount_note' => 'د تخفیف یادښت',
-    'discount_note' => 'د زاړه ریزرویشن څخه تخفیف شوی شمیر/فیصدي :old_discount دی او د انوینټري څخه تخفیف :inventory_discount دی',
+    'discount_note_message' => 'د زاړه ریزرویشن څخه تخفیف شوی شمیر/فیصدي :old_discount دی او د انوینټري څخه تخفیف :inventory_discount دی',
     'orders_payments' => 'د ریزرویشن عواید',
     'full_price' => 'ټولیز د پیرودلو مبلغ',
     "verified_orders" => 'تایید شوي ریزرویشنونه',

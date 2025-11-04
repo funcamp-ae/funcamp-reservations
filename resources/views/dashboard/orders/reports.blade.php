@@ -263,7 +263,7 @@
                                     @if($stock->pivot && $stock->pivot->discount_note)
                                     <div class="alert alert-info small mb-0">
                                         <i class="fa fa-info-circle me-1"></i> 
-                                        {{__("dashboard.".$stock->pivot->discount_note , ['old_discount' => number_format($stock->pivot->old_discount, 2),'inventory_discount' => number_format($stock->pivot->inventory_discount, 2)]) }}
+                                        {{__("dashboard.".$stock->pivot->discount_note, ['old_discount' => number_format($stock->pivot->discount_from_old_reservation, 2), 'inventory_discount' => number_format($stock->pivot->discount_from_inventory, 2)]) }}
                                     </div>
                                     @else
                                     —

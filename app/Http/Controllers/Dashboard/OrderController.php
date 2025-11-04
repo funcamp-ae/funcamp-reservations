@@ -698,14 +698,10 @@ class OrderController extends Controller
                 $discountInv = $data['discount_from_inventory_stock'][$stockId] ?? 0;
                 $quantity = $data['placed_qty'][$stockId] ?? 0;
                 
-                // Generate discount note
+                // Save just the translation key (without "dashboard." prefix)
                 $discountNote = null;
                 if ($isFromOld && ($discountOld > 0 || $discountInv > 0)) {
-                    $discountNote = __('dashboard.stock_count_note', [
-                        'count' => $quantity,
-                        'old_discount' => number_format($discountOld, 2),
-                        'inventory_discount' => number_format($discountInv, 2)
-                    ]);
+                    $discountNote = 'discount_note_message';
                 }
                 
                 $updateData = [
@@ -715,7 +711,7 @@ class OrderController extends Controller
                     'is_from_old_reservation' => $isFromOld,
                     'discount_from_old_reservation' => $isFromOld ? $discountOld : null,
                     'discount_from_inventory' => $isFromOld ? $discountInv : null,
-                    'discount_note' => "discount_note",
+                    'discount_note' => $discountNote,
                 ];
                 
                 // Use Query Builder directly to ensure all columns are updated
