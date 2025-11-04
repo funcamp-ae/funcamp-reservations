@@ -75,15 +75,51 @@
                     <div id="kt_account_settings_profile_details" class="collapse show">
                         <!--begin::Form-->
                         <form id="kt_task_form" method="POST"
-                              action="{{ isset($task) ? route('tasks.update', $task->id) : route('tasks.store') }}"
-                              class="form fv-plugins-bootstrap5 fv-plugins-framework"
-                              data-kt-redirect="{{ route('tasks.index') }}"
-                              novalidate="novalidate">
-                            @csrf
+                        action="{{ isset($task) ? route('tasks.update', $task->id) : route('tasks.store') }}"
+                        class="form fv-plugins-bootstrap5 fv-plugins-framework"
+                        data-kt-redirect="{{ route('tasks.index') }}"
+                        novalidate="novalidate">
+                        @csrf
                             @if(isset($task)) @method('PUT') @endif
-
+                            
                             <!--begin::Card body-->
                             <div class="card-body border-top p-9">
+                                <!--begin::Input group-->
+                                <div class="row mb-6">
+                                    <!--begin::Label-->
+                                    <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.task_type')</label>
+                                    <!--end::Label-->
+                                    <!--begin::Col-->
+                                    <div class="col-lg-8 fv-row fv-plugins-icon-container">
+                                        <div class="d-flex gap-2">
+                                            <select name="task_type_id" id="task_type_select" aria-label="Select Task Type"
+                                                    data-control="select2" data-placeholder="@lang('dashboard.select_task_type')"
+                                                    class="form-select form-select-solid form-select-lg fw-bold flex-grow-1">
+                                                <option value="">@lang('dashboard.select_task_type')</option>
+                                                @foreach ($taskTypes as $taskType)
+                                                    <option value="{{ $taskType->id }}"
+                                                    data-name="{{ $taskType->name }}"
+                                                    data-description="{{ $taskType->description ?? '' }}"
+                                                    @if(isset($task))
+                                                        {{ $task->task_type_id == $taskType->id ? 'selected' : '' }}
+                                                        @else
+                                                        {{ old('task_type_id') == $taskType->id ? 'selected' : '' }}
+                                                        @endif
+                                                    >{{ $taskType->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskTypeModal">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
+                                        </div>
+                                        <div class="fv-plugins-message-container invalid-feedback"></div>
+                                        @error('task_type_id')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <!--end::Col-->
+                                </div>
+                                <!--end::Input group-->
                                 <!--begin::Input group-->
                                 <div class="row mb-6">
                                     <!--begin::Label-->
@@ -123,40 +159,6 @@
                                 </div>
                                 <!--end::Input group-->
 
-                                <!--begin::Input group-->
-                                <div class="row mb-6">
-                                    <!--begin::Label-->
-                                    <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.task_type')</label>
-                                    <!--end::Label-->
-                                    <!--begin::Col-->
-                                    <div class="col-lg-8 fv-row fv-plugins-icon-container">
-                                        <div class="d-flex gap-2">
-                                            <select name="task_type_id" id="task_type_select" aria-label="Select Task Type"
-                                                    data-control="select2" data-placeholder="@lang('dashboard.select_task_type')"
-                                                    class="form-select form-select-solid form-select-lg fw-bold flex-grow-1">
-                                                <option value="">@lang('dashboard.select_task_type')</option>
-                                                @foreach ($taskTypes as $taskType)
-                                                    <option value="{{ $taskType->id }}"
-                                                    @if(isset($task))
-                                                        {{ $task->task_type_id == $taskType->id ? 'selected' : '' }}
-                                                        @else
-                                                        {{ old('task_type_id') == $taskType->id ? 'selected' : '' }}
-                                                        @endif
-                                                    >{{ $taskType->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskTypeModal">
-                                                <i class="bi bi-plus-lg"></i>
-                                            </button>
-                                        </div>
-                                        <div class="fv-plugins-message-container invalid-feedback"></div>
-                                        @error('task_type_id')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <!--end::Col-->
-                                </div>
-                                <!--end::Input group-->
 
                                 <!--begin::Input group-->
                                 <div class="row mb-6">
@@ -410,6 +412,25 @@
             });
             @endif
 
+            // Handle task type selection to populate title and description
+            $('#task_type_select').on('change', function() {
+                var selectedOption = $(this).find('option:selected');
+                var taskTypeName = selectedOption.data('name') || selectedOption.text();
+                var taskTypeDescription = selectedOption.data('description') || '';
+                
+                // Only populate if a task type is selected and fields are empty (for new tasks)
+                @if(!isset($task))
+                if ($(this).val()) {
+                    if (!$('input[name="title"]').val()) {
+                        $('input[name="title"]').val(taskTypeName);
+                    }
+                    if (!$('textarea[name="description"]').val()) {
+                        $('textarea[name="description"]').val(taskTypeDescription);
+                    }
+                }
+                @endif
+            });
+
             // Handle Create Task Type Modal Form Submission
             $(document).ready(function() {
                 $('#createTaskTypeForm').on('submit', function(e) {
@@ -434,14 +455,21 @@
                     method: 'POST',
                     data: form.serialize(),
                     success: function(response) {                        
-                        // Add new option to Select2 dropdown
+                        // Add new option to Select2 dropdown with data attributes
                         var newOption = new Option(response.name, response.id, true, true);
+                        $(newOption).attr('data-name', response.name);
+                        $(newOption).attr('data-description', response.description || '');
+                        
                         var $select = $('#task_type_select');
                         
                         // Append the option and update Select2
                         $select.append(newOption);
                         $select.val(response.id);
                         $select.trigger('change');
+                        
+                        // Populate task title and description fields
+                        $('input[name="title"]').val(response.name);
+                        $('textarea[name="description"]').val(response.description || '');
                         
                         // Close modal
                         $('#createTaskTypeModal').modal('hide');
