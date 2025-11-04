@@ -321,7 +321,7 @@
             </table>
         </div>
     @endif
-    @if($order->addons->filter(fn($addon) => $addon->pivot->verified == 1)->isNotEmpty())
+    @if($order->addons->isNotEmpty())
         <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
             <!-- Table for reservation details -->
             <table class="details-table">
@@ -336,7 +336,6 @@
                 </thead>
                 <tbody>
                 @foreach ($order->addons as $index => $addon)
-                    @if($addon->pivot->verified == 1)
                         <tr>
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $addon->name }}</td>
@@ -345,7 +344,6 @@
                             <td>{{ $addon->pivot->price * $addon->pivot->count }} @lang('dashboard.RS')</td>
                         </tr>
                         @php $totalPrice += $addon->pivot->price * $addon->pivot->count; @endphp
-                    @endif
                 @endforeach
                 </tbody>
             </table>
