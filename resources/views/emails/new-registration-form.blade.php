@@ -171,7 +171,7 @@
             <div class="divider"></div>
 
             <div style="text-align: center;">
-                <a href="{{ route('registrationforms.index') }}" class="action-button">
+                <a href="{{ route('bookings.registeration-forms.index') }}" class="action-button">
                     عرض التفاصيل الكاملة →
                 </a>
             </div>
