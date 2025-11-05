@@ -38,11 +38,12 @@ class SendUnreadMessageNotifications extends Command
         $emailsSent = 0;
 
         try {
-            // Get all users who have unread messages
+            // Get all users who have unread messages that haven't been notified yet
             $usersWithUnreadMessages = DB::table('messages')
                 ->join('chats', 'messages.chat_id', '=', 'chats.id')
                 ->join('chat_users', 'chats.id', '=', 'chat_users.chat_id')
                 ->where('messages.is_read', false)
+                ->whereNull('messages.unread_notification_sent_at') // Only messages that haven't been notified
                 ->whereColumn('messages.user_id', '!=', 'chat_users.user_id')
                 ->select('chat_users.user_id')
                 ->distinct()
@@ -58,8 +59,19 @@ class SendUnreadMessageNotifications extends Command
                     continue;
                 }
 
-                // Get all unread messages for this user
-                $unreadMessages = Message::getUnreadMessages($userId);
+                // Get all chats where the user is a member
+                $userChats = Chat::whereHas('users', function($q) use ($userId) {
+                    $q->where('user_id', $userId);
+                })->pluck('id');
+
+                // Get unread messages that haven't been notified yet
+                $unreadMessages = Message::whereIn('chat_id', $userChats)
+                    ->where('user_id', '!=', $userId)  // Messages sent by others
+                    ->where('is_read', false)          // Messages not yet read
+                    ->whereNull('unread_notification_sent_at')  // Not yet notified
+                    ->with(['chat', 'user'])
+                    ->latest()
+                    ->get();
                 
                 if ($unreadMessages->isEmpty()) {
                     continue;
@@ -77,6 +89,10 @@ class SendUnreadMessageNotifications extends Command
                     Mail::to($user->email)->send(
                         new UnreadMessagesNotification($user, $unreadMessages, $totalUnread, $chatsWithUnread)
                     );
+
+                    // Mark messages as notified
+                    Message::whereIn('id', $unreadMessages->pluck('id'))
+                        ->update(['unread_notification_sent_at' => now()]);
 
                     $this->info("Email sent to {$user->name} ({$user->email}) - {$totalUnread} unread messages");
                     $emailsSent++;

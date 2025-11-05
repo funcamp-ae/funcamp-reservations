@@ -15,12 +15,14 @@ class Message extends Model
         'message',
         'type',
         'is_read',
-        'read_at'
+        'read_at',
+        'unread_notification_sent_at'
     ];
 
     protected $casts = [
         'is_read' => 'boolean',
         'read_at' => 'datetime',
+        'unread_notification_sent_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

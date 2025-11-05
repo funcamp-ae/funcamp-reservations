@@ -107,7 +107,6 @@
             display: inline-block;
             width: 24px;
             height: 24px;
-            background-color: #855839;
             color: white;
             border-radius: 50%;
             text-align: center;
@@ -118,7 +117,7 @@
     </style>
 </head>
 <body>
-    <div class="email-container">
+    <div class="email-container" dir="rtl">
         <!-- Header -->
         <div class="email-header">
             <h1>🔔 نموذج تسجيل جديد</h1>
@@ -142,29 +141,29 @@
 
             <table class="info-table">
                 <tr>
-                    <td><span class="icon">🔢</span> رقم الطلب:</td>
+                    <td><span class="icon"><i class="fas fa-hashtag"></i></span> رقم الطلب:</td>
                     <td><strong>{{ $registrationForm->request_code }}</strong></td>
                 </tr>
                 <tr>
-                    <td><span class="icon">👤</span> الاسم:</td>
-                    <td>{{ $registrationForm->name }}</td>
+                    <td><span class="icon"><i class="fas fa-user"></i></span> الاسم:</td>
+                    <td>{{ $registrationForm->first_name }} {{ $registrationForm->last_name }}</td>
                 </tr>
                 <tr>
-                    <td><span class="icon">📧</span> البريد الإلكتروني:</td>
+                    <td><span class="icon"><i class="fas fa-envelope"></i></span> البريد الإلكتروني:</td>
                     <td>{{ $registrationForm->email }}</td>
                 </tr>
                 <tr>
-                    <td><span class="icon">📱</span> رقم الهاتف:</td>
-                    <td>{{ $registrationForm->phone }}</td>
+                    <td><span class="icon"><i class="fas fa-phone"></i></span> رقم الهاتف:</td>
+                    <td>{{ $registrationForm->mobile_phone }}</td>
                 </tr>
                 @if($registrationForm->service)
                 <tr>
-                    <td><span class="icon">🎯</span> الخدمة:</td>
+                    <td><span class="icon"><i class="fas fa-concierge-bell"></i></span> المخيم:</td>
                     <td>{{ $registrationForm->service->name }}</td>
                 </tr>
                 @endif
                 <tr>
-                    <td><span class="icon">📅</span> تاريخ التقديم:</td>
+                    <td><span class="icon"><i class="fas fa-calendar-alt"></i></span> تاريخ التقديم:</td>
                     <td>{{ $registrationForm->created_at->format('Y-m-d H:i') }}</td>
                 </tr>
             </table>
@@ -172,7 +171,7 @@
             <div class="divider"></div>
 
             <div style="text-align: center;">
-                <a href="{{ url('/dashboard/registrationforms/' . $registrationForm->id) }}" class="action-button">
+                <a href="{{ route('registrationforms.index') }}" class="action-button">
                     عرض التفاصيل الكاملة →
                 </a>
             </div>

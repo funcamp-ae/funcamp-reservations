@@ -54,7 +54,7 @@ class Kernel extends ConsoleKernel
 
         // Send unread message notifications every 5 minutes
         $schedule->command('chat:send-unread-notifications')
-            ->everyFiveMinutes()
+            ->everySecond()
             ->appendOutputTo(storage_path('logs/unread-messages.log'));
 
         // * * * * * php /home/USERNAME/yourproject/artisan schedule:run >> /dev/null 2>&1
