@@ -14,6 +14,8 @@ class NewRegistrationFormNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $registrationForm;
+
     /**
      * Create a new message instance.
      *
