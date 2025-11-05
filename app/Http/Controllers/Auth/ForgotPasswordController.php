@@ -115,9 +115,9 @@ class ForgotPasswordController extends Controller
             $status = Password::reset(
                 $request->only('email', 'password', 'password_confirmation', 'token'),
                 function (User $user, string $password) {
-                    // Don't use Hash::make() here because setPasswordAttribute already hashes it
+                    // setPasswordAttribute mutator will automatically bcrypt() it
                     $user->password = $password;
-                    $user->setRememberToken(Str::random(60));
+                    $user->remember_token = Str::random(60);
                     $user->save();
                 }
             );
@@ -136,9 +136,9 @@ class ForgotPasswordController extends Controller
                 $user = User::where('phone', $tokenData->phone)->first();
                 
                 if ($user) {
-                    // Update password (setPasswordAttribute will hash it automatically)
+                    // setPasswordAttribute mutator will automatically bcrypt() it
                     $user->password = $request->password;
-                    $user->setRememberToken(Str::random(60));
+                    $user->remember_token = Str::random(60);
                     $user->save();
         
                     // Remove the token from password_resets table
