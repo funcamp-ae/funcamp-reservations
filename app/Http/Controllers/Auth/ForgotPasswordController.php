@@ -30,89 +30,131 @@ class ForgotPasswordController extends Controller
 
     use SendsPasswordResetEmails;
 
-    public function showResetForm(Request $request)
+    public function showLinkRequestForm()
     {
-        $token = $request->token;
-        $email = DB::table('password_resets')->where('token',$token)->first();
-      
-        if(!$email)
-        {
-            return redirect(route('login'))->withDanger('رابط غير صالح');
-        }
+        return view('auth.forgot-password');
+    }
 
-        $email = $email->email;
-        
-
-        return view('auth.passwords.reset', compact('token','email')); // Return the view for password reset form
+    public function showResetForm(Request $request, $token = null)
+    {
+        return view('auth.reset-password', ['token' => $token]);
     }
 
     public function sendResetLinkEmail(Request $request)
     {
-        // Validate the request
         $request->validate([
-            'email' => 'required|email',
+            'email' => 'required|string',
         ]);
 
-        $user = User::where('email', $request->email)->first();
-
-        if ($user) {
-            $token = Str::random(60); // Generate a random string for the token
-
-
-            DB::table('password_resets')->updateOrInsert([
-                'email' => $user->email,
-            ], [
-                'email' => $user->email,
-                'token' => $token,
-                'created_at' => Carbon::now(),
-            ]);
-
-            $actionUrl = route('password.reset', ['token' => $token]);
-    
-            Mail::to($user)->send(new ResetPassword($actionUrl));
-            
-            
-            return back()->withSuccess('تم أرسال الايميل بنجاح');
-            // Other logic
+        // Get the input (email or phone)
+        $identifier = $request->input('email');
+        
+        // Determine if the input is email or phone
+        $isEmail = filter_var($identifier, FILTER_VALIDATE_EMAIL);
+        
+        // If it's an email, use Laravel's Password facade
+        if ($isEmail) {
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
+        
+            return $status === Password::RESET_LINK_SENT
+                ? back()->with('success', __($status))
+                : back()->withErrors(['email' => __($status)]);
         } else {
-           return back()->withDanger('الايميل غير موجود او هنالك خطأ ما');
-        }
+            // For phone number, handle manually
+            $user = User::where('phone', $identifier)->first();
 
+            if ($user) {
+                $token = Str::random(60);
+
+                // Delete old tokens for this user
+                DB::table('password_resets')
+                    ->where('phone', $user->phone)
+                    ->delete();
+                    
+                // Insert new token
+                DB::table('password_resets')->insert([
+                    'phone' => $user->phone,
+                    'email' => null,
+                    'token' => $token,
+                    'created_at' => Carbon::now(),
+                ]);
+
+                $actionUrl = route('password.reset', ['token' => $token]);
+        
+                // Send email notification if user has email
+                if ($user->email) {
+                    Mail::to($user)->send(new ResetPassword($actionUrl));
+                    return back()->with('success', 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني');
+                } else {
+                    // If user has no email, they can use the reset link directly
+                    return back()->with('success', 'تم إنشاء رابط إعادة تعيين كلمة المرور. يرجى استخدام الرابط المرسل.');
+                }
+                
+            } else {
+               return back()->withErrors(['email' => 'رقم الهاتف غير موجود']);
+            }
+        }
     }
 
 
     public function reset(Request $request)
     {
-
         $request->validate([
             'token' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|string',
             'password' => 'required|confirmed|min:8', 
         ]);
         
-
-        $tokenData = DB::table('password_resets')->where('email', $request->email)->first();
-
-         if ($tokenData) {
-            // Check if the token matches
-            if ( $request->token == $tokenData->token) {
-                // Perform the password update
-                DB::table('users')
-                    ->where('email', $request->email)
-                    ->update(['password' => Hash::make($request->password)]);
-    
-                // Remove the token from password_resets table
-                DB::table('password_resets')->where('email', $request->email)->delete();
-    
-                return redirect()->route('login')->with('success', "تم تعديل كلمة السر بنجاح");
-            } else {
-                return back()->with('danger', "رابط غير صالح ");
-            }
-        } else {
-            return redirect()->route('login')->with('danger', "رابط غير صالح ");
-        }
-
+        // Check if input is email
+        $isEmail = filter_var($request->email, FILTER_VALIDATE_EMAIL);
         
+        if ($isEmail) {
+            // Use Laravel's Password facade for email
+            $status = Password::reset(
+                $request->only('email', 'password', 'password_confirmation', 'token'),
+                function (User $user, string $password) {
+                    $user->forceFill([
+                        'password' => Hash::make($password)
+                    ])->setRememberToken(Str::random(60));
+         
+                    $user->save();
+                }
+            );
+         
+            return $status === Password::PASSWORD_RESET
+                ? redirect()->route('login')->with('success', __($status))
+                : back()->withErrors(['email' => [__($status)]]);
+        } else {
+            // Handle phone number reset manually
+            $tokenData = DB::table('password_resets')
+                ->where('token', $request->token)
+                ->where('phone', $request->email)
+                ->first();
+
+            if ($tokenData) {
+                $user = User::where('phone', $tokenData->phone)->first();
+                
+                if ($user) {
+                    // Update password
+                    $user->forceFill([
+                        'password' => Hash::make($request->password)
+                    ])->setRememberToken(Str::random(60));
+                    
+                    $user->save();
+        
+                    // Remove the token from password_resets table
+                    DB::table('password_resets')->where('token', $request->token)->delete();
+        
+                    return redirect()->route('login')->with('success', "تم تعديل كلمة المرور بنجاح");
+                } else {
+                    return back()->withErrors(['email' => 'المستخدم غير موجود']);
+                }
+            } else {
+                return back()->withErrors(['email' => 'رابط غير صالح أو منتهي الصلاحية']);
+            }
+        }
     }
 
 

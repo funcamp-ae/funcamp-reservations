@@ -14,6 +14,8 @@ class TrustHosts extends Middleware
     public function hosts()
     {
         return [
+            'funcamp.ae',
+            'system.funcamp.ae',
             $this->allSubdomainsOfApplicationUrl(),
         ];
     }

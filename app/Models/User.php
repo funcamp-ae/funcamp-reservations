@@ -7,6 +7,8 @@ use App\Traits\EmailTrait;
 use App\Traits\SmsTrait;
 use App\Traits\UploadTrait;
 use Carbon\Carbon;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -16,9 +18,9 @@ use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements CanResetPasswordContract
 {
-    use HasApiTokens, HasFactory, Notifiable , HasRoles , SmsTrait , UploadTrait , EmailTrait;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, SmsTrait, UploadTrait, EmailTrait, CanResetPassword;
 
     /**
      * The attributes that are mass assignable.

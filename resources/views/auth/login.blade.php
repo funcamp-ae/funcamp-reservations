@@ -251,6 +251,16 @@
                         <form class="form w-100" novalidate="novalidate" method="POST" action="{{ route('admin-login')}}">
                             @csrf
                             
+                            <!-- Success Message -->
+                            @if(session('success'))
+                                <div class="alert alert-success d-flex align-items-center mb-4" style="border-radius: 14px; background: rgba(40, 167, 69, 0.15) !important; border: 2px solid rgba(40, 167, 69, 0.3); color: white !important; backdrop-filter: blur(10px);">
+                                    <i class="fas fa-check-circle me-3" style="font-size: 20px;"></i>
+                                    <div>
+                                        <strong>{{ session('success') }}</strong>
+                                    </div>
+                                </div>
+                            @endif
+                            
                             <!-- Error Message -->
                             @if(session('error'))
                                 <div class="alert alert-danger d-flex align-items-center mb-4" style="border-radius: 14px; background: rgba(220, 53, 69, 0.15) !important; border: 2px solid rgba(220, 53, 69, 0.3); color: white !important; backdrop-filter: blur(10px);">
@@ -320,7 +330,7 @@
                                         تذكرني
                                     </label>
                                 </div>
-                                <a href="#" class="forgot-password-link">
+                                <a href="{{ route('password.request') }}" class="forgot-password-link">
                                     نسيت كلمة المرور؟
                                 </a>
                             </div>
