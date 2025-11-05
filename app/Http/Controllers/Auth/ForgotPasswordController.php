@@ -129,7 +129,7 @@ class ForgotPasswordController extends Controller
             // Handle phone number reset manually
             $tokenData = DB::table('password_resets')
                 ->where('token', $request->token)
-                ->where('phone', $request->email)
+                ->where('phone', $request->email) 
                 ->first();
 
             if ($tokenData) {

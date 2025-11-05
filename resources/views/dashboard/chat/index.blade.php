@@ -232,6 +232,7 @@ class ChatSystem {
         Echo.private(unreadCountChannel)
             .listen('.unread_message_count_for_user.updated', (e) => {
                 this.updateUnreadBadge(e.totalUnread);
+                
                 // Update the chat in the list
                 const chat = this.chats.find(c => c.id == e.chatId);
                 if (chat) {
@@ -241,7 +242,37 @@ class ChatSystem {
                     // this.renderChats();
                     this.updateChatInList(e.chatId, e.message , true);
                 }
+                
+                // If this is for the current chat and we have a message, update read status
+                if (e.chatId == this.currentChatId && e.message && this.currentMessages) {
+                    // Find the message and update its read status
+                    const message = this.currentMessages.find(m => m.id === e.message.id);
+                    if (message && message.user_id == this.currentUserId) {
+                        message.is_read = true;
+                        message.read_at = e.message.read_at;
+                        
+                        // Update just the status icon for this message without re-rendering everything
+                        this.updateMessageReadStatusIcon(e.message.id);
+                    }
+                }
             })
+    }
+
+    // Update read status icon for a specific message
+    updateMessageReadStatusIcon(messageId) {
+        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (messageElement) {
+            const metaElement = messageElement.querySelector('.message-meta');
+            if (metaElement) {
+                // Find and update the status icon
+                const oldIcon = metaElement.querySelector('.fa-check, .fa-check-double');
+                if (oldIcon) {
+                    // Replace with double checkmark
+                    oldIcon.className = 'fas fa-check-double text-primary ms-1';
+                    oldIcon.setAttribute('title', 'Read');
+                }
+            }
+        }
     }
 
     setupChatListener() {
@@ -654,15 +685,28 @@ class ChatSystem {
         let html = '';
         messages.forEach(message => {
             const isOwn = message.user_id == this.currentUserId;
+            
+            // Determine message status icon
+            let statusIcon = '';
+            if (isOwn) {
+                if (message.is_read) {
+                    // Message has been read - show double checkmark in blue/primary color
+                    statusIcon = '<i class="fas fa-check-double text-primary ms-1" title="Read"></i>';
+                } else {
+                    // Message sent but not read - show single checkmark in gray
+                    statusIcon = '<i class="fas fa-check text-muted ms-1" title="Sent"></i>';
+                }
+            }
+            
             html += `
-                <div class="message mb-3 d-flex ${isOwn ? 'justify-content-start' : 'justify-content-end'}">
+                <div class="message mb-3 d-flex ${isOwn ? 'justify-content-start' : 'justify-content-end'}" data-message-id="${message.id}">
                     <div class="message-content ${isOwn ? 'text-end' : 'text-start'}" style="max-width: 70%;">
                         <div class="d-inline-block p-3 rounded ${isOwn ? 'bg-primary text-white' : 'rounded btn-secondary shadow-sm'}" style="max-width: 100%;">
                             ${this.escapeHtml(message.message)}
                         </div>
-                        <div class="small text-muted mt-1">
+                        <div class="small text-muted mt-1 message-meta">
                             ${this.formatTime(message.created_at)}
-                            ${isOwn && message.is_read ? '<i class="fas fa-check-double text-primary ms-1"></i>' : ''}
+                            ${statusIcon}
                         </div>
                     </div>
                 </div>

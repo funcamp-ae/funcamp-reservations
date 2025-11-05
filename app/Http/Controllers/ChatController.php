@@ -175,6 +175,7 @@ class ChatController extends Controller
 
         // Broadcast the message
         broadcast(new MessageSent($message))->toOthers();
+        
 
         // Update and broadcast unread counts for all participants except sender
         $this->chatService->updateUnreadCounts($chat, $user->id, $message);

@@ -44,6 +44,16 @@ class RegistrationformController extends Controller
         try {
             DB::beginTransaction();
             $q = Registrationform::create($request->validated());
+
+            // Send email notification to all super admin users
+            $superAdmins = \App\Models\User::role('super-admin')->get();
+            
+            foreach ($superAdmins as $admin) {
+                if ($admin->email) {
+                    \Mail::to($admin->email)->send(new \App\Mail\NewRegistrationFormNotification($q));
+                }
+            }
+            
             DB::commit();
             return redirect()->route('registrationforms.create')->with('request_code' , $q->request_code);
         } catch (\Throwable $th) {
