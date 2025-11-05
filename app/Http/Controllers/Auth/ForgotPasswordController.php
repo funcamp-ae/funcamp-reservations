@@ -115,16 +115,15 @@ class ForgotPasswordController extends Controller
             $status = Password::reset(
                 $request->only('email', 'password', 'password_confirmation', 'token'),
                 function (User $user, string $password) {
-                    $user->forceFill([
-                        'password' => Hash::make($password)
-                    ])->setRememberToken(Str::random(60));
-         
+                    // Don't use Hash::make() here because setPasswordAttribute already hashes it
+                    $user->password = $password;
+                    $user->setRememberToken(Str::random(60));
                     $user->save();
                 }
             );
          
             return $status === Password::PASSWORD_RESET
-                ? redirect()->route('login')->with('success', __($status))
+                ? redirect()->route('login')->with('success', 'تم تعديل كلمة المرور بنجاح')
                 : back()->withErrors(['email' => [__($status)]]);
         } else {
             // Handle phone number reset manually
@@ -137,11 +136,9 @@ class ForgotPasswordController extends Controller
                 $user = User::where('phone', $tokenData->phone)->first();
                 
                 if ($user) {
-                    // Update password
-                    $user->forceFill([
-                        'password' => Hash::make($request->password)
-                    ])->setRememberToken(Str::random(60));
-                    
+                    // Update password (setPasswordAttribute will hash it automatically)
+                    $user->password = $request->password;
+                    $user->setRememberToken(Str::random(60));
                     $user->save();
         
                     // Remove the token from password_resets table

@@ -48,8 +48,8 @@ class Kernel extends ConsoleKernel
             ->everyMinute()
             ->appendOutputTo(storage_path('logs/whatsapp-booking-ending-reminder.log'));
 
-        // Clear expired password reset tokens every 15 minutes
-        $schedule->command('auth:clear-resets')->everyFifteenMinutes();
+        // Clear expired password reset tokens every hour
+        $schedule->command('auth:clear-resets')->hourly();
 
         // * * * * * php /home/USERNAME/yourproject/artisan schedule:run >> /dev/null 2>&1
 
