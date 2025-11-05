@@ -53,10 +53,30 @@ class SendWhatsAppBookingEndingReminderCommand extends Command
             $orders = Order::with(['customer'])
                 ->where('status', 'approved')
                 ->whereNotNull('time_to')
-                ->whereTime('time_to', '>=', $oneHourFromNow->copy()->subMinutes(5)->format('H:i:s'))
-                ->whereTime('time_to', '<=', $oneHourFromNow->copy()->addMinutes(5)->format('H:i:s'))
+                ->whereNotNull('time_from')
                 ->where('is_endBookingreminder_sent', false)
-                ->get();
+                ->get()
+                ->filter(function($order) use ($oneHourFromNow) {
+                    // Parse time_from and time_to
+                    $timeFrom = Carbon::parse($order->time_from);
+                    $timeTo = Carbon::parse($order->time_to);
+                    
+                    // Determine the actual end date
+                    // If time_to is less than time_from, it means the reservation ends the next day
+                    $endDate = Carbon::parse($order->date);
+                    if ($timeTo->format('H:i:s') < $timeFrom->format('H:i:s')) {
+                        $endDate->addDay();
+                    }
+                    
+                    // Combine date and time to get the actual end datetime
+                    $actualEndDateTime = Carbon::parse($endDate->format('Y-m-d') . ' ' . $timeTo->format('H:i:s'));
+                    
+                    // Check if the end time is within 1 hour (±5 minutes)
+                    return $actualEndDateTime->between(
+                        $oneHourFromNow->copy()->subMinutes(5),
+                        $oneHourFromNow->copy()->addMinutes(5)
+                    );
+                });
 
             $this->info("Found {$orders->count()} orders with end time around {$oneHourFromNow->format('H:i')}.");
 
