@@ -267,9 +267,9 @@
         </div>
 
         <div class="show_price_info">
-            <strong>@lang('dashboard.show_price_pdf') @lang('dashboard.order_number'):</strong><br>
+            <strong>@lang('dashboard.show_price_pdf') / {{ trans_get('dashboard.show_price_pdf', [], 'en') }} @lang('dashboard.order_number') / {{ trans_get('dashboard.order_number', [], 'en') }}:</strong><br>
             {{ 'QUO-' . $order->order_number }}<br>
-            <strong>@lang('dashboard.expired_price_offer'):</strong><br>
+            <strong>@lang('dashboard.expired_price_offer') / {{ trans_get('dashboard.expired_price_offer', [], 'en') }}:</strong><br>
             {{ \Carbon\Carbon::parse($order->expired_price_offer)->format('d-m-Y') ?? date('Y/m/d', strtotime('+1 day')) }}
         </div>
     </div>
@@ -280,9 +280,9 @@
         <table class="details-table">
             <thead>
             <tr>
-                <th>@lang('dashboard.Customer_Name')</th>
-                <th>@lang('dashboard.phone')</th>
-                <th>@lang('dashboard.email')</th>
+                <th>@lang('dashboard.Customer_Name') / {{ trans_get('dashboard.Customer_Name', [], 'en') }}</th>
+                <th>@lang('dashboard.phone') / {{ trans_get('dashboard.phone', [], 'en') }}</th>
+                <th>@lang('dashboard.email') / {{ trans_get('dashboard.email', [], 'en') }}</th>
             </tr>
             </thead>
             <tbody>
@@ -301,10 +301,10 @@
             <table class="details-table">
                 <thead>
                 <tr>
-                    <th>@lang('dashboard.serial')</th>
-                    <th>@lang('dashboard.service')</th>
-                    <th>@lang('dashboard.Qty')</th>
-                    <th>@lang('dashboard.Amount') / @lang('dashboard.RS')</th>
+                    <th>@lang('dashboard.serial') / {{ trans_get('dashboard.serial', [], 'en') }}</th>
+                    <th>@lang('dashboard.service') / {{ trans_get('dashboard.service', [], 'en') }}</th>
+                    <th>@lang('dashboard.Qty') / {{ trans_get('dashboard.Qty', [], 'en') }}</th>
+                    <th>@lang('dashboard.Amount') / {{ trans_get('dashboard.Amount', [], 'en') }} / @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'en') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -327,11 +327,11 @@
             <table class="details-table">
                 <thead>
                 <tr>
-                    <th>@lang('dashboard.serial')</th>
-                    <th>@lang('dashboard.addons')</th>
-                    <th>@lang('dashboard.Rate')</th>
-                    <th>@lang('dashboard.Qty')</th>
-                    <th>@lang('dashboard.Total') / @lang('dashboard.RS')</th>
+                    <th>@lang('dashboard.serial') / {{ trans_get('dashboard.serial', [], 'en') }}</th>
+                    <th>@lang('dashboard.addons') / {{ trans_get('dashboard.addons', [], 'en') }}</th>
+                    <th>@lang('dashboard.Rate') / {{ trans_get('dashboard.Rate', [], 'en') }}</th>
+                    <th>@lang('dashboard.Qty') / {{ trans_get('dashboard.Qty', [], 'en') }}</th>
+                    <th>@lang('dashboard.Total') / {{ trans_get('dashboard.Total', [], 'en') }} / @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'en') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -356,12 +356,12 @@
                 <thead>
                 <tr>
                     @if(!empty($order->deposit))
-                        <th>@lang('dashboard.deposit')</th>
+                        <th>@lang('dashboard.deposit') / {{ trans_get('dashboard.deposit', [], 'en') }}</th>
                     @endif
                     @if(!empty($order->insurance_amount))
-                        <th>@lang('dashboard.insurance')</th>
+                        <th>@lang('dashboard.insurance') / {{ trans_get('dashboard.insurance', [], 'en') }}</th>
                     @endif
-                    <th>@lang('dashboard.total_amount')</th>
+                    <th>@lang('dashboard.total_amount') / {{ trans_get('dashboard.total_amount', [], 'en') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -380,26 +380,26 @@
         </div>
     @endif
     <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
-        <div class="section-title">@lang('dashboard.notes')</div>
+        <div class="section-title">@lang('dashboard.notes') / {{ trans_get('dashboard.notes', [], 'en') }}</div>
         <ul class="notes-list">
-            <li>@lang('dashboard.quote_note_1')</li>
-            <li>@lang('dashboard.quote_note_2')</li>
-            <li>@lang('dashboard.quote_note_3')</li>
-            <li>@lang('dashboard.quote_note_4')</li>
+            <li>@lang('dashboard.quote_note_1') / {{ trans_get('dashboard.quote_note_1', [], 'en') }}</li>
+            <li>@lang('dashboard.quote_note_2') / {{ trans_get('dashboard.quote_note_2', [], 'en') }}</li>
+            <li>@lang('dashboard.quote_note_3') / {{ trans_get('dashboard.quote_note_3', [], 'en') }}</li>
+            <li>@lang('dashboard.quote_note_4') / {{ trans_get('dashboard.quote_note_4', [], 'en') }}</li>
         </ul>
     </div>
 
     <!-- Additional Notes -->
     @if(!empty($order->show_price_notes))
         <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
-            <div class="section-title">@lang('dashboard.additional_notes')</div>
+            <div class="section-title">@lang('dashboard.additional_notes') / {{ trans_get('dashboard.additional_notes', [], 'en') }}</div>
             <div>{!! $order->show_price_notes !!}</div>
         </div>
     @endif
 
     <!-- Thank You Message -->
     <div class="thank-you">
-        @lang('dashboard.thanks')
+        @lang('dashboard.thanks') / {{ trans_get('dashboard.thanks', [], 'en') }}
     </div>
 
     <!-- Footer -->

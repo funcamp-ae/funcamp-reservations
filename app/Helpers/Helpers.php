@@ -364,3 +364,49 @@ function detectLanguage(?string $text = ''): ?string
 {
     return \App\Helpers\TranslationHelper::detectLanguage($text);
 }
+
+/**
+ * Get translation using Lang facade
+ * Shorthand for Illuminate\Support\Facades\Lang::get()
+ *
+ * @param string $key Translation key
+ * @param array $replace Replacement values for placeholders
+ * @param string|null $locale Specific locale to use (optional)
+ * @return string|array|null
+ */
+if (!function_exists('trans_get')) {
+    function trans_get(string $key, array $replace = [], ?string $locale = null)
+    {
+        return \Illuminate\Support\Facades\Lang::get($key, $replace, $locale);
+    }
+}
+
+/**
+ * Check if translation key exists
+ * 
+ * @param string $key Translation key
+ * @param string|null $locale Specific locale to check (optional)
+ * @return bool
+ */
+if (!function_exists('trans_has')) {
+    function trans_has(string $key, ?string $locale = null): bool
+    {
+        return \Illuminate\Support\Facades\Lang::has($key, $locale);
+    }
+}
+
+/**
+ * Get translation with choice/pluralization
+ * 
+ * @param string $key Translation key
+ * @param int|array $number Number for pluralization
+ * @param array $replace Replacement values
+ * @param string|null $locale Specific locale to use (optional)
+ * @return string
+ */
+if (!function_exists('trans_choice')) {
+    function trans_choice(string $key, $number, array $replace = [], ?string $locale = null): string
+    {
+        return \Illuminate\Support\Facades\Lang::choice($key, $number, $replace, $locale);
+    }
+}
