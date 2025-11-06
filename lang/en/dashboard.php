@@ -1155,7 +1155,7 @@ return [
     'payment_link_copied' => 'Payment link copied successfully!',
     'view_details' => 'View Details',
     'direction' => 'ltr',
-    'Reservation_info' => 'Order Details',
+    'Reservation_info' => 'Reservation Details',
     'quote_note_1' => 'To confirm the reservation, the agreed deposit in the price quote must be paid, which is considered part of the camp amount.',
     'quote_note_2' => 'The remaining service payment is completed upon receiving the camp.',
     'quote_note_3' => 'The agreed insurance amount in the price quote is paid upon receiving the camp and refunded within 24 hours after ensuring the camp supplies are intact.',
