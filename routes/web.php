@@ -45,8 +45,7 @@ use App\Http\Controllers\Dashboard\PageController;
 Route::resource('registrationforms', RegistrationformController::class)->except(['index', 'edit', 'update', 'destroy']);
 
 Route::get('order-rate/{order}', "VisitorsController@rate")->name('rate');
-//  Route::post('order-rate', "VisitorsController@rateStore")->name('rate.save');
-Route::post('orders/rate_orders', "VisitorsController@rateStore")->name('rate.save');
+//  Route::post('order-rate', "VisitorsController@rateStore")->name('ratorders.client-pdfrate.save');
 # orders rate
 
 Route::get('/sign/{order}', [OrderSignatureController::class, 'show'])
@@ -1968,6 +1967,76 @@ Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.', 'middleware' => ['a
     Route::resource('manual-whatsapp-sends', \App\Http\Controllers\Dashboard\ManualWhatsappSendController::class);
     Route::get('manual-whatsapp-sends/search-customers', [\App\Http\Controllers\Dashboard\ManualWhatsappSendController::class, 'searchCustomers'])
         ->name('manual-whatsapp-sends.search-customers');
+    
+    // Plupload video upload route
+    Route::post('upload-guidance-video', function() {
+        try {
+            return Plupload::receive('file', function ($file) {
+                // Generate unique filename
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                
+                // Store in local public disk only
+                $localPath = $file->storeAs('guidance_videos', $filename, 'public');
+                
+                // Return the full accessible URL
+                $localUrl = asset('storage/' . $localPath);
+                
+                return response()->json([
+                    'status' => 'success',
+                    'url' => $localUrl,
+                    'filename' => $filename
+                ]);
+            });
+        } catch (\Exception $e) {
+            \Log::error('Video upload error: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    })->name('upload-guidance-video');
+
+    // Delete guidance video route
+    Route::post('delete-guidance-video', function(\Illuminate\Http\Request $request) {
+        try {
+            $videoUrl = $request->input('video_url');
+            
+            if (!$videoUrl) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No video URL provided'
+                ], 400);
+            }
+
+            // Extract the path from the URL
+            // Example: http://127.0.0.1:8000/storage/guidance_videos/1762457392_690cf730cef5b.mp4
+            // We need: guidance_videos/1762457392_690cf730cef5b.mp4
+            $path = str_replace(asset('storage/'), '', $videoUrl);
+            
+            // Delete from local storage
+            if (\Storage::disk('public')->exists($path)) {
+                \Storage::disk('public')->delete($path);
+                \Log::info('Video deleted successfully: ' . $path);
+                
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Video deleted successfully'
+                ]);
+            } else {
+                \Log::warning('Video file not found: ' . $path);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Video file not found'
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Video deletion error: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    })->name('delete-guidance-video');
 });
 Route::group(['middleware' => ['auth', 'admin']], function () {
     Route::get('surveys/create', [SurveyController::class, 'create'])->name('surveys.create')->middleware(['auth']);

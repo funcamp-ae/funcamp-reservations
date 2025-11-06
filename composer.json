@@ -12,6 +12,7 @@
         "endroid/qr-code": "^5.0",
         "google/cloud-translate": "^2.1",
         "guzzlehttp/guzzle": "^7.2",
+        "jildertmiedema/laravel-plupload": "0.9",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^2.14.1",
         "laravel/socialite": "^5.5",

@@ -13,6 +13,14 @@ class ServiceSiteAndCustomerService extends Model
         'workername_ar',
         'workername_en',
         'workerphone',
+        'guidance_images',
+        'guidance_videos',
+        'important_notes',
+    ];
+
+    protected $casts = [
+        'guidance_images' => 'array',
+        'guidance_videos' => 'array',
     ];
 
     /**

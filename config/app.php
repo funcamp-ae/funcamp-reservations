@@ -203,6 +203,7 @@ return [
         Spatie\Permission\PermissionServiceProvider::class,
         // Laravel\Socialite\SocialiteServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+        JildertMiedema\LaravelPlupload\LaravelPluploadServiceProvider::class,
     ],
 
     /*
@@ -221,6 +222,7 @@ return [
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
         'SurveyHelper' => App\Helpers\SurveyHelper::class,
+        'Plupload' => JildertMiedema\LaravelPlupload\Facades\Plupload::class,
     ])->toArray(),
 
 ];

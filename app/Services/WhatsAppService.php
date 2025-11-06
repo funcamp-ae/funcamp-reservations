@@ -117,7 +117,6 @@ class WhatsAppService
                     'high_quality' => true,
                     // 'title' => $message
                 ]);
-
             Log::info('WhatsApp link preview sent', [
                 'phone' => $phoneNumber,
                 'chat_id' => $this->formatPhoneNumber($phoneNumber),

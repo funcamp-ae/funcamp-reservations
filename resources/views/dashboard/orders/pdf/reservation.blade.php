@@ -276,30 +276,262 @@
         </div>
     </div>
 
-    <!-- Reservation Details -->
+    <!-- Reservation Confirmation Message -->
     <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
-        <div class="section-title">@lang('dashboard.order_details') / {{ trans_get('dashboard.order_details', [], 'opposite_locale') }}</div>
+        <div class="section-title" style="text-align: center; color: #65391B; font-size: 16px;">
+            @lang('dashboard.reservation_confirmation_message')
+        </div>
 
+        <!-- Horizontal table structure with headers on top -->
+        <table class="details-table" style="margin-top: 15px;">
+            <thead>
+                <tr>
+                    <th>@lang('dashboard.reservation_number')</th>
+                    <th>@lang('dashboard.Customer_Name')</th>
+                    <th>@lang('dashboard.phone')</th>
+                    <th>@lang('dashboard.email')</th>
+                    <th>@lang('dashboard.order_date')</th>
+                    <th>@lang('dashboard.time_from')</th>
+                    <th>@lang('dashboard.time_to')</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ $order->id }}</td>
+                    <td>{{ $order->customer->name ?? __('dashboard.not_available') }}</td>
+                    <td>{{ $order->customer->phone ?? __('dashboard.not_available') }}</td>
+                    <td>{{ $order->customer->email ?? __('dashboard.not_available') }}</td>
+                    <td>{{ $order->date ? \Carbon\Carbon::parse($order->date)->format('Y-m-d') : __('dashboard.not_available') }}</td>
+                    <td>{{ $order->time_from ?? __('dashboard.not_available') }}</td>
+                    <td>{{ $order->time_to ?? __('dashboard.not_available') }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    @php $totalPrice = 0 @endphp
+    @if(!empty($order->services))
+        <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
+            <!-- Table for reservation details -->
+            <table class="details-table">
+                <thead>
+                <tr>
+                    <th>@lang('dashboard.serial') / {{ trans_get('dashboard.serial', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.service') / {{ trans_get('dashboard.service', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.count') / {{ trans_get('dashboard.count', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.Rate') / {{ trans_get('dashboard.Rate', [], 'opposite_locale') }} / @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'opposite_locale') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                @php $totalPrice += $order->price; @endphp
+                @foreach ($order->services as $index => $service)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $service->name }}</td>
+                        <td>1</td>
+                        <td>{{ $order->price }} @lang('dashboard.RS')</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+    @if($order->addons->isNotEmpty())
+        <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
+            <!-- Table for reservation details -->
+            <table class="details-table">
+                <thead>
+                <tr>
+                    <th>@lang('dashboard.serial') / {{ trans_get('dashboard.serial', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.addons') / {{ trans_get('dashboard.addons', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.Rate') / {{ trans_get('dashboard.Rate', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.count') / {{ trans_get('dashboard.count', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.Total') / {{ trans_get('dashboard.Total', [], 'opposite_locale') }} / @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'opposite_locale') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($order->addons as $index => $addon)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $addon->name }}</td>
+                            <td>{{ $addon->pivot->price }}</td>
+                            <td>{{ $addon->pivot->count }}</td>
+                            <td>{{ $addon->pivot->price * $addon->pivot->count }} @lang('dashboard.RS')</td>
+                        </tr>
+                        @php $totalPrice += $addon->pivot->price * $addon->pivot->count; @endphp
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+    @if(!empty($order->deposit) || !empty($order->insurance_amount))
+        <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
+            <!-- Table for reservation details -->
+            <table class="details-table">
+                <thead>
+                <tr>
+                    @if(!empty($order->deposit))
+                        <th>@lang('dashboard.deposit') / {{ trans_get('dashboard.deposit', [], 'opposite_locale') }}</th>
+                    @endif
+                    @if(!empty($order->insurance_amount))
+                        <th>@lang('dashboard.insurance') / {{ trans_get('dashboard.insurance', [], 'opposite_locale') }}</th>
+                    @endif
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    @if(!empty($order->deposit))
+                        <td>{{ $order->deposit }}</td>
+                    @endif
+                    @if(!empty($order->insurance_amount))
+                        <td>{{ $order->insurance_amount }}</td>
+                        @php $totalPrice += $order->insurance_amount @endphp
+                    @endif
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    @endif
+    <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
         <!-- Table for reservation details -->
         <table class="details-table">
             <thead>
             <tr>
-                <th>@lang('dashboard.reservation_number') / {{ trans_get('dashboard.reservation_number', [], 'opposite_locale') }}</th>
-                <th>@lang('dashboard.order_date') / {{ trans_get('dashboard.order_date', [], 'opposite_locale') }}</th>
-                <th>@lang('dashboard.Customer_Name') / {{ trans_get('dashboard.Customer_Name', [], 'opposite_locale') }}</th>
-                <th>@lang('dashboard.phone') / {{ trans_get('dashboard.phone', [], 'opposite_locale') }}</th>
+                <th>@lang('dashboard.total_amount') / {{ trans_get('dashboard.total_amount', [], 'opposite_locale') }}</th>
+                <th>@lang('dashboard.Amount_Received') / {{ trans_get('dashboard.Amount_Received', [], 'opposite_locale') }}</th>
+                <th>@lang('dashboard.remaining_amount') / {{ trans_get('dashboard.remaining_amount', [], 'opposite_locale') }}</th>
             </tr>
             </thead>
             <tbody>
             <tr>
-                <td>{{ $order->id }}</td>
-                <td>{{ $order->date ? \Carbon\Carbon::parse($order->date)->format('Y-m-d') : __('dashboard.not_available') }}</td>
-                <td>{{ $order->customer->name ?? __('dashboard.not_available') }}</td>
-                <td>{{ $order->customer->phone ?? __('dashboard.not_available') }}</td>
+                <td>{{ $totalPrice }} @lang('dashboard.RS') </td>
+                @php $totalPaid = 0; @endphp
+                @if(!empty($order->payments))
+                    @foreach($order->payments as $payment)
+                        @if($payment->verified == 1)
+                            @php $totalPaid += $payment->price @endphp
+                        @endif
+                    @endforeach
+                @endif
+                <td>{{ $totalPaid }} @lang('dashboard.RS') </td>
+                <td>{{ $totalPrice - $totalPaid }} @lang('dashboard.RS') </td>
             </tr>
             </tbody>
         </table>
     </div>
+
+    <!-- Service Site and Payment Information -->
+        @php
+            $serviceSiteData = \App\Models\ServiceSiteAndCustomerService::first();
+        @endphp
+
+        @if($serviceSiteData)
+            <!-- Service Site Information Table -->
+            <table class="details-table" style="margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th>@lang('dashboard.service_site')</th>
+                        <th>@lang('dashboard.worker_name_ar')</th>
+                        <th>@lang('dashboard.worker_name_en')</th>
+                        <th>@lang('dashboard.worker_phone')</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            @php
+                                $serviceSiteText = strip_tags($serviceSiteData->service_site);
+                                // Check if it's already a Google Maps link
+                                if (preg_match('/https?:\/\/(maps\.app\.goo\.gl|goo\.gl|maps\.google\.com|google\.com\/maps)/', $serviceSiteText, $matches)) {
+                                    $mapsUrl = $serviceSiteText;
+                                } else {
+                                    $mapsUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($serviceSiteText);
+                                }
+                            @endphp
+                            <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
+                                <a href="{{ $mapsUrl }}" target="_blank" style="flex: 1; text-decoration: none; color: #007bff;">
+                                    {!! $serviceSiteData->service_site !!}
+                                </a>
+                            </div>
+                        </td>
+                        <td style="text-align: right; direction: rtl;">{!! $serviceSiteData->workername_ar !!}</td>
+                        <td style="text-align: left; direction: ltr;">{!! $serviceSiteData->workername_en !!}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px; direction: ltr; justify-content: center;">
+                                <a href="tel:{{ $serviceSiteData->workerphone }}" style="text-decoration:none; color: #007bff; font-weight: bold; font-size: 14px;">
+                                    {{ $serviceSiteData->workerphone }}
+                                </a>
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $serviceSiteData->workerphone) }}" style="text-decoration: none;">
+                                    <img src="{{ public_path('imgs/whatsapp.png') }}" alt="WhatsApp" style="width: 20px; height: 20px; vertical-align: middle;">
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Guidance Images -->
+            @if($serviceSiteData->guidance_images && count($serviceSiteData->guidance_images) > 0)
+            <table class="details-table" style="margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th>@lang('dashboard.guidance_images')</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: center;">
+                                @foreach($serviceSiteData->guidance_images as $image)
+                                    <a href="{{ asset('storage/' . $image) }}" target="_blank" style="text-decoration: none;">
+                                        <img src="{{ public_path('storage/' . $image) }}" alt="Guidance Image" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid #ddd;">
+                                    </a>
+                                @endforeach
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            @endif
+
+            <!-- Guidance Videos -->
+            @if($serviceSiteData->guidance_videos && count($serviceSiteData->guidance_videos) > 0)
+            <table class="details-table" style="margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th>@lang('dashboard.guidance_videos')</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: left; direction: ltr;">
+                            @foreach($serviceSiteData->guidance_videos as $video)
+                                <div style="margin-bottom: 10px;">
+                                    <a href="{{ $video }}" target="_blank" style="color: #007bff; text-decoration: none; font-size: 12px;">{{ $video }}</a>
+                                </div>
+                            @endforeach
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            @endif
+
+            <!-- Important Notes -->
+            @if($serviceSiteData->important_notes)
+            <table class="details-table" style="margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th>@lang('dashboard.important_notes')</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: right; direction: rtl;">{!! $serviceSiteData->important_notes !!}</td>
+                    </tr>
+                </tbody>
+            </table>
+            @endif
+        @endif
 
     <!-- Terms and Conditions -->
     <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif d-flex flex-column">

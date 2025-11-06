@@ -28,18 +28,65 @@ class ServiceSiteAndCustomerServiceController extends Controller
      */
     public function store(Request $request)
     {
+        // Debug: Log incoming request data
+        \Log::info('Store request data:', [
+            'all_data' => $request->all(),
+            'guidance_videos' => $request->input('guidance_videos'),
+            'has_guidance_videos' => $request->has('guidance_videos')
+        ]);
+
         $validatedData = $request->validate([
             'serviceSite' => 'required|string',
             'workername_en' => 'required|string',
             'workername_ar' => 'required|string',
             'workerphone' => 'required|string',
+            'guidance_images' => 'nullable|array',
+            'guidance_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'guidance_videos' => 'nullable|array',
+            'guidance_videos.*' => 'nullable|url',
+            'important_notes' => 'nullable|string',
         ]);
 
-        ServiceSiteAndCustomerService::create([
+        $data = [
             'service_site' => $validatedData['serviceSite'],
             'workername_en' => $validatedData['workername_en'],
             'workername_ar' => $validatedData['workername_ar'],
             'workerphone' => $validatedData['workerphone'],
+            'important_notes' => $request->input('important_notes'),
+        ];
+
+        // Handle multiple image uploads
+        if ($request->hasFile('guidance_images')) {
+            $imagePaths = [];
+            foreach ($request->file('guidance_images') as $image) {
+                if ($image && $image->isValid()) {
+                    $path = $image->store('guidance_images', 'public');
+                    $imagePaths[] = $path;
+                }
+            }
+            $data['guidance_images'] = !empty($imagePaths) ? $imagePaths : null;
+        }
+
+        // Handle video links - filter out empty values
+        if ($request->has('guidance_videos')) {
+            $videoLinks = array_filter($request->input('guidance_videos', []), function($link) {
+                return !empty($link);
+            });
+            $data['guidance_videos'] = !empty($videoLinks) ? array_values($videoLinks) : null;
+            
+            // Debug: Log processed video links
+            \Log::info('Processed video links:', [
+                'video_links' => $videoLinks,
+                'final_data' => $data['guidance_videos']
+            ]);
+        }
+
+        $record = ServiceSiteAndCustomerService::create($data);
+        
+        // Debug: Log created record
+        \Log::info('Created record:', [
+            'id' => $record->id,
+            'guidance_videos' => $record->guidance_videos
         ]);
 
         if ($request->ajax() || $request->wantsJson()) {
@@ -69,15 +116,44 @@ class ServiceSiteAndCustomerServiceController extends Controller
             'workername_en' => 'required|string',
             'workername_ar' => 'required|string',
             'workerphone' => 'required|string',
+            'guidance_images' => 'nullable|array',
+            'guidance_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'guidance_videos' => 'nullable|array',
+            'guidance_videos.*' => 'nullable|url',
+            'important_notes' => 'nullable|string',
         ]);
 
         $item = ServiceSiteAndCustomerService::findOrFail($id);
-        $item->update([
+        
+        $data = [
             'service_site' => $validatedData['serviceSite'],
             'workername_en' => $validatedData['workername_en'],
             'workername_ar' => $validatedData['workername_ar'],
             'workerphone' => $validatedData['workerphone'],
-        ]);
+            'important_notes' => $request->input('important_notes'),
+        ];
+
+        // Handle multiple image uploads
+        if ($request->hasFile('guidance_images')) {
+            $imagePaths = [];
+            foreach ($request->file('guidance_images') as $image) {
+                if ($image && $image->isValid()) {
+                    $path = $image->store('guidance_images', 'public');
+                    $imagePaths[] = $path;
+                }
+            }
+            $data['guidance_images'] = !empty($imagePaths) ? $imagePaths : null;
+        }
+
+        // Handle video links - filter out empty values
+        if ($request->has('guidance_videos')) {
+            $videoLinks = array_filter($request->input('guidance_videos', []), function($link) {
+                return !empty($link);
+            });
+            $data['guidance_videos'] = !empty($videoLinks) ? array_values($videoLinks) : null;
+        }
+
+        $item->update($data);
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([

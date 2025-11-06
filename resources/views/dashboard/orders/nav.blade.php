@@ -98,7 +98,7 @@
         <a href="{{ route('orders.client-pdf', $order->id) }}"
             class="nav-link text-active-primary pb-4 {{ isActiveRoute('orders.client-pdf') }}"
             target="_blank">
-            {{ __('dashboard.client_pdf') }}
+            {{ __('dashboard.reservation_confirmation_message') }}
         </a>
     </li>
     @endcan
