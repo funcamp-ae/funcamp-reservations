@@ -304,7 +304,7 @@
                     <th>@lang('dashboard.serial') / {{ trans_get('dashboard.serial', [], 'en') }}</th>
                     <th>@lang('dashboard.service') / {{ trans_get('dashboard.service', [], 'en') }}</th>
                     <th>@lang('dashboard.Qty') / {{ trans_get('dashboard.Qty', [], 'en') }}</th>
-                    <th>@lang('dashboard.Amount') / {{ trans_get('dashboard.Amount', [], 'en') }} / @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'en') }}</th>
+                    <th>@lang('dashboard.Amount') / {{ trans_get('dashboard.Amount', [], 'en') }} {{...}}/ @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'en') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -382,10 +382,14 @@
     <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
         <div class="section-title">@lang('dashboard.notes') / {{ trans_get('dashboard.notes', [], 'en') }}</div>
         <ul class="notes-list">
-            <li>@lang('dashboard.quote_note_1') / {{ trans_get('dashboard.quote_note_1', [], 'en') }}</li>
-            <li>@lang('dashboard.quote_note_2') / {{ trans_get('dashboard.quote_note_2', [], 'en') }}</li>
-            <li>@lang('dashboard.quote_note_3') / {{ trans_get('dashboard.quote_note_3', [], 'en') }}</li>
-            <li>@lang('dashboard.quote_note_4') / {{ trans_get('dashboard.quote_note_4', [], 'en') }}</li>
+            <li>@lang('dashboard.quote_note_1') </li>
+            <li>{{ trans_get('dashboard.quote_note_1', [], 'en') }}</li>
+            <li>@lang('dashboard.quote_note_2')</li> 
+            <li>{{ trans_get('dashboard.quote_note_2', [], 'en') }}</li>
+            <li>@lang('dashboard.quote_note_3') </li>
+            <li>{{ trans_get('dashboard.quote_note_3', [], 'en') }}</li>
+            <li>@lang('dashboard.quote_note_4')</li>
+            <li>{{ trans_get('dashboard.quote_note_4', [], 'en') }}</li>
         </ul>
     </div>
 
@@ -399,7 +403,8 @@
 
     <!-- Thank You Message -->
     <div class="thank-you">
-        @lang('dashboard.thanks') / {{ trans_get('dashboard.thanks', [], 'en') }}
+        <span class="d-block">@lang('dashboard.thanks')</span>
+        <span class="d-block">{{ trans_get('dashboard.thanks', [], 'en') }}</span>
     </div>
 
     <!-- Footer -->
