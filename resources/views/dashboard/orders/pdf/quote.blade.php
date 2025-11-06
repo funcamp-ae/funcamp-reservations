@@ -304,7 +304,7 @@
                     <th>@lang('dashboard.serial') / {{ trans_get('dashboard.serial', [], 'en') }}</th>
                     <th>@lang('dashboard.service') / {{ trans_get('dashboard.service', [], 'en') }}</th>
                     <th>@lang('dashboard.Qty') / {{ trans_get('dashboard.Qty', [], 'en') }}</th>
-                    <th>@lang('dashboard.Amount') / {{ trans_get('dashboard.Amount', [], 'en') }} {{...}}/ @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'en') }}</th>
+                    <th>@lang('dashboard.Amount') / {{ trans_get('dashboard.Amount', [], 'en') }} {{"..."}}/ @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'en') }}</th>
                 </tr>
                 </thead>
                 <tbody>
