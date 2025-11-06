@@ -101,7 +101,7 @@
                 </div>
 
                 <!-- Important Notes -->
-                <div class="form-group mb-25 w-100">
+                <div class="form-group w-100" style="margin-bottom: 9rem !important;">
                     <label for="important_notes">{{ __('dashboard.important_notes') }}</label>
                     <div id="editor-important-notes" dir="rtl" style="min-height:150px; direction: rtl; text-align: right;">{!! old('important_notes', isset($item) ? $item->important_notes : '') !!}</div>
                     <input type="hidden" name="important_notes" id="input-important-notes" value="{!! old('important_notes', isset($item) ? $item->important_notes : '') !!}">
