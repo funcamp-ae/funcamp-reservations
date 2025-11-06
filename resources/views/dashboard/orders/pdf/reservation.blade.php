@@ -279,20 +279,20 @@
     <!-- Reservation Confirmation Message -->
     <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
         <div class="section-title" style="text-align: center; color: #65391B; font-size: 16px;">
-            @lang('dashboard.reservation_confirmation_message')
+            @lang('dashboard.reservation_confirmation_message') / {{ trans_get('dashboard.reservation_confirmation_message', [], 'opposite_locale') }}
         </div>
 
         <!-- Horizontal table structure with headers on top -->
         <table class="details-table" style="margin-top: 15px;">
             <thead>
                 <tr>
-                    <th>@lang('dashboard.reservation_number')</th>
-                    <th>@lang('dashboard.Customer_Name')</th>
-                    <th>@lang('dashboard.phone')</th>
-                    <th>@lang('dashboard.email')</th>
-                    <th>@lang('dashboard.order_date')</th>
-                    <th>@lang('dashboard.time_from')</th>
-                    <th>@lang('dashboard.time_to')</th>
+                    <th>@lang('dashboard.reservation_number') / {{ trans_get('dashboard.reservation_number', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.Customer_Name') / {{ trans_get('dashboard.Customer_Name', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.phone') / {{ trans_get('dashboard.phone', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.email') / {{ trans_get('dashboard.email', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.order_date') / {{ trans_get('dashboard.order_date', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.time_from') / {{ trans_get('dashboard.time_from', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.time_to') / {{ trans_get('dashboard.time_to', [], 'opposite_locale') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -329,7 +329,7 @@
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $service->name }}</td>
                         <td>1</td>
-                        <td>{{ $order->price }} @lang('dashboard.RS')</td>
+                        <td>{{ $order->price }} @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'opposite_locale') }}</td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -356,7 +356,7 @@
                             <td>{{ $addon->name }}</td>
                             <td>{{ $addon->pivot->price }}</td>
                             <td>{{ $addon->pivot->count }}</td>
-                            <td>{{ $addon->pivot->price * $addon->pivot->count }} @lang('dashboard.RS')</td>
+                            <td>{{ $addon->pivot->price * $addon->pivot->count }} @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'opposite_locale') }}</td>
                         </tr>
                         @php $totalPrice += $addon->pivot->price * $addon->pivot->count; @endphp
                 @endforeach
@@ -404,7 +404,7 @@
             </thead>
             <tbody>
             <tr>
-                <td>{{ $totalPrice }} @lang('dashboard.RS') </td>
+                <td>{{ $totalPrice }} @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'opposite_locale') }}</td>
                 @php $totalPaid = 0; @endphp
                 @if(!empty($order->payments))
                     @foreach($order->payments as $payment)
@@ -413,8 +413,8 @@
                         @endif
                     @endforeach
                 @endif
-                <td>{{ $totalPaid }} @lang('dashboard.RS') </td>
-                <td>{{ $totalPrice - $totalPaid }} @lang('dashboard.RS') </td>
+                <td>{{ $totalPaid }} @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'opposite_locale') }}</td>
+                <td>{{ $totalPrice - $totalPaid }} @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'opposite_locale') }}</td>
             </tr>
             </tbody>
         </table>
@@ -430,10 +430,10 @@
             <table class="details-table" style="margin-top: 15px;">
                 <thead>
                     <tr>
-                        <th>@lang('dashboard.service_site')</th>
-                        <th>@lang('dashboard.worker_name_ar')</th>
-                        <th>@lang('dashboard.worker_name_en')</th>
-                        <th>@lang('dashboard.worker_phone')</th>
+                        <th>@lang('dashboard.service_site') / {{ trans_get('dashboard.service_site', [], 'opposite_locale') }}</th>
+                        <th>@lang('dashboard.worker_name_ar') / {{ trans_get('dashboard.worker_name_ar', [], 'opposite_locale') }}</th>
+                        <th>@lang('dashboard.worker_name_en') / {{ trans_get('dashboard.worker_name_en', [], 'opposite_locale') }}</th>
+                        <th>@lang('dashboard.worker_phone') / {{ trans_get('dashboard.worker_phone', [], 'opposite_locale') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -475,7 +475,7 @@
             <table class="details-table" style="margin-top: 15px;">
                 <thead>
                     <tr>
-                        <th>@lang('dashboard.guidance_images')</th>
+                        <th>@lang('dashboard.guidance_images') / {{ trans_get('dashboard.guidance_images', [], 'opposite_locale') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -499,7 +499,7 @@
             <table class="details-table" style="margin-top: 15px;">
                 <thead>
                     <tr>
-                        <th>@lang('dashboard.guidance_videos')</th>
+                        <th>@lang('dashboard.guidance_videos') / {{ trans_get('dashboard.guidance_videos', [], 'opposite_locale') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -521,7 +521,7 @@
             <table class="details-table" style="margin-top: 15px;">
                 <thead>
                     <tr>
-                        <th>@lang('dashboard.important_notes')</th>
+                        <th>@lang('dashboard.important_notes') / {{ trans_get('dashboard.important_notes', [], 'opposite_locale') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -554,8 +554,7 @@
 
     <!-- Thank You Message -->
     <div class="thank-you">
-        <span style="display: block;">@lang('dashboard.thanks')</span>
-        <span style="display: block;">{{ trans_get('dashboard.thanks', [], 'opposite_locale') }}</span>
+        <span style="display: block;">@lang('dashboard.thanks') / {{ trans_get('dashboard.thanks', [], 'opposite_locale') }}</span>
     </div>
 
     <!-- Footer -->
