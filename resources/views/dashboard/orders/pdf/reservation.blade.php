@@ -268,7 +268,7 @@
 
         <div class="logo">
             <img class="seal" src="{{ public_path('imgs/funcamp_remove.png') }}" alt="Funcamp Logo">
-            <P style="@if(app()->getLocale() == 'en') font-size:15px; @else font-size:20px; @endif margin: 0"><b> @lang('dashboard.Reservation_info')</b></P>
+            <P style="@if(app()->getLocale() == 'en') font-size:15px; @else font-size:20px; @endif margin: 0"><b> @lang('dashboard.Reservation_info') / {{ trans_get('dashboard.Reservation_info', [], 'en') }}</b></P>
         </div>
 
         <div class="qr-code">
@@ -278,16 +278,16 @@
 
     <!-- Reservation Details -->
     <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
-        <div class="section-title">@lang('dashboard.order_details')</div>
+        <div class="section-title">@lang('dashboard.order_details') / {{ trans_get('dashboard.order_details', [], 'en') }}</div>
 
         <!-- Table for reservation details -->
         <table class="details-table">
             <thead>
             <tr>
-                <th>@lang('dashboard.reservation_number')</th>
-                <th>@lang('dashboard.order_date')</th>
-                <th>@lang('dashboard.Customer_Name')</th>
-                <th>@lang('dashboard.phone')</th>
+                <th>@lang('dashboard.reservation_number') / {{ trans_get('dashboard.reservation_number', [], 'en') }}</th>
+                <th>@lang('dashboard.order_date') / {{ trans_get('dashboard.order_date', [], 'en') }}</th>
+                <th>@lang('dashboard.Customer_Name') / {{ trans_get('dashboard.Customer_Name', [], 'en') }}</th>
+                <th>@lang('dashboard.phone') / {{ trans_get('dashboard.phone', [], 'en') }}</th>
             </tr>
             </thead>
             <tbody>
@@ -303,7 +303,7 @@
 
     <!-- Terms and Conditions -->
     <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif d-flex flex-column">
-        <div class="section-title">@lang('dashboard.Terms_and_Conditions')</div>
+        <div class="section-title">@lang('dashboard.Terms_and_Conditions') / {{ trans_get('dashboard.Terms_and_Conditions', [], 'en') }}</div>
         <div class="rtl-text" dir="rtl" style="text-align: right;">
             {!!($termsSittng->commercial_license_ar) !!}
         </div>
@@ -315,14 +315,15 @@
     <!-- Additional Notes -->
     @if(!empty($order->order_data_notes))
         <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
-            <div class="section-title">@lang('dashboard.additional_notes')</div>
+            <div class="section-title">@lang('dashboard.additional_notes') / {{ trans_get('dashboard.additional_notes', [], 'en') }}</div>
             <div>{!! $order->order_data_notes !!}</div>
         </div>
     @endif
 
     <!-- Thank You Message -->
     <div class="thank-you">
-        @lang('dashboard.thanks')
+        <span style="display: block;">@lang('dashboard.thanks')</span>
+        <span style="display: block;">{{ trans_get('dashboard.thanks', [], 'en') }}</span>
     </div>
 
     <!-- Footer -->

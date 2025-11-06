@@ -147,7 +147,7 @@
 
         <div class="logo">
             <img class="seal" src="{{ public_path('imgs/funcamp_logo.jpg') }}" alt="Funcamp Logo">
-            <P>بيانات الحجز</P>
+            <P>بيانات الحجز / Reservation Data</P>
         </div>
 
         <div class="qr-code">
@@ -157,25 +157,25 @@
 
     <!-- Reservation Details -->
     <div class="section">
-        <div class="section-title">تفاصيل الحجز</div>
+        <div class="section-title">تفاصيل الحجز / Reservation Details</div>
         <div class="details-grid">
-            <div class="detail-label">رقم الحجز:</div>
+            <div class="detail-label">رقم الحجز / Reservation Number:</div>
             <div>{{ $order->id }}</div>
 
-            <div class="detail-label">تاريخ الحجز:</div>
+            <div class="detail-label">تاريخ الحجز / Reservation Date:</div>
             <div>{{ $order->date ? \Carbon\Carbon::parse($order->date)->format('Y-m-d') : 'غير محدد' }}</div>
 
-            <div class="detail-label">اسم العميل:</div>
+            <div class="detail-label">اسم العميل / Customer Name:</div>
             <div>{{ $order->customer->name ?? 'غير محدد' }}</div>
 
-            <div class="detail-label">رقم الهاتف:</div>
+            <div class="detail-label">رقم الهاتف / Phone Number:</div>
             <div>{{ $order->customer->phone ?? 'غير محدد' }}</div>
         </div>
     </div>
 
     <!-- Terms and Conditions -->
     <div class="section">
-        <div class="section-title">الشروط والأحكام</div>
+        <div class="section-title">الشروط والأحكام / Terms and Conditions</div>
         <div>{!! $termsSittng->terms !!}</div>
     </div>
 
@@ -186,7 +186,7 @@
         @endphp
         @if(isset($additionalData['notes']) && $additionalData['order_data'])
             <div class="section">
-                <div class="section-title">ملاحظات إضافية</div>
+                <div class="section-title">ملاحظات إضافية / Additional Notes</div>
                 <div>{!! $additionalData['notes'] !!}</div>
             </div>
         @endif
@@ -194,7 +194,8 @@
 
     <!-- Thank You Message -->
     <div class="thank-you">
-        شكرًا لاختياركم لنا ونتمنى استقبالكُم مجددًا
+        <div>شكرًا لاختياركم لنا ونتمنى استقبالكُم مجددًا</div>
+        <div>Thank you for choosing us and we hope to welcome you again</div>
     </div>
 
     <!-- Footer -->
@@ -205,7 +206,7 @@
 {{--        </div>--}}
 
         <div class="export-date">
-            تم إنشاء هذا المستند في: {{ now()->format('Y-m-d H:i') }}
+            تم إنشاء هذا المستند في / Document created at: {{ now()->format('Y-m-d H:i') }}
         </div>
 
         <div class="seal-container">

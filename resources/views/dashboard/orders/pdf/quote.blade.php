@@ -263,7 +263,7 @@
 
         <div class="logo">
             <img class="seal" src="{{ public_path('imgs/funcamp_remove.png') }}" alt="Funcamp Logo">
-            <P style="font-size: 20px;margin: 0"><b> @lang('dashboard.show_price_pdf')</b></P>
+            <P style="font-size: 20px;margin: 0"><b> @lang('dashboard.show_price_pdf') / {{ trans_get('dashboard.show_price_pdf', [], 'en') }}</b></P>
         </div>
 
         <div class="show_price_info">
