@@ -18,7 +18,6 @@ class Kernel extends ConsoleKernel
         Commands\SendWhatsAppEvaluationCommand::class,
         Commands\SendWhatsAppBookingReminderCommand::class,
         Commands\SendWhatsAppBookingEndingReminderCommand::class,
-        Commands\SendUnreadMessageNotifications::class,
     ];
     /**
      * Define the application's command schedule.
@@ -51,11 +50,6 @@ class Kernel extends ConsoleKernel
 
         // Clear expired password reset tokens every hour
         $schedule->command('auth:clear-resets')->hourly();
-
-        // Send unread message notifications every 5 minutes
-        $schedule->command('chat:send-unread-notifications')
-            ->everySecond()
-            ->appendOutputTo(storage_path('logs/unread-messages.log'));
 
         // * * * * * php /home/USERNAME/yourproject/artisan schedule:run >> /dev/null 2>&1
 
