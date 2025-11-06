@@ -295,7 +295,7 @@ return [
     'total_customers' => 'إجمالي العملاء',
     'total_orders' => 'إجمالي الحجوزات',
     'img' => 'صورة',
-    'order_details' => 'تفاصيل الطلب',
+    'order_details' => 'تفاصيل الحجز',
     'scan_qr_code_to_pay' => 'يرجي مسح رمز الاستجابة',
     'order_id' => 'رقم الحجز',
     'order_date_rev' => 'تاريخ الحجز',

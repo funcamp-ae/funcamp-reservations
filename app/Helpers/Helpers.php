@@ -377,6 +377,9 @@ function detectLanguage(?string $text = ''): ?string
 if (!function_exists('trans_get')) {
     function trans_get(string $key, array $replace = [], ?string $locale = null)
     {
+        if ($locale === "opposite_locale") {
+            $locale = app()->getLocale() == 'ar' ? 'en' : 'ar';
+        }
         return \Illuminate\Support\Facades\Lang::get($key, $replace, $locale);
     }
 }

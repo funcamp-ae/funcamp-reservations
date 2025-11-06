@@ -255,13 +255,13 @@
 
         <div class="logo">
             <img class="seal" src="{{ public_path('imgs/funcamp_remove.png') }}" alt="Funcamp Logo">
-            <P style="font-size: 20px;margin: 0"><b>@lang('dashboard.invoice') / {{ trans_get('dashboard.invoice', [], 'en') }}</b></P>
+            <P style="font-size: 20px;margin: 0"><b>@lang('dashboard.invoice') / {{ trans_get('dashboard.invoice', [], 'opposite_locale') }}</b></P>
         </div>
 
         <div class="show_price_info">
-            <strong> @lang('dashboard.invoice') / {{ trans_get('dashboard.invoice', [], 'en') }} @lang('dashboard.order_number') / {{ trans_get('dashboard.order_number', [], 'en') }}:</strong><br>
+            <strong> @lang('dashboard.invoice') / {{ trans_get('dashboard.invoice', [], 'opposite_locale') }} @lang('dashboard.order_number') / {{ trans_get('dashboard.order_number', [], 'opposite_locale') }}:</strong><br>
             {{ 'INV-' . $order->order_number }}<br>
-            <strong>@lang('dashboard.Receipt_Date') / {{ trans_get('dashboard.Receipt_Date', [], 'en') }}:</strong><br>
+            <strong>@lang('dashboard.Receipt_Date') / {{ trans_get('dashboard.Receipt_Date', [], 'opposite_locale') }}:</strong><br>
             {{ now()->format('d-m-Y H:i') }}
         </div>
     </div>
@@ -272,11 +272,11 @@
         <table class="details-table">
             <thead>
             <tr>
-                <th>@lang('dashboard.reservation_number') / {{ trans_get('dashboard.reservation_number', [], 'en') }}</th>
-                <th>@lang('dashboard.order_date') / {{ trans_get('dashboard.order_date', [], 'en') }}</th>
-                <th>@lang('dashboard.Customer_Name') / {{ trans_get('dashboard.Customer_Name', [], 'en') }}</th>
-                <th>@lang('dashboard.phone') / {{ trans_get('dashboard.phone', [], 'en') }}</th>
-                <th>@lang('dashboard.email') / {{ trans_get('dashboard.email', [], 'en') }}</th>
+                <th>@lang('dashboard.reservation_number') / {{ trans_get('dashboard.reservation_number', [], 'opposite_locale') }}</th>
+                <th>@lang('dashboard.order_date') / {{ trans_get('dashboard.order_date', [], 'opposite_locale') }}</th>
+                <th>@lang('dashboard.Customer_Name') / {{ trans_get('dashboard.Customer_Name', [], 'opposite_locale') }}</th>
+                <th>@lang('dashboard.phone') / {{ trans_get('dashboard.phone', [], 'opposite_locale') }}</th>
+                <th>@lang('dashboard.email') / {{ trans_get('dashboard.email', [], 'opposite_locale') }}</th>
             </tr>
             </thead>
             <tbody>
@@ -297,10 +297,10 @@
             <table class="details-table">
                 <thead>
                 <tr>
-                    <th>@lang('dashboard.serial') / {{ trans_get('dashboard.serial', [], 'en') }}</th>
-                    <th>@lang('dashboard.service') / {{ trans_get('dashboard.service', [], 'en') }}</th>
-                    <th>@lang('dashboard.count') / {{ trans_get('dashboard.count', [], 'en') }}</th>
-                    <th>@lang('dashboard.Rate') / {{ trans_get('dashboard.Rate', [], 'en') }} / @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'en') }}</th>
+                    <th>@lang('dashboard.serial') / {{ trans_get('dashboard.serial', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.service') / {{ trans_get('dashboard.service', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.count') / {{ trans_get('dashboard.count', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.Rate') / {{ trans_get('dashboard.Rate', [], 'opposite_locale') }} / @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'opposite_locale') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -323,11 +323,11 @@
             <table class="details-table">
                 <thead>
                 <tr>
-                    <th>@lang('dashboard.serial') / {{ trans_get('dashboard.serial', [], 'en') }}</th>
-                    <th>@lang('dashboard.addons') / {{ trans_get('dashboard.addons', [], 'en') }}</th>
-                    <th>@lang('dashboard.Rate') / {{ trans_get('dashboard.Rate', [], 'en') }}</th>
-                    <th>@lang('dashboard.count') / {{ trans_get('dashboard.count', [], 'en') }}</th>
-                    <th>@lang('dashboard.Total') / {{ trans_get('dashboard.Total', [], 'en') }} / @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'en') }}</th>
+                    <th>@lang('dashboard.serial') / {{ trans_get('dashboard.serial', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.addons') / {{ trans_get('dashboard.addons', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.Rate') / {{ trans_get('dashboard.Rate', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.count') / {{ trans_get('dashboard.count', [], 'opposite_locale') }}</th>
+                    <th>@lang('dashboard.Total') / {{ trans_get('dashboard.Total', [], 'opposite_locale') }} / @lang('dashboard.RS') / {{ trans_get('dashboard.RS', [], 'opposite_locale') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -352,10 +352,10 @@
                 <thead>
                 <tr>
                     @if(!empty($order->deposit))
-                        <th>@lang('dashboard.deposit') / {{ trans_get('dashboard.deposit', [], 'en') }}</th>
+                        <th>@lang('dashboard.deposit') / {{ trans_get('dashboard.deposit', [], 'opposite_locale') }}</th>
                     @endif
                     @if(!empty($order->insurance_amount))
-                        <th>@lang('dashboard.insurance') / {{ trans_get('dashboard.insurance', [], 'en') }}</th>
+                        <th>@lang('dashboard.insurance') / {{ trans_get('dashboard.insurance', [], 'opposite_locale') }}</th>
                     @endif
                 </tr>
                 </thead>
@@ -378,9 +378,9 @@
         <table class="details-table">
             <thead>
             <tr>
-                <th>@lang('dashboard.total_amount') / {{ trans_get('dashboard.total_amount', [], 'en') }}</th>
-                <th>@lang('dashboard.Amount_Received') / {{ trans_get('dashboard.Amount_Received', [], 'en') }}</th>
-                <th>@lang('dashboard.Balance_Due') / {{ trans_get('dashboard.Balance_Due', [], 'en') }}</th>
+                <th>@lang('dashboard.total_amount') / {{ trans_get('dashboard.total_amount', [], 'opposite_locale') }}</th>
+                <th>@lang('dashboard.Amount_Received') / {{ trans_get('dashboard.Amount_Received', [], 'opposite_locale') }}</th>
+                <th>@lang('dashboard.Balance_Due') / {{ trans_get('dashboard.Balance_Due', [], 'opposite_locale') }}</th>
             </tr>
             </thead>
             <tbody>
@@ -401,21 +401,21 @@
         </table>
     </div>
     <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
-        <div class="section-title">@lang('dashboard.notes') / {{ trans_get('dashboard.notes', [], 'en') }}</div>
+        <div class="section-title">@lang('dashboard.notes') / {{ trans_get('dashboard.notes', [], 'opposite_locale') }}</div>
         <ul>
             <li> @lang('dashboard.payment_remaining') </li>
-            <li> {{ trans_get('dashboard.payment_remaining', [], 'en') }}</li>
+            <li> {{ trans_get('dashboard.payment_remaining', [], 'opposite_locale') }}</li>
             <li> @lang('dashboard.security_deposit') </li>
-            <li> {{ trans_get('dashboard.security_deposit', [], 'en') }}</li>
+            <li> {{ trans_get('dashboard.security_deposit', [], 'opposite_locale') }}</li>
             <li> @lang('dashboard.terms1') </li>
-            <li> {{ trans_get('dashboard.terms1', [], 'en') }}</li>
+            <li> {{ trans_get('dashboard.terms1', [], 'opposite_locale') }}</li>
         </ul>
     </div>
 
     <!-- Additional Notes -->
     @if(!empty($order->invoice_notes))
         <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
-            <div class="section-title">@lang('dashboard.additional_notes') / {{ trans_get('dashboard.additional_notes', [], 'en') }}</div>
+            <div class="section-title">@lang('dashboard.additional_notes') / {{ trans_get('dashboard.additional_notes', [], 'opposite_locale') }}</div>
             <div>{!! $order->invoice_notes !!}</div>
         </div>
     @endif
@@ -423,7 +423,7 @@
     <!-- Thank You Message -->
     <div class="thank-you">
         <span style="display: block;">@lang('dashboard.thanks')</span>
-        <span style="display: block;">{{ trans_get('dashboard.thanks', [], 'en') }}</span>
+        <span style="display: block;">{{ trans_get('dashboard.thanks', [], 'opposite_locale') }}</span>
     </div>
 
     <!-- Footer -->
