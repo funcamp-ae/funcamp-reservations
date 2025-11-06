@@ -1229,6 +1229,14 @@ $request->validate($rules);
         ]);
 
         $mpdf->SetDirectionality('rtl');
+        
+        // Enable clickable links in PDF
+        $mpdf->showImageErrors = false;
+        $mpdf->autoScriptToLang = true;
+        $mpdf->baseScript = 1;
+        $mpdf->autoVietnamese = true;
+        $mpdf->autoArabic = true;
+        
         $mpdf->WriteHTML($html);
 
         // Clean up QR code file if created

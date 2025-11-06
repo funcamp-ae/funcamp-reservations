@@ -52,7 +52,8 @@
                         @if(isset($item) && $item->guidance_images)
                             @foreach($item->guidance_images as $index => $image)
                                 <div class="image-upload-item mb-2 d-flex align-items-center gap-2">
-                                    <input type="file" name="guidance_images[]" class="form-control" accept="image/*">
+                                    <input type="file" name="new_guidance_images[]" class="form-control" accept="image/*">
+                                    <input type="hidden" name="existing_guidance_images[]" value="{{ $image }}">
                                     <img src="{{ asset('storage/' . $image) }}" alt="Guidance Image" style="width: 50px; height: 50px; object-fit: cover;">
                                     <button type="button" class="btn btn-sm btn-danger remove-image">{{ __('dashboard.remove') }}</button>
                                 </div>
@@ -118,32 +119,42 @@
  @if(!isset($item))
         <div class="col-md-12">
             <div class="table-responsive">
-                <table class="table table-bordered ">
+                <table class="table table-bordered table-hover">
                     <thead class="thead-light">
                         <tr>
-                            <th>{{ __('dashboard.service_site') }}</th>
-                            <th>{{ __('dashboard.worker_name_en') }}</th>
-                            <th>{{ __('dashboard.worker_name_ar') }}</th>
-                            <th>{{ __('dashboard.phone') }}</th>
-                            <th>{{ __('dashboard.email') }}</th>
-                            <th>{{ __('dashboard.guidance_images') }}</th>
-                            <th>{{ __('dashboard.guidance_videos') }}</th>
-                            <th>{{ __('dashboard.important_notes') }}</th>
-                            <th class="text-center">{{ __('dashboard.actions') }}</th>
+                            <th style="width: 200px;">{{ __('dashboard.service_site') }}</th>
+                            <th style="width: 150px;">{{ __('dashboard.worker_name_en') }}</th>
+                            <th style="width: 150px;">{{ __('dashboard.worker_name_ar') }}</th>
+                            <th style="width: 120px;">{{ __('dashboard.phone') }}</th>
+                            <th style="width: 100px;">{{ __('dashboard.guidance_images') }}</th>
+                            <th style="width: 150px;">{{ __('dashboard.guidance_videos') }}</th>
+                            <th style="width: 200px;">{{ __('dashboard.important_notes') }}</th>
+                            <th style="width: 150px;" class="text-center">{{ __('dashboard.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse(isset($items) ? $items : [] as $row)
                             <tr>
-                                <td>{!! $row->service_site !!}</td>
-                                <td>{!! $row->workername_en !!}</td>
-                                <td>{!! $row->workername_ar !!}</td>
-                                <td>{{ $row->workerphone }}</td>
-                                <td>{{ $row->email ?? '-' }}</td>
                                 <td>
+                                    <div class="table-cell-content">
+                                        {!! $row->service_site !!}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="table-cell-content">
+                                        {!! $row->workername_en !!}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="table-cell-content">
+                                        {!! $row->workername_ar !!}
+                                    </div>
+                                </td>
+                                <td>{{ $row->workerphone }}</td>
+                                <td class="text-center">
                                     @if($row->guidance_images && count($row->guidance_images) > 0)
                                         <button type="button" class="btn btn-sm btn-primary view-images" data-bs-toggle="modal" data-bs-target="#imageModal" data-images="{{ json_encode($row->guidance_images) }}">
-                                            <i class="fas fa-eye"></i>
+                                            <i class="fas fa-eye"></i> {{ count($row->guidance_images) }}
                                         </button>
                                     @else
                                         <span class="text-muted">-</span>
@@ -151,40 +162,48 @@
                                 </td>
                                 <td>
                                     @if($row->guidance_videos && count($row->guidance_videos) > 0)
-                                        <ul class="list-unstyled mb-0">
-                                            @foreach($row->guidance_videos as $video)
-                                                <li><a href="{{ $video }}" target="_blank" class="text-primary" style="font-size: 12px;">{{ Str::limit($video, 30) }}</a></li>
+                                        <div class="table-cell-content">
+                                            @foreach($row->guidance_videos as $index => $video)
+                                                <a href="{{ $video }}" target="_blank" class="d-block text-primary text-truncate" style="font-size: 12px;">
+                                                    Video {{ $index + 1 }}
+                                                </a>
                                             @endforeach
-                                        </ul>
+                                        </div>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
                                 <td>
                                     @if($row->important_notes)
-                                        <div style="max-width: 200px; max-height: 60px; overflow: hidden;">
-                                            {!! Str::limit(strip_tags($row->important_notes), 100) !!}
+                                        <div class="table-cell-content">
+                                            {!! $row->important_notes !!}
                                         </div>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
-                                <td class="text-center d-flex flex-row flex-nowrap">
-                                    @can('bookings.service-site-customer-service.edit')
-                                    <a href="{{ route('bookings.service-site-customer-service.edit', $row->id) }}" class="btn btn-sm btn-secondary">{{ __('dashboard.edit') }}</a>
-                                    @endcan
-                                    @can('bookings.service-site-customer-service.destroy')
-                                    <form action="{{ route('bookings.service-site-customer-service.destroy', $row->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('{{ __('dashboard.delete_confirmation') }}');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-danger">{{ __('dashboard.delete') }}</button>
-                                    </form>
-                                    @endcan
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        @can('bookings.service-site-customer-service.edit')
+                                        <a href="{{ route('bookings.service-site-customer-service.edit', $row->id) }}" class="btn btn-sm btn-secondary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        @endcan
+                                        @can('bookings.service-site-customer-service.destroy')
+                                        <form action="{{ route('bookings.service-site-customer-service.destroy', $row->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('{{ __('dashboard.delete_confirmation') }}');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                        @endcan
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center">{{ __('dashboard.no_data_found') }}</td>
+                                <td colspan="8" class="text-center">{{ __('dashboard.no_data_found') }}</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -301,7 +320,20 @@
         // Remove Image
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('remove-image')) {
-                e.target.closest('.image-upload-item').remove();
+                const imageItem = e.target.closest('.image-upload-item');
+                const existingImageInput = imageItem.querySelector('input[name="existing_guidance_images[]"]');
+                
+                // If this is an existing image, mark it for deletion
+                if (existingImageInput) {
+                    const form = document.querySelector('form');
+                    const deletedInput = document.createElement('input');
+                    deletedInput.type = 'hidden';
+                    deletedInput.name = 'deleted_guidance_images[]';
+                    deletedInput.value = existingImageInput.value;
+                    form.appendChild(deletedInput);
+                }
+                
+                imageItem.remove();
             }
         });
 
@@ -485,6 +517,61 @@
     .ql-editor[dir="rtl"]::before{ right: 0; left: auto; }
     /* If you have inline country select next to phone input, ensure it stays inline */
     .country-select-wrap { display: inline-flex; align-items: center; gap:8px; }
+    
+    /* Limit Quill editor height and add scroll */
+    .ql-container {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .ql-editor {
+        min-height: 120px;
+        max-height: 300px;
+    }
+    
+    /* Table styling */
+    .table-responsive {
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    
+    .table {
+        table-layout: fixed;
+        width: 100%;
+    }
+    
+    .table td {
+        vertical-align: middle;
+        word-wrap: break-word;
+    }
+    
+    /* Constrain cell content */
+    .table-cell-content {
+        max-height: 80px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        word-wrap: break-word;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+    
+    /* Custom scrollbar for table cells */
+    .table-cell-content::-webkit-scrollbar {
+        width: 5px;
+    }
+    
+    .table-cell-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .table-cell-content::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 3px;
+    }
+    
+    .table-cell-content::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
     
     /* Carousel styling */
     #imageCarousel .carousel-control-prev-icon,

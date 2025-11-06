@@ -118,6 +118,10 @@ class ServiceSiteAndCustomerServiceController extends Controller
             'workerphone' => 'required|string',
             'guidance_images' => 'nullable|array',
             'guidance_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'new_guidance_images' => 'nullable|array',
+            'new_guidance_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'existing_guidance_images' => 'nullable|array',
+            'deleted_guidance_images' => 'nullable|array',
             'guidance_videos' => 'nullable|array',
             'guidance_videos.*' => 'nullable|url',
             'important_notes' => 'nullable|string',
@@ -133,17 +137,47 @@ class ServiceSiteAndCustomerServiceController extends Controller
             'important_notes' => $request->input('important_notes'),
         ];
 
-        // Handle multiple image uploads
+        // Handle image updates
+        $finalImages = [];
+        
+        // Keep existing images that weren't deleted
+        if ($request->has('existing_guidance_images')) {
+            $existingImages = $request->input('existing_guidance_images', []);
+            $deletedImages = $request->input('deleted_guidance_images', []);
+            
+            foreach ($existingImages as $existingImage) {
+                if (!in_array($existingImage, $deletedImages)) {
+                    $finalImages[] = $existingImage;
+                }
+            }
+            
+            // Delete removed images from storage
+            foreach ($deletedImages as $deletedImage) {
+                \Storage::disk('public')->delete($deletedImage);
+            }
+        }
+        
+        // Add new uploaded images
+        if ($request->hasFile('new_guidance_images')) {
+            foreach ($request->file('new_guidance_images') as $image) {
+                if ($image && $image->isValid()) {
+                    $path = $image->store('guidance_images', 'public');
+                    $finalImages[] = $path;
+                }
+            }
+        }
+        
+        // Add brand new images (from "Add Image" button)
         if ($request->hasFile('guidance_images')) {
-            $imagePaths = [];
             foreach ($request->file('guidance_images') as $image) {
                 if ($image && $image->isValid()) {
                     $path = $image->store('guidance_images', 'public');
-                    $imagePaths[] = $path;
+                    $finalImages[] = $path;
                 }
             }
-            $data['guidance_images'] = !empty($imagePaths) ? $imagePaths : null;
         }
+        
+        $data['guidance_images'] = !empty($finalImages) ? $finalImages : null;
 
         // Handle video links - filter out empty values
         if ($request->has('guidance_videos')) {
