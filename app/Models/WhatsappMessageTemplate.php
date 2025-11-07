@@ -48,6 +48,7 @@ class WhatsappMessageTemplate extends Model
             self::TYPE_PAYMENT_LINK_RESEND => __('dashboard.payment_link_resend'),
             self::TYPE_BOOKING_REMINDER => __('dashboard.booking_reminder'),
             self::TYPE_BOOKING_ENDING_REMINDER => __('dashboard.booking_ending_reminder'),
+            self::TYPE_RESERVATION_CONFIRMATION => __('dashboard.reservation_confirmation'),
         ];
     }
 
