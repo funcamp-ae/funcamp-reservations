@@ -33,7 +33,7 @@ class WhatsappMessageTemplate extends Model
     const TYPE_BOOKING_REMINDER = 'booking_reminder';
     const TYPE_BOOKING_ENDING_REMINDER = 'booking_ending_reminder';
     const TYPE_MANUAL_TEMPLATE = 'manual_template';
-
+    const TYPE_RESERVATION_CONFIRMATION = 'reservation_confirmation';
     // Get all available types
     public static function getTypes()
     {

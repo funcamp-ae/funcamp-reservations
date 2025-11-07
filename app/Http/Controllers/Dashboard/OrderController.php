@@ -1372,6 +1372,7 @@ $request->validate($rules);
                 $view = 'dashboard.orders.pdf.quote';
                 break;
             case 'reservation_data':
+            case 'reservation_confirmation':
                 $view = 'dashboard.orders.pdf.reservation';
                 // Generate QR code for reservation data like in generateClientPDF
                 try {
@@ -1403,7 +1404,7 @@ $request->validate($rules);
         }
 
         // Render the view with appropriate variables
-        if ($type === 'reservation_data') {
+        if ($type === 'reservation_data' || $type === 'reservation_confirmation') {
             $html = view($view, compact('order', 'termsSittng', 'qrCodeFullPath', 'editUrl'))->render();
         } else {
             $html = view($view, compact('order', 'termsSittng'))->render();
@@ -1429,7 +1430,7 @@ $request->validate($rules);
         $mpdf->Output($tempPath, \Mpdf\Output\Destination::FILE);
 
         // Clean up QR code file if created
-        if ($type === 'reservation_data' && isset($qrCodePath) && Storage::disk('public')->exists($qrCodePath)) {
+        if (($type === 'reservation_data' || $type === 'reservation_confirmation') && isset($qrCodePath) && Storage::disk('public')->exists($qrCodePath)) {
             Storage::disk('public')->delete($qrCodePath);
         }
 
@@ -1516,7 +1517,7 @@ $request->validate($rules);
     {
         $request->validate([
             'templates' => 'sometimes|array',
-            'templates.*' => 'in:show_price,reservation_data,invoice,receipt,evaluation,payment_link_created,payment_link_resend,booking_reminder,booking_ending_reminder,manual_template',
+            'templates.*' => 'in:show_price,reservation_data,invoice,receipt,evaluation,payment_link_created,payment_link_resend,booking_reminder,booking_ending_reminder,manual_template,reservation_confirmation',
             'receipts' => 'sometimes|array'
         ]);
 

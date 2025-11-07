@@ -39,6 +39,9 @@ class ServiceSiteAndCustomerService extends Model
             'workername_ar' => self::convertHtmlToWhatsApp($data->workername_ar),
             'workername_en' => self::convertHtmlToWhatsApp($data->workername_en),
             'workerphone' => $data->workerphone,
+            'important_notes' => self::convertHtmlToWhatsApp($data->important_notes),
+            'guidance_images' => $data->guidance_images,
+            'guidance_videos' => $data->guidance_videos,
         ];
     }
 
