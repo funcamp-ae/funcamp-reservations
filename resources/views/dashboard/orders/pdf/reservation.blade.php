@@ -2,7 +2,7 @@
 <html dir="@lang('dashboard.direction')" lang="{{ app()->getLocale() }}">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>@lang('dashboard.Reservation_information')</title>
+    <title>@lang('dashboard.reservation_confirmation_message')</title>
     <style>
         body {
             font-family: 'Cairo', sans-serif;
@@ -268,7 +268,9 @@
 
         <div class="logo">
             <img class="seal" src="{{ public_path('imgs/funcamp_remove.png') }}" alt="Funcamp Logo">
-            <P style="@if(app()->getLocale() == 'en') font-size:15px; @else font-size:20px; @endif margin: 0"><b> @lang('dashboard.Reservation_info') / {{ trans_get('dashboard.Reservation_info', [], 'opposite_locale') }}</b></P>
+            <P style="@if(app()->getLocale() == 'en') font-size:12px; @else font-size:16px; @endif margin: 0; white-space: nowrap; word-break: keep-all;">
+                <b> @lang('dashboard.reservation_confirmation_message') / {{ trans_get('dashboard.reservation_confirmation_message', [], 'opposite_locale') }}</b>
+            </P>
         </div>
 
         <div class="qr-code">

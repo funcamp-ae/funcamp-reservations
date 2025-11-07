@@ -1237,6 +1237,9 @@ $request->validate($rules);
         $mpdf->autoVietnamese = true;
         $mpdf->autoArabic = true;
         
+        // Add page numbers at the bottom center
+        $mpdf->SetFooter('{PAGENO} / {nbpg}');
+        
         $mpdf->WriteHTML($html);
 
         // Clean up QR code file if created
