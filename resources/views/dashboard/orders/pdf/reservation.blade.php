@@ -10,13 +10,13 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
+            background-color: #f8f9fa;
         }
 
         .container {
             width: 100%;
             margin: 0 auto;
-            background-color: #fff;
+            background-color: #f8f9fa;
             box-shadow: 0 0 5px rgba(0,0,0,0.1);
         }
 

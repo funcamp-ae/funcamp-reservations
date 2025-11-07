@@ -26,6 +26,7 @@ use App\Http\Controllers\Dashboard\ServiceSiteAndCustomerServiceController;
 use App\Http\Controllers\Dashboard\InternalNoteController;
 use App\Http\Controllers\Dashboard\SettingController;
 use App\Models\Order;
+use App\Models\TermsSittng;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{Dashboard\CampReportController, OrderSignatureController, RegistrationformController};
 use App\Http\Controllers\Dashboard\PageController;
@@ -41,6 +42,17 @@ use App\Http\Controllers\Dashboard\PageController;
 |
  */
 
+Route::get('/test', function () {
+    return view('dashboard.orders.pdf.reservation', [
+        'order' => Order::find(6),
+        'termsSittng' => TermsSittng::first(),
+        'editUrl' => null,
+        'qrCodeFullPath' => null,
+
+
+    ]);
+
+});
 
 Route::resource('registrationforms', RegistrationformController::class)->except(['index', 'edit', 'update', 'destroy']);
 
