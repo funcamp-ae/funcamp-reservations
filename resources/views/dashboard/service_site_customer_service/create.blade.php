@@ -173,11 +173,11 @@
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
-                                <td>
+                                <td class="text-center">
                                     @if($row->important_notes)
-                                        <div class="table-cell-content">
-                                            {!! $row->important_notes !!}
-                                        </div>
+                                        <button type="button" class="btn btn-sm btn-primary view-notes" data-bs-toggle="modal" data-bs-target="#notesModal" data-notes="{{ base64_encode($row->important_notes) }}">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
@@ -239,6 +239,21 @@
                     <div id="imageThumbnails" class="row g-2 mt-3">
                         <!-- Thumbnails will be loaded here -->
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Important Notes Modal -->
+    <div class="modal fade" id="notesModal" tabindex="-1" aria-labelledby="notesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notesModalLabel">{{ __('dashboard.important_notes') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="notesContent" dir="rtl" style="direction: rtl; text-align: right; max-height: 500px; overflow-y: auto;">
+                    <!-- Notes content will be loaded here -->
                 </div>
             </div>
         </div>
@@ -503,6 +518,19 @@
                     `;
                     thumbnails.appendChild(thumbnailCol);
                 });
+            }
+        });
+
+        // Handle Important Notes Modal
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.view-notes')) {
+                const button = e.target.closest('.view-notes');
+                const notesBase64 = button.getAttribute('data-notes');
+                const notesContent = document.getElementById('notesContent');
+                
+                // Decode base64 and display notes
+                const decodedNotes = atob(notesBase64);
+                notesContent.innerHTML = decodedNotes;
             }
         });
     });
