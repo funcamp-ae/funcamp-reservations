@@ -105,7 +105,9 @@
                 <div class="form-group w-100" style="margin-bottom: 9rem !important;">
                     <label for="important_notes">{{ __('dashboard.important_notes') }}</label>
                     <div id="editor-important-notes" dir="rtl" style="min-height:150px; direction: rtl; text-align: right;">{!! old('important_notes', isset($item) ? $item->important_notes : '') !!}</div>
-                    <input type="hidden" name="important_notes" id="input-important-notes" value="{!! old('important_notes', isset($item) ? $item->important_notes : '') !!}">
+                    <div class="d-none">    
+                        <input type="hidden" name="important_notes" id="input-important-notes" value="{!! old('important_notes', isset($item) ? $item->important_notes : '') !!}">
+                    </div>
                 </div>
 
                 <button type="submit" id="kt_ecommerce_add_product_submit" class="btn btn-primary w-fit mb-10">
@@ -173,10 +175,10 @@
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
-                                <td class="text-center">
+                                <td>
                                     @if($row->important_notes)
-                                        <button type="button" class="btn btn-sm btn-primary view-notes" data-bs-toggle="modal" data-bs-target="#notesModal" data-row-id="{{ $row->id }}">
-                                            <i class="fas fa-eye"></i>
+                                        <button type="button" class="btn btn-sm btn-info view-notes" data-bs-toggle="modal" data-bs-target="#notesModal" data-notes="{!! htmlspecialchars($row->important_notes) !!}">
+                                            <i class="fas fa-eye"></i> {{ __('dashboard.view') }}
                                         </button>
                                     @else
                                         <span class="text-muted">-</span>
@@ -209,15 +211,6 @@
                     </tbody>
                 </table>
             </div>
-            
-            <!-- Hidden notes content for modal -->
-            @foreach(isset($items) ? $items : [] as $row)
-                @if($row->important_notes)
-                    <div id="notes-content-{{ $row->id }}" class="d-none">
-                        {!! $row->important_notes !!}
-                    </div>
-                @endif
-            @endforeach
         </div>
     @endif
 
@@ -261,8 +254,8 @@
                     <h5 class="modal-title" id="notesModalLabel">{{ __('dashboard.important_notes') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" id="notesContent" dir="rtl" style="direction: rtl; text-align: right; max-height: 500px; overflow-y: auto;">
-                    <!-- Notes content will be loaded here -->
+                <div class="modal-body" id="notesModalBody" dir="rtl" style="text-align: right; max-height: 500px; overflow-y: auto;">
+                    <!-- Notes content will be loaded here dynamically -->
                 </div>
             </div>
         </div>
@@ -528,20 +521,15 @@
                     thumbnails.appendChild(thumbnailCol);
                 });
             }
-        });
-
-        // Handle Important Notes Modal
-        document.addEventListener('click', function(e) {
+            
+            // Handle Important Notes Modal
             if (e.target.closest('.view-notes')) {
                 const button = e.target.closest('.view-notes');
-                const rowId = button.getAttribute('data-row-id');
-                const notesContent = document.getElementById('notesContent');
-                const hiddenContent = document.getElementById('notes-content-' + rowId);
+                const notes = button.getAttribute('data-notes');
+                const notesModalBody = document.getElementById('notesModalBody');
                 
-                // Display notes from hidden div
-                if (hiddenContent) {
-                    notesContent.innerHTML = hiddenContent.innerHTML;
-                }
+                // Display the notes content
+                notesModalBody.innerHTML = notes;
             }
         });
     });
@@ -551,11 +539,23 @@
 @section('styles')
 <style>
     /* RTL input/editor adjustments */
-    .rtl-input{ font-size:14px; caret-color: auto; }
+    .rtl-input{ font-size:16px; caret-color: auto; }
     /* Make sure Quill placeholder text aligns right in RTL editors */
     .ql-editor[dir="rtl"]::before{ right: 0; left: auto; }
     /* If you have inline country select next to phone input, ensure it stays inline */
     .country-select-wrap { display: inline-flex; align-items: center; gap:8px; }
+    
+    /* Increase font size for all Quill editors */
+    .ql-container{
+        font-size: 30px !important;
+        line-height: 1.6;
+    }
+    
+    /* Specific styling for important notes editor */
+    #editor-important-notes .ql-editor {
+        font-size: 18px;
+        line-height: 1.8;
+    }
     
     /* Limit Quill editor height and add scroll */
     .ql-container {
