@@ -41,19 +41,6 @@ use App\Http\Controllers\Dashboard\PageController;
 | contains the "web" middleware group. Now create something great!
 |
  */
-
-Route::get('/test', function () {
-    return view('dashboard.orders.pdf.reservation', [
-        'order' => Order::find(6),
-        'termsSittng' => TermsSittng::first(),
-        'editUrl' => null,
-        'qrCodeFullPath' => null,
-
-
-    ]);
-
-});
-
 Route::resource('registrationforms', RegistrationformController::class)->except(['index', 'edit', 'update', 'destroy']);
 
 Route::get('order-rate/{order}', "VisitorsController@rate")->name('rate');
