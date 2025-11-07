@@ -1418,6 +1418,7 @@ $request->validate($rules);
         ]);
 
         $mpdf->SetDirectionality('rtl');
+        $mpdf->SetFooter('{PAGENO} / {nbpg}');
         $mpdf->WriteHTML($html);
 
         // Ensure temp directory exists
