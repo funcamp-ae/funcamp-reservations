@@ -175,9 +175,12 @@
                                 </td>
                                 <td class="text-center">
                                     @if($row->important_notes)
-                                        <button type="button" class="btn btn-sm btn-primary view-notes" data-bs-toggle="modal" data-bs-target="#notesModal" data-notes="{{ base64_encode($row->important_notes) }}">
+                                        <button type="button" class="btn btn-sm btn-primary view-notes" data-bs-toggle="modal" data-bs-target="#notesModal" data-row-id="{{ $row->id }}">
                                             <i class="fas fa-eye"></i>
                                         </button>
+                                        <div id="notes-content-{{ $row->id }}" style="display: none;">
+                                            {!! $row->important_notes !!}
+                                        </div>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
@@ -525,12 +528,14 @@
         document.addEventListener('click', function(e) {
             if (e.target.closest('.view-notes')) {
                 const button = e.target.closest('.view-notes');
-                const notesBase64 = button.getAttribute('data-notes');
+                const rowId = button.getAttribute('data-row-id');
                 const notesContent = document.getElementById('notesContent');
+                const hiddenContent = document.getElementById('notes-content-' + rowId);
                 
-                // Decode base64 and display notes
-                const decodedNotes = atob(notesBase64);
-                notesContent.innerHTML = decodedNotes;
+                // Display notes from hidden div
+                if (hiddenContent) {
+                    notesContent.innerHTML = hiddenContent.innerHTML;
+                }
             }
         });
     });
