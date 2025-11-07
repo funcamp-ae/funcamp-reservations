@@ -1874,6 +1874,7 @@ return [
     'invoice' => 'Invoice',
     'receipt' => 'Receipt',
     'reservation_data' => 'Reservation Data',
+    'reservation_confirmation' => 'Reservation Confirmation',
     'evaluation' => 'Evaluation',
     'payment_link_created' => 'Payment Link Created',
     'payment_link_resend' => 'Payment Link Resend',

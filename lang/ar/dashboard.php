@@ -1733,6 +1733,7 @@ return [
     'invoice' => 'الفاتورة',
     'receipt' => 'إيصال القبض',
     'reservation_data' => 'بيانات الحجز',
+    'reservation_confirmation' => 'تأكيد الحجز',
     'evaluation' => 'التقييم',
     'payment_link_created' => 'إنشاء رابط دفع الكتروني',
     'payment_link_resend' => 'إعادة إرسال رابط الدفع الإلكتروني',

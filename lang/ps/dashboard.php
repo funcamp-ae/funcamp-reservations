@@ -1723,6 +1723,7 @@ return [
     'invoice' => 'بیل',
     'receipt' => 'رسید',
     'reservation_data' => 'د حجز معلومات',
+    'reservation_confirmation' => 'د حجز تصدیق',
     'evaluation' => 'ارزونه',
     'payment_link_created' => 'د بریښنایي تادیې اړیکه جوړول',
     'payment_link_resend' => 'د بریښنایي تادیې اړیکه بیا لېږل',

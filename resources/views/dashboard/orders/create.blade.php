@@ -493,7 +493,8 @@
                                         'show_price' => __('dashboard.show_price'),
                                         'reservation_data' => __('dashboard.reservation_data'),
                                         'invoice' => __('dashboard.invoice'),
-                                        'evaluation' => __('dashboard.evaluation')
+                                        'evaluation' => __('dashboard.evaluation'),
+                                        'reservation_confirmation' => __('dashboard.reservation_confirmation')
                                     ];
 
                                     $allTemplateTypes = array_merge($checkboxTypes, ['receipt' => __('dashboard.receipt')]);
