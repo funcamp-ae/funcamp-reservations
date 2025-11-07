@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->boolean('is_evaluation_sent')->default(false)->after('is_end_booking_reminder_sent');
+            $table->boolean('is_evaluation_sent')->default(false);
         });
     }
 
