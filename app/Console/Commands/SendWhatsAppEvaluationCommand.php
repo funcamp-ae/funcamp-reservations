@@ -73,6 +73,7 @@ class SendWhatsAppEvaluationCommand extends Command
             // Find completed orders eligible for WhatsApp evaluation
             $orders = Order::with(['customer'])
                 ->where('status', 'completed')
+                ->where('is_evaluation_sent', false)
                 ->whereDate('updated_at', '<=', $completedAt->toDateString())
                 ->get();
 

@@ -389,9 +389,7 @@
                 @php $totalPaid = 0; @endphp
                 @if(!empty($order->payments))
                     @foreach($order->payments as $payment)
-                        @if($payment->verified == 1)
                             @php $totalPaid += $payment->price @endphp
-                        @endif
                     @endforeach
                 @endif
                 <td>{{ $totalPaid }} @lang('dashboard.RS') </td>

@@ -67,6 +67,9 @@ class SendWhatsAppEvaluationJob implements ShouldQueue
             );
 
             if ($success) {
+                // Mark order as evaluation sent
+                $this->order->update(['is_evaluation_sent' => true]);
+                
                 Log::info('WhatsApp evaluation message sent successfully', [
                     'order_id' => $this->order->id,
                     'customer_phone' => $this->order->customer->phone,

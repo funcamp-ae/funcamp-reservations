@@ -67,7 +67,8 @@ class Order extends Model
         'video_note_logout',
         'voice_note_logout',
         "signature_path" , 
-         "signature"
+         "signature",
+        'is_evaluation_sent',
     ];
 
     public function addHoursCount()

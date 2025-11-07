@@ -17,7 +17,7 @@
             width: 100%;
             margin: 0 auto;
             background-color: #f8f9fa;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            /* box-shadow: 0 0 5px rgba(0,0,0,0.1); */
         }
 
         .header {
