@@ -178,9 +178,6 @@
                                         <button type="button" class="btn btn-sm btn-primary view-notes" data-bs-toggle="modal" data-bs-target="#notesModal" data-row-id="{{ $row->id }}">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <div id="notes-content-{{ $row->id }}" style="display: none;">
-                                            {!! $row->important_notes !!}
-                                        </div>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
@@ -212,6 +209,15 @@
                     </tbody>
                 </table>
             </div>
+            
+            <!-- Hidden notes content for modal -->
+            @foreach(isset($items) ? $items : [] as $row)
+                @if($row->important_notes)
+                    <div id="notes-content-{{ $row->id }}" class="d-none">
+                        {!! $row->important_notes !!}
+                    </div>
+                @endif
+            @endforeach
         </div>
     @endif
 
