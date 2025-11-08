@@ -2036,22 +2036,60 @@ Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.', 'middleware' => ['a
                 'exists' => \Storage::disk('public')->exists($path)
             ]);
             
+            // Remove video URL from all ServiceSiteAndCustomerService records
+            $records = \App\Models\ServiceSiteAndCustomerService::all();
+            $removedFromRecords = 0;
+            
+            foreach ($records as $record) {
+                if ($record->guidance_videos && is_array($record->guidance_videos)) {
+                    $originalCount = count($record->guidance_videos);
+                    
+                    // Filter out the video URL from the array
+                    $updatedVideos = array_values(array_filter($record->guidance_videos, function($video) use ($videoUrl) {
+                        return $video !== $videoUrl;
+                    }));
+                    
+                    // If the array changed, update the record
+                    if (count($updatedVideos) !== $originalCount) {
+                        $record->guidance_videos = $updatedVideos;
+                        $record->save();
+                        $removedFromRecords++;
+                        
+                        \Log::info('Removed video from ServiceSiteAndCustomerService', [
+                            'record_id' => $record->id,
+                            'original_count' => $originalCount,
+                            'new_count' => count($updatedVideos)
+                        ]);
+                    }
+                }
+            }
+            
             // Delete from local storage
+            $fileDeleted = false;
             if (\Storage::disk('public')->exists($path)) {
                 \Storage::disk('public')->delete($path);
-                \Log::info('Video deleted successfully: ' . $path);
+                $fileDeleted = true;
                 
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Video deleted successfully'
-                ]);
+                \Log::info('Video file deleted successfully: ' . $path);
             } else {
-                \Log::warning('Video file not found', [
+                \Log::warning('Video file not found on disk', [
                     'path' => $path,
                     'disk_root' => \Storage::disk('public')->path(''),
                     'full_path' => \Storage::disk('public')->path($path)
                 ]);
-                
+            }
+            
+            // Return success if either file was deleted or removed from database
+            if ($fileDeleted || $removedFromRecords > 0) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Video deleted successfully',
+                    'details' => [
+                        'file_deleted' => $fileDeleted,
+                        'removed_from_records' => $removedFromRecords
+                    ]
+                ]);
+            } else {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Video file not found: ' . $path
