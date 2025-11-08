@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Order;
 use App\Services\WhatsAppService;
+use App\Services\PdfGeneratorService;
 use App\Models\WhatsappMessageTemplate;
 use App\Models\ServiceSiteAndCustomerService;
 use Illuminate\Bus\Queueable;
@@ -33,9 +34,10 @@ class SendWhatsAppBookingReminderJob implements ShouldQueue
     /**
      * Execute the job.
      *
+     * @param PdfGeneratorService $pdfService
      * @return void
      */
-    public function handle()
+    public function handle(PdfGeneratorService $pdfService)
     {
         try {
             // Get the booking reminder template
@@ -87,18 +89,39 @@ class SendWhatsAppBookingReminderJob implements ShouldQueue
             $message = str_replace(['[الاسم]', '[Name]'], $receptionName, $message);
             $message = str_replace(['[رقم الهاتف]', '[Phone Number]'], $receptionPhone, $message);
 
+            // Generate PDF for booking reminder (reservation confirmation)
+            $pdfPath = $pdfService->generateTempPdf($this->order, 'reservation_confirmation');
+
             // Send WhatsApp message
             $whatsAppService = new WhatsAppService();
-            $success = $whatsAppService->sendTextMessage(
-                $this->order->customer->phone,
-                $message
-            );
+            
+            if ($pdfPath && file_exists($pdfPath)) {
+                // Send with PDF attachment
+                $success = $whatsAppService->sendFile(
+                    $this->order->customer->phone,
+                    $pdfPath,
+                    $message
+                );
+                
+                // Clean up the temporary PDF file
+                if (file_exists($pdfPath)) {
+                    unlink($pdfPath);
+                }
+            } else {
+                // Fallback to text-only message if PDF generation fails
+                Log::warning('PDF generation failed, sending text-only message', ['order_id' => $this->order->id]);
+                $success = $whatsAppService->sendTextMessage(
+                    $this->order->customer->phone,
+                    $message
+                );
+            }
 
             if ($success) {
                 Log::info('WhatsApp booking reminder message sent successfully', [
                     'order_id' => $this->order->id,
                     'customer_phone' => $this->order->customer->phone,
-                    'reservation_date' => $date
+                    'reservation_date' => $date,
+                    'with_pdf' => $pdfPath && file_exists($pdfPath)
                 ]);
             } else {
                 Log::error('Failed to send WhatsApp booking reminder message', [

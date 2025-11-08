@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Mail\OrderDocumentsMail;
 use App\Models\Notice;
 use App\Services\WhatsAppService;
+use App\Services\PdfGeneratorService;
 use App\Models\WhatsappMessageTemplate;
 use App\Models\ServiceSiteAndCustomerService;
 use DB;
@@ -53,16 +54,19 @@ use App\Http\Requests\UpdateOrderSignInRequest;
 class OrderController extends Controller
 {
     private $orderRepository;
+    private $pdfService;
 
     public function __construct(
         IOrderRepository $orderRepository,
         IUserRepository $Iuser,
-        ICategoryRepository $Icat
+        ICategoryRepository $Icat,
+        PdfGeneratorService $pdfService
     ) {
 
         $this->orderRepository = $orderRepository;
         $this->Iuser = $Iuser;
         $this->Icat = $Icat;
+        $this->pdfService = $pdfService;
     }
 
     public function index()
@@ -1194,93 +1198,22 @@ $request->validate($rules);
     public function generateClientPDF($id)
     {
         $order = Order::with(['customer', 'services'])->findOrFail($id);
-        $termsSittng = TermsSittng::firstOrFail();
-
-        //        dd($termsSittng);
-        // Generate QR code with link to edit page
-        $editUrl = route('orders.edit', $id);
-
-        // Generate QR code using Endroid QR Code library
-        try {
-            $qrCode = QrCode::create($editUrl)
-                ->setSize(100)
-                ->setMargin(0)->setBackgroundColor(new Color(255, 255, 255)) // خلفية بيضاء نقية
-            ;
-
-            $writer = new PngWriter();
-            $result = $writer->write($qrCode);
-
-            // Save QR code to temporary file
-            $qrCodePath = 'qrcodes/order_' . $id . '.png';
-            Storage::disk('public')->put($qrCodePath, $result->getString());
-            $qrCodeFullPath = Storage::disk('public')->path($qrCodePath);
-        } catch (\Exception $e) {
-            \Log::error('QR code generation failed: ' . $e->getMessage());
-            $qrCodeFullPath = null;
-        }
-
-        $html = view('dashboard.orders.pdf.reservation', compact('order', 'termsSittng', 'qrCodeFullPath', 'editUrl'))->render();
-
-        $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'default_font' => 'xbriyaz',
-            'directionality' => 'rtl'
-        ]);
-
-        $mpdf->SetDirectionality('rtl');
-        
-        // Enable clickable links in PDF
-        $mpdf->showImageErrors = false;
-        $mpdf->autoScriptToLang = true;
-        $mpdf->baseScript = 1;
-        $mpdf->autoVietnamese = true;
-        $mpdf->autoArabic = true;
-        
-        // Add page numbers at the bottom center
-        $mpdf->SetFooter('{PAGENO} / {nbpg}');
-        
-        $mpdf->WriteHTML($html);
-
-        // Clean up QR code file if created
-        if (isset($qrCodePath) && Storage::disk('public')->exists($qrCodePath)) {
-            Storage::disk('public')->delete($qrCodePath);
-        }
-
         $filename = 'RES-' . $order->order_number . '.pdf';
-        $mpdf->Output($filename, 'I');
+        return $this->pdfService->generateAndOutputPdf($order, 'reservation', $filename, 'I');
     }
 
     public function quote($order)
     {
         $order = Order::with(['payments', 'addons', 'services', 'customer'])->findOrFail($order);
-        $termsSittng = TermsSittng::firstOrFail();
-
-        $html = view('dashboard.orders.pdf.quote', compact('order', 'termsSittng'))->render();
-        $mpdf = new Mpdf(['mode' => 'utf-8', 'format' => 'A4']);
-        $mpdf->WriteHTML($html);
-
         $filename = 'QUO-' . $order->order_number . '.pdf';
-        $mpdf->Output($filename, 'I');
+        return $this->pdfService->generateAndOutputPdf($order, 'quote', $filename, 'I');
     }
 
     public function invoice($order)
     {
         $order = Order::with(['payments', 'addons', 'services', 'customer'])->findOrFail($order);
-        $termsSittng = TermsSittng::firstOrFail();
-        //        dd($order->items);
-
-        $html = view('dashboard.orders.pdf.invoice', compact('order', 'termsSittng'))->render();
-        $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'margin_top' => 5,
-            'margin_bottom' => 5,
-        ]);
-        $mpdf->WriteHTML($html);
-
         $filename = 'INV-' . $order->order_number . '.pdf';
-        $mpdf->Output($filename, 'I');
+        return $this->pdfService->generateAndOutputPdf($order, 'invoice', $filename, 'I');
     }
 
     public function addonReceipt($orderId, $addonOrderId)
@@ -1363,79 +1296,7 @@ $request->validate($rules);
     // Update the generateTempPdf method in OrderController
     private function generateTempPdf($order, $type)
     {
-        $termsSittng = TermsSittng::firstOrFail();
-        $view = '';
-        $qrCodeFullPath = null;
-
-        switch ($type) {
-            case 'show_price':
-                $view = 'dashboard.orders.pdf.quote';
-                break;
-            case 'reservation_data':
-            case 'reservation_confirmation':
-                $view = 'dashboard.orders.pdf.reservation';
-                // Generate QR code for reservation data like in generateClientPDF
-                try {
-                    $editUrl = route('orders.edit', $order->id);
-                    $qrCode = QrCode::create($editUrl)
-                        ->setSize(100)
-                        ->setMargin(0)
-                        ->setBackgroundColor(new Color(255, 255, 255));
-
-                    $writer = new PngWriter();
-                    $result = $writer->write($qrCode);
-
-                    $qrCodePath = 'qrcodes/order_' . $order->id . '.png';
-                    Storage::disk('public')->put($qrCodePath, $result->getString());
-                    $qrCodeFullPath = Storage::disk('public')->path($qrCodePath);
-                } catch (\Exception $e) {
-                    \Log::error('QR code generation failed: ' . $e->getMessage());
-                    $qrCodeFullPath = null;
-                }
-                break;
-            case 'invoice':
-                $view = 'dashboard.orders.pdf.invoice';
-                break;
-            case 'receipt':
-                $view = 'dashboard.orders.pdf.receipt';
-                break;
-            default:
-                return false;
-        }
-
-        // Render the view with appropriate variables
-        if ($type === 'reservation_data' || $type === 'reservation_confirmation') {
-            $html = view($view, compact('order', 'termsSittng', 'qrCodeFullPath', 'editUrl'))->render();
-        } else {
-            $html = view($view, compact('order', 'termsSittng'))->render();
-        }
-
-        $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'default_font' => 'xbriyaz',
-            'directionality' => 'rtl'
-        ]);
-
-        $mpdf->SetDirectionality('rtl');
-        $mpdf->SetFooter('{PAGENO} / {nbpg}');
-        $mpdf->WriteHTML($html);
-
-        // Ensure temp directory exists
-        $tempDir = storage_path('app/temp');
-        if (!is_dir($tempDir)) {
-            mkdir($tempDir, 0775, true);
-        }
-
-        $tempPath = storage_path('app/temp/' . $type . '_' . $order->id . '.pdf');
-        $mpdf->Output($tempPath, \Mpdf\Output\Destination::FILE);
-
-        // Clean up QR code file if created
-        if (($type === 'reservation_data' || $type === 'reservation_confirmation') && isset($qrCodePath) && Storage::disk('public')->exists($qrCodePath)) {
-            Storage::disk('public')->delete($qrCodePath);
-        }
-
-        return $tempPath;
+        return $this->pdfService->generateTempPdf($order, $type);
     }
     // Add this method to send email
     public function sendEmail(Request $request, $id)
@@ -1686,98 +1547,22 @@ $request->validate($rules);
 
     private function generateAddonReceiptPdf($orderId, $addonId)
     {
-        $order = Order::with(['payments', 'addons', 'services', 'customer', 'items'])
-            ->findOrFail($orderId);
-
-        $addon = $order->addons->where('pivot.id', $addonId)->first();
-        if (!$addon) abort(404, 'Addon not found');
-
-        $termsSittng = TermsSittng::firstOrFail();
-        $html = view('dashboard.orders.pdf.addon_receipt', compact('order', 'addon', 'termsSittng'))->render();
-
-        $mpdf = new Mpdf(['mode' => 'utf-8', 'format' => 'A4']);
-        $mpdf->WriteHTML($html);
-
-        // Ensure temp directory exists
-        $tempDir = storage_path('app/temp');
-        if (!is_dir($tempDir)) {
-            mkdir($tempDir, 0775, true);
-        }
-
-        $tempPath = storage_path('app/temp/addon_receipt_' . $addonId . '.pdf');
-        $mpdf->Output($tempPath, \Mpdf\Output\Destination::FILE);
-
-        return $tempPath;
+        return $this->pdfService->generateAddonReceiptPdf($orderId, $addonId);
     }
 
     private function generatePaymentReceiptPdf($orderId, $paymentId)
     {
-        $order = Order::findOrFail($orderId);
-        $payment = Payment::with(['account'])->findOrFail($paymentId);
-        if ($payment->order_id != $order->id) abort(404, 'Payment not found');
-
-        $termsSittng = TermsSittng::firstOrFail();
-        $html = view('dashboard.orders.pdf.payment_receipt', compact('order', 'payment', 'termsSittng'))->render();
-
-        $mpdf = new Mpdf(['mode' => 'utf-8', 'format' => 'A4']);
-        $mpdf->WriteHTML($html);
-
-        // Ensure temp directory exists
-        $tempDir = storage_path('app/temp');
-        if (!is_dir($tempDir)) {
-            mkdir($tempDir, 0775, true);
-        }
-
-        $tempPath = storage_path('app/temp/payment_receipt_' . $paymentId . '.pdf');
-        $mpdf->Output($tempPath, \Mpdf\Output\Destination::FILE);
-
-        return $tempPath;
+        return $this->pdfService->generatePaymentReceiptPdf($orderId, $paymentId);
     }
 
     private function generateWarehouseReceiptPdf($orderId, $itemId)
     {
-        $order = Order::findOrFail($orderId);
-        $warehouseItem = \App\Models\OrderItem::with(['stock'])->findOrFail($itemId);
-        if ($warehouseItem->order_id != $order->id) abort(404, 'Item not found');
-
-        $termsSittng = TermsSittng::firstOrFail();
-        $html = view('dashboard.orders.pdf.warehouse_receipt', compact('order', 'warehouseItem', 'termsSittng'))->render();
-
-        $mpdf = new Mpdf(['mode' => 'utf-8', 'format' => 'A4']);
-        $mpdf->WriteHTML($html);
-
-        // Ensure temp directory exists
-        $tempDir = storage_path('app/temp');
-        if (!is_dir($tempDir)) {
-            mkdir($tempDir, 0775, true);
-        }
-
-        $tempPath = storage_path('app/temp/warehouse_receipt_' . $itemId . '.pdf');
-        $mpdf->Output($tempPath, \Mpdf\Output\Destination::FILE);
-
-        return $tempPath;
+        return $this->pdfService->generateWarehouseReceiptPdf($orderId, $itemId);
     }
 
     private function cleanupTempFiles($orderId, $documents)
     {
-        foreach ($documents as $document) {
-            if (str_starts_with($document, 'addon_receipt_')) {
-                $addonId = str_replace('addon_receipt_', '', $document);
-                $tempPath = storage_path('app/temp/addon_receipt_' . $addonId . '.pdf');
-            } elseif (str_starts_with($document, 'payment_receipt_')) {
-                $paymentId = str_replace('payment_receipt_', '', $document);
-                $tempPath = storage_path('app/temp/payment_receipt_' . $paymentId . '.pdf');
-            } elseif (str_starts_with($document, 'warehouse_receipt_')) {
-                $itemId = str_replace('warehouse_receipt_', '', $document);
-                $tempPath = storage_path('app/temp/warehouse_receipt_' . $itemId . '.pdf');
-            } else {
-                $tempPath = storage_path('app/temp/' . $document . '_' . $orderId . '.pdf');
-            }
-
-            if (file_exists($tempPath)) {
-                unlink($tempPath);
-            }
-        }
+        return $this->pdfService->cleanupTempFiles($orderId, $documents);
     }
 
     /**
