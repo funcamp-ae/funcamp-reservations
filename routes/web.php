@@ -2008,9 +2008,33 @@ Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.', 'middleware' => ['a
             }
 
             // Extract the path from the URL
-            // Example: http://127.0.0.1:8000/storage/guidance_videos/1762457392_690cf730cef5b.mp4
-            // We need: guidance_videos/1762457392_690cf730cef5b.mp4
-            $path = str_replace(asset('storage/'), '', $videoUrl);
+            // Handle different URL formats:
+            // 1. https://system.funcamp.ae/public/storage/guidance_videos/file.mov
+            // 2. https://system.funcamp.ae/storage/guidance_videos/file.mov
+            // 3. http://127.0.0.1:8000/storage/guidance_videos/file.mp4
+            
+            // Remove domain and get the path after 'storage/'
+            $path = null;
+            
+            if (strpos($videoUrl, '/public/storage/') !== false) {
+                // Format: .../public/storage/guidance_videos/file.mov
+                $path = substr($videoUrl, strpos($videoUrl, '/public/storage/') + strlen('/public/storage/'));
+            } elseif (strpos($videoUrl, '/storage/') !== false) {
+                // Format: .../storage/guidance_videos/file.mov
+                $path = substr($videoUrl, strpos($videoUrl, '/storage/') + strlen('/storage/'));
+            } else {
+                // Try to extract path from asset() URL
+                $path = str_replace(asset('storage/'), '', $videoUrl);
+            }
+            
+            // Clean up the path (remove leading slashes)
+            $path = ltrim($path, '/');
+            
+            \Log::info('Attempting to delete video', [
+                'original_url' => $videoUrl,
+                'extracted_path' => $path,
+                'exists' => \Storage::disk('public')->exists($path)
+            ]);
             
             // Delete from local storage
             if (\Storage::disk('public')->exists($path)) {
@@ -2022,10 +2046,15 @@ Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.', 'middleware' => ['a
                     'message' => 'Video deleted successfully'
                 ]);
             } else {
-                \Log::warning('Video file not found: ' . $path);
+                \Log::warning('Video file not found', [
+                    'path' => $path,
+                    'disk_root' => \Storage::disk('public')->path(''),
+                    'full_path' => \Storage::disk('public')->path($path)
+                ]);
+                
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Video file not found'
+                    'message' => 'Video file not found: ' . $path
                 ], 404);
             }
         } catch (\Exception $e) {
