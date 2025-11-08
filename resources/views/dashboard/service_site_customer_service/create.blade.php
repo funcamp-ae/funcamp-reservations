@@ -362,6 +362,11 @@
             url: '{{ route("dashboard.upload-guidance-video") }}',
             chunk_size: '2mb',
             max_file_size: '1000mb',
+            file_data_name: 'file',
+            multipart: true,
+            multipart_params: {
+                _token: '{{ csrf_token() }}'
+            },
             filters: {
                 mime_types: [
                     { title: "Video files", extensions: "mp4,mov,avi,wmv,flv,mkv,webm,m4v,3gp" }
