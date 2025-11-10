@@ -7,11 +7,10 @@
         body {
             font-family: 'Cairo', sans-serif;
             color: #333;
-            line-height: 1.8;
+            line-height: 1.6;
             margin: 0;
             padding: 0;
             background-color: #f8f9fa;
-            font-size: 20px;
         }
 
         .container {
@@ -29,14 +28,12 @@
             border-radius: 10px;
             margin-bottom: 20px;
             overflow: hidden;
-            font-size: 20px;
         }
 
         .company-info {
             text-align: left;
             float: left;
             width: 40%;
-            font-size: 20px;
         }
 
         .logo {
@@ -71,13 +68,12 @@
             border-radius: 8px;
             background-color: #f8f9fa;
             border-left: 5px solid #65391B;
-            font-size: 20px;
         }
 
         .section-title {
             color: #65391B;
             margin-bottom: 15px;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             border-bottom: 2px solid #eee;
             padding-bottom: 8px;
@@ -88,25 +84,21 @@
             width: 100%;
             border-collapse: collapse;
             margin: 15px 0;
-            font-size: 20px;
         }
 
         .details-table th {
             background-color: #65391B;
             color: white;
-            padding: 14px;
+            padding: 12px;
             text-align: center;
             border: 1px solid #65391B;
-            font-size: 20px;
-            font-weight: bold;
         }
 
         .details-table td {
-            padding: 14px;
+            padding: 12px;
             text-align: center;
             border: 1px solid #ddd;
             background-color: white;
-            font-size: 20px;
         }
 
         .details-table tr:nth-child(even) td {
@@ -118,16 +110,15 @@
             text-align: center;
             display: block;
             overflow: hidden;
-            font-size: 16px;
         }
 
         .thank-you {
-            font-size: 20px;
+            font-size: 18px;
             color: #fff;
             font-weight: bold;
             margin: 20px 0;
             text-align: center;
-            padding: 10px 15px;
+            padding: 5px 15px;
             background: linear-gradient(135deg, #B98220 0%, #6A3D1C 100%);
             border-radius: 8px;
         }
@@ -162,7 +153,7 @@
         }
 
         .social-number {
-            font-size: 16px;
+            font-size: 14px;
             vertical-align: middle;
             color: #333;
         }
@@ -182,7 +173,6 @@
             text-align: center;
             color: #777;
             margin-bottom: 10px;
-            font-size: 15px;
         }
 
         .seal-container {
@@ -234,7 +224,7 @@
         }
 
         .social-number {
-            font-size: 16px;
+            font-size: 14px;
             color: #333;
         }
 
@@ -242,7 +232,6 @@
             text-align: center;
             color: #392d2d;
             margin-bottom: 10px;
-            font-size: 15px;
         }
 
         .seal-container {
@@ -291,7 +280,7 @@
 
     <!-- Reservation Confirmation Message -->
     <div class="section @if(app()->getLocale() == 'en') ltr-text @else rtl-text @endif">
-        <div class="section-title" style="text-align: center; color: #65391B; font-size: 16px;">
+        <div class="section-title" style="text-align: center; color: #65391B;">
             @lang('dashboard.reservation_confirmation_message') / {{ trans_get('dashboard.reservation_confirmation_message', [], 'opposite_locale') }}
         </div>
 
@@ -470,15 +459,6 @@
                         </td>
                         <td>
                             @if($serviceSiteData->service_location)
-                                @php
-                                    $serviceLocationText = strip_tags($serviceSiteData->service_location);
-                                    // Check if it's already a Google Maps link
-                                    if (preg_match('/https?:\/\/(maps\.app\.goo\.gl|goo\.gl|maps\.google\.com|google\.com\/maps)/', $serviceLocationText, $matches)) {
-                                        $locationUrl = $serviceLocationText;
-                                    } else {
-                                        $locationUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($serviceLocationText);
-                                    }
-                                @endphp
                                 <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
                                     <a href="{{ $locationUrl }}" target="_blank" style="flex: 1; text-decoration: none; color: #007bff;">
                                         {!! $serviceSiteData->service_location !!}
@@ -539,7 +519,7 @@
                         <td style="text-align: left; direction: ltr;">
                             @foreach($serviceSiteData->guidance_videos as $video)
                                 <div style="margin-bottom: 10px;">
-                                    <a href="{{ $video }}" target="_blank" style="color: #007bff; text-decoration: none; font-size: 12px;">{{ $video }}</a>
+                                    <a href="{{ $video }}" target="_blank" style="color: #007bff; text-decoration: none;">{{ $video }}</a>
                                 </div>
                             @endforeach
                         </td>
@@ -592,7 +572,7 @@
     <!-- Footer -->
     <div class="footer" style="display: block; padding: 20px; border-radius: 10px; margin-top: 30px; overflow: hidden;">
         <div style="text-align: left; float: left; width: 30%;">
-            <span style="font-size: 14px; vertical-align: middle; display: inline-block;">
+            <span style="vertical-align: middle; display: inline-block;">
                 0566674766
             </span>
             <img src="{{ public_path('imgs/whatsapp.png') }}"
@@ -611,7 +591,7 @@
         </div>
 
         <div style="text-align: right; float: right; width: 30%;">
-            <span style="font-size: 14px; vertical-align: middle; display: inline-block;">
+            <span style=" vertical-align: middle; display: inline-block;">
                 funcamp.ae@
             </span>
             <img src="{{ public_path('imgs/instagram.png') }}"
