@@ -459,9 +459,10 @@
                         <td style="text-align: right; direction: rtl;">{!! $serviceSiteData->workername_ar !!}</td>
                         <td style="text-align: left; direction: ltr;">{!! $serviceSiteData->workername_en !!}</td>
                         <td>
-                            <div style="display: flex; align-items: center; gap: 10px; direction: ltr; justify-content: center;">
-                                <a href="{{ route('call.redirect', ['number' => $serviceSiteData->workerphone]) }}" style="text-decoration: none;">
-                                    <img src="{{ public_path('imgs/whatsapp.png') }}" alt="WhatsApp" style="width: 20px; height: 20px; vertical-align: middle;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; direction: ltr; justify-content: center;">
+                                <span>{{ $serviceSiteData->workerphone }}</span>
+                                <a href="https://system.funcamp.ae/call/{{ $serviceSiteData->workerphone }}" style="text-decoration: none;">
+                                    <img src="{{ public_path('imgs/phone.png') }}" alt="Phone" style="width: 20px; height: 20px; vertical-align: middle;">
                                 </a>
                             </div>
                         </td>
