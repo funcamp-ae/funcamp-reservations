@@ -442,8 +442,19 @@
                 <tbody>
                     <tr>
                         <td>
+                            @if($serviceSiteData->service_site)
+                            <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
+                                <span style="flex: 1; text-decoration: none; color: #007bff;">
+                                    {!! $serviceSiteData->service_site !!}
+                                    </span>
+                                </div>
+                                @else
+                                <span style="text-align: center;">-</span>
+                                @endif
+                            </td>
+                        <td>
                             @php
-                                $serviceSiteText = strip_tags($serviceSiteData->service_site);
+                                $serviceSiteText = strip_tags($serviceSiteData->service_location);
                                 // Check if it's already a Google Maps link
                                 if (preg_match('/https?:\/\/(maps\.app\.goo\.gl|goo\.gl|maps\.google\.com|google\.com\/maps)/', $serviceSiteText, $matches)) {
                                     $mapsUrl = $serviceSiteText;
@@ -453,29 +464,9 @@
                             @endphp
                             <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
                                 <a href="{{ $mapsUrl }}" target="_blank" style="flex: 1; text-decoration: none; color: #007bff;">
-                                    {!! $serviceSiteData->service_site !!}
+                                    {!! $serviceSiteData->service_location !!}
                                 </a>
                             </div>
-                        </td>
-                        <td>
-                            @if($serviceSiteData->service_location)
-                                @php
-                                    $serviceLocationText = strip_tags($serviceSiteData->service_location);
-                                    // Check if it's already a Google Maps link
-                                    if (preg_match('/https?:\/\/(maps\.app\.goo\.gl|goo\.gl|maps\.google\.com|google\.com\/maps)/', $serviceLocationText, $matches)) {
-                                        $locationUrl = $serviceLocationText;
-                                    } else {
-                                        $locationUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($serviceLocationText);
-                                    }
-                                @endphp
-                                <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
-                                    <a href="{{ $locationUrl }}" target="_blank" style="flex: 1; text-decoration: none; color: #007bff;">
-                                        {!! $serviceSiteData->service_location !!}
-                                    </a>
-                                </div>
-                            @else
-                                <span style="text-align: center;">-</span>
-                            @endif
                         </td>
                         <td style="text-align: right; direction: rtl;">{!! $serviceSiteData->workername_ar !!}</td>
                         <td style="text-align: left; direction: ltr;">{!! $serviceSiteData->workername_en !!}</td>
