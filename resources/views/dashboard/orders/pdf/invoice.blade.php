@@ -261,7 +261,7 @@
 
         <div class="show_price_info">
             <strong> @lang('dashboard.invoice') / {{ trans_get('dashboard.invoice', [], 'opposite_locale') }} @lang('dashboard.order_number') / {{ trans_get('dashboard.order_number', [], 'opposite_locale') }}:</strong><br>
-            {{ $order->order_number }}
+            {{ 'INV-' . $order->order_number }}<br>
         </div>
     </div>
 
