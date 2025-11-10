@@ -460,8 +460,8 @@
                         <td style="text-align: left; direction: ltr;">{!! $serviceSiteData->workername_en !!}</td>
                         <td>
                             <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; direction: ltr; justify-content: center;">
-                                <span>{{ $serviceSiteData->workerphone }}</span>
                                 <a href="https://system.funcamp.ae/call/{{ $serviceSiteData->workerphone }}" style="text-decoration: none;">
+                                     <span>{{ $serviceSiteData->workerphone }}</span>
                                     <img src="{{ public_path('imgs/phone.png') }}" alt="Phone" style="width: 20px; height: 20px; vertical-align: middle;">
                                 </a>
                             </div>
