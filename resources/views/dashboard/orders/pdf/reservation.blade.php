@@ -7,10 +7,11 @@
         body {
             font-family: 'Cairo', sans-serif;
             color: #333;
-            line-height: 1.6;
+            line-height: 1.8;
             margin: 0;
             padding: 0;
             background-color: #f8f9fa;
+            font-size: 20px;
         }
 
         .container {
@@ -28,12 +29,14 @@
             border-radius: 10px;
             margin-bottom: 20px;
             overflow: hidden;
+            font-size: 20px;
         }
 
         .company-info {
             text-align: left;
             float: left;
             width: 40%;
+            font-size: 20px;
         }
 
         .logo {
@@ -68,12 +71,13 @@
             border-radius: 8px;
             background-color: #f8f9fa;
             border-left: 5px solid #65391B;
+            font-size: 20px;
         }
 
         .section-title {
             color: #65391B;
             margin-bottom: 15px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             border-bottom: 2px solid #eee;
             padding-bottom: 8px;
@@ -84,21 +88,25 @@
             width: 100%;
             border-collapse: collapse;
             margin: 15px 0;
+            font-size: 20px;
         }
 
         .details-table th {
             background-color: #65391B;
             color: white;
-            padding: 12px;
+            padding: 14px;
             text-align: center;
             border: 1px solid #65391B;
+            font-size: 20px;
+            font-weight: bold;
         }
 
         .details-table td {
-            padding: 12px;
+            padding: 14px;
             text-align: center;
             border: 1px solid #ddd;
             background-color: white;
+            font-size: 20px;
         }
 
         .details-table tr:nth-child(even) td {
@@ -110,15 +118,16 @@
             text-align: center;
             display: block;
             overflow: hidden;
+            font-size: 16px;
         }
 
         .thank-you {
-            font-size: 18px;
+            font-size: 20px;
             color: #fff;
             font-weight: bold;
             margin: 20px 0;
             text-align: center;
-            padding: 5px 15px;
+            padding: 10px 15px;
             background: linear-gradient(135deg, #B98220 0%, #6A3D1C 100%);
             border-radius: 8px;
         }
@@ -153,7 +162,7 @@
         }
 
         .social-number {
-            font-size: 14px;
+            font-size: 16px;
             vertical-align: middle;
             color: #333;
         }
@@ -173,6 +182,7 @@
             text-align: center;
             color: #777;
             margin-bottom: 10px;
+            font-size: 15px;
         }
 
         .seal-container {
@@ -224,7 +234,7 @@
         }
 
         .social-number {
-            font-size: 14px;
+            font-size: 16px;
             color: #333;
         }
 
@@ -232,6 +242,7 @@
             text-align: center;
             color: #392d2d;
             margin-bottom: 10px;
+            font-size: 15px;
         }
 
         .seal-container {
@@ -433,6 +444,7 @@
                 <thead>
                     <tr>
                         <th>@lang('dashboard.service_site') / {{ trans_get('dashboard.service_site', [], 'opposite_locale') }}</th>
+                        <th>@lang('dashboard.service_location') / {{ trans_get('dashboard.service_location', [], 'opposite_locale') }}</th>
                         <th>@lang('dashboard.worker_name_ar') / {{ trans_get('dashboard.worker_name_ar', [], 'opposite_locale') }}</th>
                         <th>@lang('dashboard.worker_name_en') / {{ trans_get('dashboard.worker_name_en', [], 'opposite_locale') }}</th>
                         <th>@lang('dashboard.worker_phone') / {{ trans_get('dashboard.worker_phone', [], 'opposite_locale') }}</th>
@@ -455,6 +467,26 @@
                                     {!! $serviceSiteData->service_site !!}
                                 </a>
                             </div>
+                        </td>
+                        <td>
+                            @if($serviceSiteData->service_location)
+                                @php
+                                    $serviceLocationText = strip_tags($serviceSiteData->service_location);
+                                    // Check if it's already a Google Maps link
+                                    if (preg_match('/https?:\/\/(maps\.app\.goo\.gl|goo\.gl|maps\.google\.com|google\.com\/maps)/', $serviceLocationText, $matches)) {
+                                        $locationUrl = $serviceLocationText;
+                                    } else {
+                                        $locationUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($serviceLocationText);
+                                    }
+                                @endphp
+                                <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
+                                    <a href="{{ $locationUrl }}" target="_blank" style="flex: 1; text-decoration: none; color: #007bff;">
+                                        {!! $serviceSiteData->service_location !!}
+                                    </a>
+                                </div>
+                            @else
+                                <span style="text-align: center;">-</span>
+                            @endif
                         </td>
                         <td style="text-align: right; direction: rtl;">{!! $serviceSiteData->workername_ar !!}</td>
                         <td style="text-align: left; direction: ltr;">{!! $serviceSiteData->workername_en !!}</td>

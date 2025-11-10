@@ -2150,6 +2150,7 @@ return [
     'service_site_customer_service' => 'reservation Confirmation Message Data',
     'reservation_confirmation_message' => 'Reservation Confirmation Message',
     'service_site' => 'Service Site',
+    'service_location' => 'Google Maps Location',
     'worker_name_en' => 'Worker Name (EN)',
     'worker_name_ar' => 'Worker Name (AR)',
     'worker_phone' => 'Reception Office Phone Number at the Camp Site for More Assistance',

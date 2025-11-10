@@ -25,6 +25,13 @@
                     <div id="editor-serviceSite" dir="rtl" style="min-height:150px; direction: rtl; text-align: right;">{!! old('serviceSite', isset($item) ? $item->service_site : '') !!}</div>
                     <input type="hidden" name="serviceSite" id="input-serviceSite" value="{!! old('serviceSite', isset($item) ? $item->service_site : '') !!}">
                 </div>
+
+                <div class="form-group mb-25">
+                    <label for="serviceLocation">{{ __('dashboard.service_location') }}</label>
+                    <div id="editor-serviceLocation" dir="rtl" style="min-height:150px; direction: rtl; text-align: right;">{!! old('serviceLocation', isset($item) ? $item->service_location : '') !!}</div>
+                    <input type="hidden" name="serviceLocation" id="input-serviceLocation" value="{!! old('serviceLocation', isset($item) ? $item->service_location : '') !!}">
+                </div>
+
                     <div class="d-flex flex-row flex-wrap w-100 justify-content-between overflow-hidden mb-25">
                         <div class="form-group w-45 mb-25 ">
                             <label for="workername_en">{{ __('dashboard.worker_name_en') }}</label>
@@ -125,6 +132,7 @@
                     <thead class="thead-light">
                         <tr>
                             <th style="width: 200px;">{{ __('dashboard.service_site') }}</th>
+                            <th style="width: 200px;">{{ __('dashboard.service_location') }}</th>
                             <th style="width: 150px;">{{ __('dashboard.worker_name_en') }}</th>
                             <th style="width: 150px;">{{ __('dashboard.worker_name_ar') }}</th>
                             <th style="width: 120px;">{{ __('dashboard.phone') }}</th>
@@ -140,6 +148,11 @@
                                 <td>
                                     <div class="table-cell-content">
                                         {!! $row->service_site !!}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="table-cell-content">
+                                        {!! $row->service_location !!}
                                     </div>
                                 </td>
                                 <td>
@@ -205,7 +218,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center">{{ __('dashboard.no_data_found') }}</td>
+                                <td colspan="9" class="text-center">{{ __('dashboard.no_data_found') }}</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -289,6 +302,7 @@
 
         // Initialize Quill editors
         const quillService = new Quill('#editor-serviceSite', { theme: 'snow', modules: { toolbar: toolbarOptions } });
+        const quillLocation = new Quill('#editor-serviceLocation', { theme: 'snow', modules: { toolbar: toolbarOptions } });
         const quillEn = new Quill('#editor-workername-en', { theme: 'snow', modules: { toolbar: toolbarOptions } });
         const quillAr = new Quill('#editor-workername-ar', { theme: 'snow', modules: { toolbar: toolbarOptions } });
         const quillNotes = new Quill('#editor-important-notes', { theme: 'snow', modules: { toolbar: toolbarOptions } });
@@ -304,12 +318,14 @@
             root.classList.add('rtl-input');
         };
         setEditorRTL(quillService);
+        setEditorRTL(quillLocation);
         setEditorRTL(quillAr);
         setEditorRTL(quillNotes);
 
         const form = document.querySelector('form');
         form.addEventListener('submit', function (e) {
             document.getElementById('input-serviceSite').value = quillService.root.innerHTML;
+            document.getElementById('input-serviceLocation').value = quillLocation.root.innerHTML;
             document.getElementById('input-workername-en').value = quillEn.root.innerHTML;
             document.getElementById('input-workername-ar').value = quillAr.root.innerHTML;
             document.getElementById('input-important-notes').value = quillNotes.root.innerHTML;

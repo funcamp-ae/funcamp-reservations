@@ -37,6 +37,7 @@ class ServiceSiteAndCustomerServiceController extends Controller
 
         $validatedData = $request->validate([
             'serviceSite' => 'required|string',
+            'serviceLocation' => 'nullable|string',
             'workername_en' => 'required|string',
             'workername_ar' => 'required|string',
             'workerphone' => 'required|string',
@@ -49,6 +50,7 @@ class ServiceSiteAndCustomerServiceController extends Controller
 
         $data = [
             'service_site' => $validatedData['serviceSite'],
+            'service_location' => $request->input('serviceLocation'),
             'workername_en' => $validatedData['workername_en'],
             'workername_ar' => $validatedData['workername_ar'],
             'workerphone' => $validatedData['workerphone'],
@@ -113,6 +115,7 @@ class ServiceSiteAndCustomerServiceController extends Controller
     {
         $validatedData = $request->validate([
             'serviceSite' => 'required|string',
+            'serviceLocation' => 'nullable|string',
             'workername_en' => 'required|string',
             'workername_ar' => 'required|string',
             'workerphone' => 'required|string',
@@ -131,6 +134,7 @@ class ServiceSiteAndCustomerServiceController extends Controller
         
         $data = [
             'service_site' => $validatedData['serviceSite'],
+            'service_location' => $request->input('serviceLocation'),
             'workername_en' => $validatedData['workername_en'],
             'workername_ar' => $validatedData['workername_ar'],
             'workerphone' => $validatedData['workerphone'],

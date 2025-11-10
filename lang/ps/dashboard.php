@@ -1814,6 +1814,7 @@ return [
     'service_site_customer_service' => 'د بکنګ تایید پیغام معلومات',
     'reservation_confirmation_message' => 'د ریزرویشن تایید پیغام',
     'service_site' => 'د خدماتو ځای',
+    'service_location' => 'د ګوګل نقشو موقعیت',
     'worker_name_en' => 'د کارګر نوم (انګلیسي)',
     'worker_name_ar' => 'د کارګر نوم (عربي)',
     'worker_phone' => 'د کیمپ په ځای کې د استقبال دفتر تلیفون شمیره د نورو مرستو لپاره',

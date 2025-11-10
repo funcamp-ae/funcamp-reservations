@@ -10,6 +10,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
+            font-size: 20px;
             background-color: #f9f9f9;
         }
 
@@ -63,7 +64,7 @@
         .section-title {
             color: #65391B;
             margin-bottom: 5px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             border-bottom: 2px solid #eee;
             padding-bottom: 8px;
@@ -103,7 +104,7 @@
         }
 
         .thank-you {
-            font-size: 18px;
+            font-size: 20px;
             color: #fff;
             font-weight: bold;
             text-align: center;
@@ -142,7 +143,7 @@
         }
 
         .social-number {
-            font-size: 14px;
+            font-size: 20px;
             vertical-align: middle;
             color: #333;
         }
@@ -212,7 +213,7 @@
         }
 
         .social-number {
-            font-size: 14px;
+            font-size: 20px;
             color: #333;
         }
 
@@ -373,7 +374,7 @@
     <!-- Footer -->
     <div class="footer" style="display: block; padding: 20px; border-radius: 10px; margin-top: 30px; overflow: hidden;">
         <div style="text-align: left; float: left; width: 30%;">
-            <span style="font-size: 14px; vertical-align: middle; display: inline-block;">
+            <span style="font-size: 20px; vertical-align: middle; display: inline-block;">
                 0566674766
             </span>
             <img src="{{ public_path('imgs/whatsapp.png') }}"
@@ -392,7 +393,7 @@
         </div>
 
         <div style="text-align: right; float: right; width: 30%;">
-            <span style="font-size: 14px; vertical-align: middle; display: inline-block;">
+            <span style="font-size: 20px; vertical-align: middle; display: inline-block;">
                 funcamp.ae@
             </span>
             <img src="{{ public_path('imgs/instagram.png') }}"

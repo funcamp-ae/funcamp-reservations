@@ -11,6 +11,7 @@
             margin: 0;
             padding: 0;
             background-color: #f9f9f9;
+            font-size: 20px;
         }
 
         .container {
@@ -63,7 +64,7 @@
         .section-title {
             color: #65391B;
             margin-bottom: 5px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             border-bottom: 2px solid #eee;
             padding-bottom: 8px;
@@ -103,7 +104,7 @@
         }
 
         .thank-you {
-            font-size: 18px;
+            font-size: 20px;
             color: #fff;
             font-weight: bold;
             text-align: center;
@@ -142,7 +143,7 @@
         }
 
         .social-number {
-            font-size: 14px;
+            font-size: 20px;
             vertical-align: middle;
             color: #333;
         }
@@ -212,7 +213,7 @@
         }
 
         .social-number {
-            font-size: 14px;
+            font-size: 20px;
             color: #333;
         }
 
@@ -260,7 +261,7 @@
 
         <div class="show_price_info">
             <strong> @lang('dashboard.invoice') / {{ trans_get('dashboard.invoice', [], 'opposite_locale') }} @lang('dashboard.order_number') / {{ trans_get('dashboard.order_number', [], 'opposite_locale') }}:</strong><br>
-            {{ 'INV-' . $order->order_number }}<br>
+            {{ $order->id }}<br>
             <strong>@lang('dashboard.Receipt_Date') / {{ trans_get('dashboard.Receipt_Date', [], 'opposite_locale') }}:</strong><br>
             {{ now()->format('d-m-Y H:i') }}
         </div>
@@ -427,7 +428,7 @@
     <!-- Footer -->
     <div class="footer" style="display: block; padding: 20px; border-radius: 10px; margin-top: 30px; overflow: hidden;">
         <div style="text-align: left; float: left; width: 30%;">
-            <span style="font-size: 14px; vertical-align: middle; display: inline-block;">
+            <span style="font-size: 20px; vertical-align: middle; display: inline-block;">
                 0566674766
             </span>
             <img src="{{ public_path('imgs/whatsapp.png') }}"
@@ -446,7 +447,7 @@
         </div>
 
         <div style="text-align: right; float: right; width: 30%;">
-            <span style="font-size: 14px; vertical-align: middle; display: inline-block;">
+            <span style="font-size: 20px; vertical-align: middle; display: inline-block;">
                 funcamp.ae@
             </span>
             <img src="{{ public_path('imgs/instagram.png') }}"

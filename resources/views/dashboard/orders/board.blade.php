@@ -47,6 +47,7 @@
               <table class="table table-row-dashed align-middle mx-auto">
                 <thead>
                   <tr class="text-muted fw-bold">
+                    <th>@lang('dashboard.serial')</th>
                     <th>@lang('dashboard.reservation_date')</th>
                     <th>@lang('dashboard.service')</th>
                     <th>@lang('dashboard.reservation') #</th>
@@ -59,7 +60,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @forelse($todayOrders as $order)
+                  @forelse($todayOrders as $index => $order)
                   @php
                   $serviceNames = $order->services->pluck('name')->join(', ');
                   $timeFrom = $order->time_from ?? null;
@@ -72,6 +73,7 @@
                   $isPaid = $totalPaid >= $totalPrice;
                   @endphp
                   <tr>
+                    <td>{{ $index + 1 }}</td>
                     <td>{{ $order->date }}</td>
                     <td>{{ $serviceNames }}</td>
                     <td><a href="{{ route('orders.show', $order->id) }}">#{{ $order->id }}</a></td>
@@ -178,6 +180,7 @@
               <table class="table table-row-dashed align-middle mx-auto">
                 <thead>
                   <tr class="text-muted fw-bold">
+                    <th>@lang('dashboard.serial')</th>
                     <th>@lang('dashboard.reservation_date')</th>
                     <th>@lang('dashboard.service')</th>
                     <th>@lang('dashboard.order_id') #</th>
@@ -188,7 +191,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @forelse($upcomingOrders as $order)
+                  @forelse($upcomingOrders as $index => $order)
                   @php
                   $serviceNames = $order->services->pluck('name')->join(', ');
                   $verifiedPayments = $order->payments ? $order->payments->where('verified', true) : collect();
@@ -196,6 +199,7 @@
                   $isPaid = $order->price ? ($paidAmount >= (float)$order->price) : false;
                   @endphp
                   <tr>
+                    <td>{{ $index + 1 }}</td>
                     <td>{{ $order->date }}</td>
                     <td>{{ $serviceNames }}</td>
                     <td><a href="{{ route('orders.show', $order->id) }}">#{{ $order->id }}</a></td>

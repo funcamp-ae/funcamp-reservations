@@ -10,6 +10,7 @@ class ServiceSiteAndCustomerService extends Model
     use HasFactory;
     protected $fillable = [
         'service_site',
+        'service_location',
         'workername_ar',
         'workername_en',
         'workerphone',
@@ -36,6 +37,7 @@ class ServiceSiteAndCustomerService extends Model
 
         return [
             'service_site' => self::convertHtmlToWhatsApp($data->service_site),
+            'service_location' => self::convertHtmlToWhatsApp($data->service_location),
             'workername_ar' => self::convertHtmlToWhatsApp($data->workername_ar),
             'workername_en' => self::convertHtmlToWhatsApp($data->workername_en),
             'workerphone' => $data->workerphone,
