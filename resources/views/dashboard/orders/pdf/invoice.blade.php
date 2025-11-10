@@ -261,9 +261,7 @@
 
         <div class="show_price_info">
             <strong> @lang('dashboard.invoice') / {{ trans_get('dashboard.invoice', [], 'opposite_locale') }} @lang('dashboard.order_number') / {{ trans_get('dashboard.order_number', [], 'opposite_locale') }}:</strong><br>
-            {{ $order->id }}<br>
-            <strong>@lang('dashboard.Receipt_Date') / {{ trans_get('dashboard.Receipt_Date', [], 'opposite_locale') }}:</strong><br>
-            {{ now()->format('d-m-Y H:i') }}
+            {{ $order->order_number }}
         </div>
     </div>
 
