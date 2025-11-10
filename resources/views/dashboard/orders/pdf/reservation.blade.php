@@ -459,13 +459,8 @@
                         <td style="text-align: right; direction: rtl;">{!! $serviceSiteData->workername_ar !!}</td>
                         <td style="text-align: left; direction: ltr;">{!! $serviceSiteData->workername_en !!}</td>
                         <td>
-                            <a href="tel:{{ $serviceSiteData->workerphone }}">
-                                <span dir="ltr">
-                                    {{ $serviceSiteData->workerphone }}
-                                </span>
-                            </a>
                             <div style="display: flex; align-items: center; gap: 10px; direction: ltr; justify-content: center;">
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $serviceSiteData->workerphone) }}" style="text-decoration: none;">
+                                <a href="{{ route('call.redirect', ['number' => $serviceSiteData->workerphone]) }}" style="text-decoration: none;">
                                     <img src="{{ public_path('imgs/whatsapp.png') }}" alt="WhatsApp" style="width: 20px; height: 20px; vertical-align: middle;">
                                 </a>
                             </div>

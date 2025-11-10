@@ -41,6 +41,11 @@ use App\Http\Controllers\Dashboard\PageController;
 | contains the "web" middleware group. Now create something great!
 |
  */
+
+Route::get('call/{number}', function($number) {
+    return redirect('tel:' . $number);
+})->name('call.redirect');
+
 Route::resource('registrationforms', RegistrationformController::class)->except(['index', 'edit', 'update', 'destroy']);
 
 Route::get('order-rate/{order}', "VisitorsController@rate")->name('rate');
