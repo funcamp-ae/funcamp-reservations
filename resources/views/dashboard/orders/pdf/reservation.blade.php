@@ -459,6 +459,15 @@
                         </td>
                         <td>
                             @if($serviceSiteData->service_location)
+                                @php
+                                    $serviceLocationText = strip_tags($serviceSiteData->service_location);
+                                    // Check if it's already a Google Maps link
+                                    if (preg_match('/https?:\/\/(maps\.app\.goo\.gl|goo\.gl|maps\.google\.com|google\.com\/maps)/', $serviceLocationText, $matches)) {
+                                        $locationUrl = $serviceLocationText;
+                                    } else {
+                                        $locationUrl = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($serviceLocationText);
+                                    }
+                                @endphp
                                 <div style="display: flex; align-items: center; gap: 10px; direction: rtl; text-align: right;">
                                     <a href="{{ $locationUrl }}" target="_blank" style="flex: 1; text-decoration: none; color: #007bff;">
                                         {!! $serviceSiteData->service_location !!}
