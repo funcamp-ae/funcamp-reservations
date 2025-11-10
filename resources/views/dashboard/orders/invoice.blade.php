@@ -10,7 +10,7 @@
             font-family: 'Cairo', sans-serif;
             margin: 0;
             padding: 20px;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .header {

@@ -11,6 +11,7 @@
             margin: 0;
             padding: 0;
             background-color: #f8f9fa;
+            font-size: 12px;
         }
 
         .container {
@@ -73,7 +74,7 @@
         .section-title {
             color: #65391B;
             margin-bottom: 15px;
-            font-size: 18px;
+            font-size: 12px;
             font-weight: bold;
             border-bottom: 2px solid #eee;
             padding-bottom: 8px;
@@ -113,7 +114,7 @@
         }
 
         .thank-you {
-            font-size: 18px;
+            font-size: 12px;
             color: #fff;
             font-weight: bold;
             margin: 20px 0;
@@ -153,7 +154,7 @@
         }
 
         .social-number {
-            font-size: 14px;
+            font-size: 12px;
             vertical-align: middle;
             color: #333;
         }
@@ -224,7 +225,7 @@
         }
 
         .social-number {
-            font-size: 14px;
+            font-size: 12px;
             color: #333;
         }
 
@@ -268,7 +269,7 @@
 
         <div class="logo">
             <img class="seal" src="{{ public_path('imgs/funcamp_remove.png') }}" alt="Funcamp Logo">
-            <P style="@if(app()->getLocale() == 'en') font-size:12px; @else font-size:16px; @endif margin: 0; white-space: nowrap; word-break: keep-all;">
+            <P style="@if(app()->getLocale() == 'en') font-size:12px; @else font-size:12px; @endif margin: 0; white-space: nowrap; word-break: keep-all;">
                 <b> @lang('dashboard.reservation_confirmation_message') / {{ trans_get('dashboard.reservation_confirmation_message', [], 'opposite_locale') }}</b>
             </P>
         </div>

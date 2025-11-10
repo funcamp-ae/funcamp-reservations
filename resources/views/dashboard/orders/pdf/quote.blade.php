@@ -10,7 +10,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
-            font-size: 20px;
+            font-size: 12px;
             background-color: #f9f9f9;
         }
 
@@ -64,7 +64,7 @@
         .section-title {
             color: #65391B;
             margin-bottom: 5px;
-            font-size: 20px;
+            font-size: 12px;
             font-weight: bold;
             border-bottom: 2px solid #eee;
             padding-bottom: 8px;
@@ -104,7 +104,7 @@
         }
 
         .thank-you {
-            font-size: 20px;
+            font-size: 12px;
             color: #fff;
             font-weight: bold;
             text-align: center;
@@ -143,7 +143,7 @@
         }
 
         .social-number {
-            font-size: 20px;
+            font-size: 12px;
             vertical-align: middle;
             color: #333;
         }
@@ -213,7 +213,7 @@
         }
 
         .social-number {
-            font-size: 20px;
+            font-size: 12px;
             color: #333;
         }
 
@@ -264,7 +264,7 @@
 
         <div class="logo">
             <img class="seal" src="{{ public_path('imgs/funcamp_remove.png') }}" alt="Funcamp Logo">
-            <P style="font-size: 20px;margin: 0"><b> @lang('dashboard.show_price_pdf') / {{ trans_get('dashboard.show_price_pdf', [], 'opposite_locale') }}</b></P>
+            <P style="font-size: 12px;margin: 0"><b> @lang('dashboard.show_price_pdf') / {{ trans_get('dashboard.show_price_pdf', [], 'opposite_locale') }}</b></P>
         </div>
 
         <div class="show_price_info">
@@ -411,7 +411,7 @@
     <!-- Footer -->
     <div class="footer" style="display: block; padding: 20px; border-radius: 10px; margin-top: 30px; overflow: hidden;">
         <div style="text-align: left; float: left; width: 30%;">
-            <span style="font-size: 20px; vertical-align: middle; display: inline-block;">
+            <span style="font-size: 12px; vertical-align: middle; display: inline-block;">
                 0566674766
             </span>
             <img src="{{ public_path('imgs/whatsapp.png') }}"
@@ -430,7 +430,7 @@
         </div>
 
         <div style="text-align: right; float: right; width: 30%;">
-            <span style="font-size: 20px; vertical-align: middle; display: inline-block;">
+            <span style="font-size: 12px; vertical-align: middle; display: inline-block;">
                 funcamp.ae@
             </span>
             <img src="{{ public_path('imgs/instagram.png') }}"
