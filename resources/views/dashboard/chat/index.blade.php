@@ -279,6 +279,11 @@ class ChatSystem {
                     chat.total_unread = e.totalUnread;
                     // this.renderChats();
                     this.updateChatInList(e.chatId, e.message , true);
+                } else {
+                    // Chat not in list - user might have been added to a new group
+                    // Reload all chats to include the new one
+                    console.log('Received message for unknown chat, reloading chats...');
+                    this.loadChats();
                 }
                 
                 // If this is for the current chat and we have a message, update read status
