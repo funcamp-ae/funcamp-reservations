@@ -178,9 +178,9 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('dashboard.select_members') }}</label>
-                        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;" id="groupMembers">
-                            <!-- Group members will be loaded here -->
-                        </div>
+                        <select class="form-select" id="selectedUser">
+                            <option value="">{{ __('dashboard.choose_user') }}</option>
+                        </select>
                     </div>
                 </div>
             </div>
