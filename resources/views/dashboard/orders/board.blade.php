@@ -382,7 +382,7 @@
           } else {
             paymentCell.innerHTML = `
             <span class="badge bg-danger">@lang('dashboard.unpaid')</span>
-            ${order.total_price ? `<div class="text-muted paid-amount">0.00 / ${parseFloat(order.total_price).toFixed(2)}</div>` : ''}
+            ${order.total_price ? `<div class="text-muted paid-amount">0.00 - ${parseFloat(order.total_price).toFixed(2)}</div>` : ''}
           `;
           }
         }
