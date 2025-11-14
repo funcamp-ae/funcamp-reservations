@@ -1353,6 +1353,19 @@ class ChatSystem {
 
     loadGroupMembers() {
         const container = document.getElementById('groupMembers');
+        
+        // Check if users are loaded
+        if (!this.users || this.users.length === 0) {
+            container.innerHTML = '<div class="text-center py-3 text-muted">Loading users...</div>';
+            // Retry after users are loaded
+            setTimeout(() => {
+                if (this.users && this.users.length > 0) {
+                    this.loadGroupMembers();
+                }
+            }, 500);
+            return;
+        }
+        
         let html = '';
         
         this.users.forEach(user => {
@@ -1443,15 +1456,7 @@ class ChatSystem {
 
     async loadAvailableUsersForGroup() {
         try {
-            // First, get all users
-            const usersResponse = await fetch('/api/chat/users', {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            });
-
-            // Then, get current chat members
+            // Get current chat members first
             const chatResponse = await fetch(`/api/chat/${this.currentChatId}`, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -1459,19 +1464,18 @@ class ChatSystem {
                 }
             });
 
-            if (usersResponse.ok && chatResponse.ok) {
-                const users = await usersResponse.json();
+            if (chatResponse.ok) {
                 const chatData = await chatResponse.json();
                 const members = chatData.chat?.members || chatData.members || [];
                 
                 const select = document.getElementById('newMemberSelect');
                 select.innerHTML = '<option value="">Select user to add...</option>';
                 
-                // Get member IDs
+                // Get member IDs to filter
                 const memberIds = members.map(m => m.id);
                 
-                // Filter out current user and existing members
-                users.forEach(user => {
+                // Filter users from already loaded users list
+                this.users.forEach(user => {
                     if (user.id !== this.currentUserId && !memberIds.includes(user.id)) {
                         const option = document.createElement('option');
                         option.value = user.id;
