@@ -160,7 +160,7 @@
                                 <!--end::Time From-->
                                 @php
                                 $totalPaid = $order->totalPaidAmount();
-                                $totalPrice = $order->price + $order->insurance_amount + $order->addonsPrice() ;
+                                $totalPrice = $order->totalPrice();
                                 $remaining = $totalPrice - $totalPaid;
                                 @endphp
                                 <!--begin::Payments-->

@@ -23,7 +23,7 @@ class OrderStatusController extends Controller
         ->get()
         ->map(function($order) {
             $totalPaid = $order->totalPaidAmount();
-            $totalPrice = $order->price + $order->insurance_amount;
+            $totalPrice = $order->totalPrice();
             
             $paymentStatus = 'unpaid';
             if ($totalPaid >= $totalPrice) {

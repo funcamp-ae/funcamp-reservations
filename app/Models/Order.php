@@ -338,7 +338,11 @@ class Order extends Model
         $addons = $this->addons()->where("verified", true)->sum('order_addon.price');
         return $totalPayment + $totalWareHouse + $addons;
     }
-
+        public function totalPrice()
+    {
+        return $this->price + $this->insurance_amount + $this->addonsPrice();
+    }
+     
     public function verifiedItems()
     {
         return $this->items()->where('verified', true);

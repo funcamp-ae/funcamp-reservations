@@ -70,7 +70,7 @@
                   $logoutAt = $order->delivery_time ?? null;
                   $dateStr = $order->date ?? null;
                   $totalPaid = $order->totalPaidAmount();
-                  $totalPrice = $order->price + $order->insurance_amount + $order->addonsPrice() ;
+                  $totalPrice = $order->totalPrice() ;
                   $isPaid = $totalPaid >= $totalPrice;
                   @endphp
                   <tr>
@@ -231,7 +231,7 @@
                       <span class="badge bg-success">@lang('dashboard.paid')</span>
                       @else
                       <span class="badge bg-warning">@lang('dashboard.unpaid')</span>
-                      <div class="text-muted small">{{ number_format($paidAmount,2) }} - {{ number_format((float)($order->price + $order->insurance_amount + $order->addonsPrice()),2) }}</div>
+                      <div class="text-muted small">{{ number_format($paidAmount,2) }} - {{ number_format((float)($order->totalPrice()),2) }}</div>
                       @endif
                     </td>
                     <td>
