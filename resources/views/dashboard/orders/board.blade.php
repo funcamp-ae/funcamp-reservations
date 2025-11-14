@@ -49,6 +49,7 @@
                   <tr class="text-muted fw-bold">
                     <th>@lang('dashboard.serial')</th>
                     <th>@lang('dashboard.reservation_date')</th>
+                    <th>@lang('dashboard.day')</th>
                     <th>@lang('dashboard.service')</th>
                     <th>@lang('dashboard.reservation') #</th>
                     <th>@lang('dashboard.customer')</th>
@@ -75,6 +76,7 @@
                   <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $order->date }}</td>
+                    <td>{{ $order->date ? \Carbon\Carbon::createFromFormat('Y-m-d', $order->date)->locale('ar')->translatedFormat('l') : '' }}</td>
                     <td>{{ $serviceNames }}</td>
                     <td><a href="{{ route('orders.show', $order->id) }}">#{{ $order->id }}</a></td>
                     <td>{{ optional($order->customer)->name }}</td>
@@ -166,7 +168,7 @@
                   </tr>
                   @empty
                   <tr>
-                    <td colspan="10" class="text-center text-muted">@lang('dashboard.no_data')</td>
+                    <td colspan="11" class="text-center text-muted">@lang('dashboard.no_data')</td>
                   </tr>
                   @endforelse
                 </tbody>
@@ -182,6 +184,7 @@
                   <tr class="text-muted fw-bold">
                     <th>@lang('dashboard.serial')</th>
                     <th>@lang('dashboard.reservation_date')</th>
+                    <th>@lang('dashboard.day')</th>
                     <th>@lang('dashboard.service')</th>
                     <th>@lang('dashboard.order_id') #</th>
                     <th>@lang('dashboard.customer')</th>
@@ -201,6 +204,7 @@
                   <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $order->date }}</td>
+                    <td>{{ $order->date ? \Carbon\Carbon::createFromFormat('Y-m-d', $order->date)->locale('ar')->translatedFormat('l') : '' }}</td>
                     <td>{{ $serviceNames }}</td>
                     <td><a href="{{ route('orders.show', $order->id) }}">#{{ $order->id }}</a></td>
                     <td>{{ optional($order->customer)->name }}</td>
@@ -240,7 +244,7 @@
                   </tr>
                   @empty
                   <tr>
-                    <td colspan="8" class="text-center text-muted">@lang('dashboard.no_data')</td>
+                    <td colspan="9" class="text-center text-muted">@lang('dashboard.no_data')</td>
                   </tr>
                   @endforelse
                 </tbody>
