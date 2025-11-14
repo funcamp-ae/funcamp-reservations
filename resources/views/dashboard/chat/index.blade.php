@@ -1043,26 +1043,6 @@ class ChatSystem {
     setupFileUpload() {
         const self = this;
         const filePreview = document.getElementById('filePreview');
-        const cancelUploadBtn = document.getElementById('cancelUpload');
-        const previewContent = document.getElementById('previewContent');
-        const fileName = document.getElementById('fileName');
-        const progressBar = document.getElementById('uploadProgress');
-        
-        // Initialize Plupload
-        this.uploader = new plupload.Uploader({
-            runtimes: 'html5',
-            browse_button: 'uploadFileBtn',
-            url: '/api/chat/upload',
-            chunk_size: '512kb', // Smaller chunks for better reliability
-            max_retries: 5, // More retries
-            multipart: true,
-            multipart_params: {
-                '_token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'upload_id': '' // Will be set dynamically
-            },
-            filters: {
-                mime_types: [
-                    {title: "Image files", extensions: "jpg,jpeg,png,gif,webp"},
                     {title: "Video files", extensions: "mp4,mov,avi,webm"}
                 ],
                 max_file_size: '1024mb'
