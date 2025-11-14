@@ -377,7 +377,7 @@
           } else if (order.payment_status === 'partial') {
             paymentCell.innerHTML = `
             <span class="badge bg-warning">@lang('dashboard.paid_partially')</span>
-            ${order.paid_amount ? `<div class="text-muted paid-amount">${parseFloat(order.paid_amount).toFixed(2)} / ${parseFloat(order.total_price).toFixed(2)}</div>` : ''}
+            ${order.paid_amount ? `<div class="text-muted paid-amount">${parseFloat(order.paid_amount).toFixed(2)} - ${parseFloat(order.total_price).toFixed(2)}</div>` : ''}
           `;
           } else {
             paymentCell.innerHTML = `
