@@ -70,7 +70,7 @@
                   $logoutAt = $order->delivery_time ?? null;
                   $dateStr = $order->date ?? null;
                   $totalPaid = $order->totalPaidAmount();
-                  $totalPrice =$order->price + $order->insurance_amount + $order->addonsPrice() ;
+                  $totalPrice = $order->price + $order->insurance_amount + $order->addonsPrice() ;
                   $isPaid = $totalPaid >= $totalPrice;
                   @endphp
                   <tr>
