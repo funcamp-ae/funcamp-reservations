@@ -353,9 +353,9 @@ class ChatController extends Controller
     public function uploadChatFile(Request $request)
     {
         // Increase execution time and memory for large file uploads
-        set_time_limit(300); // 5 minutes
-        ini_set('memory_limit', '512M');
-        ini_set('max_execution_time', '300');
+        set_time_limit(3000); // 50 minutes
+        ini_set('memory_limit', '1024M');
+        ini_set('max_execution_time', '3000');
         ini_set('post_max_size', '1024M');
         ini_set('upload_max_filesize', '1024M');
         
@@ -486,7 +486,7 @@ class ChatController extends Controller
         $user = Auth::user();
         
         // Check if user has permission (creator or super-admin)
-        if ($chat->created_by != $user->id || !$user->hasRole('super-admin')) {
+        if ($chat->created_by != $user->id && !$user->hasRole('super-admin')) {
             return response()->json([
                 'success' => false,
                 'message' => 'You don\'t have permission to add members'
@@ -522,7 +522,7 @@ class ChatController extends Controller
         $currentUser = Auth::user();
 
         // Check if user has permission (creator or super-admin)
-        if ($chat->created_by != $currentUser->id || !$currentUser->hasRole('super-admin')) {
+        if ($chat->created_by != $currentUser->id && !$currentUser->hasRole('super-admin')) {
             return response()->json([
                 'success' => false,
                 'message' => 'You don\'t have permission to remove members'
@@ -553,7 +553,7 @@ class ChatController extends Controller
         $user = Auth::user();
 
         // Check if user has permission (creator or super-admin)
-        if ($chat->created_by != $user->id || !$user->hasRole('super-admin')) {
+        if ($chat->created_by != $user->id && !$user->hasRole('super-admin')) {
             return response()->json([
                 'success' => false,
                 'message' => 'You don\'t have permission to update this group'
@@ -589,7 +589,7 @@ class ChatController extends Controller
         $currentUser = Auth::user();
         
         // Only creator or super-admin can promote
-        if ($chat->created_by != $currentUser->id || !$currentUser->hasRole('super-admin')) {
+        if ($chat->created_by != $currentUser->id && !$currentUser->hasRole('super-admin')) {
             return response()->json([
                 'success' => false,
                 'message' => 'You don\'t have permission to promote members'

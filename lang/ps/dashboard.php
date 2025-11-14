@@ -24,6 +24,7 @@ return [
     'online' => 'آنلاین',
     'members' => 'غړي',
     'type_message' => 'پیغام ولیکئ...',
+    'attach_file' => 'فایل نښلول',
     'start_conversation' => 'خبرې پیل کړئ',
     'no_messages_yet' => 'تر اوسه هیڅ پیغام نشته',
     'no_chats' => 'تر اوسه هیڅ خبرې اترې نشته',

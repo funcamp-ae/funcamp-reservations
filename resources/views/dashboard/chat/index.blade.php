@@ -23,7 +23,7 @@
                                         {{ __('dashboard.messages') }}
                                     </h5>
                                     <div>
-                                        <button class="btn btn-sm btn-primary me-2" id="newChatBtn">
+                                        <button class="btn btn-sm btn-primary me-2" id="newChatBtn" data-bs-toggle="modal" data-bs-target="#newChatModal">
                                             {{ __('dashboard.start_new_chat') }}
                                         </button>
                                         <button class="btn btn-sm btn-outline-secondary d-md-none" id="closeSidebar">
@@ -72,10 +72,10 @@
                                         <i class="fas fa-cog"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="#" id="manageMembersBtn"><i class="fas fa-users me-2"></i>Manage Members</a></li>
-                                        <li><a class="dropdown-item" href="#" id="editGroupBtn"><i class="fas fa-edit me-2"></i>Edit Group</a></li>
+                                        <li><a class="dropdown-item" href="#" id="manageMembersBtn" data-bs-toggle="modal" data-bs-target="#manageMembersModal"><i class="fas fa-users me-2"></i>{{ __('dashboard.manage_members') }}</a></li>
+                                        <li><a class="dropdown-item" href="#" id="editGroupBtn" data-bs-toggle="modal" data-bs-target="#editGroupModal"><i class="fas fa-edit me-2"></i>{{ __('dashboard.edit_group') }}</a></li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-danger" href="#" id="leaveGroupBtn"><i class="fas fa-sign-out-alt me-2"></i>Leave Group</a></li>
+                                        <li><a class="dropdown-item text-danger" href="#" id="leaveGroupBtn"><i class="fas fa-sign-out-alt me-2"></i>{{ __('dashboard.leave_group') }}</a></li>
                                     </ul>
                                 </div>
                             </div>                                    </div>
@@ -176,11 +176,11 @@
                         <label class="form-label">{{ __('dashboard.group_description') }}</label>
                         <textarea class="form-control" id="groupDescription" rows="2" placeholder="{{ __('dashboard.enter_group_description') }}"></textarea>
                     </div>
-                    <div class="mb-3">
+                   <div class="mb-3">
                         <label class="form-label">{{ __('dashboard.select_members') }}</label>
-                        <select class="form-select" id="selectedUser">
-                            <option value="">{{ __('dashboard.choose_user') }}</option>
-                        </select>
+                        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;" id="groupMembers">
+                            <!-- Group members will be loaded here -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -197,26 +197,26 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-users me-2"></i>Manage Members</h5>
+                <h5 class="modal-title"><i class="fas fa-users me-2"></i>{{ __('dashboard.manage_members') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <!-- Add Members Section -->
                 <div class="mb-4">
-                    <h6 class="text-muted mb-3">Add Members</h6>
+                    <h6 class="text-muted mb-3">{{ __('dashboard.add_members') }}</h6>
                     <div class="input-group">
                         <select class="form-select" id="newMemberSelect">
-                            <option value="">Select user to add...</option>
+                            <option value="">{{ __('dashboard.select_user_to_add') }}</option>
                         </select>
                         <button class="btn btn-primary" type="button" id="addMemberBtn">
-                            <i class="fas fa-user-plus"></i> Add
+                            <i class="fas fa-user-plus"></i> {{ __('dashboard.add') }}
                         </button>
                     </div>
                 </div>
 
                 <!-- Current Members Section -->
                 <div>
-                    <h6 class="text-muted mb-3">Current Members</h6>
+                    <h6 class="text-muted mb-3">{{ __('dashboard.current_members') }}</h6>
                     <div class="list-group" id="membersList">
                         <!-- Members will be loaded here -->
                         <div class="text-center py-3">
@@ -236,23 +236,23 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Group</h5>
+                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>{{ __('dashboard.edit_group') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label">Group Name</label>
-                    <input type="text" class="form-control" id="editGroupName" placeholder="Enter group name">
+                    <label class="form-label">{{ __('dashboard.group_name') }}</label>
+                    <input type="text" class="form-control" id="editGroupName" placeholder="{{ __('dashboard.enter_group_name') }}">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Group Description</label>
-                    <textarea class="form-control" id="editGroupDescription" rows="3" placeholder="Enter group description"></textarea>
+                    <label class="form-label">{{ __('dashboard.group_description') }}</label>
+                    <textarea class="form-control" id="editGroupDescription" rows="3" placeholder="{{ __('dashboard.enter_group_description') }}"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('dashboard.cancel') }}</button>
                 <button type="button" class="btn btn-primary" id="saveGroupBtn">
-                    <i class="fas fa-save"></i> Save Changes
+                    <i class="fas fa-save"></i> {{ __('dashboard.save_changes') }}
                 </button>
             </div>
         </div>
@@ -566,18 +566,14 @@ class ChatSystem {
 
     bindEvents() {
         // New chat button
-        document.getElementById('newChatBtn').addEventListener('click', () => {
-            new bootstrap.Modal(document.getElementById('newChatModal')).show();
-        });
-
         // Chat type change
-        document.getElementById('chatType').addEventListener('change', (e) => {
+        document.getElementById('chatType').addEventListener('change', async (e) => {
             const type = e.target.value;
             document.getElementById('privateChatSection').style.display = type === 'private' ? 'block' : 'none';
             document.getElementById('groupChatSection').style.display = type === 'group' ? 'block' : 'none';
             
             if (type === 'group') {
-                this.loadGroupMembers();
+                await this.loadGroupMembersForCreate();
             }
         });
 
@@ -608,29 +604,58 @@ class ChatSystem {
             Notification.requestPermission();
         }
 
-        // Group management events
-        document.getElementById('manageMembersBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.openManageMembersModal();
-        });
+        // Group management events - use Bootstrap modal events
+        const manageMembersModal = document.getElementById('manageMembersModal');
+        if (manageMembersModal) {
+            // Use 'shown.bs.modal' instead of 'show.bs.modal' to load data AFTER modal opens
+            manageMembersModal.addEventListener('shown.bs.modal', async (e) => {
+                // Load data after modal is already visible
+                if (this.currentChatId) {
+                    const chat = this.chats.find(c => c.id == this.currentChatId);
+                    if (chat && chat.type === 'group') {
+                        await this.loadAvailableUsersForGroup();
+                        await this.loadGroupMembers();
+                    }
+                }
+            });
+        }
 
-        document.getElementById('editGroupBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.openEditGroupModal();
-        });
+        const editGroupModal = document.getElementById('editGroupModal');
+        if (editGroupModal) {
+            // Use 'shown.bs.modal' instead of 'show.bs.modal' to populate data AFTER modal opens
+            editGroupModal.addEventListener('shown.bs.modal', (e) => {
+                // Populate form after modal is already visible
+                if (this.currentChatId) {
+                    const chat = this.chats.find(c => c.id == this.currentChatId);
+                    if (chat && chat.type === 'group') {
+                        document.getElementById('editGroupName').value = chat.name || '';
+                        document.getElementById('editGroupDescription').value = chat.description || '';
+                    }
+                }
+            });
+        }
 
-        document.getElementById('leaveGroupBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.leaveGroup();
-        });
+        const leaveGroupBtn = document.getElementById('leaveGroupBtn');
+        if (leaveGroupBtn) {
+            leaveGroupBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.leaveGroup();
+            });
+        }
 
-        document.getElementById('addMemberBtn').addEventListener('click', () => {
-            this.addMemberToGroup();
-        });
+        const addMemberBtn = document.getElementById('addMemberBtn');
+        if (addMemberBtn) {
+            addMemberBtn.addEventListener('click', () => {
+                this.addMemberToGroup();
+            });
+        }
 
-        document.getElementById('saveGroupBtn').addEventListener('click', () => {
-            this.updateGroupInfo();
-        });
+        const saveGroupBtn = document.getElementById('saveGroupBtn');
+        if (saveGroupBtn) {
+            saveGroupBtn.addEventListener('click', () => {
+                this.updateGroupInfo();
+            });
+        }
     }
 
     async loadChats() {
@@ -696,7 +721,7 @@ class ChatSystem {
                     <i class="fas fa-comments text-muted" style="font-size: 3rem;"></i>
                     <h6 class="text-muted mt-3">@lang('dashboard.no_chats')</h6>
                     <p class="text-muted">@lang('dashboard.start_conversation')</p>
-                    <button class="btn btn-primary" onclick="document.getElementById('newChatBtn').click()">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newChatModal">
                         <i class="fas fa-plus me-1"></i> @lang('dashboard.start_new_chat')
                     </button>
                 </div>
@@ -1351,19 +1376,25 @@ class ChatSystem {
         }
     }
 
-    loadGroupMembers() {
+    async loadGroupMembersForCreate() {
         const container = document.getElementById('groupMembers');
         
-        // Check if users are loaded
+        // Check if users are loaded, if not wait for them
         if (!this.users || this.users.length === 0) {
             container.innerHTML = '<div class="text-center py-3 text-muted">Loading users...</div>';
-            // Retry after users are loaded
-            setTimeout(() => {
-                if (this.users && this.users.length > 0) {
-                    this.loadGroupMembers();
-                }
-            }, 500);
-            return;
+            
+            // Wait for users to be loaded (max 5 seconds)
+            let attempts = 0;
+            while ((!this.users || this.users.length === 0) && attempts < 10) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                attempts++;
+            }
+            
+            // If still no users, show error
+            if (!this.users || this.users.length === 0) {
+                container.innerHTML = '<div class="text-center py-3 text-danger">Failed to load users</div>';
+                return;
+            }
         }
         
         let html = '';
@@ -1437,23 +1468,6 @@ class ChatSystem {
     }
 
     // Group Management Methods
-    async openManageMembersModal() {
-        if (!this.currentChatId) return;
-
-        const chat = this.chats.find(c => c.id === this.currentChatId);
-        if (!chat || !chat.is_group) return;
-
-        // Show modal
-        const modal = new bootstrap.Modal(document.getElementById('manageMembersModal'));
-        modal.show();
-
-        // Load available users for adding
-        await this.loadAvailableUsersForGroup();
-        
-        // Load current members
-        await this.loadGroupMembers();
-    }
-
     async loadAvailableUsersForGroup() {
         try {
             // Get current chat members first
@@ -1466,7 +1480,7 @@ class ChatSystem {
 
             if (chatResponse.ok) {
                 const chatData = await chatResponse.json();
-                const members = chatData.chat?.members || chatData.members || [];
+                const members = chatData.chat?.users || chatData.users || [];
                 
                 const select = document.getElementById('newMemberSelect');
                 select.innerHTML = '<option value="">Select user to add...</option>';
@@ -1506,7 +1520,7 @@ class ChatSystem {
             if (response.ok) {
                 const data = await response.json();
                 // Handle both response structures
-                const members = data.chat?.members || data.members || [];
+                const members = data.chat?.users || data.users || [];
                 this.renderMembersList(members);
             }
         } catch (error) {
@@ -1517,10 +1531,10 @@ class ChatSystem {
 
     renderMembersList(members) {
         const membersList = document.getElementById('membersList');
-        const chat = this.chats.find(c => c.id === this.currentChatId);
+        const chat = this.chats.find(c => c.id == this.currentChatId);
         const isCreator = chat && chat.created_by === this.currentUserId;
         const currentMember = members.find(m => m.id === this.currentUserId);
-        const isAdmin = currentMember && currentMember.pivot && currentMember.pivot.is_admin;
+        const isAdmin = currentMember && currentMember.pivot && currentMember.pivot.role === 'admin';
 
         if (!members || members.length === 0) {
             membersList.innerHTML = '<div class="text-center text-muted py-3">No members</div>';
@@ -1528,7 +1542,7 @@ class ChatSystem {
         }
 
         membersList.innerHTML = members.map(member => {
-            const memberIsAdmin = member.pivot && member.pivot.is_admin;
+            const memberIsAdmin = member.pivot && member.pivot.role === 'admin';
             const canManage = isCreator || isAdmin;
             const canRemove = canManage && member.id !== this.currentUserId && member.id !== chat.created_by;
             const canPromote = isCreator && !memberIsAdmin && member.id !== this.currentUserId;
@@ -1572,7 +1586,7 @@ class ChatSystem {
         if (!userId || !this.currentChatId) return;
 
         try {
-            const response = await fetch(`/api/chat/${this.currentChatId}/members`, {
+            const response = await fetch(`/api/chat/${this.currentChatId}/add-members`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1672,21 +1686,6 @@ class ChatSystem {
         }
     }
 
-    async openEditGroupModal() {
-        if (!this.currentChatId) return;
-
-        const chat = this.chats.find(c => c.id === this.currentChatId);
-        if (!chat || !chat.is_group) return;
-
-        // Populate form with current values
-        document.getElementById('editGroupName').value = chat.name || '';
-        document.getElementById('editGroupDescription').value = chat.description || '';
-
-        // Show modal
-        const modal = new bootstrap.Modal(document.getElementById('editGroupModal'));
-        modal.show();
-    }
-
     async updateGroupInfo() {
         const name = document.getElementById('editGroupName').value.trim();
         const description = document.getElementById('editGroupDescription').value.trim();
@@ -1707,22 +1706,41 @@ class ChatSystem {
             });
 
             if (response.ok) {
-                this.showToast('Group updated successfully', 'success');
+                // Close modal first
                 bootstrap.Modal.getInstance(document.getElementById('editGroupModal')).hide();
-                await this.loadChats(); // Refresh chat list
+                
+                // Show SweetAlert success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Group updated successfully',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                // Reload chats to get updated data
+                await this.loadChats();
                 
                 // Update current chat header
-                const chat = this.chats.find(c => c.id === this.currentChatId);
+                const chat = this.chats.find(c => c.id == this.currentChatId);
                 if (chat) {
                     this.displayChatHeader(chat);
                 }
             } else {
                 const error = await response.json();
-                this.showToast(error.message || 'Failed to update group', 'error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: error.message || 'Failed to update group'
+                });
             }
         } catch (error) {
             console.error('Error updating group:', error);
-            this.showToast('Failed to update group', 'error');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to update group: ' + error.message
+            });
         }
     }
 
@@ -1730,7 +1748,7 @@ class ChatSystem {
         if (!confirm('Are you sure you want to leave this group?')) return;
 
         try {
-            const response = await fetch(`/api/chat/${this.currentChatId}/members/${this.currentUserId}`, {
+            const response = await fetch(`/api/chat/${this.currentChatId}/leave`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

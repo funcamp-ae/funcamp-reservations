@@ -1765,10 +1765,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'api/chat'], function () {
     
     // Group management routes
     Route::post('/{chat}/add-members', [App\Http\Controllers\ChatController::class, 'addMembers']);
-    Route::delete('/{chat}/remove-member/{userId}', [App\Http\Controllers\ChatController::class, 'removeMember']);
-    Route::put('/{chat}/update', [App\Http\Controllers\ChatController::class, 'updateGroup']);
-    Route::post('/{chat}/promote/{userId}', [App\Http\Controllers\ChatController::class, 'promoteToAdmin']);
-    Route::post('/{chat}/demote/{userId}', [App\Http\Controllers\ChatController::class, 'demoteAdmin']);
+    Route::delete('/{chat}/members/{userId}', [App\Http\Controllers\ChatController::class, 'removeMember']);
+    Route::put('/{chat}', [App\Http\Controllers\ChatController::class, 'updateGroup']);
+    Route::post('/{chat}/members/{userId}/promote', [App\Http\Controllers\ChatController::class, 'promoteToAdmin']);
+    Route::post('/{chat}/members/{userId}/demote', [App\Http\Controllers\ChatController::class, 'demoteAdmin']);
     
     Route::get('/{chat}', [App\Http\Controllers\ChatController::class, 'show']);
     Route::post('/{chat}/messages', [App\Http\Controllers\ChatController::class, 'sendMessage']);
