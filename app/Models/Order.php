@@ -182,7 +182,10 @@ class Order extends Model
             ->withPivot('verified','count', 'price', 'handled_by', 'description', 'id' , 'account_id' , 'payment_method')
             ->withTimestamps();
     }
-
+    public function addonsPrice()
+    {
+        return OrderAddon::where('order_id', $this->id)->sum('price');
+    }
     public function verifiedAddons()
     {
        return $this->addons()->wherePivot('verified', true);
