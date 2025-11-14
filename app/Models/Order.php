@@ -335,7 +335,7 @@ class Order extends Model
     {
         $totalPayment = $this->payments()->sum('price');
         $totalWareHouse = OrderItem::where("order_id", $this->id)->sum('total_price');
-        $addons = $this->addons()->sum('order_addon.price');
+        $addons = $this->addons()->where("verified", true)->sum('order_addon.price');
         return $totalPayment + $totalWareHouse + $addons;
     }
 
