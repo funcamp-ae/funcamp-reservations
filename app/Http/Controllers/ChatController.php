@@ -392,7 +392,7 @@ class ChatController extends Controller
             if ($chunk == $chunks - 1) {
                 // Merge all chunks
                 $finalFileName = Str::slug(pathinfo($fileName, PATHINFO_FILENAME)) . '_' . time() . '.' . pathinfo($fileName, PATHINFO_EXTENSION);
-                $targetDir = storage_path('app/public/chat/uploads');
+                $targetDir = public_path('storage/chat/uploads');
                 
                 if (!is_dir($targetDir)) {
                     mkdir($targetDir, 0777, true);
@@ -428,12 +428,15 @@ class ChatController extends Controller
 
                 // Get file info
                 $relativePath = 'chat/uploads/' . $finalFileName;
-                $fileUrl = Storage::url($relativePath);
+                // Generate proper URL for locally stored files
+                $fileUrl = asset('storage/' . $relativePath);
                 $fileType = $this->fileUploadService->getFileType($finalPath);
 
                 \Log::info('Upload complete', [
                     'file' => $finalFileName,
-                    'size' => filesize($finalPath)
+                    'size' => filesize($finalPath),
+                    'path' => $relativePath,
+                    'url' => $fileUrl
                 ]);
 
                 return response()->json([
@@ -441,7 +444,7 @@ class ChatController extends Controller
                     'result' => 'complete',
                     'success' => true,
                     'file_path' => $relativePath,
-                    'file_url' => asset($fileUrl),
+                    'file_url' => $fileUrl,
                     'file_type' => $fileType
                 ]);
             }
