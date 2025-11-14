@@ -470,93 +470,14 @@ class ChatController extends Controller
         }
     }
 
-    /**
-     * Send a file message to a chat.
-     */
-    public function sendFileMessage(Request $request, Chat $chat)
-    {
-        try {
-            \Log::info('sendFileMessage called', [
-                'chat_id' => $chat->id,
-                'user_id' => Auth::id(),
-                'request_data' => $request->all()
-            ]);
-
-            $validator = Validator::make($request->all(), [
-                'file_path' => 'required|string',
-                'file_url' => 'required|string',
-                'file_type' => 'required|in:image,video,file',
-                'message' => 'nullable|string|max:500' // Optional caption
-            ]);
-
-            if ($validator->fails()) {
-                \Log::error('Validation failed', ['errors' => $validator->errors()]);
-                return response()->json([
-                    'success' => false,
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            $user = Auth::user();
-
-            // Check if user is a member of this chat
-            if (!$chat->hasUser($user->id)) {
-                \Log::error('User not member of chat', ['user_id' => $user->id, 'chat_id' => $chat->id]);
-                return response()->json([
-                    'success' => false,
-                    'message' => 'You are not a member of this chat'
-                ], 403);
-            }
-
-            // Map file types to message type enum (text, image, file)
-            $messageType = $request->file_type === 'image' ? 'image' : 'file';
-            
-            $message = Message::create([
-                'chat_id' => $chat->id,
-                'user_id' => $user->id,
-                'message' => $request->message ?? '',
-                'type' => $messageType, // Use mapped type (image or file)
-                'file_path' => $request->file_path,
-                'file_url' => $request->file_url,
-                'file_type' => $request->file_type, // Keep original type (image, video, file)
-                'is_read' => false
-            ]);
-
-            $message->load('user');
-
-            \Log::info('File message created', ['message_id' => $message->id]);
-
-            // Broadcast the message
-            broadcast(new MessageSent($message))->toOthers();
-
-            // Update and broadcast unread counts
-            $this->chatService->updateUnreadCounts($chat, $user->id, $message);
-
-            return response()->json([
-                'success' => true,
-                'message' => $message
-            ], 201);
-
-        } catch (\Exception $e) {
-            \Log::error('sendFileMessage exception', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to send file message: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
+    
     /**
      * Add members to a group chat.
-     */
+    */
     public function addMembers(Request $request, Chat $chat)
     {
         $user = Auth::user();
-
+        
         // Check if user has permission (creator or super-admin)
         if ($chat->created_by != $user->id || !$user->hasRole('super-admin')) {
             return response()->json([
@@ -564,12 +485,12 @@ class ChatController extends Controller
                 'message' => 'You don\'t have permission to add members'
             ], 403);
         }
-
+        
         $validator = Validator::make($request->all(), [
             'user_ids' => 'required|array|min:1',
             'user_ids.*' => 'exists:users,id'
         ]);
-
+        
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -585,10 +506,10 @@ class ChatController extends Controller
             'message' => 'Members added successfully'
         ]);
     }
-
+    
     /**
      * Remove a member from a group chat.
-     */
+    */
     public function removeMember(Request $request, Chat $chat, $userId)
     {
         $currentUser = Auth::user();
@@ -610,7 +531,7 @@ class ChatController extends Controller
         }
 
         $chat->users()->detach($userId);
-
+        
         return response()->json([
             'success' => true,
             'message' => 'Member removed successfully'
@@ -619,7 +540,7 @@ class ChatController extends Controller
 
     /**
      * Update group chat details.
-     */
+    */
     public function updateGroup(Request $request, Chat $chat)
     {
         $user = Auth::user();
@@ -631,7 +552,7 @@ class ChatController extends Controller
                 'message' => 'You don\'t have permission to update this group'
             ], 403);
         }
-
+        
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|max:255',
             'description' => 'nullable|string|max:500'
@@ -659,7 +580,7 @@ class ChatController extends Controller
     public function promoteToAdmin(Request $request, Chat $chat, $userId)
     {
         $currentUser = Auth::user();
-
+        
         // Only creator or super-admin can promote
         if ($chat->created_by != $currentUser->id || !$currentUser->hasRole('super-admin')) {
             return response()->json([
@@ -670,20 +591,20 @@ class ChatController extends Controller
 
         // Update user's role in the chat
         $chat->users()->updateExistingPivot($userId, ['role' => 'admin']);
-
+        
         return response()->json([
             'success' => true,
             'message' => 'Member promoted to admin'
         ]);
     }
-
+    
     /**
      * Demote an admin to member.
-     */
+    */
     public function demoteAdmin(Request $request, Chat $chat, $userId)
     {
         $currentUser = Auth::user();
-
+        
         // Only creator or super-admin can demote
         if ($chat->created_by != $currentUser->id && !$currentUser->hasRole('super-admin')) {
             return response()->json([
@@ -699,5 +620,84 @@ class ChatController extends Controller
             'success' => true,
             'message' => 'Admin demoted to member'
         ]);
+    }
+    /**
+     * Send a file message to a chat.
+     */
+    public function sendFileMessage(Request $request, Chat $chat)
+    {
+        try {
+            \Log::info('sendFileMessage called', [
+                'chat_id' => $chat->id,
+                'user_id' => Auth::id(),
+                'request_data' => $request->all()
+            ]);
+    
+            $validator = Validator::make($request->all(), [
+                'file_path' => 'required|string',
+                'file_url' => 'required|string',
+                'file_type' => 'required|in:image,video,file',
+                'message' => 'nullable|string|max:500' // Optional caption
+            ]);
+    
+            if ($validator->fails()) {
+                \Log::error('Validation failed', ['errors' => $validator->errors()]);
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+    
+            $user = Auth::user();
+    
+            // Check if user is a member of this chat
+            if (!$chat->hasUser($user->id)) {
+                \Log::error('User not member of chat', ['user_id' => $user->id, 'chat_id' => $chat->id]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not a member of this chat'
+                ], 403);
+            }
+    
+            // Map file types to message type enum (text, image, file)
+            $messageType = $request->file_type === 'image' ? 'image' : 'file';
+            
+            $message = Message::create([
+                'chat_id' => $chat->id,
+                'user_id' => $user->id,
+                'message' => $request->message ?? '',
+                'type' => $messageType, // Use mapped type (image or file)
+                'file_path' => $request->file_path,
+                'file_url' => $request->file_url,
+                'file_type' => $request->file_type, // Keep original type (image, video, file)
+                'is_read' => false
+            ]);
+    
+            $message->load('user');
+    
+            \Log::info('File message created', ['message_id' => $message->id]);
+    
+            // Broadcast the message
+            broadcast(new MessageSent($message))->toOthers();
+    
+            // Update and broadcast unread counts
+            $this->chatService->updateUnreadCounts($chat, $user->id, $message);
+    
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ], 201);
+    
+        } catch (\Exception $e) {
+            \Log::error('sendFileMessage exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+    
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send file message: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

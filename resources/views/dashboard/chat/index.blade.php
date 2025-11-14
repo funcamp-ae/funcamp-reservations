@@ -53,20 +53,32 @@
                                 <!-- Chat Header -->
                                 <div class="border-bottom p-3" id="chatHeader" style="display: none;">
                                     <div class="d-flex align-items-center justify-content-center">
-                                        <div class="d-flex align-items-center">
-                                            <div class="me-3">
-                                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
-                                                     style="width: 50px; height: 50px;" id="chatAvatar">
-                                                    <i class="fas fa-user"></i>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <h5 class="mb-0" id="chatTitle">{{ __('dashboard.select_chat') }}</h5>
-                                                <small class="text-muted" id="chatSubtitle">{{ __('dashboard.start_conversation') }}</small>
-                                            </div>
+                            <div class="d-flex align-items-center justify-content-between w-100">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px;" id="chatAvatar">
+                                            <i class="fas fa-user"></i>
                                         </div>
-                                        
                                     </div>
+                                    <div>
+                                        <h5 class="mb-0" id="chatTitle">{{ __('dashboard.select_chat') }}</h5>
+                                        <small class="text-muted" id="chatSubtitle">{{ __('dashboard.start_conversation') }}</small>
+                                    </div>
+                                </div>
+                                <!-- Group Settings Button (Only visible for group chats) -->
+                                <div id="groupSettingsBtn" style="display: none;">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#" id="manageMembersBtn"><i class="fas fa-users me-2"></i>Manage Members</a></li>
+                                        <li><a class="dropdown-item" href="#" id="editGroupBtn"><i class="fas fa-edit me-2"></i>Edit Group</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#" id="leaveGroupBtn"><i class="fas fa-sign-out-alt me-2"></i>Leave Group</a></li>
+                                    </ul>
+                                </div>
+                            </div>                                    </div>
                                 </div>
                                 
                                 <!-- Messages Area -->
@@ -179,6 +191,74 @@
         </div>
     </div>
 </div>
+
+<!-- Manage Members Modal -->
+<div class="modal fade" id="manageMembersModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-users me-2"></i>Manage Members</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Add Members Section -->
+                <div class="mb-4">
+                    <h6 class="text-muted mb-3">Add Members</h6>
+                    <div class="input-group">
+                        <select class="form-select" id="newMemberSelect">
+                            <option value="">Select user to add...</option>
+                        </select>
+                        <button class="btn btn-primary" type="button" id="addMemberBtn">
+                            <i class="fas fa-user-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Current Members Section -->
+                <div>
+                    <h6 class="text-muted mb-3">Current Members</h6>
+                    <div class="list-group" id="membersList">
+                        <!-- Members will be loaded here -->
+                        <div class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Group Modal -->
+<div class="modal fade" id="editGroupModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Group Name</label>
+                    <input type="text" class="form-control" id="editGroupName" placeholder="Enter group name">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Group Description</label>
+                    <textarea class="form-control" id="editGroupDescription" rows="3" placeholder="Enter group description"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveGroupBtn">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -527,6 +607,30 @@ class ChatSystem {
         if ('Notification' in window && Notification.permission === 'default') {
             Notification.requestPermission();
         }
+
+        // Group management events
+        document.getElementById('manageMembersBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.openManageMembersModal();
+        });
+
+        document.getElementById('editGroupBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.openEditGroupModal();
+        });
+
+        document.getElementById('leaveGroupBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.leaveGroup();
+        });
+
+        document.getElementById('addMemberBtn').addEventListener('click', () => {
+            this.addMemberToGroup();
+        });
+
+        document.getElementById('saveGroupBtn').addEventListener('click', () => {
+            this.updateGroupInfo();
+        });
     }
 
     async loadChats() {
@@ -710,6 +814,12 @@ class ChatSystem {
         document.getElementById('chatHeader').style.display = 'block';
         document.getElementById('messageInputArea').style.display = 'block';
         
+        // Show/hide group settings button
+        const groupSettingsBtn = document.getElementById('groupSettingsBtn');
+        if (groupSettingsBtn) {
+            groupSettingsBtn.style.display = isGroup ? 'block' : 'none';
+        }
+        
         // Update avatar
         const avatar = document.getElementById('chatAvatar');
         if (isGroup) {
@@ -722,6 +832,39 @@ class ChatSystem {
         
         // Render messages
         this.renderMessages(messages);
+    }
+
+    displayChatHeader(chat) {
+        const isGroup = chat.type === 'group';
+        const chatName = isGroup ? chat.name : this.getOtherUserName(chat.users);
+        
+        // Update header
+        document.getElementById('chatTitle').textContent = chatName;
+        
+        // Update subtitle
+        const subtitle = document.getElementById('chatSubtitle');
+        if (isGroup) {
+            const memberCount = chat.members ? chat.members.length : 0;
+            subtitle.textContent = `${memberCount} members`;
+        } else {
+            subtitle.textContent = 'Private chat';
+        }
+        
+        // Show/hide group settings button
+        const groupSettingsBtn = document.getElementById('groupSettingsBtn');
+        if (groupSettingsBtn) {
+            groupSettingsBtn.style.display = isGroup ? 'block' : 'none';
+        }
+        
+        // Update avatar
+        const avatar = document.getElementById('chatAvatar');
+        if (isGroup) {
+            avatar.innerHTML = '<i class="fas fa-users"></i>';
+            avatar.className = 'bg-primary text-white rounded-circle d-flex align-items-center justify-content-center';
+        } else {
+            avatar.innerHTML = '<i class="fas fa-user"></i>';
+            avatar.className = 'bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center';
+        }
     }
 
     renderMessages(messages) {
@@ -1203,6 +1346,344 @@ class ChatSystem {
         
         // Regular text message
         return this.truncateMessage(message.message || 'Message', 40);
+    }
+
+    // Group Management Methods
+    async openManageMembersModal() {
+        if (!this.currentChatId) return;
+
+        const chat = this.chats.find(c => c.id === this.currentChatId);
+        if (!chat || !chat.is_group) return;
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('manageMembersModal'));
+        modal.show();
+
+        // Load available users for adding
+        await this.loadAvailableUsersForGroup();
+        
+        // Load current members
+        await this.loadGroupMembers();
+    }
+
+    async loadAvailableUsersForGroup() {
+        try {
+            const response = await fetch('/api/chat/users', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            if (response.ok) {
+                const users = await response.json();
+                const select = document.getElementById('newMemberSelect');
+                select.innerHTML = '<option value="">Select user to add...</option>';
+                
+                const chat = this.chats.find(c => c.id === this.currentChatId);
+                const memberIds = chat.members ? chat.members.map(m => m.id) : [];
+                
+                users.forEach(user => {
+                    if (user.id !== this.currentUserId && !memberIds.includes(user.id)) {
+                        const option = document.createElement('option');
+                        option.value = user.id;
+                        option.textContent = user.name;
+                        select.appendChild(option);
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error loading users:', error);
+        }
+    }
+
+    async loadGroupMembers() {
+        if (!this.currentChatId) return;
+
+        const membersList = document.getElementById('membersList');
+        membersList.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm"></div></div>';
+
+        try {
+            const response = await fetch(`/api/chat/${this.currentChatId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            if (response.ok) {
+                const chat = await response.json();
+                this.renderMembersList(chat.members || []);
+            }
+        } catch (error) {
+            console.error('Error loading members:', error);
+            membersList.innerHTML = '<div class="alert alert-danger">Failed to load members</div>';
+        }
+    }
+
+    renderMembersList(members) {
+        const membersList = document.getElementById('membersList');
+        const chat = this.chats.find(c => c.id === this.currentChatId);
+        const isCreator = chat && chat.created_by === this.currentUserId;
+        const currentMember = members.find(m => m.id === this.currentUserId);
+        const isAdmin = currentMember && currentMember.pivot && currentMember.pivot.is_admin;
+
+        if (!members || members.length === 0) {
+            membersList.innerHTML = '<div class="text-center text-muted py-3">No members</div>';
+            return;
+        }
+
+        membersList.innerHTML = members.map(member => {
+            const memberIsAdmin = member.pivot && member.pivot.is_admin;
+            const canManage = isCreator || isAdmin;
+            const canRemove = canManage && member.id !== this.currentUserId && member.id !== chat.created_by;
+            const canPromote = isCreator && !memberIsAdmin && member.id !== this.currentUserId;
+            const canDemote = isCreator && memberIsAdmin && member.id !== chat.created_by;
+
+            return `
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2" 
+                             style="width: 40px; height: 40px; font-size: 0.9rem;">
+                            ${member.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <div class="fw-bold">
+                                ${member.name}
+                                ${member.id === chat.created_by ? '<span class="badge bg-primary ms-2">Creator</span>' : ''}
+                                ${memberIsAdmin ? '<span class="badge bg-success ms-2">Admin</span>' : ''}
+                                ${member.id === this.currentUserId ? '<span class="badge bg-info ms-2">You</span>' : ''}
+                            </div>
+                            <small class="text-muted">${member.email || ''}</small>
+                        </div>
+                    </div>
+                    <div class="btn-group btn-group-sm">
+                        ${canPromote ? `<button class="btn btn-outline-success btn-sm" onclick="chatSystem.promoteToAdmin(${member.id})" title="Promote to Admin">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>` : ''}
+                        ${canDemote ? `<button class="btn btn-outline-warning btn-sm" onclick="chatSystem.demoteFromAdmin(${member.id})" title="Demote from Admin">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>` : ''}
+                        ${canRemove ? `<button class="btn btn-outline-danger btn-sm" onclick="chatSystem.removeMemberFromGroup(${member.id})" title="Remove">
+                            <i class="fas fa-user-times"></i>
+                        </button>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async addMemberToGroup() {
+        const userId = document.getElementById('newMemberSelect').value;
+        if (!userId || !this.currentChatId) return;
+
+        try {
+            const response = await fetch(`/api/chat/${this.currentChatId}/members`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ user_ids: [userId] })
+            });
+
+            if (response.ok) {
+                this.showToast('Member added successfully', 'success');
+                document.getElementById('newMemberSelect').value = '';
+                await this.loadGroupMembers();
+                await this.loadAvailableUsersForGroup();
+                await this.loadChats(); // Refresh chat list
+            } else {
+                const error = await response.json();
+                this.showToast(error.message || 'Failed to add member', 'error');
+            }
+        } catch (error) {
+            console.error('Error adding member:', error);
+            this.showToast('Failed to add member', 'error');
+        }
+    }
+
+    async removeMemberFromGroup(userId) {
+        if (!confirm('Are you sure you want to remove this member?')) return;
+
+        try {
+            const response = await fetch(`/api/chat/${this.currentChatId}/members/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            if (response.ok) {
+                this.showToast('Member removed successfully', 'success');
+                await this.loadGroupMembers();
+                await this.loadAvailableUsersForGroup();
+                await this.loadChats(); // Refresh chat list
+            } else {
+                const error = await response.json();
+                this.showToast(error.message || 'Failed to remove member', 'error');
+            }
+        } catch (error) {
+            console.error('Error removing member:', error);
+            this.showToast('Failed to remove member', 'error');
+        }
+    }
+
+    async promoteToAdmin(userId) {
+        try {
+            const response = await fetch(`/api/chat/${this.currentChatId}/members/${userId}/promote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            if (response.ok) {
+                this.showToast('Member promoted to admin', 'success');
+                await this.loadGroupMembers();
+            } else {
+                const error = await response.json();
+                this.showToast(error.message || 'Failed to promote member', 'error');
+            }
+        } catch (error) {
+            console.error('Error promoting member:', error);
+            this.showToast('Failed to promote member', 'error');
+        }
+    }
+
+    async demoteFromAdmin(userId) {
+        if (!confirm('Are you sure you want to remove admin privileges?')) return;
+
+        try {
+            const response = await fetch(`/api/chat/${this.currentChatId}/members/${userId}/demote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            if (response.ok) {
+                this.showToast('Admin privileges removed', 'success');
+                await this.loadGroupMembers();
+            } else {
+                const error = await response.json();
+                this.showToast(error.message || 'Failed to demote member', 'error');
+            }
+        } catch (error) {
+            console.error('Error demoting member:', error);
+            this.showToast('Failed to demote member', 'error');
+        }
+    }
+
+    async openEditGroupModal() {
+        if (!this.currentChatId) return;
+
+        const chat = this.chats.find(c => c.id === this.currentChatId);
+        if (!chat || !chat.is_group) return;
+
+        // Populate form with current values
+        document.getElementById('editGroupName').value = chat.name || '';
+        document.getElementById('editGroupDescription').value = chat.description || '';
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('editGroupModal'));
+        modal.show();
+    }
+
+    async updateGroupInfo() {
+        const name = document.getElementById('editGroupName').value.trim();
+        const description = document.getElementById('editGroupDescription').value.trim();
+
+        if (!name) {
+            this.showToast('Group name is required', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/chat/${this.currentChatId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ name, description })
+            });
+
+            if (response.ok) {
+                this.showToast('Group updated successfully', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('editGroupModal')).hide();
+                await this.loadChats(); // Refresh chat list
+                
+                // Update current chat header
+                const chat = this.chats.find(c => c.id === this.currentChatId);
+                if (chat) {
+                    this.displayChatHeader(chat);
+                }
+            } else {
+                const error = await response.json();
+                this.showToast(error.message || 'Failed to update group', 'error');
+            }
+        } catch (error) {
+            console.error('Error updating group:', error);
+            this.showToast('Failed to update group', 'error');
+        }
+    }
+
+    async leaveGroup() {
+        if (!confirm('Are you sure you want to leave this group?')) return;
+
+        try {
+            const response = await fetch(`/api/chat/${this.currentChatId}/members/${this.currentUserId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            if (response.ok) {
+                this.showToast('You have left the group', 'success');
+                this.currentChatId = null;
+                await this.loadChats();
+                
+                // Clear chat area
+                document.getElementById('messageInputArea').style.display = 'none';
+                document.getElementById('messagesArea').innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-comment text-muted" style="font-size: 4rem;"></i>
+                        <h5 class="text-muted mt-3">{{ __('dashboard.welcome_to_chat') }}</h5>
+                        <p class="text-muted">{{ __('dashboard.select_chat_to_start') }}</p>
+                    </div>
+                `;
+            } else {
+                const error = await response.json();
+                this.showToast(error.message || 'Failed to leave group', 'error');
+            }
+        } catch (error) {
+            console.error('Error leaving group:', error);
+            this.showToast('Failed to leave group', 'error');
+        }
+    }
+
+    showToast(message, type = 'info') {
+        // Use browser notification if available, otherwise alert
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Chat', { body: message });
+        } else {
+            // Create a simple toast notification
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'error' ? 'danger' : 'success'} position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 250px;';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
     }
 }
 
