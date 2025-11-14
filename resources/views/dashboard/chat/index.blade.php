@@ -1028,8 +1028,8 @@ class ChatSystem {
             runtimes: 'html5',
             browse_button: 'uploadFileBtn',
             url: '/api/chat/upload',
-            chunk_size: '1mb',
-            max_retries: 3,
+            chunk_size: '512kb', // Smaller chunks for better reliability
+            max_retries: 5, // More retries
             multipart: true,
             multipart_params: {
                 '_token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -1045,6 +1045,8 @@ class ChatSystem {
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
+            http_method: 'POST',
+            send_chunk_number: true,
             init: {
                 FilesAdded: function(up, files) {
                     const file = files[0];
@@ -1073,30 +1075,61 @@ class ChatSystem {
                 
                 UploadProgress: function(up, file) {
                     progressBar.style.width = file.percent + '%';
+                    // Show chunk progress in file name
+                    if (file.total && file.loaded) {
+                        const mbLoaded = (file.loaded / (1024 * 1024)).toFixed(2);
+                        const mbTotal = (file.size / (1024 * 1024)).toFixed(2);
+                        fileName.textContent = `${file.name} (${mbLoaded}MB / ${mbTotal}MB)`;
+                    }
+                },
+                
+                ChunkUploaded: function(up, file, info) {
+                    // Log successful chunk uploads
+                    const response = JSON.parse(info.response);
+                    if (!response.success) {
+                        console.error('Chunk upload failed:', response);
+                    }
                 },
                 
                 FileUploaded: function(up, file, response) {
-                    const result = JSON.parse(response.response);
-                    
-                    // Check if upload is complete (has file data)
-                    if (result.success && result.file_url) {
-                        self.uploadedFile = {
-                            file_path: result.file_path,
-                            file_url: result.file_url,
-                            file_type: result.file_type,
-                            preview: previewContent.innerHTML
-                        };
-                        progressBar.classList.add('bg-success');
-                    } else if (result.error) {
-                        alert('Upload failed: ' + result.error.message);
+                    try {
+                        const result = JSON.parse(response.response);
+                        
+                        // Check if upload is complete (has file data)
+                        if (result.success && result.file_url) {
+                            self.uploadedFile = {
+                                file_path: result.file_path,
+                                file_url: result.file_url,
+                                file_type: result.file_type,
+                                preview: previewContent.innerHTML
+                            };
+                            progressBar.classList.add('bg-success');
+                            fileName.textContent = file.name + ' ✓';
+                        } else if (result.error) {
+                            throw new Error(result.error.message || 'Upload failed');
+                        }
+                    } catch (error) {
+                        console.error('Upload processing error:', error);
+                        alert('Upload failed: ' + error.message);
                         filePreview.style.display = 'none';
                         self.uploader.splice();
                     }
-                    // If result.success but no file_url, it's just a chunk confirmation
                 },
                 
                 Error: function(up, err) {
-                    alert('Upload error: ' + err.message);
+                    console.error('Plupload error:', err);
+                    let errorMsg = 'Upload error: ' + err.message;
+                    
+                    // Provide more specific error messages
+                    if (err.code === plupload.HTTP_ERROR) {
+                        errorMsg = 'Network error: Connection timed out or server unreachable. Please check your connection and try again.';
+                    } else if (err.code === plupload.FILE_SIZE_ERROR) {
+                        errorMsg = 'File is too large. Maximum size is 1GB.';
+                    } else if (err.code === plupload.FILE_EXTENSION_ERROR) {
+                        errorMsg = 'File type not allowed. Only images and videos are supported.';
+                    }
+                    
+                    alert(errorMsg);
                     filePreview.style.display = 'none';
                     self.uploader.splice();
                 }
@@ -1410,21 +1443,34 @@ class ChatSystem {
 
     async loadAvailableUsersForGroup() {
         try {
-            const response = await fetch('/api/chat/users', {
+            // First, get all users
+            const usersResponse = await fetch('/api/chat/users', {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 }
             });
 
-            if (response.ok) {
-                const users = await response.json();
+            // Then, get current chat members
+            const chatResponse = await fetch(`/api/chat/${this.currentChatId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            });
+
+            if (usersResponse.ok && chatResponse.ok) {
+                const users = await usersResponse.json();
+                const chatData = await chatResponse.json();
+                const members = chatData.chat?.members || chatData.members || [];
+                
                 const select = document.getElementById('newMemberSelect');
                 select.innerHTML = '<option value="">Select user to add...</option>';
                 
-                const chat = this.chats.find(c => c.id === this.currentChatId);
-                const memberIds = chat.members ? chat.members.map(m => m.id) : [];
+                // Get member IDs
+                const memberIds = members.map(m => m.id);
                 
+                // Filter out current user and existing members
                 users.forEach(user => {
                     if (user.id !== this.currentUserId && !memberIds.includes(user.id)) {
                         const option = document.createElement('option');
@@ -1454,8 +1500,10 @@ class ChatSystem {
             });
 
             if (response.ok) {
-                const chat = await response.json();
-                this.renderMembersList(chat.members || []);
+                const data = await response.json();
+                // Handle both response structures
+                const members = data.chat?.members || data.members || [];
+                this.renderMembersList(members);
             }
         } catch (error) {
             console.error('Error loading members:', error);

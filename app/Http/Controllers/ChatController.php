@@ -352,6 +352,13 @@ class ChatController extends Controller
      */
     public function uploadChatFile(Request $request)
     {
+        // Increase execution time and memory for large file uploads
+        set_time_limit(300); // 5 minutes
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', '300');
+        ini_set('post_max_size', '1024M');
+        ini_set('upload_max_filesize', '1024M');
+        
         try {
             // Get chunk parameters
             $chunk = $request->input('chunk', 0);
