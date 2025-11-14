@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ChatController extends Controller
 {
@@ -351,32 +353,116 @@ class ChatController extends Controller
     public function uploadChatFile(Request $request)
     {
         try {
-            $result = $this->fileUploadService->handleChunkedUpload(
-                'file',
-                'chat/uploads',
-                [], // Use default allowed types
-                1024 // Max 1024MB
-            );
+            // Get chunk parameters
+            $chunk = $request->input('chunk', 0);
+            $chunks = $request->input('chunks', 1);
+            $fileName = $request->input('name');
+            
+            \Log::info('Upload chunk received', [
+                'chunk' => $chunk,
+                'chunks' => $chunks,
+                'fileName' => $fileName,
+                'has_file' => $request->hasFile('file')
+            ]);
 
-            if ($result['success']) {
+            if (!$request->hasFile('file')) {
                 return response()->json([
+                    'jsonrpc' => '2.0',
+                    'result' => null,
+                    'error' => ['code' => 100, 'message' => 'No file uploaded']
+                ], 400);
+            }
+
+            $file = $request->file('file');
+            
+            // Create temp directory
+            $tempDir = storage_path('app/plupload');
+            if (!is_dir($tempDir)) {
+                mkdir($tempDir, 0777, true);
+            }
+
+            // Generate unique identifier for this upload session
+            $uploadId = $request->input('upload_id', md5($fileName));
+            $chunkFile = $tempDir . '/' . $uploadId . '_' . $chunk . '.part';
+
+            // Save the chunk
+            $file->move($tempDir, basename($chunkFile));
+
+            // Check if this is the last chunk
+            if ($chunk == $chunks - 1) {
+                // Merge all chunks
+                $finalFileName = Str::slug(pathinfo($fileName, PATHINFO_FILENAME)) . '_' . time() . '.' . pathinfo($fileName, PATHINFO_EXTENSION);
+                $targetDir = storage_path('app/public/chat/uploads');
+                
+                if (!is_dir($targetDir)) {
+                    mkdir($targetDir, 0777, true);
+                }
+                
+                $finalPath = $targetDir . '/' . $finalFileName;
+                $out = fopen($finalPath, 'wb');
+
+                if (!$out) {
+                    throw new \Exception('Failed to create output file');
+                }
+
+                // Concatenate all chunks
+                for ($i = 0; $i < $chunks; $i++) {
+                    $chunkPath = $tempDir . '/' . $uploadId . '_' . $i . '.part';
+                    
+                    if (!file_exists($chunkPath)) {
+                        fclose($out);
+                        throw new \Exception('Chunk ' . $i . ' is missing');
+                    }
+
+                    $in = fopen($chunkPath, 'rb');
+                    if ($in) {
+                        while ($buff = fread($in, 4096)) {
+                            fwrite($out, $buff);
+                        }
+                        fclose($in);
+                        @unlink($chunkPath);
+                    }
+                }
+
+                fclose($out);
+
+                // Get file info
+                $relativePath = 'chat/uploads/' . $finalFileName;
+                $fileUrl = Storage::url($relativePath);
+                $fileType = $this->fileUploadService->getFileType($finalPath);
+
+                \Log::info('Upload complete', [
+                    'file' => $finalFileName,
+                    'size' => filesize($finalPath)
+                ]);
+
+                return response()->json([
+                    'jsonrpc' => '2.0',
+                    'result' => 'complete',
                     'success' => true,
-                    'file_path' => $result['path'],
-                    'file_url' => $result['url'],
-                    'file_type' => $this->fileUploadService->getFileType($result['path']),
-                    'message' => $result['message']
+                    'file_path' => $relativePath,
+                    'file_url' => asset($fileUrl),
+                    'file_type' => $fileType
                 ]);
             }
 
+            // Chunk received successfully, waiting for more
             return response()->json([
-                'success' => false,
-                'message' => $result['message']
-            ], 400);
+                'jsonrpc' => '2.0',
+                'result' => 'ok',
+                'success' => true
+            ]);
 
         } catch (\Exception $e) {
+            \Log::error('Upload exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
-                'success' => false,
-                'message' => 'Upload failed: ' . $e->getMessage()
+                'jsonrpc' => '2.0',
+                'result' => null,
+                'error' => ['code' => 500, 'message' => $e->getMessage()]
             ], 500);
         }
     }
@@ -386,53 +472,79 @@ class ChatController extends Controller
      */
     public function sendFileMessage(Request $request, Chat $chat)
     {
-        $validator = Validator::make($request->all(), [
-            'file_path' => 'required|string',
-            'file_url' => 'required|string',
-            'file_type' => 'required|in:image,video,file',
-            'message' => 'nullable|string|max:500' // Optional caption
-        ]);
+        try {
+            \Log::info('sendFileMessage called', [
+                'chat_id' => $chat->id,
+                'user_id' => Auth::id(),
+                'request_data' => $request->all()
+            ]);
 
-        if ($validator->fails()) {
+            $validator = Validator::make($request->all(), [
+                'file_path' => 'required|string',
+                'file_url' => 'required|string',
+                'file_type' => 'required|in:image,video,file',
+                'message' => 'nullable|string|max:500' // Optional caption
+            ]);
+
+            if ($validator->fails()) {
+                \Log::error('Validation failed', ['errors' => $validator->errors()]);
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $user = Auth::user();
+
+            // Check if user is a member of this chat
+            if (!$chat->hasUser($user->id)) {
+                \Log::error('User not member of chat', ['user_id' => $user->id, 'chat_id' => $chat->id]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not a member of this chat'
+                ], 403);
+            }
+
+            // Map file types to message type enum (text, image, file)
+            $messageType = $request->file_type === 'image' ? 'image' : 'file';
+            
+            $message = Message::create([
+                'chat_id' => $chat->id,
+                'user_id' => $user->id,
+                'message' => $request->message ?? '',
+                'type' => $messageType, // Use mapped type (image or file)
+                'file_path' => $request->file_path,
+                'file_url' => $request->file_url,
+                'file_type' => $request->file_type, // Keep original type (image, video, file)
+                'is_read' => false
+            ]);
+
+            $message->load('user');
+
+            \Log::info('File message created', ['message_id' => $message->id]);
+
+            // Broadcast the message
+            broadcast(new MessageSent($message))->toOthers();
+
+            // Update and broadcast unread counts
+            $this->chatService->updateUnreadCounts($chat, $user->id, $message);
+
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ], 201);
+
+        } catch (\Exception $e) {
+            \Log::error('sendFileMessage exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Failed to send file message: ' . $e->getMessage()
+            ], 500);
         }
-
-        $user = Auth::user();
-
-        // Check if user is a member of this chat
-        if (!$chat->hasUser($user->id)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You are not a member of this chat'
-            ], 403);
-        }
-
-        $message = Message::create([
-            'chat_id' => $chat->id,
-            'user_id' => $user->id,
-            'message' => $request->message ?? '',
-            'type' => $request->file_type,
-            'file_path' => $request->file_path,
-            'file_url' => $request->file_url,
-            'file_type' => $request->file_type,
-            'is_read' => false
-        ]);
-
-        $message->load('user');
-
-        // Broadcast the message
-        broadcast(new MessageSent($message))->toOthers();
-
-        // Update and broadcast unread counts
-        $this->chatService->updateUnreadCounts($chat, $user->id, $message);
-
-        return response()->json([
-            'success' => true,
-            'message' => $message
-        ], 201);
     }
 
     /**

@@ -775,7 +775,7 @@ class ChatSystem {
             html += `
                 <div class="message mb-3 d-flex ${isOwn ? 'justify-content-start' : 'justify-content-end'}" data-message-id="${message.id}">
                     <div class="message-content ${isOwn ? 'text-end' : 'text-start'}" style="max-width: 70%;">
-                        <div class="d-inline-block p-3 rounded ${isOwn ? 'bg-primary text-white' : 'rounded btn-secondary shadow-sm'}" style="max-width: 100%;">
+                        <div class="d-inline-block p-3 rounded ${isOwn ? 'bg-primary text-white' : 'rounded btn-secondary shadow-sm'}" style="max-width: fit-content;">
                             ${fileContent}
                             ${message.message ? this.escapeHtml(message.message) : ''}
                         </div>
@@ -879,6 +879,11 @@ class ChatSystem {
             url: '/api/chat/upload',
             chunk_size: '1mb',
             max_retries: 3,
+            multipart: true,
+            multipart_params: {
+                '_token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'upload_id': '' // Will be set dynamically
+            },
             filters: {
                 mime_types: [
                     {title: "Image files", extensions: "jpg,jpeg,png,gif,webp"},
@@ -892,6 +897,11 @@ class ChatSystem {
             init: {
                 FilesAdded: function(up, files) {
                     const file = files[0];
+                    
+                    // Generate unique upload ID for this session
+                    const uploadId = 'upload_' + new Date().getTime() + '_' + Math.random().toString(36).substr(2, 9);
+                    up.settings.multipart_params.upload_id = uploadId;
+                    
                     fileName.textContent = file.name;
                     filePreview.style.display = 'block';
                     
@@ -916,7 +926,9 @@ class ChatSystem {
                 
                 FileUploaded: function(up, file, response) {
                     const result = JSON.parse(response.response);
-                    if (result.success) {
+                    
+                    // Check if upload is complete (has file data)
+                    if (result.success && result.file_url) {
                         self.uploadedFile = {
                             file_path: result.file_path,
                             file_url: result.file_url,
@@ -924,11 +936,12 @@ class ChatSystem {
                             preview: previewContent.innerHTML
                         };
                         progressBar.classList.add('bg-success');
-                    } else {
-                        alert('Upload failed: ' + result.message);
+                    } else if (result.error) {
+                        alert('Upload failed: ' + result.error.message);
                         filePreview.style.display = 'none';
                         self.uploader.splice();
                     }
+                    // If result.success but no file_url, it's just a chunk confirmation
                 },
                 
                 Error: function(up, err) {

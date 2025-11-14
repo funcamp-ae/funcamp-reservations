@@ -24,15 +24,22 @@ class FileUploadService
             if (empty($allowedTypes)) {
                 $allowedTypes = [
                     'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
-                    'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo', 'video/webm',"video/mov"
+                    'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo', 'video/webm'
                 ];
             }
 
             $result = Plupload::receive($fieldName, function ($file) use ($directory, $allowedTypes, $maxSize) {
                 // Validate file type
                 $mimeType = $file->getMimeType();
-                if (!in_array($mimeType, $allowedTypes)) {
-                    throw new \Exception('File type not allowed. Allowed types: ' . implode(', ', $allowedTypes));
+                
+                \Log::info('Plupload file received', [
+                    'mime' => $mimeType,
+                    'size' => $file->getSize(),
+                    'name' => $file->getClientOriginalName()
+                ]);
+                
+                if (!empty($allowedTypes) && !in_array($mimeType, $allowedTypes)) {
+                    throw new \Exception('File type not allowed: ' . $mimeType);
                 }
 
                 // Validate file size (in bytes)
@@ -46,38 +53,64 @@ class FileUploadService
                 $extension = $file->getClientOriginalExtension();
                 $filename = Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '_' . time() . '.' . $extension;
 
-                // Store file using Laravel Storage facade
-                $relativePath = $directory . '/' . $filename;
-                Storage::disk('public')->put($relativePath, file_get_contents($file->getRealPath()));
+                // Store file
+                $targetPath = storage_path('app/public/' . $directory);
+                if (!file_exists($targetPath)) {
+                    mkdir($targetPath, 0777, true);
+                }
+                
+                $file->move($targetPath, $filename);
 
+                \Log::info('File stored successfully', ['filename' => $filename]);
+
+                // Return the filename (Plupload will handle returning 'ready' for chunks)
                 return $filename;
             });
 
-            // Check if upload was successful
-            if ($result === 'ready' || is_string($result)) {
-                $filename = is_string($result) ? $result : null;
-                
-                if ($filename) {
-                    $relativePath = $directory . '/' . $filename;
-                    $url = Storage::url($relativePath);
+            \Log::info('Plupload result', ['result' => $result, 'type' => gettype($result)]);
 
-                    return [
-                        'success' => true,
-                        'path' => $relativePath,
-                        'url' => asset($url),
-                        'message' => 'File uploaded successfully'
-                    ];
-                }
+            // Plupload returns 'ready' when chunks are being processed
+            // and the filename when upload is complete
+            if ($result === 'ready') {
+                // Chunk received, waiting for more
+                return [
+                    'success' => true,
+                    'path' => null,
+                    'url' => null,
+                    'message' => 'Chunk received',
+                    'status' => 'chunking'
+                ];
+            }
+            
+            if (is_string($result) && $result !== 'ready') {
+                // Upload complete - result is the filename
+                $filename = $result;
+                $relativePath = $directory . '/' . $filename;
+                $url = Storage::url($relativePath);
+
+                return [
+                    'success' => true,
+                    'path' => $relativePath,
+                    'url' => asset($url),
+                    'message' => 'File uploaded successfully',
+                    'status' => 'complete'
+                ];
             }
 
+            // If we get here, something unexpected happened
             return [
                 'success' => false,
                 'path' => null,
                 'url' => null,
-                'message' => 'Upload failed'
+                'message' => 'Unexpected response from Plupload: ' . json_encode($result)
             ];
 
         } catch (\Exception $e) {
+            \Log::error('Upload error in handleChunkedUpload', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return [
                 'success' => false,
                 'path' => null,
@@ -85,6 +118,54 @@ class FileUploadService
                 'message' => $e->getMessage()
             ];
         }
+    }
+    /**
+     * Handle standard Laravel file upload (fallback)
+     */
+    private function handleStandardUpload($fieldName, $directory, $allowedTypes, $maxSize)
+    {
+        $request = request();
+        
+        if (!$request->hasFile($fieldName)) {
+            throw new \Exception('No file uploaded');
+        }
+
+        $file = $request->file($fieldName);
+
+        // Validate file
+        if (!$file->isValid()) {
+            throw new \Exception('Invalid file upload');
+        }
+
+        // Validate file type
+        $mimeType = $file->getMimeType();
+        if (!empty($allowedTypes) && !in_array($mimeType, $allowedTypes)) {
+            throw new \Exception('File type not allowed: ' . $mimeType);
+        }
+
+        // Validate file size
+        $maxSizeBytes = $maxSize * 1024 * 1024;
+        if ($file->getSize() > $maxSizeBytes) {
+            throw new \Exception('File size exceeds maximum allowed size of ' . $maxSize . 'MB');
+        }
+
+        // Generate unique filename
+        $originalName = $file->getClientOriginalName();
+        $extension = $file->getClientOriginalExtension();
+        $filename = Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '_' . time() . '.' . $extension;
+
+        // Store file
+        $relativePath = $directory . '/' . $filename;
+        $file->storeAs('public/' . $directory, $filename);
+
+        $url = Storage::url($relativePath);
+
+        return [
+            'success' => true,
+            'path' => $relativePath,
+            'url' => asset($url),
+            'message' => 'File uploaded successfully'
+        ];
     }
 
     /**
