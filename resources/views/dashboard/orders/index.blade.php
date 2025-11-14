@@ -75,6 +75,7 @@
                                 <th class="fw-bolder">@lang('dashboard.sequence')</th>
                                 <th class="fw-bolder">@lang('dashboard.reservation_number')</th>
                                 <th class="fw-bolder">@lang('dashboard.reservation_date')</th>
+                                <th class="fw-bolder">@lang('dashboard.day')</th>
                                 <th class="fw-bolder">@lang('dashboard.customer')</th>
                                 <th class="fw-bolder">@lang('dashboard.service')</th>
                                 <th class="fw-bolder">@lang('dashboard.Duration of hours')</th>
@@ -114,6 +115,12 @@
                                 </td>
                                 <!--begin::Reservation Date-->
                                 <td>{{ $order->date ? \Carbon\Carbon::createFromFormat('Y-m-d', $order->date)->format('d M Y') : '' }}</td>
+                                <!--end::Reservation Date-->
+                                
+                                <!--begin::Day-->
+                                <td>{{ $order->date ? \Carbon\Carbon::createFromFormat('Y-m-d', $order->date)->locale('ar')->translatedFormat('l') : '' }}</td>
+                                <!--end::Day-->
+                                
                                 <!--begin::Customer Name-->
                                 <td>
                                     <div class="d-flex">

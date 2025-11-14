@@ -2202,6 +2202,7 @@ return [
     'upcoming' => 'Upcoming',
     'upcoming_reservations' => 'Upcoming Reservations',
     'reservation_date' => 'Reservation Date',
+    'day' => 'Day',
     'reservation' => 'Reservation',
     'payment_status' => 'Payment Status',
     'paid' => 'Paid',

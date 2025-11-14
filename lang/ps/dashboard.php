@@ -1877,6 +1877,7 @@ return [
     'upcoming' => 'راتلونکي',
     'upcoming_reservations' => 'راتلونکي حجزونه',
     'reservation_date' => 'د حجز نېټه',
+    'day' => 'ورځ',
     'reservation' => 'حجز',
     'payment_status' => 'د تادیې حالت',
     'paid' => 'تادیه شوی',

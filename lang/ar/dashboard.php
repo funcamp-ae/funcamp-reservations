@@ -1888,6 +1888,7 @@ return [
     'upcoming' => 'القادمة',
     'upcoming_reservations' => 'الحجوزات القادمة',
     'reservation_date' => 'تاريخ الحجز',
+    'day' => 'اليوم',
     'reservation' => 'الحجز',
     'payment_status' => 'حالة الدفع',
     'paid' => 'مدفوع',
