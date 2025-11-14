@@ -1759,6 +1759,17 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'api/chat'], function () {
     Route::get('/unread-count', [App\Http\Controllers\ChatController::class, 'getUnreadCount']);
     Route::get('/unread-messages', [App\Http\Controllers\ChatController::class, 'getUnreadMessages']);
     
+    // File upload routes
+    Route::post('/upload', [App\Http\Controllers\ChatController::class, 'uploadChatFile'])->name('chat.upload');
+    Route::post('/{chat}/file-message', [App\Http\Controllers\ChatController::class, 'sendFileMessage']);
+    
+    // Group management routes
+    Route::post('/{chat}/add-members', [App\Http\Controllers\ChatController::class, 'addMembers']);
+    Route::delete('/{chat}/remove-member/{userId}', [App\Http\Controllers\ChatController::class, 'removeMember']);
+    Route::put('/{chat}/update', [App\Http\Controllers\ChatController::class, 'updateGroup']);
+    Route::post('/{chat}/promote/{userId}', [App\Http\Controllers\ChatController::class, 'promoteToAdmin']);
+    Route::post('/{chat}/demote/{userId}', [App\Http\Controllers\ChatController::class, 'demoteAdmin']);
+    
     Route::get('/{chat}', [App\Http\Controllers\ChatController::class, 'show']);
     Route::post('/{chat}/messages', [App\Http\Controllers\ChatController::class, 'sendMessage']);
     Route::post('/{chat}/mark-read', [App\Http\Controllers\ChatController::class, 'markAsRead']);

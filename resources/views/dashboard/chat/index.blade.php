@@ -15,7 +15,7 @@
                         </button>
 
                         <!-- Chat List Sidebar -->
-                        <div class="col-md-4 border-end @if(session('theme') == 'dark') bg-dark @else bg-white @endif" id="chatSidebar" style="transition: transform 0.3s ease-in-out; overflow-y: auto;">
+                        <div class="col-md-4 border-end @if(session('theme') == 'dark') bg-dark @else bg-white @endif" id="chatSidebar" style="overflow-y: auto;">
                             <div class="p-3 border-bottom">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h5 class="mb-0">
@@ -80,8 +80,40 @@
                                 
                                 <!-- Message Input -->
                                 <div class="border-top p-3 " id="messageInputArea" style="display: none;">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="{{ __('dashboard.type_message') }}..." id="messageInput">
+                                    <div class="d-flex align-items-end gap-2">
+                                        <!-- File Upload Button -->
+                                        <button class="btn btn-outline-secondary" id="uploadFileBtn" type="button" title="{{ __('dashboard.attach_file') }}">
+                                            <i class="fas fa-paperclip"></i>
+                                        </button>
+                                        
+                                        <!-- Hidden file input for plupload -->
+                                        <input type="file" id="fileInput" style="display: none;" accept="image/*,video/*">
+                                        
+                                        <!-- Message Input -->
+                                        <div class="flex-grow-1">
+                                            <input type="text" class="form-control" placeholder="{{ __('dashboard.type_message') }}..." id="messageInput">
+                                            <!-- File preview area -->
+                                            <div id="filePreview" class="mt-2" style="display: none;">
+                                                <div class="card">
+                                                    <div class="card-body p-2">
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <div class="d-flex align-items-center">
+                                                                <div id="previewContent"></div>
+                                                                <span id="fileName" class="ms-2 small"></span>
+                                                            </div>
+                                                            <button class="btn btn-sm btn-danger" id="cancelUpload" type="button">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="progress mt-2" style="height: 5px;">
+                                                            <div class="progress-bar" id="uploadProgress" role="progressbar" style="width: 0%"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Send Button -->
                                         <button class="btn btn-primary" id="sendBtn">
                                             <i class="fas fa-paper-plane"></i>
                                         </button>
@@ -150,6 +182,9 @@
 @endsection
 
 @push('scripts')
+<!-- Plupload CDN -->
+<script src="https://cdn.jsdelivr.net/npm/plupload@2.3.9/js/plupload.full.min.js"></script>
+
 <script>
 class ChatSystem {
     constructor() {
@@ -158,6 +193,8 @@ class ChatSystem {
         this.chats = [];
         this.users = [];
         this.activeChannels = new Map(); // Track active Echo channels
+        this.uploadedFile = null;
+        this.uploader = null;
         this.init();
     }
 
@@ -166,6 +203,7 @@ class ChatSystem {
         this.loadUsers();
         this.loadChats();
         this.setupGlobalMessageListener();
+        this.setupFileUpload();
         if (this.currentChatId) {
             this.setupChatChannel(this.currentChatId);
         }
@@ -328,8 +366,8 @@ class ChatSystem {
 }
 
     handleNewMessage(event) {
-        const { message, chat_id, user } = event;
-        
+        const { fullMessageDetails , chat_id, user } = event;
+        let message = fullMessageDetails.message;
         // Update chat list - move chat to top and update latest message
         this.updateChatInList(chat_id, message);
         
@@ -346,7 +384,7 @@ class ChatSystem {
             this.markMessageAsRead(message.id);
         } else if (message.user_id != this.currentUserId) {
             // Show notification for messages in other chats
-            this.showNotification(user.name, message.message);
+            this.showNotification(user.name, fullMessageDetails);
         }
     }
 
@@ -421,8 +459,21 @@ class ChatSystem {
     showNotification(senderName, message) {
         // Check if browser supports notifications
         if ('Notification' in window && Notification.permission === 'granted') {
+            let notificationBody = '';
+            
+            // Handle different message types
+            if (message.file_url && (message.type === 'image' || message.file_type === 'image')) {
+                notificationBody = message.message ? message.message : '📷 Sent an image';
+            } else if (message.file_url && (message.type === 'video' || message.file_type === 'video')) {
+                notificationBody = message.message ? message.message : '🎥 Sent a video';
+            } else if (message.file_url && (message.type === 'file' || message.file_type === 'file')) {
+                notificationBody = message.message ? message.message : '📎 Sent a file';
+            } else {
+                notificationBody = this.truncateMessage(message.message || 'New message', 50);
+            }
+            
             new Notification(`New message from ${senderName}`, {
-                body: this.truncateMessage(message, 50),
+                body: notificationBody,
                 icon: '/path/to/notification-icon.png'
             });
         }
@@ -566,7 +617,7 @@ class ChatSystem {
                                 <div>
                                     <h6 class="mb-1">${chatName}</h6>
                                     <small class="text-muted">
-                                        ${latestMessage ? this.truncateMessage(latestMessage.message, 40) : '@lang('dashboard.no_messages_yet')'}
+                                        ${latestMessage ? this.getMessagePreview(latestMessage) : '@lang('dashboard.no_messages_yet')'}
                                     </small>
                                 </div>
                                 <div class="text-end">
@@ -689,7 +740,9 @@ class ChatSystem {
             // Determine message status icon
             let statusIcon = '';
             if (isOwn) {
-                if (message.is_read) {
+                if (message.upload_failed) {
+                    statusIcon = '<i class="fas fa-exclamation-circle text-danger ms-1" title="Failed to send"></i>';
+                } else if (message.is_read) {
                     // Message has been read - show double checkmark in blue/primary color
                     statusIcon = '<i class="fas fa-check-double text-primary ms-1" title="Read"></i>';
                 } else {
@@ -698,11 +751,33 @@ class ChatSystem {
                 }
             }
             
+            // Render file content
+            let fileContent = '';
+            if (message.file_url && (message.type === 'image' || message.file_type === 'image')) {
+                fileContent = `
+                    <div class="mb-2">
+                        <img src="${message.file_url}" style="max-width: 300px; max-height: 300px; border-radius: 8px; cursor: pointer;" 
+                             onclick="window.open('${message.file_url}', '_blank')" 
+                             alt="Image" loading="lazy">
+                    </div>
+                `;
+            } else if (message.file_url && (message.type === 'video' || message.file_type === 'video')) {
+                fileContent = `
+                    <div class="mb-2">
+                        <video controls style="max-width: 300px; max-height: 300px; border-radius: 8px;">
+                            <source src="${message.file_url}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                `;
+            }
+            
             html += `
                 <div class="message mb-3 d-flex ${isOwn ? 'justify-content-start' : 'justify-content-end'}" data-message-id="${message.id}">
                     <div class="message-content ${isOwn ? 'text-end' : 'text-start'}" style="max-width: 70%;">
                         <div class="d-inline-block p-3 rounded ${isOwn ? 'bg-primary text-white' : 'rounded btn-secondary shadow-sm'}" style="max-width: 100%;">
-                            ${this.escapeHtml(message.message)}
+                            ${fileContent}
+                            ${message.message ? this.escapeHtml(message.message) : ''}
                         </div>
                         <div class="small text-muted mt-1 message-meta">
                             ${this.formatTime(message.created_at)}
@@ -721,8 +796,16 @@ class ChatSystem {
         const input = document.getElementById('messageInput');
         const message = input.value.trim();
         
-        if (!message || !this.currentChatId) return;
+        // Check if we have a file or message
+        if (!message && !this.uploadedFile) return;
+        if (!this.currentChatId) return;
 
+        // If file is being uploaded, send file message
+        if (this.uploadedFile) {
+            await this.sendFileMessage(message);
+            return;
+        }
+        
         // Clear input immediately
         input.value = '';
         
@@ -777,6 +860,173 @@ class ChatSystem {
             this.currentMessages = this.currentMessages.filter(msg => !msg.is_temp);
             this.renderMessages(this.currentMessages);
             alert('Failed to send message: ' + error.message);
+        }
+    }
+
+    // Setup file upload with Plupload
+    setupFileUpload() {
+        const self = this;
+        const filePreview = document.getElementById('filePreview');
+        const cancelUploadBtn = document.getElementById('cancelUpload');
+        const previewContent = document.getElementById('previewContent');
+        const fileName = document.getElementById('fileName');
+        const progressBar = document.getElementById('uploadProgress');
+        
+        // Initialize Plupload
+        this.uploader = new plupload.Uploader({
+            runtimes: 'html5',
+            browse_button: 'uploadFileBtn',
+            url: '/api/chat/upload',
+            chunk_size: '1mb',
+            max_retries: 3,
+            filters: {
+                mime_types: [
+                    {title: "Image files", extensions: "jpg,jpeg,png,gif,webp"},
+                    {title: "Video files", extensions: "mp4,mov,avi,webm"}
+                ],
+                max_file_size: '1024mb'
+            },
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            init: {
+                FilesAdded: function(up, files) {
+                    const file = files[0];
+                    fileName.textContent = file.name;
+                    filePreview.style.display = 'block';
+                    
+                    // Show preview
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        if (file.type.startsWith('image/')) {
+                            previewContent.innerHTML = `<img src="${e.target.result}" style="max-width: 50px; max-height: 50px; border-radius: 4px;">`;
+                        } else if (file.type.startsWith('video/')) {
+                            previewContent.innerHTML = `<i class="fas fa-video fa-2x text-primary"></i>`;
+                        }
+                    };
+                    reader.readAsDataURL(file.getNative());
+                    
+                    // Start upload automatically
+                    up.start();
+                },
+                
+                UploadProgress: function(up, file) {
+                    progressBar.style.width = file.percent + '%';
+                },
+                
+                FileUploaded: function(up, file, response) {
+                    const result = JSON.parse(response.response);
+                    if (result.success) {
+                        self.uploadedFile = {
+                            file_path: result.file_path,
+                            file_url: result.file_url,
+                            file_type: result.file_type,
+                            preview: previewContent.innerHTML
+                        };
+                        progressBar.classList.add('bg-success');
+                    } else {
+                        alert('Upload failed: ' + result.message);
+                        filePreview.style.display = 'none';
+                        self.uploader.splice();
+                    }
+                },
+                
+                Error: function(up, err) {
+                    alert('Upload error: ' + err.message);
+                    filePreview.style.display = 'none';
+                    self.uploader.splice();
+                }
+            }
+        });
+        
+        this.uploader.init();
+        
+        // Cancel upload
+        cancelUploadBtn.addEventListener('click', () => {
+            this.uploader.splice();
+            this.uploadedFile = null;
+            filePreview.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressBar.classList.remove('bg-success');
+        });
+    }
+
+    // Send file message
+    async sendFileMessage(caption = '') {
+        if (!this.uploadedFile || !this.currentChatId) return;
+        
+        const input = document.getElementById('messageInput');
+        const filePreview = document.getElementById('filePreview');
+        const progressBar = document.getElementById('uploadProgress');
+        
+        // Create temporary message with file preview
+        const tempMessage = {
+            id: 'temp_' + Date.now(),
+            user_id: this.currentUserId,
+            message: caption,
+            type: this.uploadedFile.file_type,
+            file_url: this.uploadedFile.file_url,
+            file_type: this.uploadedFile.file_type,
+            created_at: new Date().toISOString(),
+            is_read: false,
+            is_temp: true
+        };
+
+        // Add and display immediately
+        if (!this.currentMessages) {
+            this.currentMessages = [];
+        }
+        this.currentMessages.push(tempMessage);
+        this.renderMessages(this.currentMessages);
+
+        // Clear input and file
+        input.value = '';
+        filePreview.style.display = 'none';
+        progressBar.style.width = '0%';
+        progressBar.classList.remove('bg-success');
+        
+        const uploadData = {...this.uploadedFile};
+        this.uploadedFile = null;
+
+        try {
+            const response = await fetch(`/api/chat/${this.currentChatId}/file-message`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    file_path: uploadData.file_path,
+                    file_url: uploadData.file_url,
+                    file_type: uploadData.file_type,
+                    message: caption
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Replace temp message with real message
+                this.currentMessages = this.currentMessages.filter(msg => !msg.is_temp);
+                this.currentMessages.push(data.message);
+                this.renderMessages(this.currentMessages);
+                this.updateChatInList(this.currentChatId, data.message);
+            } else {
+                // Show error on temp message
+                this.currentMessages = this.currentMessages.filter(msg => !msg.is_temp);
+                tempMessage.upload_failed = true;
+                this.currentMessages.push(tempMessage);
+                this.renderMessages(this.currentMessages);
+                alert('Failed to send file: ' + (data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error sending file:', error);
+            // Show error
+            this.currentMessages = this.currentMessages.filter(msg => !msg.is_temp);
+            tempMessage.upload_failed = true;
+            this.currentMessages.push(tempMessage);
+            this.renderMessages(this.currentMessages);
+            alert('Failed to send file: ' + error.message);
         }
     }
 
@@ -922,6 +1172,20 @@ class ChatSystem {
         div.textContent = text;
         return div.innerHTML;
     }
+
+    getMessagePreview(message) {
+        // Handle file messages with special preview text
+        if (message.file_url && (message.type === 'image' || message.file_type === 'image')) {
+            return message.message ? this.truncateMessage(message.message, 40) : '📷 Image';
+        } else if (message.file_url && (message.type === 'video' || message.file_type === 'video')) {
+            return message.message ? this.truncateMessage(message.message, 40) : '🎥 Video';
+        } else if (message.file_url && (message.type === 'file' || message.file_type === 'file')) {
+            return message.message ? this.truncateMessage(message.message, 40) : '📎 File';
+        }
+        
+        // Regular text message
+        return this.truncateMessage(message.message || 'Message', 40);
+    }
 }
 
 // Initialize when document is ready
@@ -934,19 +1198,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeSidebar = document.getElementById('closeSidebar');
     const chatContent = document.getElementById('chatContent');
     
-    // Hide sidebar by default on mobile
-    if (window.innerWidth < 768) {
-        sidebar.style.transform = @if(session('lang') == 'ar')'translateX(100%)'@else 'translateX(-100%)' @endif;
-        chatContent.style.display = 'none';
-    }
-    
     // Toggle sidebar
     function toggleSidebar() {
-        if (window.innerWidth < 768) {
-            const isOpen = sidebar.style.transform === 'translateX(0px)';
-            sidebar.style.transform = isOpen ? @if(session('lang') == 'ar')'translateX(100%)'@else 'translateX(-100%)' @endif : 'translateX(0)';
-            chatContent.style.display = isOpen ? 'none' : 'flex';
-        }
+        sidebar.classList.toggle('show-sidebar');
+        chatContent.classList.toggle('hide-content');
     }
     
     // Event listeners
@@ -961,17 +1216,6 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleSidebar();
         }
     });
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 768) {
-            sidebar.style.transform = 'none';
-            chatContent.style.display = 'flex';
-        } else if (sidebar.style.transform === 'none') {
-            sidebar.style.transform = @if(session('lang') == 'ar')'translateX(100%)'@else 'translateX(-100%)' @endif;
-            chatContent.style.display = 'none';
-        }
-    });
 });
 </script>
 <style>
@@ -979,14 +1223,41 @@ document.addEventListener('DOMContentLoaded', function() {
         #chatSidebar {
             position: fixed;
             top: 0;
-            @if(session('lang') == 'ar')right: 0;@else left: 0; @endif
+            @if(session('lang') == 'ar')
+            right: 0;
+            transform: translateX(100%);
+            @else
+            left: 0;
+            transform: translateX(-100%);
+            @endif
             bottom: 0;
             z-index: 100;
             width: 280px;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease-in-out;
         }
+        
+        #chatSidebar.show-sidebar {
+            transform: translateX(0) !important;
+        }
+        
         #chatContent {
             width: 100%;
+            display: none;
+        }
+        
+        #chatContent.hide-content {
+            display: flex !important;
+        }
+    }
+    
+    @media (min-width: 768px) {
+        #chatSidebar {
+            transform: none !important;
+        }
+        
+        #chatContent {
+            display: flex !important;
         }
     }
 </style>
