@@ -754,6 +754,9 @@ class ChatSystem {
         try {
             this.currentChatId = chatId;
             
+            // Clear any pending file upload when switching chats
+            this.clearFileUpload();
+            
             // Setup real-time channel for this chat
             this.setupChatChannel(chatId);
             
@@ -1188,6 +1191,45 @@ class ChatSystem {
             this.currentMessages.push(tempMessage);
             this.renderMessages(this.currentMessages);
             alert('Failed to send file: ' + error.message);
+        }
+    }
+
+    clearFileUpload() {
+        // Clear uploaded file data
+        this.uploadedFile = null;
+        
+        // Reset file preview UI
+        const filePreview = document.getElementById('filePreview');
+        const progressBar = document.getElementById('uploadProgress');
+        const previewContent = document.getElementById('previewContent');
+        const fileName = document.getElementById('fileName');
+        
+        if (filePreview) {
+            filePreview.style.display = 'none';
+        }
+        
+        if (progressBar) {
+            progressBar.style.width = '0%';
+            progressBar.classList.remove('bg-success');
+        }
+        
+        if (previewContent) {
+            previewContent.innerHTML = '';
+        }
+        
+        if (fileName) {
+            fileName.textContent = '';
+        }
+        
+        // Reset file input
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        
+        // Stop any ongoing upload
+        if (this.uploader) {
+            this.uploader.splice();
         }
     }
 
