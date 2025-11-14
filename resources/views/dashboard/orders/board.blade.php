@@ -70,7 +70,7 @@
                   $logoutAt = $order->delivery_time ?? null;
                   $dateStr = $order->date ?? null;
                   $totalPaid = $order->totalPaidAmount();
-                  $totalPrice = $order->price + $order->insurance_amount;
+                  $totalPrice =$order->price + $order->insurance_amount + $order->addonsPrice() ;
                   $isPaid = $totalPaid >= $totalPrice;
                   @endphp
                   <tr>
@@ -103,7 +103,7 @@
                       <span class="badge bg-success">@lang('dashboard.paid_totaly')</span>
                       @elseif($totalPaid < $totalPrice && $totalPaid> 0)
                         <span class="badge bg-warning">@lang('dashboard.paid_partially')</span>
-                        <div class="text-muted small paid-amount">{{ number_format($totalPaid,2) }} / {{ number_format($totalPrice,2) }}</div>
+                        <div class="text-muted small paid-amount">{{ number_format($totalPaid,2) }} - {{ number_format($totalPrice,2) }}</div>
                         @elseif($totalPaid == 0)
                         <span class="badge bg-danger">@lang('dashboard.unpaid')</span>
                         @endif
@@ -231,7 +231,7 @@
                       <span class="badge bg-success">@lang('dashboard.paid')</span>
                       @else
                       <span class="badge bg-warning">@lang('dashboard.unpaid')</span>
-                      <div class="text-muted small">{{ number_format($paidAmount,2) }} / {{ number_format((float)$order->price,2) }}</div>
+                      <div class="text-muted small">{{ number_format($paidAmount,2) }} - {{ number_format((float)($order->price + $order->insurance_amount + $order->addonsPrice()),2) }}</div>
                       @endif
                     </td>
                     <td>
