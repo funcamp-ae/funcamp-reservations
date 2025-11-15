@@ -18,6 +18,9 @@ class BankAccountPolicy
 
     public function view(User $user, BankAccount $bankAccount): bool
     {
+        if ($bankAccount->is_private) {
+            return $user->hasPermissionTo('bank-accounts.private.show');
+        }
         return $user->hasPermissionTo('bank-accounts.show');
     }
 

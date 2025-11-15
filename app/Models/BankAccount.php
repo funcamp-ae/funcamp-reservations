@@ -13,7 +13,8 @@ class BankAccount extends Model
         'name',
         'account_number',
         'balance',
-        'notes'
+        'notes',
+        'is_private'
     ];
 
     public function orderAddons()

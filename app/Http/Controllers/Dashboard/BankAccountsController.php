@@ -53,6 +53,7 @@ class BankAccountsController extends Controller
             'balance' => 'required|numeric',
             'notes' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+            'is_private' => 'nullable|boolean',
         ]);
 
             if ($request->hasFile('image')) {
@@ -85,7 +86,9 @@ class BankAccountsController extends Controller
      */
     public function show( $bankAccount)
     {
+        
         $bank = BankAccount::findOrFail($bankAccount);
+        $this->authorize('view', $bank);
         $startDate = request('start_date');
         $endDate = request('end_date');
 
@@ -152,6 +155,7 @@ class BankAccountsController extends Controller
             'account_number' => 'nullable|unique:bank_accounts,account_number,' . $bankAccount->id,
             'name' => 'required',
             'notes' => 'nullable|string',
+            'is_private' => 'nullable|boolean',
         ]);
 
         $bankAccount->update($validatedData);

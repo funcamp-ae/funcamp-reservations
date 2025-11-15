@@ -58,6 +58,20 @@
                             </div>
                         </div>
 
+                        <!-- Is Private Toggle -->
+                        <div class="row mb-6">
+                            <label class="col-lg-4 col-form-label fw-bold fs-6">{{ __('dashboard.bank_account_private') }}</label>
+                            <div class="col-lg-8">
+                                <div class="form-check form-switch form-check-custom form-check-solid">
+                                    <input class="form-check-input" type="checkbox" name="is_private" id="is_private" value="1" {{ (isset($bank) && $bank->is_private) || old('is_private') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_private">
+                                        {{ __('dashboard.make_account_private') }}
+                                    </label>
+                                </div>
+                                <div class="form-text text-muted">{{ __('dashboard.private_account_description') }}</div>
+                            </div>
+                        </div>
+
                         <!--begin::Actions-->
                         <div class="d-flex justify-content-end">
                             <!--begin::Button-->

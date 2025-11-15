@@ -95,7 +95,13 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td> {{$bank->balance }} {{$bank->curruncy}}</td>
+                                @if($bank->is_private)
+                                    @can('bank-accounts.private.show')
+                                         <td> {{$bank->balance }} {{$bank->curruncy}}</td>
+                                    @endcan
+                                @else
+                                    <td> {{$bank->balance }} {{$bank->curruncy}}</td>
+                                @endif
                                 <td>{{$bank->notes}}</td>
                                 <!--begin::Action=-->
                                 <td class="text-end">
