@@ -620,6 +620,20 @@ return [
     'activate_desc' => '<h4 class="text-gray-900 fw-bolder">تاسو حساب فعال کوئ</h4><div class="fs-6 ">د حساب خاوند د بریالیتوب سره فعال کیدو وروسته د ننوتلو وړتیا لري',
 
     'confirm_activate' => 'زه د حساب فعال کول تایید کوم',
+
+    // WhatsApp templates: modal UI
+    'add_type' => 'د ډول اضافه کول',
+    'type_key' => 'د ډول کیلي',
+    'type_key_hint' => 'لنډه کیلي وکاروئ، لکه reservation_confirmation',
+    'add_placeholder' => 'مستبدل اضافه کړئ',
+    'placeholder' => 'مستبدل',
+    'variable_key' => 'د متغیر کیلي',
+    'variable_key_hint' => 'بېلګه: service_location, workername_en, price',
+    'default_placeholders' => 'اصلي مستبدلات',
+    'custom_placeholders' => 'دودیز مستبدلات',
+    'enter_type_key_example' => 'د ډول کیلي ولیکئ (بېلګه: :example)',
+    'enter_placeholder_example' => 'مستبدل ولیکئ (بېلګه: :example)',
+    'enter_variable_key_example' => 'د متغیر کیلي ولیکئ (بېلګه: :example)',
     'activation_status' => 'د حسابونو د دریځ بدلول',
 
     'account_status' => 'د حساب دریځ',

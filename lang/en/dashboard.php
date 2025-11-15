@@ -530,7 +530,22 @@ return [
     'confirm_deactivate' => 'Confirm Deactivation',
     'activate_account' => 'Activate Account',
     'activate_desc' => "<h4 class='text-gray-900 fw-bolder'>You are activating the account</h4><div class='fs-6 '>The account owner will be able to log in after successful activation.",
-    'confirm_activate' => 'Confirm Activation',
+    'confirm_activate' => 'I confirm account activation',
+
+    // WhatsApp templates: modal UI
+    'add_type' => 'Add Type',
+    'type_key' => 'Type Key',
+    'type_key_hint' => 'Use a short key, e.g. reservation_confirmation',
+    'add_placeholder' => 'Add Placeholder',
+    'placeholder' => 'Placeholder',
+    'variable_key' => 'Variable Key',
+    'variable_key_hint' => 'Example: service_location, workername_en, price',
+    'default_placeholders' => 'Default Placeholders',
+    'custom_placeholders' => 'Custom Placeholders',
+    'enter_type_key_example' => 'Enter type key (e.g. :example)',
+    'enter_placeholder_example' => 'Enter placeholder (e.g. :example)',
+    'enter_variable_key_example' => 'Enter variable key (e.g. :example)',
+
     'activation_status' => 'Change Account Status',
     'account_status' => 'Account Status',
     'nickname_ar' => 'Role in Arabic',

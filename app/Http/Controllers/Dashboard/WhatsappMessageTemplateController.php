@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\WhatsappMessageTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class WhatsappMessageTemplateController extends Controller
 {
@@ -41,8 +42,11 @@ class WhatsappMessageTemplateController extends Controller
         $types = WhatsappMessageTemplate::getTypes();
         $defaultPlaceholders = WhatsappMessageTemplate::getDefaultPlaceholders();
         // Load DB placeholders through the model instance helper
-        $dbPlaceholders = WhatsappMessageTemplate::getDatabasePlaceholderAliases();
-        return view('dashboard.whatsapp_templates.create', compact('types', 'defaultPlaceholders', 'dbPlaceholders'));
+        $dbPlaceholders = app(\App\Models\WhatsappMessageTemplate::class);
+        $dbPlaceholders = (new \ReflectionClass($dbPlaceholders))->getMethod('getDatabasePlaceholderAliases')->invoke($dbPlaceholders);
+        $variableKeys = app(\App\Models\WhatsappMessageTemplate::class);
+        $variableKeys = (new \ReflectionClass($variableKeys))->getMethod('buildVariablesForReplacement')->invoke($variableKeys);
+        return view('dashboard.whatsapp_templates.create', compact('types', 'defaultPlaceholders', 'dbPlaceholders', 'variableKeys'));
     }
 
     /**
@@ -55,7 +59,7 @@ class WhatsappMessageTemplateController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'type' => 'required|string|in:show_price,invoice,receipt,reservation_data,evaluation,payment_link_created,payment_link_resend,booking_reminder,booking_ending_reminder,manual_template',
+            'type' => ['required', 'string', Rule::in(WhatsappMessageTemplate::getRawTypes())],
             'message_ar' => 'required|string',
             'message_en' => 'required|string',
             'is_active' => 'nullable|in:on,1,true',
@@ -110,8 +114,11 @@ class WhatsappMessageTemplateController extends Controller
         $template = WhatsappMessageTemplate::findOrFail($id);
         $types = WhatsappMessageTemplate::getTypes();
         $defaultPlaceholders = WhatsappMessageTemplate::getDefaultPlaceholders();
-        $dbPlaceholders = WhatsappMessageTemplate::getDatabasePlaceholderAliases();
-        return view('dashboard.whatsapp_templates.edit', compact('template', 'types', 'defaultPlaceholders', 'dbPlaceholders'));
+        $dbPlaceholders = app(\App\Models\WhatsappMessageTemplate::class);
+        $dbPlaceholders = (new \ReflectionClass($dbPlaceholders))->getMethod('getDatabasePlaceholderAliases')->invoke($dbPlaceholders);
+$variableKeys = app(\App\Models\WhatsappMessageTemplate::class);
+        $variableKeys = (new \ReflectionClass($variableKeys))->getMethod('buildVariablesForReplacement')->invoke($variableKeys);        
+        return view('dashboard.whatsapp_templates.edit', compact('template', 'types', 'defaultPlaceholders', 'dbPlaceholders', 'variableKeys'));
     }
 
     /**
@@ -127,7 +134,7 @@ class WhatsappMessageTemplateController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'type' => 'required|string|in:show_price,invoice,receipt,reservation_data,evaluation,payment_link_created,payment_link_resend,booking_reminder,booking_ending_reminder,manual_template',
+            'type' => ['required', 'string', Rule::in(WhatsappMessageTemplate::getRawTypes())],
             'message_ar' => 'required|string',
             'message_en' => 'required|string',
             'is_active' => 'nullable|in:on,1,true',

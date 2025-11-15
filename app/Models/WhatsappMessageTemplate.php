@@ -99,12 +99,13 @@ class WhatsappMessageTemplate extends Model
     {
         // Build variables and placeholders map
         $placeholders = $this->buildPlaceholdersFromOrder($order, $serviceSiteData);
-
-        // Replace all placeholders in one pass
-        if (!empty($placeholders)) {
-            $message = str_replace(array_keys($placeholders), array_values($placeholders), $message);
-        }
         
+        // Replace placeholders one by one to avoid edge cases
+        if (!empty($placeholders)) {
+            foreach ($placeholders as $needle => $replacement) {
+                $message = str_replace($needle, (string) $replacement, $message);
+            }
+        }
         // Convert HTML tags to WhatsApp formatting
         $message = str_replace(["<b>", "</b>"], "*", $message); // Bold
         $message = str_replace(["<strong>", "</strong>"], "*", $message); // Strong (bold)
@@ -186,7 +187,7 @@ class WhatsappMessageTemplate extends Model
     }
 
     // Load aliases stored in the database (WhatsappPlaceholder)
-    public function getDatabasePlaceholderAliases(): array
+    private function getDatabasePlaceholderAliases(): array
     {
         $map = [];
         try {
@@ -308,32 +309,32 @@ class WhatsappMessageTemplate extends Model
      */
     private function buildVariablesForReplacement($order = null, $serviceSiteData = null)
     {
-        $vars = [
-            'customer_name' => (string) (optional(optional($order)->customer)->name ?? ''),
-            'evaluation_link' => (string) env('APP_URL').'/survey/'.$order->id,
-            'terms_conditions_link' => (string) env('APP_URL').'/sign/'.$order->id,
+        
+        $orderAttrs = [
+            'customer_id', 'price', 'deposit', 'insurance_amount', 'notes', 'date', 'time_from', 'time_to',
+            'time_of_receipt', 'time_of_receipt_notes', 'delivery_time', 'delivery_time_notes', 'voice_note',
+            'video_note', 'image_before_receiving', 'image_after_delivery', 'status', 'refunds', 'refunds_notes',
+            'delayed_time', 'inventory_withdrawal', 'insurance_status', 'confiscation_description', 'report_text',
+            'show_price_notes', 'order_data_notes', 'invoice_notes', 'receipt_notes', 'people_count',
+            'client_notes', 'insurance_handled_by', 'is_insurance_verified', 'partial_confiscation_amount',
+            'video_note_logout', 'voice_note_logout', 'signature_path', 'signature', 'is_evaluation_sent',
         ];
-
         if ($order) {
-            $orderAttrs = [
-                'customer_id', 'price', 'deposit', 'insurance_amount', 'notes', 'date', 'time_from', 'time_to',
-                'time_of_receipt', 'time_of_receipt_notes', 'delivery_time', 'delivery_time_notes', 'voice_note',
-                'video_note', 'image_before_receiving', 'image_after_delivery', 'status', 'refunds', 'refunds_notes',
-                'delayed_time', 'inventory_withdrawal', 'insurance_status', 'confiscation_description', 'report_text',
-                'show_price_notes', 'order_data_notes', 'invoice_notes', 'receipt_notes', 'people_count',
-                'client_notes', 'insurance_handled_by', 'is_insurance_verified', 'partial_confiscation_amount',
-                'video_note_logout', 'voice_note_logout', 'signature_path', 'signature', 'is_evaluation_sent',
+            $vars = [
+                'customer_name' => (string) (optional(optional($order)->customer)->name ?? ''),
+                'evaluation_link' => (string) env('APP_URL').'/survey/'.$order->id,
+                'terms_conditions_link' => (string) env('APP_URL').'/sign/'.$order->id,
             ];
             foreach ($orderAttrs as $attr) {
                 $vars[$attr] = isset($order->$attr) ? (string) $order->$attr : '';
             }
         }
 
+        $svcAttrs = [
+            'service_site', 'service_location', 'workername_ar', 'workername_en', 'workerphone',
+            'guidance_images', 'guidance_videos', 'important_notes',
+        ];
         if ($serviceSiteData) {
-            $svcAttrs = [
-                'service_site', 'service_location', 'workername_ar', 'workername_en', 'workerphone',
-                'guidance_images', 'guidance_videos', 'important_notes',
-            ];
             foreach ($svcAttrs as $attr) {
                 $value = $serviceSiteData[$attr] ?? '';
                 // Convert arrays to comma-separated strings for placeholders
@@ -342,6 +343,9 @@ class WhatsappMessageTemplate extends Model
                 }
                 $vars[$attr] = (string) $value;
             }
+        }
+        if (!$serviceSiteData && !$order) {
+            $vars = array_merge($svcAttrs, $orderAttrs , ['customer_name' , 'evaluation_link' , 'terms_conditions_link']);
         }
 
         return $vars;

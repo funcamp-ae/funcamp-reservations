@@ -108,10 +108,68 @@
             </div>
         </form>
     </div>
+
+    <!-- Add Type Modal -->
+    <div class="modal fade" id="addTypeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@lang('dashboard.add_type')</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">@lang('dashboard.type_key')</label>
+                        <input type="text" id="typeKeyInput" class="form-control" placeholder="reservation_confirmation" />
+                        <small class="text-muted">@lang('dashboard.type_key_hint')</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">@lang('dashboard.cancel')</button>
+                    <button type="button" id="saveTypeBtn" class="btn btn-primary">@lang('dashboard.add')</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Placeholder Modal -->
+    <div class="modal fade" id="addPlaceholderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@lang('dashboard.add_placeholder')</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">@lang('dashboard.placeholder')</label>
+                        <input type="text" id="placeholderInput" class="form-control" placeholder="[Camp Address]" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@lang('dashboard.variable_key')</label>
+                        <input type="text" id="variableKeyInput" class="form-control" placeholder="service_location" list="availableVariableKeys" />
+                        <small class="text-muted">@lang('dashboard.variable_key_hint')</small>
+                        @if(!empty($variableKeys))
+                        <datalist id="availableVariableKeys">
+                            @foreach($variableKeys as $key)
+                                <option value="{{ $key }}"></option>
+                            @endforeach
+                        </datalist>
+                        @endif
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">@lang('dashboard.cancel')</button>
+                    <button type="button" id="savePlaceholderBtn" class="btn btn-primary">@lang('dashboard.add')</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
 <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize CKEditor 5 for Arabic message
@@ -160,52 +218,115 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('CKEditor 5 English initialization error:', error);
         });
 
-    // Helpers
-    function csrfHeaders() {
-        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        return token ? { 'X-CSRF-TOKEN': token } : {};
+    // jQuery global CSRF setup
+    (function(){
+        var token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (token && window.$) {
+            $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': token, 'Accept':'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
+        }
+    })();
+
+    // Bootstrap modal helpers
+    function showModalById(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (window.bootstrap && bootstrap.Modal) {
+            const m = bootstrap.Modal.getOrCreateInstance(el);
+            m.show();
+        } else {
+            el.classList.add('show');
+            el.style.display = 'block';
+            el.removeAttribute('aria-hidden');
+        }
+    }
+    function hideModalById(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (window.bootstrap && bootstrap.Modal) {
+            const m = bootstrap.Modal.getOrCreateInstance(el);
+            m.hide();
+        } else {
+            el.classList.remove('show');
+            el.style.display = 'none';
+            el.setAttribute('aria-hidden', 'true');
+        }
     }
 
-    // Add Type Modal (simple prompt to keep UI minimal)
+    // Add Type via modal
     const btnAddType = document.getElementById('btnAddType');
     const typeSelect = document.getElementById('typeSelect');
-    if (btnAddType) {
+    const saveTypeBtn = document.getElementById('saveTypeBtn');
+    const typeKeyInput = document.getElementById('typeKeyInput');
+    if (btnAddType && saveTypeBtn && typeKeyInput) {
         btnAddType.addEventListener('click', function() {
-            const key = prompt('@lang('dashboard.enter_type_key_example', ['example' => 'reservation_confirmation'])');
+            typeKeyInput.value = '';
+            showModalById('addTypeModal');
+        });
+        saveTypeBtn.addEventListener('click', function() {
+            const key = (typeKeyInput.value || '').trim();
             if (!key) return;
-            fetch('{{ route('dashboard.whatsapp-meta.type.store') }}', {
+            $.ajax({
+                url: '{{ route('dashboard.whatsapp-meta.type.store') }}',
                 method: 'POST',
-                headers: Object.assign({'Content-Type': 'application/json'}, csrfHeaders()),
-                body: JSON.stringify({ key })
-            }).then(r => r.json()).then(data => {
-                if (!data.success) { alert(JSON.stringify(data.errors || data)); return; }
-                const opt = document.createElement('option');
-                opt.value = data.key;
-                opt.textContent = data.label || data.key;
-                typeSelect.appendChild(opt);
-                typeSelect.value = data.key;
-            }).catch(err => alert(err));
+                contentType: 'application/json; charset=UTF-8',
+                dataType: 'json',
+                data: JSON.stringify({ key }),
+                success: function(data){
+                    if (!data.success) {
+                        Swal.fire({ icon:'error', title:'Error', html: `<pre>${$('<div>').text(JSON.stringify(data.errors || data)).html()}</pre>` });
+                        return;
+                    }
+                    const opt = document.createElement('option');
+                    opt.value = data.key;
+                    opt.textContent = data.label || data.key;
+                    typeSelect.appendChild(opt);
+                    typeSelect.value = data.key;
+                    hideModalById('addTypeModal');
+                    Swal.fire({ icon:'success', title:'@lang('dashboard.success')' });
+                },
+                error: function(xhr){
+                    Swal.fire({ icon:'error', title:'Error', html: xhr.responseText || 'Request failed' });
+                }
+            });
         });
     }
 
-    // Add Placeholder (simple prompt inputs)
+    // Add Placeholder via modal
     const btnAddPlaceholder = document.getElementById('btnAddPlaceholder');
-    if (btnAddPlaceholder) {
+    const savePlaceholderBtn = document.getElementById('savePlaceholderBtn');
+    const placeholderInput = document.getElementById('placeholderInput');
+    const variableKeyInput = document.getElementById('variableKeyInput');
+    if (btnAddPlaceholder && savePlaceholderBtn && placeholderInput && variableKeyInput) {
         btnAddPlaceholder.addEventListener('click', function() {
-            const placeholder = prompt('@lang('dashboard.enter_placeholder_example', ['example' => '[Camp Address]'])');
-            if (!placeholder) return;
-            const variable_key = prompt('@lang('dashboard.enter_variable_key_example', ['example' => 'service_location'])');
-            if (!variable_key) return;
-            fetch('{{ route('dashboard.whatsapp-meta.placeholder.store') }}', {
+            placeholderInput.value = '';
+            variableKeyInput.value = '';
+            showModalById('addPlaceholderModal');
+        });
+        savePlaceholderBtn.addEventListener('click', function() {
+            const placeholder = (placeholderInput.value || '').trim();
+            const variable_key = (variableKeyInput.value || '').trim();
+            if (!placeholder || !variable_key) return;
+            $.ajax({
+                url: '{{ route('dashboard.whatsapp-meta.placeholder.store') }}',
                 method: 'POST',
-                headers: Object.assign({'Content-Type': 'application/json'}, csrfHeaders()),
-                body: JSON.stringify({ placeholder, variable_key })
-            }).then(r => r.json()).then(data => {
-                if (!data.success) { alert(JSON.stringify(data.errors || data)); return; }
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>${data.placeholder}</strong> → <code>${data.variable_key}</code>`;
-                document.getElementById('customPlaceholdersList').appendChild(li);
-            }).catch(err => alert(err));
+                contentType: 'application/json; charset=UTF-8',
+                dataType: 'json',
+                data: JSON.stringify({ placeholder, variable_key }),
+                success: function(data){
+                    if (!data.success) {
+                        Swal.fire({ icon:'error', title:'Error', html: `<pre>${$('<div>').text(JSON.stringify(data.errors || data)).html()}</pre>` });
+                        return;
+                    }
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${data.placeholder}</strong> → <code>${data.variable_key}</code>`;
+                    document.getElementById('customPlaceholdersList').appendChild(li);
+                    hideModalById('addPlaceholderModal');
+                    Swal.fire({ icon:'success', title:'@lang('dashboard.success')' });
+                },
+                error: function(xhr){
+                    Swal.fire({ icon:'error', title:'Error', html: xhr.responseText || 'Request failed' });
+                }
+            });
         });
     }
 });

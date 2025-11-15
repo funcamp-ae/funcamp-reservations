@@ -49,6 +49,7 @@ use App\Services\StockAdjustmentService;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use App\Http\Requests\UpdateOrderSignInRequest;
+use Illuminate\Validation\Rule;
 
 
 class OrderController extends Controller
@@ -1379,7 +1380,7 @@ $request->validate($rules);
     {
         $request->validate([
             'templates' => 'sometimes|array',
-            'templates.*' => 'in:show_price,reservation_data,invoice,receipt,evaluation,payment_link_created,payment_link_resend,booking_reminder,booking_ending_reminder,manual_template,reservation_confirmation',
+            'templates.*' => ['required', 'string', Rule::in(WhatsappMessageTemplate::getRawTypes())],
             'receipts' => 'sometimes|array'
         ]);
 

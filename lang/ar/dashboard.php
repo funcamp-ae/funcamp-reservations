@@ -623,6 +623,20 @@ return [
     'controll' => 'التحكم',
     'profile_details' => 'البيانات الشخصية',
     'deactivate_account' => 'تعطيل الحساب',
+
+    // واجهة قوالب واتساب: نوافذ إضافة النوع والمستبدلات
+    'add_type' => 'إضافة نوع',
+    'type_key' => 'مفتاح النوع',
+    'type_key_hint' => 'استخدم مفتاحًا قصيرًا، مثال: reservation_confirmation',
+    'add_placeholder' => 'إضافة مستبدل',
+    'placeholder' => 'المستبدل',
+    'variable_key' => 'مفتاح المتغير',
+    'variable_key_hint' => 'مثال: service_location, workername_en, price',
+    'default_placeholders' => 'المستبدلات الافتراضية',
+    'custom_placeholders' => 'المستبدلات المخصصة',
+    'enter_type_key_example' => 'أدخل مفتاح النوع (مثال: :example)',
+    'enter_placeholder_example' => 'أدخل المستبدل (مثال: :example)',
+    'enter_variable_key_example' => 'أدخل مفتاح المتغير (مثال: :example)',
     'deactivate_desc' => '<h4 class="text-gray-900 fw-bolder">أنت تقوم بإلغاء تنشيط الحساب</h4>
     <div class="fs-6 ">لمزيد من الأمان ، يتطلب ذلك تأكيد بريدك الإلكتروني أو رقم هاتفك عند إعادة تعيين كلمة مرور تسجيل الدخول.',
     'expense_item'     => 'بند المصاريف',

@@ -497,10 +497,10 @@
                                         'reservation_confirmation' => __('dashboard.reservation_confirmation')
                                     ];
 
-                                    $allTemplateTypes = array_merge($checkboxTypes, ['receipt' => __('dashboard.receipt')]);
+                                    $allTemplateTypes = array_merge($checkboxTypes, ['receipt' => __('dashboard.receipt') , ]);
                                 @endphp
 
-                                @foreach($checkboxTypes as $type => $label)
+                                @foreach(\App\Models\WhatsappMessageTemplate::getTypes() as $type => $label)
                                     @if(\App\Models\WhatsappMessageTemplate::active()->ofType($type)->exists())
                                         <label class="checkbox">
                                             <input type="checkbox" name="templates[]" value="{{ $type }}">

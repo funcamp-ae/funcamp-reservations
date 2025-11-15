@@ -38,6 +38,7 @@ class WhatsAppService
 
             Log::info('WhatsApp text message sent', [
                 'phone' => $phoneNumber,
+                'message' => $message,
                 'chat_id' => $this->formatPhoneNumber($phoneNumber),
                 'status_code' => $response->status(),
                 'response_body' => $response->body(),
