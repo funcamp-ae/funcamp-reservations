@@ -156,6 +156,9 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => 'scheduling.create', 'nickname_ar' => 'إنشاء جدولة', 'nickname_en' => 'Create Schedule', 'group' => 'scheduling'],
             ['name' => 'scheduling.edit', 'nickname_ar' => 'تعديل جدولة', 'nickname_en' => 'Edit Schedule', 'group' => 'scheduling'],
             ['name' => 'scheduling.delete', 'nickname_ar' => 'حذف جدولة', 'nickname_en' => 'Delete Schedule', 'group' => 'scheduling'],
+
+            // Bank Accounts Private
+            ['name' => 'bank-accounts.private.show', 'nickname_ar' => 'عرض الحسابات البنكية الخاصة', 'nickname_en' => 'View Private Bank Accounts', 'group' => 'bank_accounts'],
         ];
 
         // Create new permissions
@@ -187,7 +190,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
 
         $admin = User::updateOrCreate(
-            ['email' => 'admin@gmail.com'],
+            ['email' => 'admin@funcamp.ae'],
             [
                 'id' => 1,
                 'name' => 'admin',
@@ -221,7 +224,17 @@ class RolesAndPermissionsSeeder extends Seeder
                 'created_at' => Carbon::now(),
             ]
         );
+        
+        // Assign all permissions to super-admin role
         $role->givePermissionTo(Permission::all());
+        
+        // Assign super-admin role to admin user
         $admin->assignRole('super-admin');
+        
+        // Explicitly give bank-accounts.private.show permission to admin user
+        $privatePermission = Permission::where('name', 'bank-accounts.private.show')->first();
+        if ($privatePermission) {
+            $admin->givePermissionTo($privatePermission);
+        }
     }
 }
