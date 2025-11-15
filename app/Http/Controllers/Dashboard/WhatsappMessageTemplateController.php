@@ -87,7 +87,7 @@ class WhatsappMessageTemplateController extends Controller
                 ->with('success', __('dashboard.template_created_successfully'));
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error', __('dashboard.something_went_wrong'))
+                ->with('error',$e->getMessage()  ?? __('dashboard.something_went_wrong'))
                 ->withInput();
         }
     }
