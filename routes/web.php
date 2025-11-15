@@ -20,6 +20,7 @@ use App\Http\Controllers\Dashboard\QuestionController;
 use App\Http\Controllers\Dashboard\SurveyController;
 use App\Http\Controllers\Dashboard\SurveySubmissionController;
 use App\Http\Controllers\Dashboard\WhatsappMessageTemplateController;
+use App\Http\Controllers\Dashboard\WhatsappMetaController;
 use App\Http\Controllers\Dashboard\StockController;
 use App\Http\Controllers\Dashboard\StockAdjustmentController;
 use App\Http\Controllers\Dashboard\ServiceSiteAndCustomerServiceController;
@@ -107,13 +108,6 @@ Route::get('/theme/switch/{theme}', [SettingController::class, 'switchTheme'])
     ->name('theme.switch')
     ->middleware('web');
 Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'namespace' => 'Dashboard'], function () {
-    // WhatsApp meta AJAX endpoints (types and placeholders)
-    Route::post('whatsapp-meta/type', [\App\Http\Controllers\Dashboard\WhatsappMetaController::class, 'storeType'])
-        ->name('dashboard.whatsapp-meta.type.store')
-        ->withoutMiddleware('check-role');
-    Route::post('whatsapp-meta/placeholder', [\App\Http\Controllers\Dashboard\WhatsappMetaController::class, 'storePlaceholder'])
-        ->name('dashboard.whatsapp-meta.placeholder.store')
-        ->withoutMiddleware('check-role');
 
 // Route::post('service-site-customer-service', [ServiceSiteAndCustomerServiceController::class, 'store'])->name('bookings.service-site-customer-service.store');
 //     Route::get('service-site-customer-service/{id}/edit', [ServiceSiteAndCustomerServiceController::class, 'edit'])->name('bookings.service-site-customer-service.edit');
@@ -1577,6 +1571,19 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
         'uses' => 'WhatsappMessageTemplateController@toggleStatus',
         'as' => 'whatsapp-templates.toggle-status',
         'title' => ['actions.toggle-status', 'dashboard.whatsapp-templates']
+    ]);
+
+    // WhatsApp Meta Routes (Type & Placeholder)
+    Route::post('whatsapp-meta/type/store', [
+        'uses' => 'WhatsappMetaController@storeType',
+        'as' => 'whatsapp-meta.type.store',
+        'title' => ['actions.add', 'dashboard.whatsapp-type']
+    ]);
+
+    Route::post('whatsapp-meta/placeholder/store', [
+        'uses' => 'WhatsappMetaController@storePlaceholder',
+        'as' => 'whatsapp-meta.placeholder.store',
+        'title' => ['actions.add', 'dashboard.whatsapp-placeholder']
     ]);
 
 

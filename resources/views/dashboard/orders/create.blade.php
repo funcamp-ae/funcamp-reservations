@@ -383,22 +383,12 @@
                         <div class="row mb-8">
                             <label class="col-form-label fw-bold fs-6">@lang('dashboard.select_documents_to_send')</label>
                             <div class="checkbox-list">
+                                @foreach(\App\Models\WhatsappMessageTemplate::getTypes() as $type)
                                 <label class="checkbox">
-                                    <input type="checkbox" name="documents[]" value="show_price">
-                                    <span></span>
-                                    @lang('dashboard.show_price_pdf')
+                                    <input type="checkbox" name="documents[]" value="{{ $type }}">
+                                        {{ $type }}
                                 </label>
-                                <label class="checkbox">
-                                    <input type="checkbox" name="documents[]" value="reservation_data">
-                                    <span></span>
-                                    @lang('dashboard.reservation_data_pdf')
-                                </label>
-                                <label class="checkbox">
-                                    <input type="checkbox" name="documents[]" value="invoice">
-                                    <span></span>
-                                    @lang('dashboard.invoice_pdf')
-                                </label>
-
+                                @endforeach
                                 <!-- Addon Receipts -->
                                 @if(isset($order) && $order->addons->where('pivot.verified', true)->count() > 0)
                                     <div class="mt-3">

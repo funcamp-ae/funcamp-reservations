@@ -80,16 +80,9 @@
                         <button type="button" id="btnAddPlaceholder" class="btn btn-sm btn-light-primary">@lang('dashboard.add_placeholder')</button>
                     </div>
                     <div class="mt-3">
-                        <h6 class="fw-bold mb-2">@lang('dashboard.default_placeholders')</h6>
-                        <ul class="mb-3" id="defaultPlaceholdersList">
-                            @foreach(($defaultPlaceholders ?? []) as $ph)
-                                <li><strong>{{ $ph }}</strong></li>
-                            @endforeach
-                        </ul>
-                        <h6 class="fw-bold mb-2">@lang('dashboard.custom_placeholders')</h6>
                         <ul class="mb-0" id="customPlaceholdersList">
                             @foreach(($dbPlaceholders ?? []) as $ph => $var)
-                                <li><strong>{{ $ph }}</strong> → <code>{{ $var }}</code></li>
+                                <li><strong>{{ $ph }}</strong></li>
                             @endforeach
                         </ul>
                     </div>
@@ -119,7 +112,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">@lang('dashboard.type_key')</label>
+                        <label class="form-label">@lang('dashboard.template_type')</label>
                         <input type="text" id="typeKeyInput" class="form-control" placeholder="reservation_confirmation" />
                         <small class="text-muted">@lang('dashboard.type_key_hint')</small>
                     </div>
@@ -151,8 +144,8 @@
                         <small class="text-muted">@lang('dashboard.variable_key_hint')</small>
                         @if(!empty($variableKeys))
                         <datalist id="availableVariableKeys">
-                            @foreach($variableKeys as $key)
-                                <option value="{{ $key }}"></option>
+                            @foreach($variableKeys as $key => $label)
+                                <option value="{{ $key }}">{{ $label }}</option>
                             @endforeach
                         </datalist>
                         @endif
@@ -266,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const key = (typeKeyInput.value || '').trim();
             if (!key) return;
             $.ajax({
-                url: '{{ route('dashboard.whatsapp-meta.type.store') }}',
+                url: '{{ route('whatsapp-meta.type.store') }}',
                 method: 'POST',
                 contentType: 'application/json; charset=UTF-8',
                 dataType: 'json',
@@ -307,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const variable_key = (variableKeyInput.value || '').trim();
             if (!placeholder || !variable_key) return;
             $.ajax({
-                url: '{{ route('dashboard.whatsapp-meta.placeholder.store') }}',
+                url: '{{ route('whatsapp-meta.placeholder.store') }}',
                 method: 'POST',
                 contentType: 'application/json; charset=UTF-8',
                 dataType: 'json',
@@ -318,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>${data.placeholder}</strong> → <code>${data.variable_key}</code>`;
+                    li.innerHTML = `<strong>${data.placeholder}</strong>`;
                     document.getElementById('customPlaceholdersList').appendChild(li);
                     hideModalById('addPlaceholderModal');
                     Swal.fire({ icon:'success', title:'@lang('dashboard.success')' });

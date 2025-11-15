@@ -166,7 +166,7 @@ class ExpensesController extends Controller
                 'date' => $date,
                 'statement' => $request->statement ?? 'general_expenses',
                 'notes' => $request->notes,
-                'images' => $imagePaths, // Store multiple images as array
+                'images' => $imagePaths ?? null, // Store multiple images as array
                 'image' => !empty($imagePaths) ? $imagePaths[0] : null, // First image for backward compatibility
                 'order_id' => $request->order_id,
                 'source' => $request->source,

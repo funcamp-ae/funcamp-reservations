@@ -1302,15 +1302,15 @@ $request->validate($rules);
     // Add this method to send email
     public function sendEmail(Request $request, $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'documents' => 'sometimes|array',
-            'documents.*' => 'in:show_price,reservation_data,invoice,receipt',
+            'documents.*' => ['required', 'string', Rule::in(WhatsappMessageTemplate::getRawTypes())],
             'receipts' => 'sometimes|array'
         ]);
 
         $order = Order::with(['customer', 'addons', 'payments', 'items.stock'])->findOrFail($id);
         $documentsToSend = [];
-
+        $serviceSiteData = ServiceSiteAndCustomerService::getLatestForWhatsApp();
         // Generate main documents
         if ($request->has('documents')) {
             foreach ($request->documents as $document) {
@@ -1358,13 +1358,16 @@ $request->validate($rules);
             }
         }
 
-        if (empty($documentsToSend)) {
-            return response()->json(['success' => false, 'message' => 'Please select at least one document to send'], 400);
-        }
+        // if (empty($documentsToSend)) {
+        //     return response()->json(['success' => false, 'message' => 'Please select at least one document to send'], 400);
+        // }
 
         try {
-            Mail::to($order->customer->email)
-                ->send(new OrderDocumentsMail($order, $documentsToSend));
+            foreach ($validated['documents'] as $document) {
+                $content = WhatsappMessageTemplate::where('type', $document)->first()->getBilingualMessage($serviceSiteData, $order , "mail");
+                Mail::to($order->customer->email)
+                    ->send(new OrderDocumentsMail($order, $documentsToSend , "Funcamp",$content));
+            }
 
             // Clean up temporary files
             $this->cleanupTempFiles($order->id, $documentsToSend);
@@ -1378,7 +1381,7 @@ $request->validate($rules);
     // Add WhatsApp sending method
     public function sendWhatsApp(Request $request, $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'templates' => 'sometimes|array',
             'templates.*' => ['required', 'string', Rule::in(WhatsappMessageTemplate::getRawTypes())],
             'receipts' => 'sometimes|array'

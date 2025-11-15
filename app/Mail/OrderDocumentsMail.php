@@ -15,17 +15,19 @@ class OrderDocumentsMail extends Mailable
     public $order;
     public $documents;
     public $subject;
+    public $content;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($order, array $documents, $subject = null)
+    public function __construct($order, array $documents, $subject = null, $content = null)
     {
         $this->order = $order;
         $this->documents = $documents;
         $this->subject = $subject ?? 'مستندات الحجز من Funcamp';
+        $this->content = $content;
     }
 
     /**
@@ -36,7 +38,10 @@ class OrderDocumentsMail extends Mailable
     public function build()
     {
         $email = $this->subject($this->subject)
-            ->view('emails.order_documents');
+            ->view('emails.order_documents')
+            ->with([
+                'content' => $this->content
+            ]);
 
         // Attach PDFs based on selected documents
         foreach ($this->documents as $document) {

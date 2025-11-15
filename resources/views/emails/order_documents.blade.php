@@ -60,7 +60,14 @@
     </div>
 
     <div class="email-body">
-        <h2>عزيزي العميل،</h2>
+        <!-- <h2>عزيزي العميل،</h2> -->
+        
+        @if(isset($content) && $content)
+            <div style="margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-right: 4px solid #B98220; border-radius: 5px;">
+                {!! ($content) !!}
+            </div>
+        @endif
+        
         <p>مرفق لك المستندات التالية:</p>
 
         <div class="documents-list">

@@ -98,12 +98,11 @@
                         </div>
                         <div class="card-body">
                             <div class="message-preview" dir="rtl">
-                                {!! nl2br(e($template->getProcessedMessage('ar', 'أحمد محمد', 'https://example.com/survey/123'))) !!}
+                                {!! nl2br(e($template->getProcessedMessage('ar', 'أحمد محمد', null , \App\Models\Order::find(1)))) !!}
                             </div>
                         </div>
                     </div>
-                </div>
-
+</div>
                 <div class="col-md-6">
                     <div class="card card-bordered">
                         <div class="card-header">
@@ -113,7 +112,7 @@
                         </div>
                         <div class="card-body">
                             <div class="message-preview" dir="ltr">
-                                {!! nl2br(e($template->getProcessedMessage('en', 'Ahmed Mohamed', 'https://example.com/survey/123'))) !!}
+                                {!! nl2br(e($template->getProcessedMessage('en', 'Ahmed Mohamed' , null , \App\Models\Order::find(1)))) !!}
                             </div>
                         </div>
                     </div>

@@ -17,11 +17,13 @@ class WhatsappMessageTemplate extends Model
         'message_ar',
         'message_en',
         'is_active',
+        'send_with_pdf',
         'description'
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'send_with_pdf' => 'boolean',
     ];
     // protected static $types = [
     //     'show_price' => 'dashboard.show_price',
@@ -42,6 +44,9 @@ class WhatsappMessageTemplate extends Model
         foreach ($types as $type) {
             $translationKey = 'dashboard.' . $type;
             $translated = __($translationKey);
+            if ($translated === $translationKey) {
+                $translated = $type; // Fallback to raw type if no translation found
+            }
             $result[$type] = $translated;
         }
         return $result;
@@ -85,11 +90,14 @@ class WhatsappMessageTemplate extends Model
     }
 
     // Get bilingual message (Arabic + English)
-    public function getBilingualMessage($serviceSiteData = null, $order = null)
+    public function getBilingualMessage($serviceSiteData = null, $order = null, $context = null)
     {
         $arabicMessage = $this->processMessageContent($this->message_ar, $serviceSiteData, $order);
         $englishMessage = $this->processMessageContent($this->message_en, $serviceSiteData, $order);
         
+        if ($context) {
+            return $arabicMessage . "<br>" . "━━━━━━━━━━━━━" . "<br>" . $englishMessage;
+        }
         // Combine both messages with a separator
         return $arabicMessage . "\n\n" . "━━━━━━━━━━━━━" . "\n\n" . $englishMessage;
     }
@@ -99,13 +107,18 @@ class WhatsappMessageTemplate extends Model
     {
         // Build variables and placeholders map
         $placeholders = $this->buildPlaceholdersFromOrder($order, $serviceSiteData);
-        
+        \Log::info('Processing WhatsApp message template', [
+            'placeholders' => $placeholders,
+        ]);
         // Replace placeholders one by one to avoid edge cases
         if (!empty($placeholders)) {
             foreach ($placeholders as $needle => $replacement) {
                 $message = str_replace($needle, (string) $replacement, $message);
             }
         }
+        \Log::info('Processed WhatsApp message content', [
+            'message' => $message,
+        ]);
         // Convert HTML tags to WhatsApp formatting
         $message = str_replace(["<b>", "</b>"], "*", $message); // Bold
         $message = str_replace(["<strong>", "</strong>"], "*", $message); // Strong (bold)
