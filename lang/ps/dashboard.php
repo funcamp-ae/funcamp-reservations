@@ -215,6 +215,7 @@ return [
     'bank_account_private' => 'د بانک ځانګړی حساب',
     'make_account_private' => 'دا حساب ځانګړی کړئ',
     'private_account_description' => 'ځانګړي حسابونه د عام کاروونکو څخه پټ دي',
+    'private' => 'ځانګړی',
     'from_account' => 'د حساب څخه لیږد',
     'to_account' => 'حساب ته',
     'choose_from_account' => 'لیږونکی حساب وټاکئ',

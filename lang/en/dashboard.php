@@ -1576,6 +1576,7 @@ return [
     'bank_account_private' => 'Bank Account Private',
     'make_account_private' => 'Make this account private',
     'private_account_description' => 'Private accounts are hidden from regular users',
+    'private' => 'Private',
     'from_account' => 'From Account',
     'to_account' => 'To Account',
     'choose_from_account' => 'Choose Sender Account',

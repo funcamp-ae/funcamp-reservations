@@ -97,7 +97,9 @@
                                 </td>
                                 @if($bank->is_private)
                                     @can('bank-accounts.private.show')
-                                         <td> {{$bank->balance }} {{$bank->curruncy}}</td>
+                                        <td> {{$bank->balance }} {{$bank->curruncy}}</td>
+                                    @else
+                                        <td><span class="badge badge-light-warning">@lang('dashboard.private')</span></td>
                                     @endcan
                                 @else
                                     <td> {{$bank->balance }} {{$bank->curruncy}}</td>

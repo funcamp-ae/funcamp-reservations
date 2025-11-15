@@ -230,6 +230,7 @@ return [
     'bank_account_private' => 'حساب بنكي خاص',
     'make_account_private' => 'جعل هذا الحساب خاص',
     'private_account_description' => 'الحسابات الخاصة مخفية عن المستخدمين العاديين',
+    'private' => 'خاص',
     'from_account' => 'تحويل من حساب',
     'to_account' => 'إلى الحساب',
     'choose_from_account' => 'اختر الحساب المرسل',
