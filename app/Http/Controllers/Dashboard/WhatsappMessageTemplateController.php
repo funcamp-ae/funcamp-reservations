@@ -62,7 +62,7 @@ class WhatsappMessageTemplateController extends Controller
             'message_ar' => 'required|string',
             'message_en' => 'required|string',
             'is_active' => 'nullable|in:on,1,true',
-            'send_with_pdf' => 'nullable|in:on,1,true',
+            // 'send_with_pdf' => 'nullable|in:on,1,true',
             'description' => 'nullable|string|max:1000',
         ]);
 
@@ -79,7 +79,7 @@ class WhatsappMessageTemplateController extends Controller
                 'message_ar' => $request->message_ar,
                 'message_en' => $request->message_en,
                 'is_active' => $request->has('is_active'),
-                'send_with_pdf' => $request->has('send_with_pdf'),
+                // 'send_with_pdf' => $request->has('send_with_pdf'),
                 'description' => $request->description,
             ]);
 
@@ -87,7 +87,7 @@ class WhatsappMessageTemplateController extends Controller
                 ->with('success', __('dashboard.template_created_successfully'));
         } catch (\Exception $e) {
             return redirect()->back()
-                ->with('error',$e->getMessage()  ?? __('dashboard.something_went_wrong'))
+                ->with('error',$e->getMessage() ?? __('dashboard.something_went_wrong'))
                 ->withInput();
         }
     }
@@ -138,7 +138,7 @@ class WhatsappMessageTemplateController extends Controller
             'message_ar' => 'required|string',
             'message_en' => 'required|string',
             'is_active' => 'nullable|in:on,1,true',
-            'send_with_pdf' => 'nullable|in:on,1,true',
+            // 'send_with_pdf' => 'nullable|in:on,1,true',
             'description' => 'nullable|string|max:1000',
         ]);
 
@@ -155,7 +155,7 @@ class WhatsappMessageTemplateController extends Controller
                 'message_ar' => $request->message_ar,
                 'message_en' => $request->message_en,
                 'is_active' => $request->has('is_active'),
-                'send_with_pdf' => $request->has('send_with_pdf'),
+                // 'send_with_pdf' => $request->has('send_with_pdf'),
                 'description' => $request->description,
             ]);
 
