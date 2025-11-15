@@ -1411,7 +1411,8 @@ $request->validate($rules);
                     if ($templateType === 'evaluation') {
                         // Send evaluation with survey link (public route that doesn't require auth)
                         $surveyUrl = route('surveys.public', ['order' => $order->id]);
-                        $message = $template->getBilingualMessage($order->customer->name, $surveyUrl, $serviceSiteData);
+                        // New signature uses (serviceSiteData, order); evaluation link is built internally
+                        $message = $template->getBilingualMessage($serviceSiteData, $order);
 
                         // Log the generated URL and message for debugging
                         Log::info('Evaluation message prepared', [
@@ -1435,7 +1436,7 @@ $request->validate($rules);
                         );
                     } else {
                         // Get bilingual message for non-evaluation templates
-                        $message = $template->getBilingualMessage($order->customer->name, '', $serviceSiteData);
+                        $message = $template->getBilingualMessage($serviceSiteData, $order);
 
                         // Send message with PDF file
                         $pdfPath = $this->generateTempPdf($order, $templateType);

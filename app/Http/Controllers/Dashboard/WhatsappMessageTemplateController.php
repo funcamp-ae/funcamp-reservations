@@ -39,7 +39,10 @@ class WhatsappMessageTemplateController extends Controller
     public function create()
     {
         $types = WhatsappMessageTemplate::getTypes();
-        return view('dashboard.whatsapp_templates.create', compact('types'));
+        $defaultPlaceholders = WhatsappMessageTemplate::getDefaultPlaceholders();
+        // Load DB placeholders through the model instance helper
+        $dbPlaceholders = WhatsappMessageTemplate::getDatabasePlaceholderAliases();
+        return view('dashboard.whatsapp_templates.create', compact('types', 'defaultPlaceholders', 'dbPlaceholders'));
     }
 
     /**
@@ -106,7 +109,9 @@ class WhatsappMessageTemplateController extends Controller
     {
         $template = WhatsappMessageTemplate::findOrFail($id);
         $types = WhatsappMessageTemplate::getTypes();
-        return view('dashboard.whatsapp_templates.edit', compact('template', 'types'));
+        $defaultPlaceholders = WhatsappMessageTemplate::getDefaultPlaceholders();
+        $dbPlaceholders = WhatsappMessageTemplate::getDatabasePlaceholderAliases();
+        return view('dashboard.whatsapp_templates.edit', compact('template', 'types', 'defaultPlaceholders', 'dbPlaceholders'));
     }
 
     /**

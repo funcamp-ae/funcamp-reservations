@@ -25,8 +25,11 @@
 
                     <div class="col-md-6">
                         <div class="fv-row mb-7">
-                            <label class="required fw-semibold fs-6 mb-2">@lang('dashboard.template_type')</label>
-                            <select name="type" class="form-select form-select-solid" required>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="required fw-semibold fs-6 mb-0">@lang('dashboard.template_type')</label>
+                                <button type="button" id="btnAddType" class="btn btn-sm btn-light-primary">@lang('dashboard.add_type')</button>
+                            </div>
+                            <select name="type" id="typeSelect" class="form-select form-select-solid" required>
                                 <option value="">@lang('dashboard.select_type')</option>
                                 @foreach($types as $key => $value)
                                     <option value="{{ $key }}" {{ old('type') == $key ? 'selected' : '' }}>
@@ -72,14 +75,24 @@
                 </div>
 
                 <div class="alert alert-info">
-                    <h5>@lang('dashboard.available_placeholders'):</h5>
-                    <ul class="mb-0">
-                        <li><strong>[اسم العميل]</strong> / <strong>[Customer Name]</strong> - @lang('dashboard.customer_name_placeholder')</li>
-                        <li><strong>[رابط التقييم]</strong> / <strong>[🔗 Evaluation Link]</strong> - @lang('dashboard.evaluation_link_placeholder')</li>
-                        <li><strong>[موقع المخيم]</strong> / <strong>[Camp Location]</strong> - @lang('dashboard.camp_location_placeholder')</li>
-                        <li><strong>[اسم العامل]</strong> / <strong>[Worker Name]</strong> - @lang('dashboard.worker_name_placeholder')</li>
-                        <li><strong>[رقم هاتف العامل]</strong> / <strong>[Worker Phone]</strong> - @lang('dashboard.worker_phone_placeholder')</li>
-                    </ul>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">@lang('dashboard.available_placeholders'):</h5>
+                        <button type="button" id="btnAddPlaceholder" class="btn btn-sm btn-light-primary">@lang('dashboard.add_placeholder')</button>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="fw-bold mb-2">@lang('dashboard.default_placeholders')</h6>
+                        <ul class="mb-3" id="defaultPlaceholdersList">
+                            @foreach(($defaultPlaceholders ?? []) as $ph)
+                                <li><strong>{{ $ph }}</strong></li>
+                            @endforeach
+                        </ul>
+                        <h6 class="fw-bold mb-2">@lang('dashboard.custom_placeholders')</h6>
+                        <ul class="mb-0" id="customPlaceholdersList">
+                            @foreach(($dbPlaceholders ?? []) as $ph => $var)
+                                <li><strong>{{ $ph }}</strong> → <code>{{ $var }}</code></li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -146,6 +159,55 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('CKEditor 5 English initialization error:', error);
         });
+
+    // Helpers
+    function csrfHeaders() {
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        return token ? { 'X-CSRF-TOKEN': token } : {};
+    }
+
+    // Add Type Modal (simple prompt to keep UI minimal)
+    const btnAddType = document.getElementById('btnAddType');
+    const typeSelect = document.getElementById('typeSelect');
+    if (btnAddType) {
+        btnAddType.addEventListener('click', function() {
+            const key = prompt('@lang('dashboard.enter_type_key_example', ['example' => 'reservation_confirmation'])');
+            if (!key) return;
+            fetch('{{ route('dashboard.whatsapp-meta.type.store') }}', {
+                method: 'POST',
+                headers: Object.assign({'Content-Type': 'application/json'}, csrfHeaders()),
+                body: JSON.stringify({ key })
+            }).then(r => r.json()).then(data => {
+                if (!data.success) { alert(JSON.stringify(data.errors || data)); return; }
+                const opt = document.createElement('option');
+                opt.value = data.key;
+                opt.textContent = data.label || data.key;
+                typeSelect.appendChild(opt);
+                typeSelect.value = data.key;
+            }).catch(err => alert(err));
+        });
+    }
+
+    // Add Placeholder (simple prompt inputs)
+    const btnAddPlaceholder = document.getElementById('btnAddPlaceholder');
+    if (btnAddPlaceholder) {
+        btnAddPlaceholder.addEventListener('click', function() {
+            const placeholder = prompt('@lang('dashboard.enter_placeholder_example', ['example' => '[Camp Address]'])');
+            if (!placeholder) return;
+            const variable_key = prompt('@lang('dashboard.enter_variable_key_example', ['example' => 'service_location'])');
+            if (!variable_key) return;
+            fetch('{{ route('dashboard.whatsapp-meta.placeholder.store') }}', {
+                method: 'POST',
+                headers: Object.assign({'Content-Type': 'application/json'}, csrfHeaders()),
+                body: JSON.stringify({ placeholder, variable_key })
+            }).then(r => r.json()).then(data => {
+                if (!data.success) { alert(JSON.stringify(data.errors || data)); return; }
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${data.placeholder}</strong> → <code>${data.variable_key}</code>`;
+                document.getElementById('customPlaceholdersList').appendChild(li);
+            }).catch(err => alert(err));
+        });
+    }
 });
 </script>
 @endpush

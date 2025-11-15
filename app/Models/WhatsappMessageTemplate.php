@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\WhatsappMessageType;
+use App\Models\WhatsappPlaceholder;
 
 class WhatsappMessageTemplate extends Model
 {
@@ -21,35 +23,39 @@ class WhatsappMessageTemplate extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
-
-    // Template types constants
-    const TYPE_SHOW_PRICE = 'show_price';
-    const TYPE_INVOICE = 'invoice';
-    const TYPE_RECEIPT = 'receipt';
-    const TYPE_RESERVATION_DATA = 'reservation_data';
-    const TYPE_EVALUATION = 'evaluation';
-    const TYPE_PAYMENT_LINK_CREATED = 'payment_link_created';
-    const TYPE_PAYMENT_LINK_RESEND = 'payment_link_resend';
-    const TYPE_BOOKING_REMINDER = 'booking_reminder';
-    const TYPE_BOOKING_ENDING_REMINDER = 'booking_ending_reminder';
-    const TYPE_MANUAL_TEMPLATE = 'manual_template';
-    const TYPE_RESERVATION_CONFIRMATION = 'reservation_confirmation';
-    // Get all available types
+    // protected static $types = [
+    //     'show_price' => 'dashboard.show_price',
+    //     'invoice' => 'dashboard.invoice',
+    //     'receipt' => 'dashboard.receipt',
+    //     'reservation_data' => 'dashboard.reservation_data',
+    //     'evaluation' => 'dashboard.evaluation',
+    //     'payment_link_created' => 'dashboard.payment_link_created',
+    //     'payment_link_resend' => 'dashboard.payment_link_resend',
+    //     'booking_reminder' => 'dashboard.booking_reminder',
+    //     'booking_ending_reminder' => 'dashboard.booking_ending_reminder',
+    //     'reservation_confirmation' => 'dashboard.reservation_confirmation',
+    // ];
     public static function getTypes()
     {
-        return [
-            self::TYPE_MANUAL_TEMPLATE => __('dashboard.manual_template'),
-            self::TYPE_SHOW_PRICE => __('dashboard.show_price'),
-            self::TYPE_INVOICE => __('dashboard.invoice'),
-            self::TYPE_RECEIPT => __('dashboard.receipt'),
-            self::TYPE_RESERVATION_DATA => __('dashboard.reservation_data'),
-            self::TYPE_EVALUATION => __('dashboard.evaluation'),
-            self::TYPE_PAYMENT_LINK_CREATED => __('dashboard.payment_link_created'),
-            self::TYPE_PAYMENT_LINK_RESEND => __('dashboard.payment_link_resend'),
-            self::TYPE_BOOKING_REMINDER => __('dashboard.booking_reminder'),
-            self::TYPE_BOOKING_ENDING_REMINDER => __('dashboard.booking_ending_reminder'),
-            self::TYPE_RESERVATION_CONFIRMATION => __('dashboard.reservation_confirmation'),
-        ];
+        $types = self::getRawTypes();
+        $result = [];
+        foreach ($types as $type) {
+            $translationKey = 'dashboard.' . $type;
+            $translated = __($translationKey);
+            $result[$type] = $translated;
+        }
+        return $result;
+    }
+
+    // Get distinct raw types from the database
+    public static function getRawTypes(): array
+    {
+        return WhatsappMessageType::all()->pluck('key')->toArray();
+    }
+
+    public static function addType(string $key, string $translationKey): void
+    {
+        WhatsappMessageType::updateOrCreate(['key' => $key]);
     }
 
     // Scope for active templates
@@ -71,44 +77,32 @@ class WhatsappMessageTemplate extends Model
     }
 
     // Replace placeholders in message
-    public function getProcessedMessage($language = 'ar', $customerName = '', $evaluationLink = '', $serviceSiteData = null)
+    public function getProcessedMessage($language = 'ar', $serviceSiteData = null, $order = null)
     {
         $message = $language === 'en' ? $this->message_en : $this->message_ar;
         
-        return $this->processMessageContent($message, $customerName, $evaluationLink, $serviceSiteData);
+        return $this->processMessageContent($message, $serviceSiteData, $order);
     }
 
     // Get bilingual message (Arabic + English)
-    public function getBilingualMessage($customerName = '', $evaluationLink = '', $serviceSiteData = null)
+    public function getBilingualMessage($serviceSiteData = null, $order = null)
     {
-        $arabicMessage = $this->processMessageContent($this->message_ar, $customerName, $evaluationLink, $serviceSiteData);
-        $englishMessage = $this->processMessageContent($this->message_en, $customerName, $evaluationLink, $serviceSiteData);
+        $arabicMessage = $this->processMessageContent($this->message_ar, $serviceSiteData, $order);
+        $englishMessage = $this->processMessageContent($this->message_en, $serviceSiteData, $order);
         
         // Combine both messages with a separator
         return $arabicMessage . "\n\n" . "━━━━━━━━━━━━━" . "\n\n" . $englishMessage;
     }
 
     // Helper method to process message content
-    private function processMessageContent($message, $customerName = '', $evaluationLink = '', $serviceSiteData = null)
+    private function processMessageContent($message, $serviceSiteData = null, $order = null)
     {
-        // Replace placeholders
-        $message = str_replace('[اسم العميل]', $customerName, $message);
-        $message = str_replace('[Customer Name]', $customerName, $message);
-        $message = str_replace('[customer\'s name]', $customerName, $message);
-        $message = str_replace('[Customer\'s Name]', $customerName, $message);
-        $message = str_replace('[رابط التقييم]', $evaluationLink, $message);
-        $message = str_replace('[🔗 رابط التقييم]', $evaluationLink, $message); // Arabic with emoji
-        $message = str_replace('[🔗 Evaluation Link]', $evaluationLink, $message);
-        $message = str_replace('[Evaluation Link]', $evaluationLink, $message);
-        
-        // Replace service site placeholders if data is provided
-        if ($serviceSiteData) {
-            $message = str_replace('[موقع المخيم]', $serviceSiteData['service_site'] ?? '', $message);
-            $message = str_replace('[Camp Location]', $serviceSiteData['service_site'] ?? '', $message);
-            $message = str_replace('[اسم العامل]', $serviceSiteData['workername_ar'] ?? '', $message);
-            $message = str_replace('[Worker Name]', $serviceSiteData['workername_en'] ?? '', $message);
-            $message = str_replace('[رقم هاتف العامل]', $serviceSiteData['workerphone'] ?? '', $message);
-            $message = str_replace('[Worker Phone]', $serviceSiteData['workerphone'] ?? '', $message);
+        // Build variables and placeholders map
+        $placeholders = $this->buildPlaceholdersFromOrder($order, $serviceSiteData);
+
+        // Replace all placeholders in one pass
+        if (!empty($placeholders)) {
+            $message = str_replace(array_keys($placeholders), array_values($placeholders), $message);
         }
         
         // Convert HTML tags to WhatsApp formatting
@@ -166,5 +160,199 @@ class WhatsappMessageTemplate extends Model
         $message = trim($message); // Remove leading/trailing whitespace
         
         return $message;
+    }
+
+    /**
+     * Build the variable values used for placeholder replacement
+     */
+    private function buildReplacementVariables($customerName, $evaluationLink, $serviceSiteData)
+    {
+        return [
+            'customer_name' => (string) $customerName,
+            'evaluation_link' => (string) $evaluationLink,
+            'service_site' => (string) $this->getServiceDataValue($serviceSiteData, 'service_site'),
+            'service_location' => (string) $this->getServiceDataValue($serviceSiteData, 'service_location'),
+            'worker_name_ar' => (string) $this->getServiceDataValue($serviceSiteData, 'workername_ar'),
+            'worker_name_en' => (string) $this->getServiceDataValue($serviceSiteData, 'workername_en'),
+            'worker_phone' => (string) $this->getServiceDataValue($serviceSiteData, 'workerphone'),
+        ];
+    }
+
+    // Public accessor for default aliases (for UI usage)
+    public static function getDefaultPlaceholders(): array
+    {
+        // Instantiate to access instance private method
+        return (new self())->getDefaultPlaceholderAliases();
+    }
+
+    // Load aliases stored in the database (WhatsappPlaceholder)
+    public function getDatabasePlaceholderAliases(): array
+    {
+        $map = [];
+        try {
+            $rows = WhatsappPlaceholder::all(['placeholder', 'variable_key']);
+            foreach ($rows as $row) {
+                if (!empty($row->placeholder) && !empty($row->variable_key)) {
+                    $map[$row->placeholder] = $row->variable_key;
+                }
+            }
+        } catch (\Throwable $e) {
+            // fail-safe: if table not migrated yet, ignore
+        }
+        return $map;
+    }
+
+    // Safely read a field from service site data whether it's an array or object
+    private function getServiceDataValue($serviceSiteData, string $key)
+    {
+        if (is_array($serviceSiteData)) {
+            return $serviceSiteData[$key] ?? '';
+        }
+        if (is_object($serviceSiteData)) {
+            return $serviceSiteData->$key ?? '';
+        }
+        return '';
+    }
+
+    /**
+     * Map all supported placeholders to their corresponding variable values
+     */
+    private function buildPlaceholdersMap(array $vars)
+    {
+        // Resolve default aliases + runtime aliases to actual values
+        // Merge default aliases, DB aliases, and runtime aliases
+        $aliases = array_merge($this->getDefaultPlaceholderAliases(), $this->getDatabasePlaceholderAliases());
+        $map = [];
+        foreach ($aliases as $placeholder => $varKey) {
+            $map[$placeholder] = $vars[$varKey] ?? '';
+        }
+
+        // // Also support generic bracketed variables like [price], [date], [service_location], etc.
+        // foreach ($vars as $key => $value) {
+        //     $placeholder = '[' . $key . ']';
+        //     if (!array_key_exists($placeholder, $map)) {
+        //         $map[$placeholder] = $value;
+        //     }
+        // }
+
+        return $map;
+    }
+
+    // Register one alias at runtime: e.g., addPlaceholderAlias('[My Placeholder]', 'price')
+    public static function addPlaceholderAlias(string $placeholder, string $variableKey): void
+    {
+        // Persist to DB so it is available across requests
+        try {
+            WhatsappPlaceholder::updateOrCreate(
+                ['placeholder' => $placeholder],
+                ['variable_key' => $variableKey]
+            );
+        } catch (\Throwable $e) {
+            // If DB not ready, fall back to memory for this request
+        }
+    }
+
+    // Register many aliases at runtime
+    public static function addPlaceholderAliases(array $aliases): void
+    {
+        // $aliases = ['[My Placeholder]' => 'price', ...]
+        foreach ($aliases as $placeholder => $variableKey) {
+            try {
+                WhatsappPlaceholder::updateOrCreate(
+                    ['placeholder' => $placeholder],
+                    ['variable_key' => $variableKey]
+                );
+            } catch (\Throwable $e) {
+                // ignore DB issues and still populate in-memory cache
+            }
+        }
+    }
+    // Default human-friendly placeholder aliases mapped to variable keys
+    private function getDefaultPlaceholderAliases(): array
+    {
+        return [
+            // Customer name
+            '[اسم العميل]' => 'customer_name',
+            '[Customer Name]' => 'customer_name',
+            "[customer's name]" => 'customer_name',
+            "[Customer's Name]" => 'customer_name',
+
+            // Evaluation link
+            '[رابط التقييم]' => 'evaluation_link',
+            '[🔗 رابط التقييم]' => 'evaluation_link',
+            '[🔗 Evaluation Link]' => 'evaluation_link',
+            '[Evaluation Link]' => 'evaluation_link',
+
+            // Service site / location
+            '[موقع المخيم]' => 'service_site',
+            '[Camp Location]' => 'service_site',
+            '[العنوان]' => 'service_location',
+            '[Address]' => 'service_location',
+            '[Camp Address]' => 'service_location',
+
+            // Worker info
+            '[اسم العامل]' => 'worker_name_ar',
+            '[Worker Name]' => 'worker_name_en',
+            '[رقم هاتف العامل]' => 'worker_phone',
+            '[Worker Phone]' => 'worker_phone',
+
+            // Other aliases
+            // '[Terms & Conditions Link]' => 'terms_conditions_link',
+        ];
+    }
+
+    /**
+     * Build variables from Order model and ServiceSite data
+     * - Safely extracts customer name and all relevant order attributes
+     * - Merges with service site data fields
+     */
+    private function buildVariablesForReplacement($order = null, $serviceSiteData = null)
+    {
+        $vars = [
+            'customer_name' => (string) (optional(optional($order)->customer)->name ?? ''),
+            'evaluation_link' => (string) env('APP_URL').'/survey/'.$order->id,
+            'terms_conditions_link' => (string) env('APP_URL').'/sign/'.$order->id,
+        ];
+
+        if ($order) {
+            $orderAttrs = [
+                'customer_id', 'price', 'deposit', 'insurance_amount', 'notes', 'date', 'time_from', 'time_to',
+                'time_of_receipt', 'time_of_receipt_notes', 'delivery_time', 'delivery_time_notes', 'voice_note',
+                'video_note', 'image_before_receiving', 'image_after_delivery', 'status', 'refunds', 'refunds_notes',
+                'delayed_time', 'inventory_withdrawal', 'insurance_status', 'confiscation_description', 'report_text',
+                'show_price_notes', 'order_data_notes', 'invoice_notes', 'receipt_notes', 'people_count',
+                'client_notes', 'insurance_handled_by', 'is_insurance_verified', 'partial_confiscation_amount',
+                'video_note_logout', 'voice_note_logout', 'signature_path', 'signature', 'is_evaluation_sent',
+            ];
+            foreach ($orderAttrs as $attr) {
+                $vars[$attr] = isset($order->$attr) ? (string) $order->$attr : '';
+            }
+        }
+
+        if ($serviceSiteData) {
+            $svcAttrs = [
+                'service_site', 'service_location', 'workername_ar', 'workername_en', 'workerphone',
+                'guidance_images', 'guidance_videos', 'important_notes',
+            ];
+            foreach ($svcAttrs as $attr) {
+                $value = $serviceSiteData[$attr] ?? '';
+                // Convert arrays to comma-separated strings for placeholders
+                if (is_array($value)) {
+                    $value = implode(', ', $value);
+                }
+                $vars[$attr] = (string) $value;
+            }
+        }
+
+        return $vars;
+    }
+
+    /**
+     * Public helper: build full placeholders map from Order and ServiceSite data
+     */
+    public function buildPlaceholdersFromOrder($order = null, $serviceSiteData = null, $customerName = '', $evaluationLink = '')
+    {
+        $vars = $this->buildVariablesForReplacement($order, $serviceSiteData);
+        return $this->buildPlaceholdersMap($vars);
     }
 }
