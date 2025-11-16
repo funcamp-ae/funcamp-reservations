@@ -580,38 +580,44 @@
         $(document).on('click', '.js-delete-stock', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            if ($(this).data('isretrieved')) {
 
+            const $link = $(this);
+            const url = $link.data('url');
+            const isRetrieved = $link.data('isretrieved');
+
+            // Determine the row type (stock or report)
+            const $row = $link.closest('.stock-item-row').length
+                ? $link.closest('.stock-item-row')
+                : $link.closest('.reports-item-row');
+
+            if (!$row.length) {
+                toast('error', 'Unable to determine row type.');
+                return;
+            }
+
+            if (isRetrieved) {
                 // For retrieved items, remove the row client-side and update UI
-                if ($(this).closest('.stock-item-row').length === 0) {
-                    const $reportRow = $(this).closest('.reports-item-row');
-                    $reportRow.remove();
-                    if (typeof renumberReportRows === 'function') renumberReportRows();
-                    if (typeof refreshReportMoveButtons === 'function') refreshReportMoveButtons();
-                    if (typeof updateReportOrders === 'function') updateReportOrders();
+                $row.remove();
+                if ($row.hasClass('stock-item-row')) {
+                    renumberStockRows();
                 } else {
-                    const $stockRow = $(this).closest('.stock-item-row');
-                    $stockRow.remove();
-                    if (typeof renumberStockRows === 'function') renumberStockRows();
+                    renumberReportRows();
+                    refreshReportMoveButtons();
+                    updateReportOrders();
                 }
                 toast('success', "{{ __('dashboard.success') }}");
                 return;
             }
-            const $link = $(this);
-            const url   = $link.data('url');
-            
-            // Try to find either stock-item-row (div) or reports-item-row (tr)
-            let $row = $link.closest('.stock-item-row');
-            if ($row.length === 0) {
-                $row = $link.closest('.reports-item-row');
+
+            if (!url) {
+                toast('error', 'Missing delete URL');
+                return;
             }
 
-
-            if (!url) { toast('error', 'Missing delete URL'); return; }
             confirmTop({
                 title: "{{ __('dashboard.confirm_delete') }}",
                 confirmText: "{{ __('dashboard.delete') }}",
-                cancelText:  "{{ __('dashboard.cancel') }}"
+                cancelText: "{{ __('dashboard.cancel') }}"
             }, function () {
                 $.ajax({
                     url: url,
@@ -619,7 +625,13 @@
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function (resp) {
                         $row.remove();
-                        renumberStockRows();
+                        if ($row.hasClass('stock-item-row')) {
+                            renumberStockRows();
+                        } else {
+                            renumberReportRows();
+                            refreshReportMoveButtons();
+                            updateReportOrders();
+                        }
                         toast('success', resp?.message || "{{ __('dashboard.success') }}");
                     },
                     error: function (xhr) {
