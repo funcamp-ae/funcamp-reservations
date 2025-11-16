@@ -96,7 +96,7 @@ class ServicesController extends Controller
                     
                     // Check for regular file upload first. Prefer the loop $index as the key (matches inputs),
                     // but fall back to the provided order value if present (defensive).
-                    $files = $request->file('reports_images')[$index] ?? $request->file('reports_images')[$order] ?? null;
+                    $files = $request->file('reports_images')[$report_orders[$index] - 1] ?? $request->file('reports_images')[$report_orders[$index] - 1] ?? null;
                     if ($files instanceof \Illuminate\Http\UploadedFile) {
                         // \Log::info("yes there is reports image");
                         $imagePath = $files->store('reports', 'public');
