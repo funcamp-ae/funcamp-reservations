@@ -206,7 +206,7 @@
                     @endif
 
                 </td>
-                <td>{{ $transaction->handledBy?->name?? '-' }}</td>
+                <td>{{ $transaction->handledBy?->name ?? '-' }}</td>
 
             <!-- <td>{{ $transaction->description }}</td> -->
 

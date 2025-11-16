@@ -210,6 +210,7 @@ public function moneyTransfer(Request $request)
         \Log::info(json_encode($validatedData));
         $validatedData = array_merge($validatedData, [
             'verified' => true ,
+            'handled_by' => auth()->id()
         ]);
 
         Transaction::create($validatedData);
