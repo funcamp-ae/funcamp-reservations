@@ -90,18 +90,28 @@ class ServicesController extends Controller
                         'report_orders' => $order,
                         'set_qty' => 0
                     ]);
+                    $imagePath = null;
+                    
+                    // Check for regular file upload first
                     if ($files = $request->file("reports_images")[$order] ?? null) {
-                        $path = $files->store('reports', 'public');
-                        $newReport->update([
-                            'image' => $path
-                        ]);
-                        // handle image upload from retrieved service
+                        $imagePath = $files->store('reports', 'public');
+                    } 
+                    // Handle custom_reports_images (from retrieved service)
+                    else if(isset($request->custom_reports_images) && isset($request->custom_reports_images[$index])){
+                        $existingPath = $request->custom_reports_images[$index];
                         
-                    }else if(isset($request->custom_reports_images) && isset($request->custom_reports_images[$index])){
-                        Storage::copy($request->custom_reports_images[$index], 'reports');
-                        $newReport->update([
-                            'image' => substr($request->custom_reports_images[$index], strrpos($request->custom_reports_images[$index], 'reports/') , strlen($request->custom_reports_images[$index]))
-                        ]);
+                        // Clean the path and ensure it's relative to storage
+                        $existingPath = str_replace(env('APP_URL') . '/storage/', '', $existingPath);
+                        
+                        // Check if the file exists in public storage
+                        if (Storage::disk('public')->exists($existingPath)) {                            
+                            $imagePath = $existingPath;
+                        }
+
+                    }
+                    // Update the report with the image path if we have one
+                    if ($imagePath) {
+                        $newReport->update(['image' => $imagePath]);
                     }
                     
                 }
