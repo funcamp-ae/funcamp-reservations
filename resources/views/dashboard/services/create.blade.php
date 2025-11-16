@@ -581,30 +581,19 @@
             e.preventDefault();
             e.stopPropagation();
             if ($(this).data('isretrieved')) {
-                // For retrieved service stocks/reports, clear and disable all inputs
-                // inside the row before removing it so they won't be submitted.
-                let $retrievedRow = $(this).closest('.stock-item-row');
-                if ($retrievedRow.length === 0) {
-                    $retrievedRow = $(this).closest('.reports-item-row');
+
+                // For retrieved items, remove the row client-side and update UI
+                if ($(this).closest('.stock-item-row').length === 0) {
+                    const $reportRow = $(this).closest('.reports-item-row');
+                    $reportRow.remove();
+                    if (typeof renumberReportRows === 'function') renumberReportRows();
+                    if (typeof refreshReportMoveButtons === 'function') refreshReportMoveButtons();
+                    if (typeof updateReportOrders === 'function') updateReportOrders();
+                } else {
+                    const $stockRow = $(this).closest('.stock-item-row');
+                    $stockRow.remove();
+                    if (typeof renumberStockRows === 'function') renumberStockRows();
                 }
-
-                if ($retrievedRow.length) {
-                    // Clear file inputs and remove name attributes to avoid submission
-                    $retrievedRow.find('input, select, textarea').each(function () {
-                        var $el = $(this);
-                        if ($el.is(':file')) {
-                            try { $el.val(''); } catch (err) { /* ignore */ }
-                        }
-                        $el.removeAttr('name');
-                        $el.prop('disabled', true);
-                    });
-
-                    $retrievedRow.remove();
-                }
-
-                // Update numbering for both stocks and reports if present
-                renumberStockRows();
-                if (typeof renumberReportRows === 'function') renumberReportRows();
                 toast('success', "{{ __('dashboard.success') }}");
                 return;
             }
@@ -616,6 +605,7 @@
             if ($row.length === 0) {
                 $row = $link.closest('.reports-item-row');
             }
+
 
             if (!url) { toast('error', 'Missing delete URL'); return; }
             confirmTop({
