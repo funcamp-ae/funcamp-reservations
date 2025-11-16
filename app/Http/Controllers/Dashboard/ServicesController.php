@@ -72,7 +72,7 @@ class ServicesController extends Controller
             $request['registeration_forms'] = $request['registeration_forms'] == 'on' ? 1 : 0;
             $serviceData = $request->only(['name', 'description', 'price', 'hours', 'hour_from', 'hour_to','registeration_forms']);
             $service = Service::create($serviceData);
-
+            $report_orders = $request->report_orders ?? [];
             if (isset($request->stocks) && isset($request->counts)) {
                 $stocksData = array_combine($request->stocks, $request->counts);
                 $service->stocks()->sync([]);
@@ -83,7 +83,7 @@ class ServicesController extends Controller
             }
             if (isset($request->reports) && isset($request->reports_counts)) {
                 foreach ($request->reports as $index => $reportName) {
-                    \Log::info($reportName);
+                    // \Log::info($reportName);
                     $count = $request->reports_counts[$index]; // the count for each report record
                     $order = $request->report_orders[$index] ?? $index; // the order for each report record
                     $newReport = $service->reports()->create([
@@ -98,15 +98,15 @@ class ServicesController extends Controller
                     // but fall back to the provided order value if present (defensive).
                     $files = $request->file('reports_images')[$index] ?? $request->file('reports_images')[$order] ?? null;
                     if ($files instanceof \Illuminate\Http\UploadedFile) {
-                        \Log::info("yes there is reports image");
+                        // \Log::info("yes there is reports image");
                         $imagePath = $files->store('reports', 'public');
                     }
 
                     // Handle custom_reports_images (from retrieved service)
-                    else if (isset($request->custom_reports_images) && array_key_exists($report_orders[$index], $request->custom_reports_images)) {
-                        $existingPath = $request->custom_reports_images[$report_orders[$index]];
-                        \Log::info("yes there is custom reports image");
-                        \Log::info($existingPath);
+                    else if (isset($request->custom_reports_images) && array_key_exists($report_orders[$index] - 1, $request->custom_reports_images)) {
+                        $existingPath = $request->custom_reports_images[$report_orders[$index] - 1];
+                        // \Log::info("yes there is custom reports image");
+                        // \Log::info($existingPath);
 
                         // Normalize the provided URL/path to a storage-relative path.
                         // Use parse_url to extract the path component, then remove leading '/storage/' or 'storage/'.
@@ -118,18 +118,18 @@ class ServicesController extends Controller
                         } else {
                             $existingPath = $urlPath;
                         }
-                        \Log::info($existingPath);
+                        // \Log::info($existingPath);
 
                         // Check if the file exists in public storage
                         if ($existingPath && Storage::disk('public')->exists($existingPath)) {
-                            \Log::info("file exists in public storage: " . $existingPath);
+                            // \Log::info("file exists in public storage: " . $existingPath);
                             $imagePath = $existingPath;
                         }
                     }
-                    \Log::info("image path set to: " . $imagePath);
+                    // \Log::info("image path set to: " . $imagePath);
                     // Update the report with the image path if we have one
                     if ($imagePath) {
-                        \Log::info("updating report image with path: " . $imagePath);
+                        // \Log::info("updating report image with path: " . $imagePath);
                         $newReport->update(['image' => $imagePath]);
                     }
                     // dd("");
