@@ -93,7 +93,7 @@
 
                                         <tr data-id="{{ $rf->id }}">
                                             <td><span class="   text-hover-primary fw-bold">{{ $rf->request_code }}</span></td>
-                                            <td><i class="bi bi-telephone me-1"></i>{{ $rf->mobile_phone ?? '—' }}</td>
+                                            <td dir="ltr"><i class="bi bi-telephone me-1"></i>{{ $rf->mobile_phone ?? '—' }}</td>
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div class="symbol symbol-35px symbol-circle me-3">
