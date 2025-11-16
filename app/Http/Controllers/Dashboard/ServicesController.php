@@ -39,6 +39,7 @@ class ServicesController extends Controller
     // Store a newly created service in the database
     public function store(Request $request)
     {
+        \Log::info($request->all());
         // Allow access if user has either services.create OR camp-types.create permission
         if (!auth()->user()->can('services.create') && !auth()->user()->can('camp-types.create')) {
             abort(403, 'Unauthorized');
