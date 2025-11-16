@@ -583,14 +583,14 @@
             if ($(this).data('isretrieved')) {
                 // For retrieved service stocks/reports, clear and disable all inputs
                 // inside the row before removing it so they won't be submitted.
-                var $row = $(this).closest('.stock-item-row');
-                if ($row.length === 0) {
-                    $row = $(this).closest('.reports-item-row');
+                let $retrievedRow = $(this).closest('.stock-item-row');
+                if ($retrievedRow.length === 0) {
+                    $retrievedRow = $(this).closest('.reports-item-row');
                 }
 
-                if ($row.length) {
+                if ($retrievedRow.length) {
                     // Clear file inputs and remove name attributes to avoid submission
-                    $row.find('input, select, textarea').each(function () {
+                    $retrievedRow.find('input, select, textarea').each(function () {
                         var $el = $(this);
                         if ($el.is(':file')) {
                             try { $el.val(''); } catch (err) { /* ignore */ }
@@ -599,7 +599,7 @@
                         $el.prop('disabled', true);
                     });
 
-                    $row.remove();
+                    $retrievedRow.remove();
                 }
 
                 // Update numbering for both stocks and reports if present
