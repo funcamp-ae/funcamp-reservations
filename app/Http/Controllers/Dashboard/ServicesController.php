@@ -103,8 +103,8 @@ class ServicesController extends Controller
                     }
 
                     // Handle custom_reports_images (from retrieved service)
-                    else if (isset($request->custom_reports_images) && array_key_exists($index, $request->custom_reports_images)) {
-                        $existingPath = $request->custom_reports_images[$index];
+                    else if (isset($request->custom_reports_images) && array_key_exists($report_orders[$index], $request->custom_reports_images)) {
+                        $existingPath = $request->custom_reports_images[$report_orders[$index]];
                         \Log::info("yes there is custom reports image");
                         \Log::info($existingPath);
 
