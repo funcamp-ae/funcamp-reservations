@@ -146,6 +146,76 @@
                                         <!--end::Action=-->
                                     </tr>
                                 @endcan
+                            @else
+                                    <tr data-id="{{$bank->id}}">
+                                        <!--begin::Checkbox-->
+                                        <td>
+                                            <div class="form-check form-check-sm form-check-custom form-check-solid ">
+                                                <input class="form-check-input checkSingle" type="checkbox" value="1" id="{{$bank->id}}"/>
+                                            </div>
+                                        </td>
+                                        <!--end::Checkbox-->
+                                        <!--begin::Category=-->
+                                        <td>
+                                            <div class="d-flex">
+                                                <div class="ms-5">
+                                                    <!--begin::Title-->
+                                                    <a href="{{ route('bank-accounts.show', $bank->id) }}" class="text-hover-primary fs-5 fw-bolder mb-1" data-kt-ecommerce-category-filter="category_name">
+                                                        @if($bank->account_number) {{$bank->account_number   }} <br> @endif 
+                                                        <small>{{$bank->name }}</small>
+                                                    </a>
+                                                    <!--end::Title-->
+                                                </div>
+                                            </div>
+                                        </td>
+                                        @if($bank->is_private)
+                                            @can('bank-accounts.private.show')
+                                                <td> {{$bank->balance }} {{$bank->curruncy}}</td>
+                                            @else
+                                                <td><span class="badge badge-light-warning">@lang('dashboard.private')</span></td>
+                                            @endcan
+                                        @else
+                                            <td> {{$bank->balance }} {{$bank->curruncy}}</td>
+                                        @endif
+                                        <td>{{$bank->notes}}</td>
+                                        <!--begin::Action=-->
+                                        <td class="text-end">
+                                            <a href="#" class="btn btn-sm" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                            @lang('dashboard.actions')
+                                            <!--begin::Svg Icon | path: icons/duotune/arrows/arr072.svg-->
+                                            <span class="svg-icon svg-icon-5 m-0">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M11.4343 12.7344L7.25 8.55005C6.83579 8.13583 6.16421 8.13584 5.75 8.55005C5.33579 8.96426 5.33579 9.63583 5.75 10.05L11.2929 15.5929C11.6834 15.9835 12.3166 15.9835 12.7071 15.5929L18.25 10.05C18.6642 9.63584 18.6642 8.96426 18.25 8.55005C17.8358 8.13584 17.1642 8.13584 16.75 8.55005L12.5657 12.7344C12.2533 13.0468 11.7467 13.0468 11.4343 12.7344Z" fill="currentColor" />
+                                                </svg>
+                                            </span>
+                                            <!--end::Svg Icon--></a>
+                                            <!--begin::Menu-->
+                                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
+                                                <!--begin::Menu item-->
+                                                @can('bank-accounts.show')
+                                                <div class="menu-item px-3">
+                                                    <a href="{{route('bank-accounts.show', $bank->id)}}" class="menu-link px-3">@lang('dashboard.show')</a>
+                                                </div>
+                                                @endcan 
+
+                                                @can('bank-accounts.edit')
+                                                <div class="menu-item px-3">
+                                                    <a href="{{route('bank-accounts.edit', $bank->id)}}" class="menu-link px-3">@lang('dashboard.edit')</a>
+                                                </div>
+                                                @endcan 
+                                                <!--end::Menu item-->
+                                                @can('bank-accounts.destroy')
+                                                <!--begin::Menu item-->
+                                                <div class="menu-item px-3">
+                                                    <a href="#" class="menu-link px-3" data-kt-ecommerce-category-filter="delete_row" data-url="{{route('bank-accounts.destroy', $bank->id)}}" data-id="{{$bank->id}}">@lang('dashboard.delete')</a>
+                                                </div>
+                                                @endcan 
+                                                <!--end::Menu item-->
+                                            </div>
+                                            <!--end::Menu-->
+                                        </td>
+                                        <!--end::Action=-->
+                                    </tr>
                             @endif
                             <!--end::Table row-->
                         @endforeach
