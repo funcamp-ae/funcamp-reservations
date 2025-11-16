@@ -600,7 +600,6 @@
                 $row = $link.closest('.reports-item-row');
             }
 
-
             if (!url) { toast('error', 'Missing delete URL'); return; }
             confirmTop({
                 title: "{{ __('dashboard.confirm_delete') }}",

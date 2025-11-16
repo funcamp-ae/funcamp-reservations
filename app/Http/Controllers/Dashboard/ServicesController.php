@@ -83,6 +83,7 @@ class ServicesController extends Controller
             }
             if (isset($request->reports) && isset($request->reports_counts)) {
                 foreach ($request->reports as $index => $reportName) {
+                    \Log::info($reportName);
                     $count = $request->reports_counts[$index]; // the count for each report record
                     $order = $request->report_orders[$index] ?? $index; // the order for each report record
                     $newReport = $service->reports()->create([
@@ -95,26 +96,33 @@ class ServicesController extends Controller
                     
                     // Check for regular file upload first
                     if ($files = $request->file("reports_images")[$order] ?? null) {
+                        \Log::info("yes there is reports image");
                         $imagePath = $files->store('reports', 'public');
                     } 
+
                     // Handle custom_reports_images (from retrieved service)
                     else if(isset($request->custom_reports_images) && isset($request->custom_reports_images[$index])){
                         $existingPath = $request->custom_reports_images[$index];
-                        
+                        \Log::info("yes there is custom reports image");
+                      
+                        \Log::info($existingPath);
                         // Clean the path and ensure it's relative to storage
                         $existingPath = str_replace(env('APP_URL') . '/storage/', '', $existingPath);
-                        
+                        \Log::info($existingPath);
                         // Check if the file exists in public storage
-                        if (Storage::disk('public')->exists($existingPath)) {                            
+                        if (Storage::disk('public')->exists($existingPath)) {    
+                            \Log::info("file exists in public storage: " . $existingPath);
                             $imagePath = $existingPath;
                         }
 
                     }
+                    \Log::info("image path set to: " . $imagePath);
                     // Update the report with the image path if we have one
                     if ($imagePath) {
+                        \Log::info("updating report image with path: " . $imagePath);
                         $newReport->update(['image' => $imagePath]);
                     }
-                    
+                    // dd("");
                 }
             }
             \DB::commit();
