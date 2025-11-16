@@ -581,13 +581,30 @@
             e.preventDefault();
             e.stopPropagation();
             if ($(this).data('isretrieved')) {
-                // For retrieved service stocks, just remove the row without AJAX
-                if ($(this).closest('.stock-item-row').length === 0) {
-                    $(this).closest('.reports-item-row').remove();
-                } else {
-                    $(this).closest('.stock-item-row').remove();
+                // For retrieved service stocks/reports, clear and disable all inputs
+                // inside the row before removing it so they won't be submitted.
+                var $row = $(this).closest('.stock-item-row');
+                if ($row.length === 0) {
+                    $row = $(this).closest('.reports-item-row');
                 }
+
+                if ($row.length) {
+                    // Clear file inputs and remove name attributes to avoid submission
+                    $row.find('input, select, textarea').each(function () {
+                        var $el = $(this);
+                        if ($el.is(':file')) {
+                            try { $el.val(''); } catch (err) { /* ignore */ }
+                        }
+                        $el.removeAttr('name');
+                        $el.prop('disabled', true);
+                    });
+
+                    $row.remove();
+                }
+
+                // Update numbering for both stocks and reports if present
                 renumberStockRows();
+                if (typeof renumberReportRows === 'function') renumberReportRows();
                 toast('success', "{{ __('dashboard.success') }}");
                 return;
             }

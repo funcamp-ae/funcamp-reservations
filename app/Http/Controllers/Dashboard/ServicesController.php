@@ -94,27 +94,37 @@ class ServicesController extends Controller
                     ]);
                     $imagePath = null;
                     
-                    // Check for regular file upload first
-                    if ($files = $request->file("reports_images")[$order] ?? null) {
+                    // Check for regular file upload first. Prefer the loop $index as the key (matches inputs),
+                    // but fall back to the provided order value if present (defensive).
+                    $files = $request->file('reports_images')[$index] ?? $request->file('reports_images')[$order] ?? null;
+                    if ($files instanceof \Illuminate\Http\UploadedFile) {
                         \Log::info("yes there is reports image");
                         $imagePath = $files->store('reports', 'public');
-                    } 
+                    }
 
                     // Handle custom_reports_images (from retrieved service)
-                    else if(isset($request->custom_reports_images) && isset($request->custom_reports_images[$index])){
+                    else if (isset($request->custom_reports_images) && array_key_exists($index, $request->custom_reports_images)) {
                         $existingPath = $request->custom_reports_images[$index];
                         \Log::info("yes there is custom reports image");
-                      
                         \Log::info($existingPath);
-                        // Clean the path and ensure it's relative to storage
-                        $existingPath = str_replace(env('APP_URL') . '/storage/', '', $existingPath);
+
+                        // Normalize the provided URL/path to a storage-relative path.
+                        // Use parse_url to extract the path component, then remove leading '/storage/' or 'storage/'.
+                        $path = $existingPath;
+                        $urlPath = parse_url($path, PHP_URL_PATH) ?: $path;
+                        $urlPath = ltrim($urlPath, '/');
+                        if (str_starts_with($urlPath, 'storage/')) {
+                            $existingPath = preg_replace('#^storage/#', '', $urlPath);
+                        } else {
+                            $existingPath = $urlPath;
+                        }
                         \Log::info($existingPath);
+
                         // Check if the file exists in public storage
-                        if (Storage::disk('public')->exists($existingPath)) {    
+                        if ($existingPath && Storage::disk('public')->exists($existingPath)) {
                             \Log::info("file exists in public storage: " . $existingPath);
                             $imagePath = $existingPath;
                         }
-
                     }
                     \Log::info("image path set to: " . $imagePath);
                     // Update the report with the image path if we have one
@@ -270,8 +280,8 @@ class ServicesController extends Controller
                         $report = ServiceReport::findOrFail($reportId);
                         $report->update($reportData);
 
-                        // Handle file upload using order-based indexing like in store method
-                        $file = $request->file('reports_images')[$order] ?? null;
+                        // Handle file upload using index-first indexing (matches input names), fallback to order.
+                        $file = $request->file('reports_images')[$index] ?? $request->file('reports_images')[$order] ?? null;
                         if ($file instanceof \Illuminate\Http\UploadedFile) {
                             if ($report->image && Storage::disk('public')->exists($report->image)) {
                                 Storage::disk('public')->delete($report->image);
@@ -284,7 +294,7 @@ class ServicesController extends Controller
                         unset($existingReports[$reportId]);
                     } else {
                         // Creating new report
-                        $file = $request->file('reports_images')[$order] ?? null;
+                        $file = $request->file('reports_images')[$index] ?? $request->file('reports_images')[$order] ?? null;
                         if ($file instanceof \Illuminate\Http\UploadedFile) {
                             $reportData['image'] = $file->store('reports', 'public');
                         }
