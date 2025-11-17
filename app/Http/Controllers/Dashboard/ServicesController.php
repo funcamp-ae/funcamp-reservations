@@ -281,7 +281,7 @@ class ServicesController extends Controller
                         $report->update($reportData);
 
                         // Handle file upload using index-first indexing (matches input names), fallback to order.
-                        $file = $request->file('reports_images')[$index] ?? $request->file('reports_images')[$order] ?? null;
+                        $file = $request->file('reports_images')[$request->report_orders[$index] - 1] ?? $request->file('reports_images')[$order] ?? null;
                         if ($file instanceof \Illuminate\Http\UploadedFile) {
                             if ($report->image && Storage::disk('public')->exists($report->image)) {
                                 Storage::disk('public')->delete($report->image);
@@ -294,7 +294,7 @@ class ServicesController extends Controller
                         unset($existingReports[$reportId]);
                     } else {
                         // Creating new report
-                        $file = $request->file('reports_images')[$index] ?? $request->file('reports_images')[$order] ?? null;
+                        $file = $request->file('reports_images')[$request->report_orders[$index] - 1] ?? $request->file('reports_images')[$order] ?? null;
                         if ($file instanceof \Illuminate\Http\UploadedFile) {
                             $reportData['image'] = $file->store('reports', 'public');
                         }
