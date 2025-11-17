@@ -182,14 +182,12 @@
 
         function moveItem(id, direction, order, $tr) {
             if (direction === 'up' && $tr.is(':first-child')) {
+                console.log('Cannot move the first row up');
                 return; // No movement possible
             }
             if (direction === 'down' && $tr.is(':last-child')) {
                     console.error('Invalid parameters for moveItem');
                 return;
-            }
-            if ((direction === 'down' && order <= 1) || (direction === 'up' && $tr.is(':last-child'))) {
-                return; // No movement possible
             }
             // Optimistically swap rows in the DOM
             if (direction === 'up') {
