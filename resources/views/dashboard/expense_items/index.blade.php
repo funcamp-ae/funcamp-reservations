@@ -181,7 +181,7 @@
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         function moveItem(id, direction, order, $tr) {
-            if ((direction === 'down' && order <= 1)) {
+            if ((direction === 'down' && order <= 1) || (direction === 'up' && $tr.is(':last-child'))) {
                 return; // No movement possible
             }
             // Optimistically swap rows in the DOM
