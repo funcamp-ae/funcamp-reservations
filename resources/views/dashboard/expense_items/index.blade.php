@@ -184,16 +184,23 @@
             if ((direction === 'down' && order <= 1)) {
                 return; // No movement possible
             }
-            // Optimistically swap rows in the DOM
+
+            // Optimistically swap rows in the DOM and update data-order
             if (direction === 'up') {
                 const $prev = $tr.prev();
                 if ($prev && $prev.length) {
+                    const prevOrder = $prev.find('.move-up, .move-down').data('order');
                     $tr.insertBefore($prev);
+                    $tr.find('.move-up, .move-down').data('order', prevOrder);
+                    $prev.find('.move-up, .move-down').data('order', order);
                 }
             } else {
                 const $next = $tr.next();
                 if ($next && $next.length) {
+                    const nextOrder = $next.find('.move-up, .move-down').data('order');
                     $tr.insertAfter($next);
+                    $tr.find('.move-up, .move-down').data('order', nextOrder);
+                    $next.find('.move-up, .move-down').data('order', order);
                 }
             }
 
@@ -217,11 +224,15 @@
                             const $prev = $tr.next();
                             if ($prev && $prev.length) {
                                 $tr.insertAfter($prev);
+                                $tr.find('.move-up, .move-down').data('order', order);
+                                $prev.find('.move-up, .move-down').data('order', prevOrder);
                             }
                         } else {
                             const $next = $tr.prev();
                             if ($next && $next.length) {
                                 $tr.insertBefore($next);
+                                $tr.find('.move-up, .move-down').data('order', order);
+                                $next.find('.move-up, .move-down').data('order', nextOrder);
                             }
                         }
                     }
@@ -235,11 +246,15 @@
                         const $prev = $tr.next();
                         if ($prev && $prev.length) {
                             $tr.insertAfter($prev);
+                            $tr.find('.move-up, .move-down').data('order', order);
+                            $prev.find('.move-up, .move-down').data('order', prevOrder);
                         }
                     } else {
                         const $next = $tr.prev();
                         if ($next && $next.length) {
                             $tr.insertBefore($next);
+                            $tr.find('.move-up, .move-down').data('order', order);
+                            $next.find('.move-up, .move-down').data('order', nextOrder);
                         }
                     }
                 });
