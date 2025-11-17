@@ -94,9 +94,6 @@
                                         <button class="btn btn-sm btn-light move-up" data-id="{{$item->id}}" title="@lang('dashboard.up')">▲</button>
                                         <button class="btn btn-sm btn-light move-down" data-id="{{$item->id}}" title="@lang('dashboard.down')">▼</button>
                                     </div>
-                                    <div class="mt-1">
-                                        <span class="ordered-count" data-id="{{$item->id}}">{{ $item->ordered_count ?? '' }}</span>
-                                    </div>
                                 </td>
                                 <td>
                                     <div class="d-flex">
@@ -184,23 +181,24 @@
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         function moveItem(id, direction, $tr) {
+            // Optimistically swap rows in the DOM
+            if (direction === 'up') {
+                const $prev = $tr.prev();
+                if ($prev && $prev.length) {
+                    $tr.insertBefore($prev);
+                }
+            } else {
+                const $next = $tr.next();
+                if ($next && $next.length) {
+                    $tr.insertAfter($next);
+                }
+            }
+
+            // Send the request to the server
             axios.post(`{{ url('expense-items') }}/${id}/move`, { direction: direction }, { headers: { 'X-CSRF-TOKEN': token } })
                 .then(function(res){
                     if (res.data.moved) {
-                        // swap rows in DOM
-                        if (direction === 'up') {
-                            const $prev = $tr.prev();
-                            if ($prev && $prev.length) {
-                                $tr.insertBefore($prev);
-                            }
-                        } else {
-                            const $next = $tr.next();
-                            if ($next && $next.length) {
-                                $tr.insertAfter($next);
-                            }
-                        }
-
-                        // update ordered_count displays if provided
+                        // Update ordered_count displays if provided
                         if (res.data.current) {
                             const cur = res.data.current;
                             $(`.ordered-count[data-id='${cur.id}']`).text(cur.ordered_count);
@@ -210,12 +208,37 @@
                             $(`.ordered-count[data-id='${nei.id}']`).text(nei.ordered_count);
                         }
                     } else {
-                        // noop
+                        console.log(res);
+                        // Revert the optimistic swap if the server indicates failure
+                        if (direction === 'up') {
+                            const $prev = $tr.next();
+                            if ($prev && $prev.length) {
+                                $tr.insertAfter($prev);
+                            }
+                        } else {
+                            const $next = $tr.prev();
+                            if ($next && $next.length) {
+                                $tr.insertBefore($next);
+                            }
+                        }
                     }
                 })
                 .catch(function(err){
                     console.error(err);
                     Swal.fire({ icon: 'error', title: '{{ __('dashboard.error') }}', text: err.response?.data?.message || err.message });
+
+                    // Revert the optimistic swap on error
+                    if (direction === 'up') {
+                        const $prev = $tr.next();
+                        if ($prev && $prev.length) {
+                            $tr.insertAfter($prev);
+                        }
+                    } else {
+                        const $next = $tr.prev();
+                        if ($next && $next.length) {
+                            $tr.insertBefore($next);
+                        }
+                    }
                 });
         }
 

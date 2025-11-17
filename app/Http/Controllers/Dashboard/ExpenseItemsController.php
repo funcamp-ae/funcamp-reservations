@@ -15,7 +15,7 @@ class ExpenseItemsController extends Controller
     {
         $this->authorize('viewAny', ExpenseItem::class);
 
-        $expenseItems = ExpenseItem::orderBy('created_at','desc')->get();
+        $expenseItems = ExpenseItem::orderBy('ordered_count','desc')->get();
 
         return view('dashboard.expense_items.index', compact('expenseItems'));
     }
@@ -125,7 +125,7 @@ class ExpenseItemsController extends Controller
 
             $current = $expenseItem ;
 
-            $targetOrder = $data['direction'] === 'up' ? $current->ordered_count - 1 : $current->ordered_count + 1;
+            $targetOrder = $data['direction'] === 'up' ? $current->ordered_count + 1 : $current->ordered_count - 1;
 
             if ($targetOrder < 1) {
                 return response()->json(['message' => 'noop', 'moved' => false], 200);
@@ -133,7 +133,7 @@ class ExpenseItemsController extends Controller
 
             $max = (int) ExpenseItem::max('ordered_count');
             if ($targetOrder > $max) {
-                return response()->json(['message' => 'noop', 'moved' => false], 200);
+                return response()->json(['message' => 'noop2', 'moved' => false , 'm' => $max , 't' => $targetOrder], 200);
             }
 
             $neighbor = ExpenseItem::where('ordered_count', $targetOrder)
