@@ -181,8 +181,11 @@
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         function moveItem(id, direction, order, $tr) {
-            if (direction === 'up' && $tr.is(':last-child')) {
-                console.error('Invalid parameters for moveItem');
+            if (direction === 'up' && $tr.is(':first-child')) {
+                return; // No movement possible
+            }
+            if (direction === 'down' && $tr.is(':last-child')) {
+                    console.error('Invalid parameters for moveItem');
                 return;
             }
             if ((direction === 'down' && order <= 1) || (direction === 'up' && $tr.is(':last-child'))) {
