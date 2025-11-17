@@ -109,7 +109,7 @@ class ExpensesController extends Controller
     {
         $this->authorize('create', Expense::class);
 
-        $expenseItems = ExpenseItem::all();
+        $expenseItems = ExpenseItem::orderBy('ordered_count', 'desc')->get();
         $bankAccounts = BankAccount::all();
 
         // Get recent expenses (last 10 expenses)
