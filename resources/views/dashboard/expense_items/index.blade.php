@@ -91,8 +91,8 @@
                                 </td>
                                 <td class="ordered-col">
                                     <div>
-                                        <button class="btn btn-sm btn-light move-up" data-id="{{$item->id}}" title="@lang('dashboard.up')">▲</button>
-                                        <button class="btn btn-sm btn-light move-down" data-id="{{$item->id}}" title="@lang('dashboard.down')">▼</button>
+                                        <button class="btn btn-sm btn-light move-up" data-id="{{$item->id}}" data-order="{{$item->ordered_count}}" title="@lang('dashboard.up')">▲</button>
+                                        <button class="btn btn-sm btn-light move-down" data-id="{{$item->id}}" data-order="{{$item->ordered_count}}" title="@lang('dashboard.down')">▼</button>
                                     </div>
                                 </td>
                                 <td>
@@ -180,7 +180,10 @@
     (function(){
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-        function moveItem(id, direction, $tr) {
+        function moveItem(id, direction, order, $tr) {
+            if ((direction === 'down' && order <= 1)) {
+                return; // No movement possible
+            }
             // Optimistically swap rows in the DOM
             if (direction === 'up') {
                 const $prev = $tr.prev();
@@ -245,9 +248,10 @@
         $(document).on('click', '.move-up, .move-down', function(e){
             e.preventDefault();
             const id = $(this).data('id');
+            const order = $(this).data('order');
             const dir = $(this).hasClass('move-up') ? 'up' : 'down';
             const $tr = $(this).closest('tr');
-            moveItem(id, dir, $tr);
+            moveItem(id, dir, order, $tr);
         });
     })();
 </script>
