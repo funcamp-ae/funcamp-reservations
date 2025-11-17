@@ -184,23 +184,26 @@
             if ((direction === 'down' && order <= 1)) {
                 return; // No movement possible
             }
-
-            // Optimistically swap rows in the DOM and update data-order
+            // Optimistically swap rows in the DOM
             if (direction === 'up') {
                 const $prev = $tr.prev();
                 if ($prev && $prev.length) {
-                    const prevOrder = $prev.find('.move-up, .move-down').data('order');
                     $tr.insertBefore($prev);
-                    $tr.find('.move-up, .move-down').data('order', prevOrder);
+
+                    // Update data-order attributes
+                    const prevOrder = $prev.find('.move-up').data('order');
                     $prev.find('.move-up, .move-down').data('order', order);
+                    $tr.find('.move-up, .move-down').data('order', prevOrder);
                 }
             } else {
                 const $next = $tr.next();
                 if ($next && $next.length) {
-                    const nextOrder = $next.find('.move-up, .move-down').data('order');
                     $tr.insertAfter($next);
-                    $tr.find('.move-up, .move-down').data('order', nextOrder);
+
+                    // Update data-order attributes
+                    const nextOrder = $next.find('.move-up').data('order');
                     $next.find('.move-up, .move-down').data('order', order);
+                    $tr.find('.move-up, .move-down').data('order', nextOrder);
                 }
             }
 
@@ -224,15 +227,21 @@
                             const $prev = $tr.next();
                             if ($prev && $prev.length) {
                                 $tr.insertAfter($prev);
-                                $tr.find('.move-up, .move-down').data('order', order);
-                                $prev.find('.move-up, .move-down').data('order', prevOrder);
+
+                                // Revert data-order attributes
+                                const prevOrder = $prev.find('.move-up').data('order');
+                                $prev.find('.move-up, .move-down').data('order', order);
+                                $tr.find('.move-up, .move-down').data('order', prevOrder);
                             }
                         } else {
                             const $next = $tr.prev();
                             if ($next && $next.length) {
                                 $tr.insertBefore($next);
-                                $tr.find('.move-up, .move-down').data('order', order);
-                                $next.find('.move-up, .move-down').data('order', nextOrder);
+
+                                // Revert data-order attributes
+                                const nextOrder = $next.find('.move-up').data('order');
+                                $next.find('.move-up, .move-down').data('order', order);
+                                $tr.find('.move-up, .move-down').data('order', nextOrder);
                             }
                         }
                     }
@@ -246,15 +255,11 @@
                         const $prev = $tr.next();
                         if ($prev && $prev.length) {
                             $tr.insertAfter($prev);
-                            $tr.find('.move-up, .move-down').data('order', order);
-                            $prev.find('.move-up, .move-down').data('order', prevOrder);
                         }
                     } else {
                         const $next = $tr.prev();
                         if ($next && $next.length) {
                             $tr.insertBefore($next);
-                            $tr.find('.move-up, .move-down').data('order', order);
-                            $next.find('.move-up, .move-down').data('order', nextOrder);
                         }
                     }
                 });
