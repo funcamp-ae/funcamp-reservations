@@ -109,7 +109,7 @@ class PaymentSummaryService
         return Transaction::whereIn('source', ['reservation_expenses', 'general_expenses'])
             ->with([
                 'expense',
-                'account' 
+                'account',
             ])
             ->latest()
             ->take($limit)

@@ -449,7 +449,7 @@
                                                     <!-- @php
                                                         $statement = "dashboard.".$expense->expense?->statement != __('dashboard.'.$expense->expense?->statement) ? __('dashboard.'.$expense->expense?->statement) : $expense->expense?->statement;
                                                     @endphp -->
-                                                    <span class="text-muted d-block">{{ $expense->expenseItem?->name}}</span>
+                                                    <span class="text-muted d-block">{{ $expense->expense->expenseItem?->name }}</span>
                                                 </td>
                                                 <td>
                                                     <span class="badge badge-light-primary">
