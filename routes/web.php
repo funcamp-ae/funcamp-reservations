@@ -1356,6 +1356,13 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
         'title' => ['actions.delete', 'dashboard.expense-items']
     ]);
 
+    // Move (reorder) expense item up/down
+    Route::post('expense-items/{expenseItem}/move', [
+        'uses' => 'ExpenseItemsController@move',
+        'as' => 'expense-items.move',
+        'title' => ['actions.move', 'dashboard.expense-items']
+    ]);
+
     /*------------ end Of expense-items ----------*/
     /*------------ start Of expenses ----------*/
     Route::get('expenses', [

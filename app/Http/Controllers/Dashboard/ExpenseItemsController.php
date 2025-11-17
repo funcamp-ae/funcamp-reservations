@@ -111,4 +111,78 @@ class ExpenseItemsController extends Controller
         $expenseItem->delete();
        return response()->json();
     }
+
+    public function move(Request $request, ExpenseItem $expenseItem)
+    {
+        // $this->authorize('update', $expenseItem);
+
+        $data = $request->validate([
+            'direction' => 'required|in:up,down',
+        ]);
+
+        return \DB::transaction(function () use ($expenseItem, $data) {
+            $this->normalizeOrderedCounts();
+
+            $current = $expenseItem ;
+
+            $targetOrder = $data['direction'] === 'up' ? $current->ordered_count - 1 : $current->ordered_count + 1;
+
+            if ($targetOrder < 1) {
+                return response()->json(['message' => 'noop', 'moved' => false], 200);
+            }
+
+            $max = (int) ExpenseItem::max('ordered_count');
+            if ($targetOrder > $max) {
+                return response()->json(['message' => 'noop', 'moved' => false], 200);
+            }
+
+            $neighbor = ExpenseItem::where('ordered_count', $targetOrder)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$neighbor) {
+                $this->normalizeOrderedCounts();
+                $neighbor = ExpenseItem::where('ordered_count', $targetOrder)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$neighbor) {
+                    return response()->json(['message' => 'noop', 'moved' => false], 200);
+                }
+            }
+
+            // Swap ordered_count values
+            $temp = $current->ordered_count;
+            $current->ordered_count = $neighbor->ordered_count;
+            $neighbor->ordered_count = $temp;
+
+            $current->save();
+            $neighbor->save();
+
+            return response()->json([
+                'message' => 'ok',
+                'moved'   => true,
+                'current' => ['id' => $current->id, 'ordered_count' => $current->ordered_count],
+                'neighbor'=> ['id' => $neighbor->id, 'ordered_count' => $neighbor->ordered_count],
+            ], 200);
+        });
+    }
+
+    private function normalizeOrderedCounts(): void
+    {
+        $rows = ExpenseItem::orderByRaw('CASE WHEN ordered_count IS NULL THEN 0 ELSE 1 END ASC')
+            ->orderBy('ordered_count')
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get();
+
+        $i = 1;
+        foreach ($rows as $r) {
+            if ((int)$r->ordered_count !== $i) {
+                $r->ordered_count = $i;
+                $r->save();
+            }
+            $i++;
+        }
+    }
 }

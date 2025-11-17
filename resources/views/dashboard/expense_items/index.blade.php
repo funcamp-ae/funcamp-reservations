@@ -66,9 +66,11 @@
                                     <input class="form-check-input" id="checkedAll"  type="checkbox" data-kt-check="true" data-kt-check-target="#kt_ecommerce_category_table .form-check-input" value="1" />
                                 </div>
                             </th>
+                            <th class="fw-bolder">#</th>
                             <th class="fw-bolder">@lang('dashboard.name')</th>
                             <th class="fw-bolder">@lang('dashboard.number_of_times')</th>
                             <th class="fw-bolder">@lang('dashboard.notes')</th>
+                            
                             <th class="fw-bolder">@lang('dashboard.created_date')</th>
                             <th class="fw-bolder">@lang('dashboard.created_time')</th>
                             <th class="text-end min-w-70px fw-bolder">@lang('dashboard.actions')</th>
@@ -85,6 +87,15 @@
                                 <td>
                                     <div class="form-check form-check-sm form-check-custom form-check-solid">
                                         <input class="form-check-input checkSingle" type="checkbox" value="1" id="{{$item->id}}"/>
+                                    </div>
+                                </td>
+                                <td class="ordered-col">
+                                    <div>
+                                        <button class="btn btn-sm btn-light move-up" data-id="{{$item->id}}" title="@lang('dashboard.up')">▲</button>
+                                        <button class="btn btn-sm btn-light move-down" data-id="{{$item->id}}" title="@lang('dashboard.down')">▼</button>
+                                    </div>
+                                    <div class="mt-1">
+                                        <span class="ordered-count" data-id="{{$item->id}}">{{ $item->ordered_count ?? '' }}</span>
                                     </div>
                                 </td>
                                 <td>
@@ -165,4 +176,56 @@
     border: 1px solid #000;
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+    (function(){
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        function moveItem(id, direction, $tr) {
+            axios.post(`{{ url('expense-items') }}/${id}/move`, { direction: direction }, { headers: { 'X-CSRF-TOKEN': token } })
+                .then(function(res){
+                    if (res.data.moved) {
+                        // swap rows in DOM
+                        if (direction === 'up') {
+                            const $prev = $tr.prev();
+                            if ($prev && $prev.length) {
+                                $tr.insertBefore($prev);
+                            }
+                        } else {
+                            const $next = $tr.next();
+                            if ($next && $next.length) {
+                                $tr.insertAfter($next);
+                            }
+                        }
+
+                        // update ordered_count displays if provided
+                        if (res.data.current) {
+                            const cur = res.data.current;
+                            $(`.ordered-count[data-id='${cur.id}']`).text(cur.ordered_count);
+                        }
+                        if (res.data.neighbor) {
+                            const nei = res.data.neighbor;
+                            $(`.ordered-count[data-id='${nei.id}']`).text(nei.ordered_count);
+                        }
+                    } else {
+                        // noop
+                    }
+                })
+                .catch(function(err){
+                    console.error(err);
+                    Swal.fire({ icon: 'error', title: '{{ __('dashboard.error') }}', text: err.response?.data?.message || err.message });
+                });
+        }
+
+        $(document).on('click', '.move-up, .move-down', function(e){
+            e.preventDefault();
+            const id = $(this).data('id');
+            const dir = $(this).hasClass('move-up') ? 'up' : 'down';
+            const $tr = $(this).closest('tr');
+            moveItem(id, dir, $tr);
+        });
+    })();
+</script>
 @endpush
