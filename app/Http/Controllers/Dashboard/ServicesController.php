@@ -219,62 +219,38 @@ class ServicesController extends Controller
                 return $carry;
             }, []);
 
-       \Log::info('Update request received', ['request' => $request->all()]);
-        \Log::info('Validated data', ['validated' => $validated]);
-        \Log::info('Requested counts', ['requestedCounts' => $requestedCounts]);
-
-        try {
-            \Log::info('Starting transaction for service update', ['serviceId' => $serviceId]);
+       try {
             \DB::beginTransaction();
-            \Log::info('Fetching existing pivot data');
             $existingPivot = $service->stocks()
                 ->get()
                 ->mapWithKeys(fn ($s) => [(int)$s->id => (int)$s->pivot->count]);
-            \Log::info('Existing pivot data', ['existingPivot' => $existingPivot]);
-
             $existingPivotKeys = $existingPivot->keys()->all();
 
-            \Log::info('Calculating lock IDs');
             $lockIds = array_values(array_unique(array_merge(
                 array_keys($requestedCounts),
                 $existingPivotKeys
             )));
-            \Log::info('Lock IDs', ['lockIds' => $lockIds]);
-
-            \Log::info('Fetching stock models');
             $stockModels = Stock::whereIn('id', $lockIds)->lockForUpdate()->get()->keyBy('id');
-            \Log::info('Stock models fetched', ['stockModels' => $stockModels]);
 
             foreach ($requestedCounts as $stockId => $newCount) {
-                \Log::info('Processing stock', ['stockId' => $stockId, 'newCount' => $newCount]);
                 $stock = $stockModels[$stockId] ?? null;
                 if (!$stock) {
-                    \Log::error('Stock not found', ['stockId' => $stockId]);
                     throw new \RuntimeException("Stock #{$stockId} not found.");
                 }
                 $old   = $existingPivot[$stockId] ?? 0;
                 $delta = $newCount - $old;
-                \Log::info('Stock delta calculated', ['stockId' => $stockId, 'delta' => $delta]);
                 if ($delta > 0 && (int)$stock->quantity < $delta) {
-                    \Log::error('Insufficient stock quantity', ['stockId' => $stockId, 'delta' => $delta, 'available' => $stock->quantity]);
                     throw ValidationException::withMessages([
                         'stocks' => ["Insufficient quantity for '{$stock->name}'. Need {$delta}, available {$stock->quantity}."],
                     ]);
                 }
             }
 
-            \Log::info('Preparing sync payload');
             $syncPayload = [];
             foreach ($requestedCounts as $stockId => $count) {
                 $syncPayload[$stockId] = ['count' => $count];
             }
-            \Log::info('Sync payload prepared', ['syncPayload' => $syncPayload]);
-
-            \Log::info('Syncing stocks');
             $service->stocks()->sync($syncPayload);
-            \Log::info('Stocks synced successfully');
-
-            \Log::info('Updating service details');
             $service->update([
                 'name'        => $validated['name'],
                 'description' => $validated['description'] ?? null,
@@ -284,16 +260,12 @@ class ServicesController extends Controller
                 'hour_from'   => $validated['hour_from'],
                 'hour_to'     => $validated['hour_to'],
             ]);
-            \Log::info('Service details updated successfully');
 
             if ($request->filled('reports') && $request->filled('reports_counts')) {
-                \Log::info('Processing reports');
                 $existingReports = $service->reports()->pluck('id', 'id')->toArray();
-                \Log::info('Existing reports fetched', ['existingReports' => $existingReports]);
                 $updatedReports  = [];
 
                 foreach ($request->reports as $index => $reportName) {
-                    \Log::info('Processing report', ['index' => $index, 'reportName' => $reportName]);
                     $count    = (int) ($request->reports_counts[$index] ?? 0);
                     $reportId = $request->report_ids[$index] ?? null;
                     $order    = $request->report_orders[$index];
@@ -305,27 +277,24 @@ class ServicesController extends Controller
                     ];
 
                     if ($reportId && isset($existingReports[$reportId])) {
-                        \Log::info('Updating existing report', ['reportId' => $reportId]);
                         $report = ServiceReport::findOrFail($reportId);
                         $report->update($reportData);
 
-                        $file = $request->file('reports_images')[$request->report_orders[$index] - 1] ?? $request->file('reports_images')[$order] ?? null;
-                            \Log::info('Report image file', ['file' => $file]);
+                        // Handle file upload using index-first indexing (matches input names), fallback to order.
+                        $file = $request->file('reports_images')[$index] ?? $request->file('reports_images')[$order] ?? null;
                         if ($file instanceof \Illuminate\Http\UploadedFile) {
-                            \Log::info('Uploading new report image', ['reportId' => $reportId]);
                             if ($report->image && Storage::disk('public')->exists($report->image)) {
                                 Storage::disk('public')->delete($report->image);
                             }
                             $path = $file->store('reports', 'public');
                             $report->update(['image' => $path]);
-                            \Log::info('Report image updated', ['reportId' => $reportId, 'path' => $path]);
                         }
 
                         $updatedReports[] = $reportId;
                         unset($existingReports[$reportId]);
                     } else {
-                        \Log::info('Creating new report', ['reportName' => $reportName]);
-                        $file = $request->file('reports_images')[$request->report_orders[$index] - 1] ?? $request->file('reports_images')[$order] ?? null;
+                        // Creating new report
+                        $file = $request->file('reports_images')[$index] ?? $request->file('reports_images')[$order] ?? null;
                         if ($file instanceof \Illuminate\Http\UploadedFile) {
                             $reportData['image'] = $file->store('reports', 'public');
                         }
@@ -335,20 +304,17 @@ class ServicesController extends Controller
                 }
 
                 if (!empty($existingReports)) {
-                    \Log::info('Deleting unused reports', ['reportIds' => array_keys($existingReports)]);
                     ServiceReport::whereIn('id', array_keys($existingReports))->delete();
                 }
             } else {
-                \Log::info('Deleting all reports for service', ['serviceId' => $service->id]);
                 $service->reports()->delete();
             }
 
             \DB::commit();
-            \Log::info('Service update transaction committed successfully');
             return response()->json();
         } catch (\Throwable $e) {
             \DB::rollBack();
-            \Log::error('Service update failed', ['error' => $e->getMessage()]);
+            \Log::error('Service update failed: '.$e->getMessage());
             return response()->json([
                 'errors' => ['server' => $e->getMessage()],
             ], 500);
