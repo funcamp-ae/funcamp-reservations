@@ -446,10 +446,10 @@
                                                 <td>
                                                     <span class="fw-bold">{{ __("dashboard.".$expense->source ?? '') }}</span>
                                                     <!-- check if translation available -->
-                                                    @php
+                                                    <!-- @php
                                                         $statement = "dashboard.".$expense->expense?->statement != __('dashboard.'.$expense->expense?->statement) ? __('dashboard.'.$expense->expense?->statement) : $expense->expense?->statement;
-                                                    @endphp
-                                                    <span class="text-muted d-block">{{ $statement  }}</span>
+                                                    @endphp -->
+                                                    <span class="text-muted d-block">{{ $expense->expenseItem->name}}</span>
                                                 </td>
                                                 <td>
                                                     <span class="badge badge-light-primary">
