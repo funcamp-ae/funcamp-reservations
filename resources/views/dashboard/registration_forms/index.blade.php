@@ -84,7 +84,7 @@
                                                 __('dashboard.service') => $rf->service->name ?? '-',
                                                 __('dashboard.booking_date') => $rf->booking_date->format('Y-m-d') ?? '-',
                                                 __('dashboard.time_slot') => $slotLabel,
-                                                __('dashboard.day') => $rf->booking_date->format('l') ?? '-',
+                                                __('dashboard.day') => $rf->booking_date->translatedFormat('l') ?? '-',
                                                 __('dashboard.persons') => (int) ($rf->persons ?? 0),
                                                 __('dashboard.notes') => $rf->notes ?? '—',
                                                 __('dashboard.mobile_phone') => $rf->mobile_phone ?? '—',
