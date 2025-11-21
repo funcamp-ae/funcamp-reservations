@@ -131,14 +131,11 @@ class OrderController extends Controller
         $services = Service::latest()->select('id', 'name', 'price')->get();
 
         $internalNotes = InternalNote::orderBy('created_at', 'desc')->get();
-        $rawTypes = WhatsappMessageType::all()->pluck('key')->toArray() ;  
-
         return view('dashboard.orders.create', [
             'customers' => $customers,
             'services' => $services,
             'internalNotes' => $internalNotes,
             'scheduledDate' => $scheduledDate,
-            'rawTypes' => $rawTypes,
         ]);
     }
 
@@ -367,7 +364,6 @@ class OrderController extends Controller
 
         // Pass the notes to the order object so they'll be displayed in the form
         $order->notes = $notes;
-        $rawTypes = WhatsappMessageType::all()->pluck('key')->toArray() ;  
         return view('dashboard.orders.create', [
             'order' => $order,
             'customers' => $customers,
@@ -376,8 +372,6 @@ class OrderController extends Controller
             'additionalNotesData' => $additionalNotesData,
             'internalNotes' => $internalNotes,
             'selectedInternalNote' => isset($selectedInternalNote) ? $selectedInternalNote : [],
-            'rawTypes' => $rawTypes,
-
         ]);
     }
 

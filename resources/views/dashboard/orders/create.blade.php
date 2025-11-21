@@ -385,7 +385,7 @@
                             <div class="checkbox-list">
                                 @foreach(\App\Models\WhatsappMessageTemplate::getTypes() as $key => $type)
                                 <label class="checkbox">
-                                    <input type="checkbox" name="documents[]" value="{{ isset($rawTypes[$key]) ? $rawTypes[$key] : '' }}">
+                                    <input type="checkbox" name="documents[]" value="{{ isset($key) ? $key : '' }}">
                                         {{ $type }}
                                 </label>
                                 @endforeach
