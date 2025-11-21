@@ -92,6 +92,8 @@ class BankAccountsController extends Controller
         $startDate = request('start_date');
         $endDate = request('end_date');
 
+        $perPage = 10; // Set your desired items per page
+
         $transactions = Transaction::where(function ($query) use ($bank) {
                 $query->where('account_id', $bank->id)
                       ->orWhere('receiver_id', $bank->id)
@@ -103,26 +105,14 @@ class BankAccountsController extends Controller
                     ->where('verified', "1")
                     ->where("amount" , ">" , 0)
                     ->orderBy('created_at', 'desc')
-                    ->get();
+                    ->paginate(100);
 
-        // Sort the merged collection by created_at
-        // $merged = $merged->sortByDesc('created_at');
-
-        // Manually paginate the merged collection
-        $currentPage = Paginator::resolveCurrentPage();
-        $perPage = 10; // Set your desired items per page
-        $currentResults = $transactions->slice(($currentPage - 1) * $perPage, $perPage)->all();
-        $paginatedResults = new LengthAwarePaginator($currentResults, $transactions->count(), $perPage, $currentPage, [
-            'path' => Paginator::resolveCurrentPath(),
-            'pageName' => 'page',
-        ]);
-
-        // Append query parameters to pagination links
-        $paginatedResults->appends(request()->all());
+        // Preserve query parameters on pagination links
+        $transactions->appends(request()->all());
 
         return view('dashboard.banks.show',[
             'bank' => $bank,
-            'transactions' => $paginatedResults
+            'transactions' => $transactions
         ]);
     }
 

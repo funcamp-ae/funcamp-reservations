@@ -131,7 +131,6 @@
                     <!--end::Table body-->
                 </table>
                 <!--end::Table-->
-                <div class="mt-4">{{$expenses->onEachSide(1)->links('pagination::bootstrap-5')}}</div>
             </div>
 
 <!-- Image Preview Modal -->

@@ -86,7 +86,7 @@ class ExpensesController extends Controller
                 ->orWhereNull('verified')
         )
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(100);
 
         // جلب جميع بنود المصاريف للفلتر
         $expenseItems = ExpenseItem::orderBy('created_at','desc')->get();
@@ -118,8 +118,7 @@ class ExpensesController extends Controller
                 $q->where('source', 'general_expenses');
             })
             ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
+            ->paginate(100);
 
         return view('dashboard.expenses.create', compact('expenseItems', 'bankAccounts', 'recentExpenses'));
     }
@@ -224,8 +223,7 @@ class ExpensesController extends Controller
                 $q->where('source', 'general_expenses');
             })
             ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
+            ->paginate(100);
 
         return view('dashboard.expenses.create', compact('expenseItems', 'expense', 'bankAccounts', 'recentExpenses'));
     }
