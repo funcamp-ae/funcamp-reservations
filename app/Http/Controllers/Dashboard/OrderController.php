@@ -108,7 +108,7 @@ class OrderController extends Controller
             }], 'price')
             ->paginate(100);
             $rawTypes = WhatsappMessageType::all()->pluck('key')->toArray() ;  
-        return view('dashboard.orders.index', compact('orders'));
+        return view('dashboard.orders.index', compact('orders' , 'rawTypes'));
     }
 
     public function updateInsuranceStatusAndPrice($order, $price, $originalInsuranceAmount, $insuranceStatus, $confiscationDescription, $insuranceAmount)
