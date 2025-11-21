@@ -355,6 +355,7 @@ class OrderController extends Controller
 
         // If we have an internal note, use its content, otherwise use the order notes
         $notes = $order->notes;
+        
         $additionalNotesData = [
             'notes' => $order->additional_notes,
             'show_price' => $order->show_price,
@@ -366,7 +367,7 @@ class OrderController extends Controller
 
         // Pass the notes to the order object so they'll be displayed in the form
         $order->notes = $notes;
-
+        $rawTypes = WhatsappMessageType::all()->pluck('key')->toArray() ;  
         return view('dashboard.orders.create', [
             'order' => $order,
             'customers' => $customers,
@@ -374,7 +375,9 @@ class OrderController extends Controller
             'addonsPrice' => $addonsPrice,
             'additionalNotesData' => $additionalNotesData,
             'internalNotes' => $internalNotes,
-            'selectedInternalNote' => isset($selectedInternalNote) ? $selectedInternalNote : []
+            'selectedInternalNote' => isset($selectedInternalNote) ? $selectedInternalNote : [],
+            'rawTypes' => $rawTypes,
+
         ]);
     }
 
