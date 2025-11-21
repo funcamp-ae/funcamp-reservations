@@ -1309,7 +1309,14 @@ $request->validate($rules);
         $order = Order::with(['customer', 'addons', 'payments', 'items.stock'])->findOrFail($id);
         $documentsToSend = [];
         $serviceSiteData = ServiceSiteAndCustomerService::getLatestForWhatsApp();
-        // Generate main documents
+
+        // if (empty($documentsToSend)) {
+        //     return response()->json(['success' => false, 'message' => 'Please select at least one document to send'], 400);
+        // }
+
+        try {
+            foreach ($validated['documents'] as $document) {
+                        // Generate main documents
         if ($request->has('documents')) {
             foreach ($request->documents as $document) {
                 $tempPath = $this->generateTempPdf($order, $document);
@@ -1355,13 +1362,6 @@ $request->validate($rules);
                 }
             }
         }
-
-        // if (empty($documentsToSend)) {
-        //     return response()->json(['success' => false, 'message' => 'Please select at least one document to send'], 400);
-        // }
-
-        try {
-            foreach ($validated['documents'] as $document) {
                 $content = WhatsappMessageTemplate::where('type', $document)->first()->getBilingualMessage($serviceSiteData, $order , "mail");
                 Mail::to($order->customer->email)
                     ->send(new OrderDocumentsMail($order, $documentsToSend , "Funcamp",$content));
