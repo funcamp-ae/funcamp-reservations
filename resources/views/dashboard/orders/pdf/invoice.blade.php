@@ -354,7 +354,7 @@
                         <th>@lang('dashboard.deposit') / {{ trans_get('dashboard.deposit', [], 'opposite_locale') }}</th>
                     @endif
                     @if(!empty($order->insurance_amount))
-                        <th>@lang('dashboard.insurance') (@lang('dashboard.retrieved')) / {{ trans_get('dashboard.insurance', [], 'opposite_locale') }} ({{ trans_get('dashboard.retrieved', [], 'opposite_locale') }})</th>
+                        <th>@lang('dashboard.insurance') (@lang('dashboard.retrieved')) / ({{ trans_get('dashboard.insurance', [], 'opposite_locale') }} ({{ trans_get('dashboard.retrieved', [], 'opposite_locale') }}</th>
                     @endif
                 </tr>
                 </thead>
