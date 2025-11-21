@@ -1307,72 +1307,85 @@ $request->validate($rules);
         ]);
 
         $order = Order::with(['customer', 'addons', 'payments', 'items.stock'])->findOrFail($id);
-        $documentsToSend = [];
         $serviceSiteData = ServiceSiteAndCustomerService::getLatestForWhatsApp();
 
-        // if (empty($documentsToSend)) {
-        //     return response()->json(['success' => false, 'message' => 'Please select at least one document to send'], 400);
-        // }
-
         try {
-            foreach ($validated['documents'] as $document) {
-                        // Generate main documents
-        if ($request->has('documents')) {
-            foreach ($request->documents as $document) {
-                $tempPath = $this->generateTempPdf($order, $document);
-                if ($tempPath) {
-                    $documentsToSend[] = $document;
-                }
-            }
-        }
+            // Send each selected main document as a separate email
+            if (!empty($validated['documents'])) {
+                foreach ($validated['documents'] as $document) {
+                    // generate single PDF for this document
+                    $tempPath = $this->generateTempPdf($order, $document);
 
-        // Generate receipt documents
-        if ($request->has('receipts')) {
-            foreach ($request->receipts as $type => $ids) {
-                foreach ($ids as $itemId) {
-                    switch ($type) {
-                        case 'addon':
-                            $addon = $order->addons->where('pivot.id', $itemId)->first();
-                            if ($addon) {
-                                $tempPath = $this->generateAddonReceiptPdf($order->id, $itemId);
-                                if ($tempPath) {
-                                    $documentsToSend[] = "addon_receipt_{$itemId}";
-                                }
-                            }
-                            break;
-                        case 'payment':
-                            $payment = $order->payments->find($itemId);
-                            if ($payment) {
-                                $tempPath = $this->generatePaymentReceiptPdf($order->id, $itemId);
-                                if ($tempPath) {
-                                    $documentsToSend[] = "payment_receipt_{$itemId}";
-                                }
-                            }
-                            break;
-                        case 'warehouse':
-                            $item = $order->items->find($itemId);
-                            if ($item) {
-                                $tempPath = $this->generateWarehouseReceiptPdf($order->id, $itemId);
-                                if ($tempPath) {
-                                    $documentsToSend[] = "warehouse_receipt_{$itemId}";
-                                }
-                            }
-                            break;
+                    // Build email content using the matching template (if exists)
+                    $template = WhatsappMessageTemplate::where('type', $document)->first();
+                    $content = $template ? $template->getBilingualMessage($serviceSiteData, $order, 'mail') : '';
+
+                    // Send email only if pdf exists (or still send with empty attachments depending on requirements)
+                    if ($tempPath && file_exists($tempPath)) {
+                        Mail::to($order->customer->email)
+                            ->send(new OrderDocumentsMail($order, [$document], "Funcamp", $content));
+
+                        // Remove the generated temp file immediately
+                        try { if (file_exists($tempPath)) unlink($tempPath); } catch (\Throwable $ignore) {}
+                    } else {
+                        // If PDF generation failed, still attempt to send the email with the template content
+                        Mail::to($order->customer->email)
+                            ->send(new OrderDocumentsMail($order, [], "Funcamp", $content));
                     }
                 }
             }
-        }
-                $content = WhatsappMessageTemplate::where('type', $document)->first()->getBilingualMessage($serviceSiteData, $order , "mail");
-                Mail::to($order->customer->email)
-                    ->send(new OrderDocumentsMail($order, $documentsToSend , "Funcamp",$content));
-            }
 
-            // Clean up temporary files
-            $this->cleanupTempFiles($order->id, $documentsToSend);
+            // Process receipts: send each receipt as a separate email using 'receipt' template
+            if ($request->has('receipts')) {
+                $receiptTemplate = WhatsappMessageTemplate::getByType('receipt');
+                $receiptContent = $receiptTemplate ? $receiptTemplate->getBilingualMessage($serviceSiteData, $order, 'mail') : '';
+
+                foreach ($request->receipts as $type => $ids) {
+                    foreach ($ids as $itemId) {
+                        $tempPath = null;
+                        $docKey = null;
+                        switch ($type) {
+                            case 'addon':
+                                $addon = $order->addons->where('pivot.id', $itemId)->first();
+                                if ($addon) {
+                                    $tempPath = $this->generateAddonReceiptPdf($order->id, $itemId);
+                                    $docKey = "addon_receipt_{$itemId}";
+                                }
+                                break;
+                            case 'payment':
+                                $payment = $order->payments->find($itemId);
+                                if ($payment) {
+                                    $tempPath = $this->generatePaymentReceiptPdf($order->id, $itemId);
+                                    $docKey = "payment_receipt_{$itemId}";
+                                }
+                                break;
+                            case 'warehouse':
+                                $item = $order->items->find($itemId);
+                                if ($item) {
+                                    $tempPath = $this->generateWarehouseReceiptPdf($order->id, $itemId);
+                                    $docKey = "warehouse_receipt_{$itemId}";
+                                }
+                                break;
+                        }
+
+                        if ($docKey) {
+                            if ($tempPath && file_exists($tempPath)) {
+                                Mail::to($order->customer->email)
+                                    ->send(new OrderDocumentsMail($order, [$docKey], "Funcamp", $receiptContent));
+
+                                try { if (file_exists($tempPath)) unlink($tempPath); } catch (\Throwable $ignore) {}
+                            } else {
+                                // send without attachment but with receipt content
+                                Mail::to($order->customer->email)
+                                    ->send(new OrderDocumentsMail($order, [], "Funcamp", $receiptContent));
+                            }
+                        }
+                    }
+                }
+            }
 
             return response()->json(['success' => true, 'message' => 'تم إرسال البريد الإلكتروني بنجاح']);
         } catch (\Exception $e) {
-            $this->cleanupTempFiles($order->id, $documentsToSend);
             return response()->json(['success' => false, 'message' => 'فشل في إرسال البريد الإلكتروني: ' . $e->getMessage()], 500);
         }
     }
