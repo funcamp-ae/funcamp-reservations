@@ -22,7 +22,7 @@
                         </button>
 
                         @include('dashboard.layouts.popUpSearch.orderSearchPopup')
-
+                        
                     </div>
                     <!--end::Search-->
                     @can('bookings.scan-qr')
@@ -40,10 +40,17 @@
                 <!--begin::Card toolbar-->
                 <div class="card-toolbar">
                     <!-- Search Input -->
-                    <div class="d-flex align-items-center position-relative me-5">
+                    <div class="d-flex align-items-center position-relative me-3">
                         <i class="fas fa-search position-absolute ms-4"></i>
                         <input type="text" id="orderSearchInput" class="form-control form-control-solid w-250px ps-12" 
                             placeholder="@lang('dashboard.search_orders_placeholder')">
+                    </div>
+
+                    <!-- Date filter (date-only) -->
+                    <div class="d-flex align-items-center position-relative me-5">
+                        <i class="fas fa-calendar position-absolute ms-4"></i>
+                        <input type="date" id="orderDateFilter" class="form-control form-control-solid w-200px ps-12" 
+                            placeholder="@lang('dashboard.filter_by_date')">
                     </div>
                     
                     <!--begin::Add customer-->
@@ -103,7 +110,7 @@
                         <tbody class="fw-bold ">
                             @foreach ($orders as $order)
                             <!--begin::Table row-->
-                            <tr data-id="{{$order->id}}" data-phone="{{ $order->customer->phone ?? '' }}" data-email="{{ $order->customer->email ?? '' }}">
+                            <tr data-date="{{ $order->date }}" data-id="{{$order->id}}" data-phone="{{ $order->customer->phone ?? '' }}" data-email="{{ $order->customer->email ?? '' }}">
                                 <td>{{ $orders->firstItem() + $loop->index }}</td>
                                 <td>
                                     @can('bookings.edit')
@@ -410,6 +417,28 @@
                // $(this).replaceWith($(this).text());
             //});
       //  }
+    });
+</script>
+
+<script>
+    // Date filter: show only rows with matching data-date attribute (expects YYYY-MM-DD)
+    $(document).on('change', '#orderDateFilter', function() {
+        var selected = $(this).val(); // format YYYY-MM-DD
+        if (!selected) {
+            // no date selected, show all rows
+            $('tbody tr').show();
+            return;
+        }
+
+        $('tbody tr').each(function() {
+            var $row = $(this);
+            var rowDate = $row.data('date') ? String($row.data('date')) : '';
+            if (rowDate === selected) {
+                $row.show();
+            } else {
+                $row.hide();
+            }
+        });
     });
 </script>
 
