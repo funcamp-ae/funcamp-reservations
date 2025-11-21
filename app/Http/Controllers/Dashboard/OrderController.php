@@ -50,7 +50,7 @@ use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use App\Http\Requests\UpdateOrderSignInRequest;
 use Illuminate\Validation\Rule;
-
+use App\Models\WhatsappMessageType ;
 
 class OrderController extends Controller
 {
@@ -107,8 +107,7 @@ class OrderController extends Controller
                 $q->verified();
             }], 'price')
             ->paginate(100);
-            $rawTypes = WhatsappMessageType::all()->pluck('key')->toArray() ;  
-        return view('dashboard.orders.index', compact('orders' , 'rawTypes'));
+        return view('dashboard.orders.index', compact('orders'));
     }
 
     public function updateInsuranceStatusAndPrice($order, $price, $originalInsuranceAmount, $insuranceStatus, $confiscationDescription, $insuranceAmount)
@@ -132,12 +131,14 @@ class OrderController extends Controller
         $services = Service::latest()->select('id', 'name', 'price')->get();
 
         $internalNotes = InternalNote::orderBy('created_at', 'desc')->get();
+        $rawTypes = WhatsappMessageType::all()->pluck('key')->toArray() ;  
 
         return view('dashboard.orders.create', [
             'customers' => $customers,
             'services' => $services,
             'internalNotes' => $internalNotes,
             'scheduledDate' => $scheduledDate,
+            'rawTypes' => $rawTypes,
         ]);
     }
 
