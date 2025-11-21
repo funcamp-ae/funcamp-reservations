@@ -269,6 +269,7 @@ return [
     'insurance' => 'التأمين',
     'insurance_status' => 'حالة التأمين',
     'returned' => 'رد التأمين',
+    'retrieved' => 'مسترجع',
     'insurance_returned_note' => 'تم رد التأمين',
     'yes' => 'نعم',
     'no' => 'لا',

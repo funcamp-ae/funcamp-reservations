@@ -253,6 +253,7 @@ return [
     'insurance' => 'بیمه',
     'insurance_status' => 'د بیمې حالت',
     'returned' => 'بیرته ورکړل شوی',
+    'retrieved' => 'اخیستل شوی',
     'insurance_returned_note' => 'بیمه بیرته ورکړل شوه',
     'yes' => 'هو',
     'no' => 'نه',

@@ -191,6 +191,7 @@ return [
     'insurance' => 'Insurance',
     'insurance_status' => 'Insurance Status',
     'returned' => 'Insurance Returned',
+    'retrieved' => 'Retrieved',
     'yes' => 'Yes',
     'no' => 'No',
     'showall' => 'Show All',
