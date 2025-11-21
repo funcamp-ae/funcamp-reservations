@@ -383,15 +383,9 @@
                         <div class="row mb-8">
                             <label class="col-form-label fw-bold fs-6">@lang('dashboard.select_documents_to_send')</label>
                             <div class="checkbox-list">
-                                @php 
-                                $rawTypes = null;
-                                @endphp
-                                @foreach(\App\Models\WhatsappMessageTemplate::getRawTypes() as $type)
-                                      $rawTypes[] = $type ;
-                                @endforeach
                                 @foreach(\App\Models\WhatsappMessageTemplate::getTypes() as $key => $type)
                                 <label class="checkbox">
-                                    <input type="checkbox" name="documents[]" value="{{ $rawTypes[$key] }}">
+                                    <input type="checkbox" name="documents[]" value="{{ isset($rawTypes[$key]) ? $rawTypes[$key] : '' }}">
                                         {{ $type }}
                                 </label>
                                 @endforeach

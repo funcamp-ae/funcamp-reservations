@@ -107,7 +107,7 @@ class OrderController extends Controller
                 $q->verified();
             }], 'price')
             ->paginate(100);
-
+            $rawTypes = WhatsappMessageType::all()->pluck('key')->toArray() ;  
         return view('dashboard.orders.index', compact('orders'));
     }
 
