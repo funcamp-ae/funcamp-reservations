@@ -40,7 +40,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php $grouped = $orders->whereDate('date', '>=', now()->startOfDay())->groupBy('date'); @endphp
+                            @php $grouped = $orders->where('date', '>=', now()->startOfDay())->groupBy('date'); @endphp
                             @foreach($grouped as $date => $group)
                             <tr class="date-row">
                                 <td rowspan="1">
