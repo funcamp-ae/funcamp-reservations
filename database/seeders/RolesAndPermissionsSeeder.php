@@ -78,6 +78,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => 'addons.edit', 'nickname_ar' => 'تعديل إضافة', 'nickname_en' => 'Edit Addon', 'group' => 'addons'],
             ['name' => 'addons.delete', 'nickname_ar' => 'حذف إضافة', 'nickname_en' => 'Delete Addon', 'group' => 'addons'],
             ['name' => 'addons.print', 'nickname_ar' => 'طباعة الإضافات', 'nickname_en' => 'Print Addons', 'group' => 'addons'],
+            ['name' => 'bookings.registeration-forms.fetch', 'nickname_ar' => 'سحب بيانات من استمارات التسجيل', 'nickname_en' => 'bookings.registeration-forms.fetch', 'group' => 'bookings'],
 
             // Camp Types
             ['name' => 'camp-types.index', 'nickname_ar' => 'عرض أنواع المخيم', 'nickname_en' => 'View Camp Types', 'group' => 'camp_types'],

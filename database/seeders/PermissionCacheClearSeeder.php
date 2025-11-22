@@ -18,7 +18,12 @@ class PermissionCacheClearSeeder extends Seeder
     {
         // Clear permission cache using Spatie's permission package
         if (class_exists(\Spatie\Permission\PermissionRegistrar::class)) {
+            $role = Role::where('name', 'super-admin')->first()->givePermissionTo(Permission::all());
             app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+              // Assign all permissions to super-admin role
+
+        // User::role('super-admin')->get()->assignRole('super-admin');
+
             $this->command->info('Permission cache cleared using Spatie PermissionRegistrar.');
         }
 

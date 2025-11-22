@@ -164,6 +164,7 @@ class NewPermissionsSeeder extends Seeder
             ['name' => 'inventory.search.all', 'nickname_ar' => 'البحث من صفحة جميع المخزون', 'nickname_en' => 'Search from All Inventory page', 'group' => 'stocks'],
 
             // Additional Bookings Permissions (21 permissions)
+                        ['name' => 'bookings.registeration-forms.fetch', 'nickname_ar' => 'سحب بيانات من استمارات التسجيل', 'nickname_en' => 'bookings.registeration-forms.fetch', 'group' => 'bookings'],
             ['name' => 'bookings.registration.forms', 'nickname_ar' => 'صفحة استمارات التسجيل، مع جميع الأزرار والحقول فيها', 'nickname_en' => 'Registration Forms page, with all its buttons and fields', 'group' => 'bookings'],
             ['name' => 'bookings.pending', 'nickname_ar' => 'صفحة الحجوزات المعلقة', 'nickname_en' => 'Pending Bookings page', 'group' => 'bookings'],
             ['name' => 'bookings.approved', 'nickname_ar' => 'صفحة الحجوزات المعتمدة', 'nickname_en' => 'Approved Bookings page', 'group' => 'bookings'],
