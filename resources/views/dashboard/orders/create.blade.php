@@ -80,7 +80,7 @@
                                     @php
                                         $initialServiceIds = isset($order)
                                             ? $order->services->pluck('id')->all()
-                                            : collect(old('service_ids', request('service_ids', [])))->map(fn($v)=>(int)$v)->all();
+                                            : collect(old('service_ids', $preselectedServiceIds ?? request('service_ids', [])))->map(fn($v)=>(int)$v)->all();
                                     @endphp
                                     <select name="service_ids[]" id="service_id"
                                             class="js-select2 form-select form-select-lg form-select-solid"
@@ -823,7 +823,7 @@
                 };
                 console.log(payload.service_ids)
                 // If we have an rf_id, fetch the customer data first
-                if (url.searchParams.has('rf_id') && "{{ Route::has('orders.customers.check') ? '1' : '0' }}" === "1") {
+                if (url.searchParams.has('rf_id')  && "{{ Route::has('orders.customers.check') ? '1' : '0' }}" === "1") {
                     $.ajax({
                         url: "{{ route('orders.customers.check') }}",
                         method: "GET",

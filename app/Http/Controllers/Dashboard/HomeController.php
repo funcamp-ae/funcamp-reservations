@@ -71,6 +71,14 @@ class HomeController extends Controller
         ]);
     }
 
+    public function calenderList()
+    {
+        $orders = Order::with('customer', 'services')->get();
+        return view('dashboard.calender_list', [
+            'orders' => $orders,
+        ]);
+    }
+
     public function reprots()
     {
 

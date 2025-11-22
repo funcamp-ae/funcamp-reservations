@@ -35,7 +35,19 @@ class Service extends Model
     {
         return $this->belongsToMany(Order::class, 'order_service');
     }
-
+    /**
+     * Return services that are NOT booked on the provided date.
+     * Usage: Service::availableOn('2025-11-22')
+     *
+     * @param  string|\Carbon\Carbon  $day
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public static function availableOn($day)
+    {
+        return Service::whereDoesntHave('orders', function($q) use ($day) {
+            $q->whereDate('date', $day);
+        })->get();
+    }
     public function reports()
     {
         return $this->hasMany(ServiceReport::class);

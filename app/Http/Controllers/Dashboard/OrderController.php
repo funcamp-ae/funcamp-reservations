@@ -126,6 +126,8 @@ class OrderController extends Controller
     {
         $this->authorize('create', Order::class);
         $scheduledDate = $request->query('scheduledDate');
+        // Preserve any preselected service ids from the query before clearing
+        $preselectedServiceIds = $request->query('service_ids', []);
         $request->query->replace([]);
         $customers = Customer::latest()->select('id', 'name')->get();
         $services = Service::latest()->select('id', 'name', 'price')->get();
@@ -136,6 +138,7 @@ class OrderController extends Controller
             'services' => $services,
             'internalNotes' => $internalNotes,
             'scheduledDate' => $scheduledDate,
+            'preselectedServiceIds' => $preselectedServiceIds,
         ]);
     }
 

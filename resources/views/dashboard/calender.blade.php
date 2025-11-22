@@ -31,7 +31,11 @@
                 </div>
             </div>
             <div class="card-body">
-                <div id="calendar"></div>
+                <div class="d-flex" style="justify-content: center;">
+                    <a href="{{ route('calender.bookings') }}" class="btn btn-lg btn-primary">عرض الحجوزات (قائمة)</a>
+                </div>
+
+                <div id="calendar" class="mt-5"></div>
             </div>
         </div>
     </div>
@@ -106,21 +110,55 @@
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
 <script>
     $(document).ready(function() {
-        $('table tbody td').hover(
-            function() {
-                var date = $(this).data('date');
-                if(!date) return;
-                $(this).css({
-                    'background-color': '#e3f2fd',
-                    'transition': 'background-color 0.2s ease-in-out'
-                });
-            },
-            function() {
-                var date = $(this).data('date');
-                if(!date) return;
-                $(this).css('background-color', '');
-            }
-        );
+        // Hover highlight for visible order rows
+        $('table tbody').on('mouseenter', 'tr.order-row', function() {
+            $(this).css({'background-color': '#e3f2fd', 'transition': 'background-color 0.15s'});
+        }).on('mouseleave', 'tr.order-row', function() {
+            $(this).css('background-color', '');
+        });
+
+        // Filtering logic
+        function applyFilters() {
+            var booking = $('#searchBooking').val().trim().toLowerCase();
+            var name = $('#searchName').val().trim().toLowerCase();
+            var phone = $('#searchPhone').val().trim();
+            var email = $('#searchEmail').val().trim().toLowerCase();
+            var date = $('#filterDate').val(); // YYYY-MM-DD
+
+            $('.order-row').each(function() {
+                var $tr = $(this);
+                var tBooking = String($tr.data('booking') || '').toLowerCase();
+                var tName = String($tr.data('name') || '').toLowerCase();
+                var tPhone = String($tr.data('phone') || '');
+                var tEmail = String($tr.data('email') || '').toLowerCase();
+                var tDate = String($tr.data('date') || '');
+
+                var match = true;
+                if (booking && tBooking.indexOf(booking) === -1) match = false;
+                if (name && tName.indexOf(name) === -1) match = false;
+                if (phone && tPhone.indexOf(phone) === -1) match = false;
+                if (email && tEmail.indexOf(email) === -1) match = false;
+                if (date && tDate !== date) match = false; // exact date match
+
+                if (match) {
+                    $tr.show();
+                } else {
+                    $tr.hide();
+                }
+            });
+        }
+
+        $('#searchBooking,#searchName,#searchPhone,#searchEmail').on('keyup', applyFilters);
+        $('#filterDate').on('change', applyFilters);
+        $('#clearFilters').on('click', function(e) {
+            e.preventDefault();
+            $('#filterDate').val('');
+            $('#searchBooking,#searchName,#searchPhone,#searchEmail').val('');
+            applyFilters();
+        });
+
+        // run once to ensure initial state
+        applyFilters();
     });
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');

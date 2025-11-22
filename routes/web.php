@@ -1438,6 +1438,11 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
         'as' => 'calender',
         'title' => 'dashboard.calender'
     ]);
+    Route::get('calender/bookings', [
+        'uses' => 'HomeController@calenderList',
+        'as' => 'calender.bookings',
+        'title' => 'dashboard.calender_bookings'
+    ]);
     /*------------ end Of Settings ----------*/
 
     /*------------ start Of general payments ----------*/
