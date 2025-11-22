@@ -302,6 +302,7 @@ return [
             'open' => 'Open',
         ],
         'no_services' => 'No available camps',
+        'available_camps_button' => 'Available Camps',
     ],
     'stocks' => 'Stocks',
     'filter_higher_selling' => 'Filter by Higher Selling Items',

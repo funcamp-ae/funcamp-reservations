@@ -403,6 +403,7 @@ return [
             'open' => 'فتح',
         ],
         'no_services' => 'لا توجد مخيمات متاحة',
+        'available_camps_button' => 'توفر المخيمات',
     ],
     'Calender' => 'التقويم',
     'characters' => 'الكلمات',

@@ -49,7 +49,7 @@
                                     </div>
                                 </td>
                                         <td>
-                                            <table class="table mb-0">
+                                            <table class="table mb-0 nested-table">
                                                 <thead style="background:#b37314;color:#fff">
                                                     <tr>
                                                         <th style="width:30px">{{ __('dashboard.calendar.table.subheader.index') }}</th>
@@ -117,6 +117,25 @@
     table thead tr { 
         background: linear-gradient(135deg, #ba7321 0%, #b16e17ff 100%) !important ; 
         box-shadow : none !important; 
+    }
+    /* nested table (bookings per date) styling */
+    .nested-table {
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+    }
+    .nested-table thead tr {
+        background: linear-gradient(135deg, #b37314 0%, #a85f13 100%) !important;
+        color: #fff;
+    }
+    .nested-table th, .nested-table td {
+        padding: 0.6rem 0.75rem;
+        vertical-align: middle;
+    }
+    .available-services-select {
+        border-radius: 8px;
+        padding: 0.35rem 0.6rem;
     }
 </style>
 @endsection

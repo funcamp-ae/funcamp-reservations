@@ -388,6 +388,7 @@ return [
             'open' => 'پرانیستل',
         ],
         'no_services' => 'هیڅ کمپ شتون نلري',
+        'available_camps_button' => 'د کمپونو شتون',
     ],
     'Calender' => 'جدول',
     'characters' => 'کلمات',

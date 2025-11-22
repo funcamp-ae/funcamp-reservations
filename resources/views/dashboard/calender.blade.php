@@ -32,7 +32,7 @@
             </div>
             <div class="card-body">
                 <div class="d-flex" style="justify-content: center;">
-                    <a href="{{ route('calender.bookings') }}" class="btn btn-lg btn-primary">عرض الحجوزات (قائمة)</a>
+                    <a href="{{ route('calender.bookings') }}" class="btn btn-lg btn-primary">{{ __('dashboard.calendar.available_camps_button') }}</a>
                 </div>
 
                 <div id="calendar" class="mt-5"></div>
