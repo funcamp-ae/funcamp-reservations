@@ -40,7 +40,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php $grouped = $orders->groupBy('date'); @endphp
+                            @php $grouped = $orders->whereDate('date', '>=', now()->startOfDay())->groupBy('date'); @endphp
                             @foreach($grouped as $date => $group)
                             <tr class="date-row">
                                 <td rowspan="1">
@@ -56,8 +56,6 @@
                                                         <th>{{ __('dashboard.calendar.table.subheader.camp_type') }}</th>
                                                         <th>{{ __('dashboard.calendar.table.subheader.client_name') }}</th>
                                                         <th>{{ __('dashboard.calendar.table.subheader.booking_number') }}</th>
-                                                        <th>{{ __('dashboard.calendar.table.subheader.phone') }}</th>
-                                                        <th>{{ __('dashboard.calendar.table.subheader.email') }}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -73,9 +71,6 @@
                                                                 {{ $order->booking_number ?? $order->id }}
                                                             @endcan
                                                         </td>
-                                                        <td>{{ $order->customer->phone ?? '---' }}</td>
-                                                        <td>{{ $order->customer->email ?? '---' }}</td>
-
                                                     </tr>
                                                     @endforeach
                                                 </tbody>
