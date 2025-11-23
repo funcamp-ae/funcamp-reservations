@@ -173,7 +173,7 @@ public function accountsStore(Request $request)
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('payments/images', 'public');
             $validatedData['image_path'] = $path;
-            $validatedData['images'] = [$path];
+            $validatedData['images'] = json_encode([$path]);
         } else {
             $validatedData['images'] = null;
         }
@@ -372,7 +372,7 @@ public function moneyTransfer(Request $request)
                     'date' => now(),
                     'description' => $request->notes ?? ('Payment: ' . $request->statement),
                     'image_path' => $validatedData['image'] ?? null,
-                    'images' => isset($validatedData['image']) ? [$validatedData['image']] : null,
+                    'images' => isset($validatedData['image']) ? json_encode([$validatedData['image']]) : null,
                     'payment_id' => $payment->id,
                     'verified' => 0, // Changed from false to true so it appears in general payments
                     'order_id' => $payment->order_id,
@@ -455,7 +455,7 @@ public function moneyTransfer(Request $request)
             'date' => now(),
             'description' => $request->notes ?? ('Payment: ' . $request->statement),
             'image_path' => $validatedData['image'] ?? null,
-            'images' => isset($validatedData['image']) ? [$validatedData['image']] : null,
+            'images' => isset($validatedData['image']) ? json_encode([$validatedData['image']]) : null,
             'verified' => 0,
             'handled_by' =>auth()->id()
         ]);

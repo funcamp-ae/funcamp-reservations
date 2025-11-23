@@ -165,7 +165,7 @@ class ExpensesController extends Controller
                 'date' => $date,
                 'statement' => $request->statement ?? 'general_expenses',
                 'notes' => $request->notes,
-                'images' => $imagePaths ?? null, // Store multiple images as array
+                'images' => isset($imagePaths) && !empty($imagePaths) ? json_encode($imagePaths) : null, // Store multiple images as JSON
                 'image' => !empty($imagePaths) ? $imagePaths[0] : null, // First image for backward compatibility
                 'order_id' => $request->order_id,
                 'source' => $request->source,
@@ -181,7 +181,7 @@ class ExpensesController extends Controller
                 'date' => $date,
                 'description' => $request->notes ?? ('Expense: ' . ($request->statement ?? 'general_expenses')),
                 'image_path' => !empty($imagePaths) ? $imagePaths[0] : ($expense->image ?? null),
-                'images' => $imagePaths ?? ($expense->images ?? null),
+                'images' => isset($imagePaths) && !empty($imagePaths) ? json_encode($imagePaths) : (isset($expense->images) && is_array($expense->images) ? json_encode($expense->images) : ($expense->images ?? null)),
                 'source' => $request->source,
                 'expense_id' => $expense->id
             ]);
@@ -285,7 +285,7 @@ class ExpensesController extends Controller
 
                 // Store new images
                 $imagePaths = $expense->uploadMultipleImages($request->file('image'), 'expenses');
-                $data['images'] = $imagePaths;
+                $data['images'] = isset($imagePaths) && !empty($imagePaths) ? json_encode($imagePaths) : null;
             }
             $data["verified"] = 0 ; // Reset verified status on update
             $data['handled_by'] = auth()->id();
@@ -299,7 +299,7 @@ class ExpensesController extends Controller
                 'date' => $data['date'],
                 'description' => $request->notes ?? ('Expense: ' . ($request->statement ?? 'general_expenses')),
                 'image_path' => isset($imagePaths) && !empty($imagePaths) ? $imagePaths[0] : ($expense->image ?? $expense->image_path ?? null),
-                'images' => isset($imagePaths) && !empty($imagePaths) ? $imagePaths : ($expense->images ?? null),
+                'images' => isset($imagePaths) && !empty($imagePaths) ? json_encode($imagePaths) : (isset($expense->images) && is_array($expense->images) ? json_encode($expense->images) : ($expense->images ?? null)),
                 'source' => $request->source,
                 'handled_by' => auth()->id()
             ]);

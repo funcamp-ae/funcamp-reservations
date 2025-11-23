@@ -251,7 +251,7 @@ class GeneralPaymentsController extends Controller
             if ($request->hasFile('image')) {
                 $imagePath = $request->file('image')->store('general_payments', 'public');
                 $validatedData['image_path'] = $imagePath;
-                $validatedData['images'] = [$imagePath];
+                $validatedData['images'] = json_encode([$imagePath]);
             } else {
                 $validatedData['images'] = null;
             }
@@ -300,11 +300,12 @@ class GeneralPaymentsController extends Controller
             if ($request->hasFile('image')) {
                 $imagePath = $request->file('image')->store('general_payments', 'public');
                 $validatedData['image_path'] = $imagePath;
-                $validatedData['images'] = [$imagePath];
+                $validatedData['images'] = json_encode([$imagePath]);
             } else {
                 $validatedData['images'] = null;
             }
             $validatedData["amount"] = $validatedData["price"] ;
+            $validatedData["statement"] ="account_charge";
             $payment = GeneralPayment::create($validatedData);
             $transaction = $payment->transaction()->create($validatedData);
 
@@ -364,7 +365,7 @@ class GeneralPaymentsController extends Controller
             }
             // Ensure images array is synced for the transaction
             if (isset($updateData['image_path'])) {
-                $updateData['images'] = [$updateData['image_path']];
+                $updateData['images'] = json_encode([$updateData['image_path']]);
             } else {
                 $updateData['images'] = null;
             }
@@ -422,7 +423,7 @@ class GeneralPaymentsController extends Controller
                 }
                 $imagePath = $request->file('image')->store('general_payments', 'public');
                 $validatedData['image_path'] = $imagePath;
-                $validatedData['images'] = [$imagePath];
+                $validatedData['images'] = json_encode([$imagePath]);
             }
             if ($payment->verified) {
                 $bankAccount->update([
@@ -432,7 +433,7 @@ class GeneralPaymentsController extends Controller
             $payment->update($validatedData);
             // also sync images on the transaction
             if (isset($validatedData['image_path'])) {
-                $validatedData['images'] = [$validatedData['image_path']];
+                $validatedData['images'] = isset($validatedData['image_path']) ? json_encode([$validatedData['image_path']]) : null;
             } else {
                 $validatedData['images'] = null;
             }
@@ -499,6 +500,7 @@ class GeneralPaymentsController extends Controller
         }
         // Add handled_by to the validated data
         $validatedData['handled_by'] = auth()->id();
+        $validatedData['statement'] = "general_revenue_deposit";
         $payment = GeneralPayment::create($validatedData);
         
             $payment->transaction()->create([
@@ -804,7 +806,7 @@ class GeneralPaymentsController extends Controller
                 'source' => $request->source ?? 'add_funds_page',
                 'description' => $request->description ?? 'Add funds to account',
                 'image_path' => $imagePath ?? null,
-                'images' => $imagePath ? [$imagePath] : null,
+                'images' => $imagePath ? json_encode([$imagePath]) : null,
                 'general_payment_id' => $payment->id,
                 'type' => 'deposit', // Funds added to account
                 'handled_by' => auth()->id()
@@ -901,7 +903,7 @@ class GeneralPaymentsController extends Controller
                 ];
                 if (!empty($imagePath)) {
                     $txUpdate['image_path'] = $imagePath;
-                    $txUpdate['images'] = [$imagePath];
+                    $txUpdate['images'] = json_encode([$imagePath]);
                 } else {
                     $txUpdate['images'] = null;
                 }
