@@ -877,6 +877,7 @@ class GeneralPaymentsController extends Controller
                 'payment_method' => $request->payment_method,
                 'date' => $request->date,
                 'verified' => false, // Reset verification on update
+                'statement' => 'add_funds', // Set statement type
                 "handled_by" => auth()->id()
             ];
 
