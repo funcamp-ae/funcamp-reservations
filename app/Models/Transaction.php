@@ -133,7 +133,6 @@ class Transaction extends Model
           return   route('bank-accounts.show', $this->id);
         }
     }
-    //  ,general_expenses , ,  , charge_account , add_funds_page , general_revenue_deposit , 
 public function getDetailedSource()
     {
         $accountName = $this->account?->name ?? '';
@@ -165,6 +164,13 @@ public function getDetailedSource()
                     'order_id' => $this->order_id,
                     'statement' => $this->expense->statement ?? '',
                     'date' => $this->expense->created_at ?? $this->created_at,
+                    'account' => $this->handledBy->name ?? null,
+                ]);
+            }elseif ($this->source == 'general_revenue_deposit') {
+                return __("dashboard.".'Reservation #:order_id — payment (:statement) on :date by :account', [
+                    'order_id' => $this->order_id,
+                    'statement' => $this->statement ?? '',
+                    'date' => $this->created_at ?? $this->created_at,
                     'account' => $this->handledBy->name ?? null,
                 ]);
             }
