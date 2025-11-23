@@ -39,7 +39,7 @@
                             <tr data-item-id="{{ $linkId }}" data-item-type="{{ $linkType }}">
                                 <td>{{$loop->iteration }}</td>
                                 <td>{!! nl2br(e($t->getDetailedSource() ?? '-')) !!}</td>
-                                <td>{{ $t->type == 'deposit' ? (__('dashboard.moneyDeposit')) : __('dashboard.' . $t->type) ?? '-' }}</td>
+                                <td>{{ $t->type == 'deposit' ? __('dashboard.moneyDeposit') : __('dashboard.' . $t->type) ?? '-' }}</td>
                                 <td>{{ $t->account->name ?? '-' }}</td>
                                 <td>
                                     @if($t->image_path || $t->images)
