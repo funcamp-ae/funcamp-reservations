@@ -284,6 +284,7 @@ class GeneralPaymentsController extends Controller
             'date' => 'nullable|date',
             'time' => 'nullable|string',
             'description' => 'nullable|string',
+            'statement' => 'nullable|string',
             "date" => 'nullable|date',
             'source' => 'nullable|string',
             'order_id' => 'nullable|exists:orders,id',
