@@ -16,6 +16,7 @@ class Transaction extends Model
         'amount',
         'type',
         'source', //=>  reservation_payments ,general_expenses , reservation_expenses , insurances , reservation_addon , charge_account , add_funds_page , general_revenue_deposit , warehouse_sales ;
+        'statement',
         'date',
         'verified',
         'description',
