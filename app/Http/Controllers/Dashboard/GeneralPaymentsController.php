@@ -509,6 +509,8 @@ class GeneralPaymentsController extends Controller
             'source' => $request->source,
             'account_id' => $request->account_id,
             'type' => 'deposit',
+            'date' => now(),
+            'statement' => 'general_revenue_deposit',
             'description' => $request->notes ?? null,
             'image_path' => $payment->image_path ?? null,
             'images' => $payment->image_path ? json_encode([$payment->image_path]) : null,

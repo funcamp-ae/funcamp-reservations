@@ -182,7 +182,7 @@ public function getDetailedSource()
         }
 
         return __("dashboard.".'Payments / general: (:source) on :date by :account', [
-            'source' => __("dashboard.".$this->statement) ?? __("dashboard.".$this->generalPayment()->statement) ?? '--',
+            'source' =>$this->statement ? __("dashboard.".$this->statement) : __("dashboard.".$this->generalPayment()->statement) ?? '',
             'date' => $this->created_at,
             'account' => $this->handledBy->name ?? null,
         ]);
