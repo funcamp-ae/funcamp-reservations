@@ -591,7 +591,7 @@ class GeneralPaymentsController extends Controller
             'amount' => $validatedData['price'],
             'date' => $payment->date,
             'statement' => 'general_revenue_deposit',
-            'source' => $payment->source,
+            'source' => $payment->source ?? 'general_revenue_deposit',
             'description' => $validatedData['notes'] ?? null,
             'type' => 'deposit',
             'handled_by' => auth()->id() // Add handled_by for the transaction

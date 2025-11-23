@@ -148,21 +148,21 @@ public function getDetailedSource()
             } elseif ($this->orderItem) {
                 return __("dashboard.".'Reservation #:order_id — warehouse sale (:name) on :date by :account', [
                     'order_id' => $this->order_id,
-                    'name' => $this->orderItem->name ?? '',
+                    'name' => $this->orderItem?->stock?->name ?? '',
                     'date' => $this->orderItem->created_at ?? $this->created_at,
                     'account' => $this->handledBy->name ?? null,
                 ]);
             } elseif ($this->orderAddon) {
                 return __("dashboard.".'Reservation #:order_id — addon (:name) on :date by :account', [
                     'order_id' => $this->order_id,
-                    'name' => $this->orderAddon->name ?? '',
+                    'name' => $this->orderAddon->addon?->name ?? '',
                     'date' => $this->orderAddon->created_at ?? $this->created_at,
                     'account' => $this->handledBy->name ?? null,
                 ]);
             } elseif ($this->expense) {
                 return __("dashboard.".'Reservation #:order_id — expense (:statement) on :date by :account', [
                     'order_id' => $this->order_id,
-                    'statement' => $this->expense->statement ?? '',
+                    'statement' => __("dashboard.".$this->expense->statement) ?? '',
                     'date' => $this->expense->created_at ?? $this->created_at,
                     'account' => $this->handledBy->name ?? null,
                 ]);

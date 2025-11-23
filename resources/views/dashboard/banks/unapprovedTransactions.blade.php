@@ -43,7 +43,7 @@
                                 <td>{{ $t->account->name ?? '-' }}</td>
                                 <td>
                                     @if($t->image_path || $t->images)
-                                        <a href="javascript:void(0)" class="view-images" data-images="{{ e(json_encode($t->images ?? [$t->image_path])) }}">{{ __('dashboard.view') }}</a>
+                                        <a href="javascript:void(0)" class="view-images" data-images='@json($t->images ?? [$t->image_path])'>{{ __('dashboard.view') }}</a>
                                     @else
                                         -
                                     @endif
@@ -83,14 +83,11 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{{ __('dashboard.preview') }}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+                <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
       </div>
       <div class="modal-body" id="previewBody"></div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('dashboard.close') }}</button>
-      </div>
     </div>
   </div>
 </div>
@@ -125,8 +122,13 @@
 
         // View images
         $(document).on('click', '.view-images', function(){
-            var data = $(this).data('images');
-            var images = typeof data === 'string' ? JSON.parse(data) : data;
+            var raw = $(this).attr('data-images');
+            var images = [];
+            try {
+                images = raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                images = [];
+            }
             var html = '';
             images = images || [];
             images.forEach(function(src){
@@ -143,6 +145,12 @@
             var notes = $(this).data('notes') || '';
             $('#previewBody').html('<pre style="white-space:pre-wrap;">'+notes+'</pre>');
             $('#previewModal').modal('show');
+        });
+
+        // Ensure modal close works across Bootstrap versions and if data attributes don't bind
+        $('#previewModal').on('click', '[data-dismiss="modal"], [data-bs-dismiss="modal"], .close, .btn-close', function(e){
+            e.preventDefault();
+            try { $('#previewModal').modal('hide'); } catch(err) { $('#previewModal').hide(); }
         });
     });
 </script>
