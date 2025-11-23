@@ -490,7 +490,7 @@ class GeneralPaymentsController extends Controller
             'price' => 'required|numeric',
             'payment_method' => 'nullable|string',
             'statement' => 'nullable',
-            'notes' => 'nullable|string',
+            'description' => 'nullable|string',
             "image" => "nullable|image|mimes:jpeg,png,jpg,gif"
         ]);
 
@@ -502,13 +502,14 @@ class GeneralPaymentsController extends Controller
         // Add handled_by to the validated data
         $validatedData['handled_by'] = auth()->id();
         $validatedData['statement'] = "general_revenue_deposit";
+        $validatedData['notes'] = $request->description ?? null;
+        unset($validatedData['description']);
         $payment = GeneralPayment::create($validatedData);
         
             $payment->transaction()->create([
             'amount' => $request->price,
             'source' => $request->source,
             'account_id' => $request->account_id,
-            'note' => $request->notes ?? null,
             'payment_method' => $request->payment_method ?? null,
             'type' => 'deposit',
             'date' => now(),
@@ -562,7 +563,7 @@ class GeneralPaymentsController extends Controller
             'account_id' => 'required|exists:bank_accounts,id',
             'payment_method' => 'nullable|string',
             'statement' => 'nullable',
-            'notes' => 'nullable|string',
+            'description' => 'nullable|string',
             'order_id' => 'nullable|exists:orders,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
@@ -585,6 +586,8 @@ class GeneralPaymentsController extends Controller
         $validatedData['verified'] = 0;
         $validatedData['statement'] = "general_revenue_deposit";
         $validatedData['handled_by'] = auth()->id(); // Add handled_by for the payment update
+        $validatedData["notes"] = $validatedData["description"] ?? null;
+        unset($validatedData['description']);
         $payment->update($validatedData);
         
         // Prepare transaction data
