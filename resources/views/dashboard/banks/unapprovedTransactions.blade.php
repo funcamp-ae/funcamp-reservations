@@ -147,12 +147,47 @@
             }
             var html = '';
             images = images || [];
-            images.forEach(function(src){
-                if(!src) return;
-                html += '<img src="' + "{{ env('APP_URL') }}/storage/" + src + '" class="img-fluid mb-2" style="max-width:100%;">';
-            });
+            // Build a carousel if multiple images, otherwise show single image
+            if (images.length > 1) {
+                html += '<div id="previewCarousel" class="carousel slide" data-ride="carousel" data-bs-ride="carousel">';
+                // indicators
+                html += '<ol class="carousel-indicators">';
+                images.forEach(function(_, idx){
+                    html += '<li data-target="#previewCarousel" data-slide-to="'+idx+'"'+(idx===0? ' class="active"' : '')+'></li>';
+                });
+                html += '</ol>';
+                // inner
+                html += '<div class="carousel-inner">';
+                images.forEach(function(src, idx){
+                    if(!src) return;
+                    html += '<div class="carousel-item'+(idx===0? ' active' : '')+'">';
+                    html += '<img src="' + "{{ env('APP_URL') }}/storage/" + src + '" class="d-block w-100" style="max-height:70vh; object-fit:contain;">';
+                    html += '</div>';
+                });
+                html += '</div>';
+                // controls
+                html += '<a class="carousel-control-prev" href="#previewCarousel" role="button" data-slide="prev" data-bs-slide="prev">';
+                html += '<span class="carousel-control-prev-icon" aria-hidden="true"></span>';
+                html += '<span class="sr-only">Previous</span>';
+                html += '</a>';
+                html += '<a class="carousel-control-next" href="#previewCarousel" role="button" data-slide="next" data-bs-slide="next">';
+                html += '<span class="carousel-control-next-icon" aria-hidden="true"></span>';
+                html += '<span class="sr-only">Next</span>';
+                html += '</a>';
+                html += '</div>';
+            } else if (images.length === 1) {
+                var src = images[0];
+                if(src) html += '<img src="' + "{{ env('APP_URL') }}/storage/" + src + '" class="img-fluid" style="max-width:100%; max-height:70vh; object-fit:contain;">';
+            }
             if(!html) html = '<p>-</p>';
             $('#previewBody').html(html);
+            // initialize carousel (support both BS4 and BS5)
+            try {
+                if (typeof $().carousel === 'function') { $('#previewCarousel').carousel(); }
+                else if (window.bootstrap && window.bootstrap.Carousel) { new bootstrap.Carousel(document.getElementById('previewCarousel')); }
+            } catch (err) {
+                // ignore initialization errors
+            }
             $('#previewModal').modal('show');
         });
 
