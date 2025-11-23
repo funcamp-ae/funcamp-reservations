@@ -590,6 +590,7 @@ class GeneralPaymentsController extends Controller
             'account_id' => $validatedData['account_id'],
             'amount' => $validatedData['price'],
             'date' => $payment->date,
+            'statement' => 'general_revenue_deposit',
             'source' => $payment->source,
             'description' => $validatedData['notes'] ?? null,
             'type' => 'deposit',
