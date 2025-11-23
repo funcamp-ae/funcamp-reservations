@@ -501,14 +501,14 @@ class GeneralPaymentsController extends Controller
         $validatedData['handled_by'] = auth()->id();
         $payment = GeneralPayment::create($validatedData);
         
-        $payment->transaction()->create([
+            $payment->transaction()->create([
             'amount' => $request->price,
             'source' => $request->source,
             'account_id' => $request->account_id,
             'type' => 'deposit',
             'description' => $request->notes ?? null,
             'image_path' => $payment->image_path ?? null,
-            'images' => $payment->image_path ? [$payment->image_path] : null,
+            'images' => $payment->image_path ? json_encode([$payment->image_path]) : null,
             'order_id' => $request->order_id,
             'handled_by' => auth()->id(),
 

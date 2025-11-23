@@ -31,6 +31,9 @@ class Transaction extends Model
         'stock_id',
         'handled_by'
         ];
+    protected $casts = [
+        'images' => 'array',
+    ];
     
      // Define the sender relationship
     public function account()
