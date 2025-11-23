@@ -162,14 +162,14 @@ public function getDetailedSource()
             } elseif ($this->expense) {
                 return __("dashboard.".'Reservation #:order_id — expense (:statement) on :date by :account', [
                     'order_id' => $this->order_id,
-                    'statement' => __("dashboard.".$this->expense->statement) ?? '',
+                    'statement' => $this->expense->statement ?? '',
                     'date' => $this->expense->created_at ?? $this->created_at,
                     'account' => $this->handledBy->name ?? null,
                 ]);
             }elseif ($this->source == 'general_revenue_deposit') {
                 return __("dashboard.".'Reservation #:order_id — payment (:statement) on :date by :account', [
                     'order_id' => $this->order_id,
-                    'statement' => $this->statement ?? '',
+                    'statement' => __("dashboard.".$this->statement) ?? '',
                     'date' => $this->created_at ?? $this->created_at,
                     'account' => $this->handledBy->name ?? null,
                 ]);

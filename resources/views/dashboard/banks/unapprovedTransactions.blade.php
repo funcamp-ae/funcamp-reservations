@@ -42,15 +42,23 @@
                                 <td>{{ $t->type == 'deposit' ? __('dashboard.moneyDeposit') : __('dashboard.' . $t->type) ?? '-' }}</td>
                                 <td>{{ $t->account->name ?? '-' }}</td>
                                 <td>
-                                    @if($t->image_path || $t->images)
-                                        <a href="javascript:void(0)" class="view-images" data-images='@json($t->images ?? [$t->image_path])'>{{ __('dashboard.view') }}</a>
+                                    @php
+                                        // Normalize images to an array for JSON encoding in the attribute.
+                                        if (is_string($t->images)) {
+                                            $previewImages = json_decode($t->images, true) ?: [];
+                                        } else {
+                                            $previewImages = $t->images ?? ($t->image_path ? [$t->image_path] : []);
+                                        }
+                                    @endphp
+                                    @if(!empty($previewImages))
+                                        <a href="javascript:void(0)" class="view-images" data-images='@json($previewImages)'>{{ __('dashboard.view') }}</a>
                                     @else
                                         -
                                     @endif
                                 </td>
                                 <td>
                                     @if($t->description)
-                                        <a href="javascript:void(0)" class="view-notes" data-notes="{{ e($t->description) }}">{{ __('dashboard.view') }}</a>
+                                        <a href="javascript:void(0)" class="view-notes" data-notes='@json($t->description)'>{{ __('dashboard.view') }}</a>
                                     @else - @endif
                                 </td>
                                 <td>@if($t->order_id)<a href="{{ route('orders.edit', $t->order_id) }}">{{ $t->order_id }}</a>@else - @endif</td>
@@ -126,8 +134,16 @@
             var images = [];
             try {
                 images = raw ? JSON.parse(raw) : [];
+                // Handle double-encoded JSON (string that contains JSON array)
+                if (typeof images === 'string') {
+                    images = images ? JSON.parse(images) : [];
+                }
             } catch (e) {
                 images = [];
+            }
+            // Ensure we have an array
+            if (!Array.isArray(images)) {
+                images = images ? [images] : [];
             }
             var html = '';
             images = images || [];

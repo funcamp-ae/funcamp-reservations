@@ -508,6 +508,8 @@ class GeneralPaymentsController extends Controller
             'amount' => $request->price,
             'source' => $request->source,
             'account_id' => $request->account_id,
+            'note' => $request->notes ?? null,
+            'payment_method' => $request->payment_method ?? null,
             'type' => 'deposit',
             'date' => now(),
             'statement' => 'general_revenue_deposit',
