@@ -138,7 +138,7 @@ public function getDetailedSource()
             if ($this->payment) {
                 return __("dashboard.".'Reservation #:order_id — payment (:statement) on :date by :account', [
                     'order_id' => $this->order_id,
-                    'statement' => $this->payment->statement ?? '',
+                    'statement' => __("dashboard.".$this->payment->statement ?? ''),
                     'date' => $this->payment->created_at ?? $this->created_at,
                     'account' => $this->handledBy->name ?? null,
                 ]);
