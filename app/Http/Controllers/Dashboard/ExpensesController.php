@@ -179,7 +179,9 @@ class ExpensesController extends Controller
                 'order_id' => $request->order_id,
                 'type' => 'debit',
                 'date' => $date,
-                'description' => 'Expense: ' . ($request->statement ?? 'general_expenses'),
+                'description' => $request->notes ?? ('Expense: ' . ($request->statement ?? 'general_expenses')),
+                'image_path' => !empty($imagePaths) ? $imagePaths[0] : ($expense->image ?? null),
+                'images' => $imagePaths ?? ($expense->images ?? null),
                 'source' => $request->source,
                 'expense_id' => $expense->id
             ]);
@@ -295,7 +297,9 @@ class ExpensesController extends Controller
                 "verified" => 0, 
                 'type' => 'debit',
                 'date' => $data['date'],
-                'description' => 'Expense: ' . ($request->statement ?? 'general_expenses'),
+                'description' => $request->notes ?? ('Expense: ' . ($request->statement ?? 'general_expenses')),
+                'image_path' => isset($imagePaths) && !empty($imagePaths) ? $imagePaths[0] : ($expense->image ?? $expense->image_path ?? null),
+                'images' => isset($imagePaths) && !empty($imagePaths) ? $imagePaths : ($expense->images ?? null),
                 'source' => $request->source,
                 'handled_by' => auth()->id()
             ]);

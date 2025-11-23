@@ -165,14 +165,17 @@ public function accountsStore(Request $request)
 
     DB::beginTransaction();
 
-    try {
-        $validatedData = array_merge($validatedData, [
+        try {
+            $validatedData = array_merge($validatedData, [
             'type' => "deposit"
                 ]);
         // Handle optional photo
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('payments/images', 'public');
             $validatedData['image_path'] = $path;
+            $validatedData['images'] = [$path];
+        } else {
+            $validatedData['images'] = null;
         }
         $validatedData["price"] = $validatedData["amount"];
         $payment = GeneralPayment::create($validatedData);
@@ -361,22 +364,24 @@ public function moneyTransfer(Request $request)
                 }
             }
 
-            Transaction::create([
-                'account_id' => $request->account_id,
-                'amount' => $request->price,
-                'type' => 'deposit',
-                'source'=> $source ? $source : $request->source,
-                'date' => now(),
-                'description' => 'Payment: ' . $request->statement,
-                'payment_id' => $payment->id,
-                'verified' => 0, // Changed from false to true so it appears in general payments
-                'order_id' => $payment->order_id,
-                'handled_by' => auth()->id(),
-                'customer_id' => $payment->customer_id ?? null
-            ]);
+                Transaction::create([
+                    'account_id' => $request->account_id,
+                    'amount' => $request->price,
+                    'type' => 'deposit',
+                    'source'=> $source ? $source : $request->source,
+                    'date' => now(),
+                    'description' => $request->notes ?? ('Payment: ' . $request->statement),
+                    'image_path' => $validatedData['image'] ?? null,
+                    'images' => isset($validatedData['image']) ? [$validatedData['image']] : null,
+                    'payment_id' => $payment->id,
+                    'verified' => 0, // Changed from false to true so it appears in general payments
+                    'order_id' => $payment->order_id,
+                    'handled_by' => auth()->id(),
+                    'customer_id' => $payment->customer_id ?? null
+                ]);
 
             DB::commit();
-             // If it's an AJAX/JSON request, return JSON to satisfy front-end expectations
+            // If it's an AJAX/JSON request, return JSON to satisfy front-end expectations
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => true,
@@ -448,7 +453,9 @@ public function moneyTransfer(Request $request)
             'type' => 'deposit',
             'source'=> $request->source,
             'date' => now(),
-            'description' => 'Payment: ' . $request->statement,
+            'description' => $request->notes ?? ('Payment: ' . $request->statement),
+            'image_path' => $validatedData['image'] ?? null,
+            'images' => isset($validatedData['image']) ? [$validatedData['image']] : null,
             'verified' => 0,
             'handled_by' =>auth()->id()
         ]);

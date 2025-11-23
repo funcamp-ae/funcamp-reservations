@@ -1362,6 +1362,18 @@
 
                         @endcan
 
+                        @can('transactions.index')
+                        <!-- Unapproved transactions central review -->
+                        <div class="menu-item">
+                            <a href="{{ route('bank.unapproved_transactions') }}" class="menu-link py-3 {{ isActiveRoute('bank.unapproved_transactions') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">@lang('dashboard.unapproved_transactions')</span>
+                            </a>
+                        </div>
+                        @endcan
+
                         <!--end::Menu item-->
 
                         @can('transactions.index')

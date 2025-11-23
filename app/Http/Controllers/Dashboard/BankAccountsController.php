@@ -73,6 +73,8 @@ class BankAccountsController extends Controller
                 "verified" => 1,
                 'date' => now(),
                 'description' => 'Initial deposit',
+                'image_path' => null,
+                'images' => null,
             ]);
 
         return response()->json(['message' => 'Bank account created successfully', 'bank_account' => $bankAccount]);

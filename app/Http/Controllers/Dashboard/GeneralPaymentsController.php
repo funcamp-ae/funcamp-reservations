@@ -251,6 +251,9 @@ class GeneralPaymentsController extends Controller
             if ($request->hasFile('image')) {
                 $imagePath = $request->file('image')->store('general_payments', 'public');
                 $validatedData['image_path'] = $imagePath;
+                $validatedData['images'] = [$imagePath];
+            } else {
+                $validatedData['images'] = null;
             }
 
             $payment = Transaction::create($validatedData);
@@ -297,6 +300,9 @@ class GeneralPaymentsController extends Controller
             if ($request->hasFile('image')) {
                 $imagePath = $request->file('image')->store('general_payments', 'public');
                 $validatedData['image_path'] = $imagePath;
+                $validatedData['images'] = [$imagePath];
+            } else {
+                $validatedData['images'] = null;
             }
             $validatedData["amount"] = $validatedData["price"] ;
             $payment = GeneralPayment::create($validatedData);
@@ -356,6 +362,12 @@ class GeneralPaymentsController extends Controller
                 BankAccount::where('id', $payment->account_id)
                     ->decrement('balance', (float)$payment->price);
             }
+            // Ensure images array is synced for the transaction
+            if (isset($updateData['image_path'])) {
+                $updateData['images'] = [$updateData['image_path']];
+            } else {
+                $updateData['images'] = null;
+            }
             $payment->update($updateData);
             $updateData["amount"] = $updateData["price"] ;
             unset($updateData["price"], $updateData["image"] , $updateData["notes"] , $updateData["time"]);
@@ -410,6 +422,7 @@ class GeneralPaymentsController extends Controller
                 }
                 $imagePath = $request->file('image')->store('general_payments', 'public');
                 $validatedData['image_path'] = $imagePath;
+                $validatedData['images'] = [$imagePath];
             }
             if ($payment->verified) {
                 $bankAccount->update([
@@ -417,6 +430,12 @@ class GeneralPaymentsController extends Controller
                 ]);
             }
             $payment->update($validatedData);
+            // also sync images on the transaction
+            if (isset($validatedData['image_path'])) {
+                $validatedData['images'] = [$validatedData['image_path']];
+            } else {
+                $validatedData['images'] = null;
+            }
             $payment->transaction()->update($validatedData);
             
 
@@ -487,7 +506,9 @@ class GeneralPaymentsController extends Controller
             'source' => $request->source,
             'account_id' => $request->account_id,
             'type' => 'deposit',
-            'description' => $request->notes,
+            'description' => $request->notes ?? null,
+            'image_path' => $payment->image_path ?? null,
+            'images' => $payment->image_path ? [$payment->image_path] : null,
             'order_id' => $request->order_id,
             'handled_by' => auth()->id(),
 
@@ -782,6 +803,8 @@ class GeneralPaymentsController extends Controller
                 'order_id' => $request->order_id,
                 'source' => $request->source ?? 'add_funds_page',
                 'description' => $request->description ?? 'Add funds to account',
+                'image_path' => $imagePath ?? null,
+                'images' => $imagePath ? [$imagePath] : null,
                 'general_payment_id' => $payment->id,
                 'type' => 'deposit', // Funds added to account
                 'handled_by' => auth()->id()
@@ -868,14 +891,21 @@ class GeneralPaymentsController extends Controller
 
             // Update corresponding transaction if it exists
             if ($payment->transaction) {
-                $payment->transaction->update([
+                $txUpdate = [
                     'account_id' => $request->account_id,
                     'amount' => $request->amount,
                     'date' => $request->date,
                     'description' => $request->description ?? 'Updated add funds to account',
                     'verified' => false, // Reset verification on update
                     "handled_by" => auth()->id()
-                ]);
+                ];
+                if (!empty($imagePath)) {
+                    $txUpdate['image_path'] = $imagePath;
+                    $txUpdate['images'] = [$imagePath];
+                } else {
+                    $txUpdate['images'] = null;
+                }
+                $payment->transaction->update($txUpdate);
             }
             
             DB::commit();

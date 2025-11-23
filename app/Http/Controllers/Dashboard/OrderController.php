@@ -570,6 +570,8 @@ class OrderController extends Controller
                 'order_id' => $order->id,
                 'amount' => $validatedData['price'],
                 'description' => $validatedData['description'],
+                'image_path' => null,
+                'images' => null,
                 'source' => 'reservation_addon',
                 'type' => 'deposit',
                 'handled_by' => auth()->id()
@@ -1142,6 +1144,9 @@ $request->validate($rules);
                     $item->update(['is_insurance_verified' => true]);
                     $item->update(["insurance_handled_by" => auth()->user()->id]);
                 }
+                if (request()->ajax() || request()->wantsJson()) {
+                    return response()->json(['success' => true, 'verified' => $item->is_insurance_verified ?? true]);
+                }
                 return redirect()->back()->with('success', __('dashboard.success'));
             } elseif ($type == 'expense') {
                 $item = Expense::findOrFail($id);
@@ -1175,10 +1180,31 @@ $request->validate($rules);
                 default => $type,
             }, $item, $newVerifiedStatus));
 
+            if (request()->ajax()) {
+                return response()->json(['success' => true, 'verified' => $newVerifiedStatus]);
+            }
             return redirect()->back()->with('success', __('dashboard.success'));
         } catch (\Exception $e) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
             return redirect()->back()->with('error', $e->getMessage());
         }
+    }
+
+    /**
+     * Central page to list unapproved (unverified) transactions for review
+     */
+    public function unapprovedTransactions()
+    {
+        // $this->authorize('viewAny', Transaction::class);
+
+        $transactions = Transaction::with('account')
+            ->where('verified', 0)
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('dashboard.banks.unapprovedTransactions', compact('transactions'));
     }
 
     public function acceptTerms($id)

@@ -998,6 +998,13 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
         'title' => ['actions.add', 'dashboard.accounts']
     ]);
 
+    # unapproved transactions (central review page)
+    Route::get('bank/unapproved-transactions', [
+        'uses' => 'OrderController@unapprovedTransactions',
+        'as' => 'bank.unapproved_transactions',
+        'title' => 'dashboard.unapproved_transactions'
+    ]);
+
     # payments store
     Route::post('accounts/store', [
         'uses' => 'PaymentsController@accountsStore',

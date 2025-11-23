@@ -15,7 +15,7 @@ class Transaction extends Model
         'receiver_id',
         'amount',
         'type',
-        'source',
+        'source', //=>  reservation_payments ,general_expenses , reservation_expenses , insurances , reservation_addon , charge_account , add_funds_page , general_revenue_deposit , warehouse_sales ;
         'date',
         'verified',
         'description',
@@ -27,6 +27,7 @@ class Transaction extends Model
         'order_item_id',
         'general_payment_id',
         'image_path',
+        'images',
         'stock_id',
         'handled_by'
         ];
@@ -128,5 +129,58 @@ class Transaction extends Model
           return   route('bank-accounts.show', $this->id);
         }
     }
+    //  ,general_expenses , ,  , charge_account , add_funds_page , general_revenue_deposit , 
+public function getDetailedSource()
+    {
+        $accountName = $this->account?->name ?? '';
 
+        if ($this->order_id) {
+            if ($this->payment) {
+                return __("dashboard.".'Reservation #:order_id — payment (:statement) on :date by :account', [
+                    'order_id' => $this->order_id,
+                    'statement' => $this->payment->statement ?? '',
+                    'date' => $this->payment->created_at ?? $this->created_at,
+                    'account' => $this->handledBy->name ?? null,
+                ]);
+            } elseif ($this->orderItem) {
+                return __("dashboard.".'Reservation #:order_id — warehouse sale (:name) on :date by :account', [
+                    'order_id' => $this->order_id,
+                    'name' => $this->orderItem->name ?? '',
+                    'date' => $this->orderItem->created_at ?? $this->created_at,
+                    'account' => $this->handledBy->name ?? null,
+                ]);
+            } elseif ($this->orderAddon) {
+                return __("dashboard.".'Reservation #:order_id — addon (:name) on :date by :account', [
+                    'order_id' => $this->order_id,
+                    'name' => $this->orderAddon->name ?? '',
+                    'date' => $this->orderAddon->created_at ?? $this->created_at,
+                    'account' => $this->handledBy->name ?? null,
+                ]);
+            } elseif ($this->expense) {
+                return __("dashboard.".'Reservation #:order_id — expense (:statement) on :date by :account', [
+                    'order_id' => $this->order_id,
+                    'statement' => $this->expense->statement ?? '',
+                    'date' => $this->expense->created_at ?? $this->created_at,
+                    'account' => $this->handledBy->name ?? null,
+                ]);
+            }
+
+            return '';
+        }
+
+        // Non-reservation sources
+        if (str_contains($this->source ?? '', 'expenses') && $this->expense) {
+            return __("dashboard.".'Expenses / general: (:statement) on :date by :account', [
+                'statement' => $this->expense->expenseItem->name ?? '',
+                'date' => $this->expense->created_at ?? $this->created_at,
+                'account' => $this->handledBy->name ?? null,
+            ]);
+        }
+
+        return __("dashboard.".'Payments / general: (:source) on :date by :account', [
+            'source' => $this->generalPayment()->statement ?? '',
+            'date' => $this->created_at,
+            'account' => $this->handledBy->name ?? null,
+        ]);
+    }
 }
