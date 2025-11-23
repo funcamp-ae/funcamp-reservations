@@ -345,7 +345,7 @@ class GeneralPaymentsController extends Controller
             $updateData = $validated;
             $updateData['verified'] = 0;
             $updateData['notes'] = $validated["description"];
-
+            $updateData['statement'] = "account_charge";
             // Merge provided time into date if present
             if (!empty($updateData['date']) && $request->filled('time')) {
                 $updateData['date'] = Carbon::parse($updateData['date'] . ' ' . $request->input('time'))->toDateTimeString();
@@ -578,6 +578,7 @@ class GeneralPaymentsController extends Controller
             ]);
         }
         $validatedData['verified'] = 0;
+        $validatedData['statement'] = "general_revenue_deposit";
         $validatedData['handled_by'] = auth()->id(); // Add handled_by for the payment update
         $payment->update($validatedData);
         
