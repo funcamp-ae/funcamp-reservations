@@ -149,7 +149,7 @@
             images = images || [];
             images.forEach(function(src){
                 if(!src) return;
-                html += '<img src="' + src + '" class="img-fluid mb-2" style="max-width:100%;">';
+                html += '<img src="' + "{{ env('APP_URL') }}/storage/" + src + '" class="img-fluid mb-2" style="max-width:100%;">';
             });
             if(!html) html = '<p>-</p>';
             $('#previewBody').html(html);
