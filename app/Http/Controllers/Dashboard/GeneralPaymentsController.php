@@ -808,6 +808,7 @@ class GeneralPaymentsController extends Controller
                 'source' => $request->source ?? 'add_funds_page',
                 'description' => $request->description ?? 'Add funds to account',
                 'image_path' => $imagePath ?? null,
+                'statement' => 'add_funds', // Set statement type
                 'images' => $imagePath ? json_encode([$imagePath]) : null,
                 'general_payment_id' => $payment->id,
                 'type' => 'deposit', // Funds added to account
