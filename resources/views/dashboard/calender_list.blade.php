@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-bordered" id="ordersTable" style="direction: rtl; text-align: right">
+                    <table class="table table-bordered" id="ordersTable">
                         <thead>
                             <tr>
                                 <th style="min-width:160px">{{ __('dashboard.calendar.table.header.date') }}</th>
