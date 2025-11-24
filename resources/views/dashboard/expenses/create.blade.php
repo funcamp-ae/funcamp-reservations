@@ -110,15 +110,24 @@
                                             multiple>
                                         <small class="form-text text-muted">@lang('dashboard.you_can_upload_multiple_images')</small>
                                         
-                                        @if(isset($expense) && (($expense->images && count($expense->images) > 0) || $expense->image_path || $expense->image))
+                                        @if(isset($expense) && (($expense->images && (is_array($expense->images) || is_string($expense->images))) || $expense->image_path || $expense->image))
                                             <div class="mt-3">
                                                 <p class="text-muted fw-bold">@lang('dashboard.existing_attachments'):</p>
                                                 <div class="d-flex flex-wrap gap-2">
                                                     @php
                                                         $images = [];
-                                                        if($expense->images && is_array($expense->images) && count($expense->images) > 0) {
-                                                            $images = $expense->images;
-                                                        } elseif($expense->image_path || $expense->image) {
+                                                        if(isset($expense->images)) {
+                                                            if(is_array($expense->images) && count($expense->images) > 0) {
+                                                                $images = $expense->images;
+                                                            } elseif(is_string($expense->images)) {
+                                                                $decoded = json_decode($expense->images, true);
+                                                                if(is_array($decoded) && count($decoded) > 0) {
+                                                                    $images = $decoded;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if(empty($images) && ($expense->image_path || $expense->image)) {
                                                             $images[] = $expense->image_path ?? $expense->image;
                                                         }
                                                     @endphp
@@ -264,15 +273,24 @@
                                     <td>
                                             @php
                                                 $images = [];
-                                                if($expense->images && is_array($expense->images) && count($expense->images) > 0) {
-                                                    $images = $expense->images;
-                                                } elseif($expense->image_path || $expense->image) {
+                                                if(isset($expense->images)) {
+                                                    if(is_array($expense->images) && count($expense->images) > 0) {
+                                                        $images = $expense->images;
+                                                    } elseif(is_string($expense->images)) {
+                                                        $decoded = json_decode($expense->images, true);
+                                                        if(is_array($decoded) && count($decoded) > 0) {
+                                                            $images = $decoded;
+                                                        }
+                                                    }
+                                                }
+
+                                                if(empty($images) && ($expense->image_path || $expense->image)) {
                                                     $images[] = $expense->image_path ?? $expense->image;
                                                 }
                                             @endphp
                                             
                                             @if(count($images) > 0)
-                                                <button type="button" class="btn btn-sm btn-primary d-flex gap-2 align-items-center justify-content-center" onclick="previewMultipleImages({{ json_encode(array_map(fn($img) => asset('storage/' . $img), $images)) }}, '{{ $expense->id }}')">
+                                                <button type="button" class="btn btn-sm btn-primary d-flex gap-2 align-items-center justify-content-center" onclick="previewMultipleImages({{ json_encode(array_map(function($img){return asset('storage/' . $img);}, $images)) }}, '{{ $expense->id }}')">
                                                     <span> {{ count($images) }}</span><i class="fas fa-eye"></i> 
                                                 </button>
                                             @else
