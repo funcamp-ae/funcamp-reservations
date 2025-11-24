@@ -46,7 +46,7 @@ class Service extends Model
     {
         return Service::whereDoesntHave('orders', function($q) use ($day) {
             $q->whereDate('date', $day);
-        })->get();
+        })->orderBy('created_at' , 'desc')->get();
     }
     public function reports()
     {

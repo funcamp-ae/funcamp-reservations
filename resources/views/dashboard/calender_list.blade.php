@@ -36,7 +36,7 @@
                             <tr>
                                 <th style="min-width:160px">{{ __('dashboard.calendar.table.header.date') }}</th>
                                 <th>{{ __('dashboard.calendar.table.header.booked_services') }}</th>
-                                <th style="min-width:360px">{{ __('dashboard.calendar.table.header.available_camps') }}</th>
+                                <th style="min-width:160px">{{ __('dashboard.calendar.table.header.available_camps') }}</th>
                             </tr>
                         </thead>
                         <tbody>
