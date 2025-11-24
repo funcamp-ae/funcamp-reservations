@@ -87,19 +87,50 @@
     </div>
 </div>
 
-<!-- Modal for images/notes preview -->
-<div class="modal fade" id="previewModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">{{ __('dashboard.preview') }}</h5>
+<!-- Modal for images preview -->
+<div class="modal fade" id="imagesModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ __('dashboard.images_preview') ?? __('dashboard.preview') }}</h5>
                 <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-      </div>
-      <div class="modal-body" id="previewBody"></div>
+            </div>
+            <div class="modal-body" id="imagesPreviewBody">
+                <div id="previewCarousel" class="carousel slide" data-ride="carousel" data-bs-ride="carousel">
+                    <ol class="carousel-indicators"></ol>
+                    <div class="carousel-inner"></div>
+                    <a class="carousel-control-prev" href="#previewCarousel" role="button" data-slide="prev" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#previewCarousel" role="button" data-slide="next" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+</div>
+
+<!-- Modal for notes preview -->
+<div class="modal fade" id="notesModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ __('dashboard.notes') }}</h5>
+                <button type="button" class="close border-0" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="notesPreviewBody"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-bs-dismiss="modal">{{ __('dashboard.close') }}</button>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 @push('scripts')
@@ -147,63 +178,64 @@
             if (!Array.isArray(images)) {
                 images = images ? [images] : [];
             }
-            var html = '';
             images = images || [];
-            // Build a carousel if multiple images, otherwise show single image
-            if (images.length > 1) {
-                html += '<div id="previewCarousel" class="carousel slide" data-ride="carousel" data-bs-ride="carousel">';
-                // indicators
-                html += '<ol class="carousel-indicators">';
-                images.forEach(function(_, idx){
-                    html += '<li data-target="#previewCarousel" data-slide-to="'+idx+'"'+(idx===0? ' class="active"' : '')+'></li>';
-                });
-                html += '</ol>';
-                // inner
-                html += '<div class="carousel-inner">';
-                images.forEach(function(src, idx){
-                    if(!src) return;
-                    html += '<div class="carousel-item'+(idx===0? ' active' : '')+'">';
-                    html += '<img src="' + "{{ env('APP_URL') }}/storage/" + src + '" class="d-block w-100" style="max-height:70vh; object-fit:contain;">';
-                    html += '</div>';
-                });
-                html += '</div>';
-                // controls
-                html += '<a class="carousel-control-prev" href="#previewCarousel" role="button" data-slide="prev" data-bs-slide="prev">';
-                html += '<span class="carousel-control-prev-icon" aria-hidden="true"></span>';
-                html += '<span class="sr-only">Previous</span>';
-                html += '</a>';
-                html += '<a class="carousel-control-next" href="#previewCarousel" role="button" data-slide="next" data-bs-slide="next">';
-                html += '<span class="carousel-control-next-icon" aria-hidden="true"></span>';
-                html += '<span class="sr-only">Next</span>';
-                html += '</a>';
-                html += '</div>';
-            } else if (images.length === 1) {
-                var src = images[0];
-                if(src) html += '<img src="' + "{{ env('APP_URL') }}/storage/" + src + '" class="img-fluid" style="max-width:100%; max-height:70vh; object-fit:contain;">';
+            // populate existing carousel skeleton
+            var indicatorsHtml = '';
+            var innerHtml = '';
+            images.forEach(function(src, idx){
+                if(!src) return;
+                indicatorsHtml += '<li data-target="#previewCarousel" data-slide-to="'+idx+'"'+(idx===0? ' class="active"' : '')+'></li>';
+                innerHtml += '<div class="carousel-item'+(idx===0? ' active' : '')+'">';
+                innerHtml += '<img src="' + "{{ env('APP_URL') }}/storage/" + src + '" class="d-block w-100" style="max-height:70vh; object-fit:contain;">';
+                innerHtml += '</div>';
+            });
+
+            // If no images, show placeholder instead of carousel
+            if (!indicatorsHtml && !innerHtml) {
+                $('#previewCarousel').hide();
+                $('#imagesPreviewBody').html('<p>-</p>');
+            } else {
+                $('#previewCarousel').show();
+                $('#previewCarousel .carousel-indicators').html(indicatorsHtml);
+                $('#previewCarousel .carousel-inner').html(innerHtml);
+                // show carousel (but disable controls if single image)
+                var $prev = $('#previewCarousel .carousel-control-prev');
+                var $next = $('#previewCarousel .carousel-control-next');
+                if (images.length < 2) {
+                    $prev.css({'pointer-events':'none','opacity':0.5});
+                    $next.css({'pointer-events':'none','opacity':0.5});
+                } else {
+                    $prev.css({'pointer-events':'','opacity':''});
+                    $next.css({'pointer-events':'','opacity':''});
+                }
+
+                // initialize carousel (support both BS4 and BS5)
+                try {
+                    if (typeof $().carousel === 'function') { $('#previewCarousel').carousel(0); }
+                    else if (window.bootstrap && window.bootstrap.Carousel) { new bootstrap.Carousel(document.getElementById('previewCarousel'));
+                    }
+                } catch (err) {
+                    // ignore initialization errors
+                }
             }
-            if(!html) html = '<p>-</p>';
-            $('#previewBody').html(html);
-            // initialize carousel (support both BS4 and BS5)
-            try {
-                if (typeof $().carousel === 'function') { $('#previewCarousel').carousel(); }
-                else if (window.bootstrap && window.bootstrap.Carousel) { new bootstrap.Carousel(document.getElementById('previewCarousel')); }
-            } catch (err) {
-                // ignore initialization errors
-            }
-            $('#previewModal').modal('show');
+
+            $('#imagesModal').modal('show');
         });
 
-        // View notes
+        // View notes (plain content, no extra wrappers)
         $(document).on('click', '.view-notes', function(){
-            var notes = $(this).data('notes') || '';
-            $('#previewBody').html('<pre style="white-space:pre-wrap;">'+notes+'</pre>');
-            $('#previewModal').modal('show');
+            var raw = $(this).attr('data-notes');
+            var notes = '';
+            try { notes = raw ? JSON.parse(raw) : ''; } catch (e) { notes = raw || ''; }
+            // Insert plain text (no HTML wrappers) to avoid extra formatting
+            $('#notesPreviewBody').text(notes);
+            $('#notesModal').modal('show');
         });
 
-        // Ensure modal close works across Bootstrap versions and if data attributes don't bind
-        $('#previewModal').on('click', '[data-dismiss="modal"], [data-bs-dismiss="modal"], .close, .btn-close', function(e){
+        // Ensure modal close works across Bootstrap versions and if data attributes don't bind (apply to both modals)
+        $('#imagesModal, #notesModal').on('click', '[data-dismiss="modal"], [data-bs-dismiss="modal"], .close, .btn-close', function(e){
             e.preventDefault();
-            try { $('#previewModal').modal('hide'); } catch(err) { $('#previewModal').hide(); }
+            try { $(this).closest('.modal').modal('hide'); } catch(err) { $(this).closest('.modal').hide(); }
         });
     });
 </script>
