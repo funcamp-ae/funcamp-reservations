@@ -199,6 +199,7 @@ return [
     'general_revenue' => 'General Revenue',
     'add_revenue' => 'Add Revenue',
     'financial_system' => 'Financial System',
+    'images_preview' => 'Images Preview',
     'unapproved_transactions' => 'Unapproved Transactions',
     'Reservation #:order_id — payment (:statement) on :date by :account' => "Reservation #:order_id\npayment (:statement) \non :date\nby :account",
     'Reservation #:order_id — warehouse sale (:name) on :date by :account' => "Reservation #:order_id\nwarehouse sale (:name) \non :date\nby :account",

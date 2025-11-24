@@ -276,6 +276,7 @@ return [
     'showall' => 'عرض الكل',
     'reservation_revenue' => 'إيرادات الحجوزات',
     'financial_system' => 'النظام المالي',
+    'images_preview' => 'معاينة الصور',
     'unapproved_transactions' => 'المعاملات غير المعتمدة',
         'Reservation #:order_id — payment (:statement) on :date by :account' => "الحجز #:order_id\nالمدفوعات (:statement) \nبتاريخ :date\nبواسطة :account",
         'Reservation #:order_id — warehouse sale (:name) on :date by :account' => "الحجز #:order_id\nمبيعات المخزن (:name) \nبتاريخ :date\nبواسطة :account",
