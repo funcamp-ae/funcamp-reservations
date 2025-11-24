@@ -93,7 +93,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">{{ __('dashboard.images_preview') ?? __('dashboard.preview') }}</h5>
-                <button type="button border-0" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" style="border: none;" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
