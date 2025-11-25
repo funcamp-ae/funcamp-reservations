@@ -26,13 +26,13 @@ class ContactGuideController extends Controller
     {
         $validated = $request->validate([
             'entity_name' => 'nullable|string|max:255',
-            'contact_person_name' => 'required|string|max:255',
-            'primary_phone' => 'required|string|max:50',
-            'secondary_phone' => 'required|string|max:50',
-            'fixed_phone' => 'required|string|max:50',
-            'email' => 'required|email|max:255',
-            'photo' => 'required|image|max:10000',
-            'notes' => 'required|string',
+            'contact_person_name' => 'nullable|string|max:255',
+            'primary_phone' => 'nullable|string|max:50',
+            'secondary_phone' => 'nullable|string|max:50',
+            'fixed_phone' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:255',
+            'photo' => 'nullable|image|max:10000',
+            'notes' => 'nullable|string',
         ]);
 
         if ($request->hasFile('photo')) {
@@ -60,13 +60,13 @@ class ContactGuideController extends Controller
     {
         $validated = $request->validate([
             'entity_name' => 'nullable|string|max:255',
-            'contact_person_name' => 'required|string|max:255',
-            'primary_phone' => 'required|string|max:50',
-            'secondary_phone' => 'required|string|max:50',
-            'fixed_phone' => 'required|string|max:50',
-            'email' => 'required|email|max:255',
+            'contact_person_name' => 'nullable|string|max:255',
+            'primary_phone' => 'nullable|string|max:50',
+            'secondary_phone' => 'nullable|string|max:50',
+            'fixed_phone' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:255',
             'photo' => 'nullable|image|max:10000',
-            'notes' => 'required|string',
+            'notes' => 'nullable|string',
         ]);
 
         if ($request->hasFile('photo')) {

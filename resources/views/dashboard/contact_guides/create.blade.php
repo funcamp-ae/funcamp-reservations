@@ -16,17 +16,17 @@
         <div class="card-body row g-6">
           <div class="col-md-6">
             <label class="form-label">@lang('dashboard.entity_name') <span class="text-danger">*</span></label>
-            <input type="text" name="entity_name" class="form-control" value="{{ old('entity_name', $contact->entity_name ?? '') }}" required>
+            <input type="text" name="entity_name" class="form-control" value="{{ old('entity_name', $contact->entity_name ?? '') }}" >
           </div>
           <div class="col-md-6">
             <label class="form-label">@lang('dashboard.contact_person_name')</label>
-            <input type="text" name="contact_person_name" class="form-control" value="{{ old('contact_person_name', $contact->contact_person_name ?? '') }}" required>
+            <input type="text" name="contact_person_name" class="form-control" value="{{ old('contact_person_name', $contact->contact_person_name ?? '') }}" >
           </div>
           <!-- Primary Phone -->
           <div class="col-md-4">
             <label class="form-label">@lang('dashboard.primary_phone') <span class="text-danger">*</span></label>
             <div class="input-group">
-              <input type="tel" name="primary_phone" class="form-control" value="{{ $contact->primary_phone ?? '' }}" data-dial="{{ isset($contact) && $contact->primary_phone ? substr($contact->primary_phone, 0, 4) : '971' }}" required>
+              <input type="tel" name="primary_phone" class="form-control" value="{{ $contact->primary_phone ?? '' }}" data-dial="{{ isset($contact) && $contact->primary_phone ? substr($contact->primary_phone, 0, 4) : '971' }}" >
             </div>
           </div>
 
@@ -47,7 +47,7 @@
           </div>
           <div class="col-md-6">
             <label class="form-label">@lang('dashboard.email')</label>
-            <input type="email" name="email" class="form-control" value="{{ old('email', $contact->email ?? '') }}" required>
+            <input type="email" name="email" class="form-control" value="{{ old('email', $contact->email ?? '') }}" >
           </div>
           <div class="col-md-6">
             <label class="form-label">@lang('dashboard.photo')</label>
