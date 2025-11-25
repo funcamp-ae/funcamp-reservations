@@ -73,7 +73,7 @@ class HomeController extends Controller
 
     public function calenderList()
     {
-        $grouped = Order::with('customer', 'services')->where('date', '>=', now()->startOfDay())->orderBy('date' , 'asc')->get()->groupBy('date');
+        $grouped = Order::with('customer', 'services')->where('status' , 'approved')->where('date', '>=', now()->startOfDay())->orderBy('date' , 'asc')->get()->groupBy('date');
         return view('dashboard.calender_list', [
             'grouped' => $grouped,
         ]);
