@@ -233,3 +233,40 @@
 <!--end::Post-->
 					
 @endsection
+
+@if(isset($transactions_count) && $transactions_count > 0)
+    <!-- Unapproved Transactions Alert Modal -->
+    <div class="modal fade" id="unapprovedTransactionsModal" tabindex="-1" aria-labelledby="unapprovedTransactionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="unapprovedTransactionsModalLabel">@lang('dashboard.unapproved_transactions')</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">@lang('dashboard.you_have_x_unapproved_transactions', ['count' => $transactions_count])</p>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ route('bank.unapproved_transactions') }}" class="btn btn-primary">@lang('dashboard.go')</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@lang('dashboard.close')</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            try {
+                var modalEl = document.getElementById('unapprovedTransactionsModal');
+                if(modalEl){
+                    var modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                }
+            } catch (e) {
+                console.warn('Modal show failed', e);
+            }
+        });
+    </script>
+    @endpush
+@endif

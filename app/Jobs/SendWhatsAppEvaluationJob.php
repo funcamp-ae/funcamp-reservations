@@ -11,7 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-
+use App\Models\ServiceSiteAndCustomerService ;
 class SendWhatsAppEvaluationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -56,7 +56,9 @@ class SendWhatsAppEvaluationJob implements ShouldQueue
             $surveyUrl = route('surveys.public', ['order' => $this->order->id]);
             
             // Get bilingual message
-            $message = $template->getBilingualMessage($this->order->customer->name, $surveyUrl);
+            $serviceSiteData = ServiceSiteAndCustomerService::getLatestForWhatsApp();
+
+            $message = $template->getBilingualMessage($serviceSiteData , $this->order);
 
             // Send WhatsApp message
             $whatsAppService = new WhatsAppService();

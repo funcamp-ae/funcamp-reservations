@@ -263,6 +263,8 @@ return [
     'financial_system' => 'مالي سیسټم',
     'images_preview' => 'د انځورونو مخکتنه',
     'unapproved_transactions' => 'نا تایید شوي راکړې ورکړې',
+    'you_have_x_unapproved_transactions' => 'تاسو :count نا تایید شوي راکړې ورکړې لرئ.',
+    'go' => 'تلل',
     'Reservation #:order_id — payment (:statement) on :date by :account' => "رزرویشن #:order_id\nتادیه (:statement) په :date\nله خوا :account",
     'Reservation #:order_id — warehouse sale (:name) on :date by :account' => "رزرویشن #:order_id\nد ګودام پلور (:name) په :date\nله خوا :account",
     'Reservation #:order_id — addon (:name) on :date by :account' => "رزرویشن #:order_id\nاضافي (:name) په :date\nله خوا :account",

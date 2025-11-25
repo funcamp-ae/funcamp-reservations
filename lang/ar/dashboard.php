@@ -278,6 +278,8 @@ return [
     'financial_system' => 'النظام المالي',
     'images_preview' => 'معاينة الصور',
     'unapproved_transactions' => 'المعاملات غير المعتمدة',
+    'you_have_x_unapproved_transactions' => 'لديك :count معاملة غير معتمدة.',
+    'go' => 'اذهب',
         'Reservation #:order_id — payment (:statement) on :date by :account' => "الحجز #:order_id\nالمدفوعات (:statement) \nبتاريخ :date\nبواسطة :account",
         'Reservation #:order_id — warehouse sale (:name) on :date by :account' => "الحجز #:order_id\nمبيعات المخزن (:name) \nبتاريخ :date\nبواسطة :account",
         'Reservation #:order_id — addon (:name) on :date by :account' => "الحجز #:order_id\nإضافة (:name) \nبتاريخ :date\nبواسطة :account",

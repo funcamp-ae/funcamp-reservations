@@ -201,6 +201,8 @@ return [
     'financial_system' => 'Financial System',
     'images_preview' => 'Images Preview',
     'unapproved_transactions' => 'Unapproved Transactions',
+    'you_have_x_unapproved_transactions' => 'You have :count unapproved transactions.',
+    'go' => 'Go',
     'Reservation #:order_id — payment (:statement) on :date by :account' => "Reservation #:order_id\npayment (:statement) \non :date\nby :account",
     'Reservation #:order_id — warehouse sale (:name) on :date by :account' => "Reservation #:order_id\nwarehouse sale (:name) \non :date\nby :account",
     'Reservation #:order_id — addon (:name) on :date by :account' => "Reservation #:order_id\naddon (:name) \non :date\nby :account",
