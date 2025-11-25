@@ -13,7 +13,7 @@
             @can('contact-guides.create')
           <a href="{{ route('contact-guides.create') }}" class="btn btn-primary me-2">@lang('dashboard.add_title', ['page_title' => __('dashboard.contact')])</a>
           @endcan
-            @can('contact-guides.export-pdf')
+            @can('contact-guides.export')
           <a href="{{ route('contact-guides.export-pdf') }}" class="btn btn-danger" target="_blank">
             <i class="bi bi-file-earmark-pdf"></i> @lang('dashboard.export_pdf')
           </a>

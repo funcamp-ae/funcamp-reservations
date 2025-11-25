@@ -22,10 +22,11 @@ class BankAccountsController extends Controller
     public function index()
     {
         $this->authorize('viewAny', BankAccount::class);
-
+        $transactions_count = Transaction::where('verified', 0)->count();
         $banks = BankAccount::orderBy('created_at','desc')->get();
         return view('dashboard.banks.index',[
-            'banks' => $banks
+            'banks' => $banks,
+            'transactions_count' => $transactions_count,    
         ]);
     }
 

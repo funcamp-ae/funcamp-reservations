@@ -230,10 +230,7 @@
     </div>
     <!--end::Container-->
 </div>
-<!--end::Post-->
-					
-@endsection
-
+<!--end::Post-->			
 @if(isset($transactions_count) && $transactions_count > 0)
     <!-- Unapproved Transactions Alert Modal -->
     <div class="modal fade" id="unapprovedTransactionsModal" tabindex="-1" aria-labelledby="unapprovedTransactionsModalLabel" aria-hidden="true">
@@ -254,6 +251,9 @@
         </div>
     </div>
 
+    @endif
+@endsection
+
     @push('js')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -269,4 +269,3 @@
         });
     </script>
     @endpush
-@endif
