@@ -75,7 +75,7 @@ class SendWhatsAppBookingReminderJob implements ShouldQueue
             $locationLink = $serviceSite; // Generate Google Maps link
 
             // Get bilingual message with placeholders replaced
-            $message = $template->getBilingualMessage($customerName);
+            $message = $template->getBilingualMessage( $serviceSiteData, $this->order, null, $customerName);
             
             // Replace additional placeholders specific to booking reminder
             $message = str_replace(['[رقم الحجز]', '[Reservation Number]'], $reservationNumber, $message);

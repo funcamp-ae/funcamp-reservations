@@ -563,7 +563,7 @@ class PaymentLinkController extends Controller
         }
 
         // Get bilingual message
-        $message = $template->getBilingualMessage($customer->name);
+        $message = $template->getBilingualMessage(null, null, null, $customer->name);
         
         // Replace payment link placeholder
         $message = str_replace(['[🔗 رابط الدفع]', '[🔗 Payment Link]'], $paymentUrl, $message);
@@ -602,7 +602,7 @@ class PaymentLinkController extends Controller
             }
 
             // Get bilingual message
-            $message = $template->getBilingualMessage($paymentLink->customer->name);
+            $message = $template->getBilingualMessage(null, null, null, $paymentLink->customer->name);
             
             // Replace payment link placeholder
             $paymentUrl = $request->input('payment_url', $paymentLink->payment_url);

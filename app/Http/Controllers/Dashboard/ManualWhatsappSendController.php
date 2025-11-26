@@ -131,7 +131,7 @@ class ManualWhatsappSendController extends Controller
             foreach ($phoneNumbers as $phoneData) {
                 try {
                     // Prepare message
-                    $message = $template->getBilingualMessage($phoneData['name']);
+                    $message = $template->getBilingualMessage(null, null, null, $phoneData['name']);
                     
                     // Add custom message if provided
                     if ($manualSend->custom_message) {
