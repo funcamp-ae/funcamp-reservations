@@ -64,7 +64,7 @@ class SendWhatsAppBookingEndingReminderJob implements ShouldQueue
             $receptionPhone = $serviceSiteData['workerphone'] ?? '+971501234567'; // Use worker phone or default
 
             // Get bilingual message with placeholders replaced
-            $message = $template->getBilingualMessage($customerName);
+            $message = $template->getBilingualMessage($serviceSiteData, $this->order, null, $customerName);
             
             // Replace additional placeholders specific to booking ending reminder
             $message = str_replace(['[رقم الحجز]', '[Reservation Number]'], $reservationNumber, $message);

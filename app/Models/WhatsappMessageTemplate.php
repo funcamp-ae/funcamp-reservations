@@ -90,10 +90,10 @@ class WhatsappMessageTemplate extends Model
     }
 
     // Get bilingual message (Arabic + English)
-    public function getBilingualMessage($serviceSiteData = null, $order = null, $context = null)
+    public function getBilingualMessage($serviceSiteData = null, $order = null, $context = null, $customerName = '')
     {
-        $arabicMessage = $this->processMessageContent($this->message_ar, $serviceSiteData, $order);
-        $englishMessage = $this->processMessageContent($this->message_en, $serviceSiteData, $order);
+        $arabicMessage = $this->processMessageContent($this->message_ar, $serviceSiteData, $order , $customerName);
+        $englishMessage = $this->processMessageContent($this->message_en, $serviceSiteData, $order, $customerName);
         
         if ($context) {
             return $arabicMessage . "<br>" . "━━━━━━━━━━━━━" . "<br>" . $englishMessage;
@@ -103,10 +103,10 @@ class WhatsappMessageTemplate extends Model
     }
 
     // Helper method to process message content
-    private function processMessageContent($message, $serviceSiteData = null, $order = null)
+    private function processMessageContent($message, $serviceSiteData = null, $order = null, $customerName = '')
     {
         // Build variables and placeholders map
-        $placeholders = $this->buildPlaceholdersFromOrder($order, $serviceSiteData);
+        $placeholders = $this->buildPlaceholdersFromOrder($order, $serviceSiteData , $customerName);
         \Log::info('Processing WhatsApp message template', [
             'placeholders' => $placeholders,
         ]);
@@ -320,7 +320,7 @@ class WhatsappMessageTemplate extends Model
      * - Safely extracts customer name and all relevant order attributes
      * - Merges with service site data fields
      */
-    private function buildVariablesForReplacement($order = null, $serviceSiteData = null)
+    private function buildVariablesForReplacement($order = null, $serviceSiteData = null, $customerName = '')
     {
         
         $orderAttrs = [
@@ -334,7 +334,7 @@ class WhatsappMessageTemplate extends Model
         ];
         if ($order) {
             $vars = [
-                'customer_name' => (string) (optional(optional($order)->customer)->name ?? ''),
+                'customer_name' => $order ? (string) ($order?->customer?->name ?? $customerName) : '',
                 'evaluation_link' => (string) env('APP_URL').'/survey/'.$order->id,
                 'terms_conditions_link' => (string) env('APP_URL').'/sign/'.$order->id,
             ];
@@ -369,7 +369,7 @@ class WhatsappMessageTemplate extends Model
      */
     public function buildPlaceholdersFromOrder($order = null, $serviceSiteData = null, $customerName = '', $evaluationLink = '')
     {
-        $vars = $this->buildVariablesForReplacement($order, $serviceSiteData);
+        $vars = $this->buildVariablesForReplacement($order, $serviceSiteData , $customerName);
         return $this->buildPlaceholdersMap($vars);
     }
 }
