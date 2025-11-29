@@ -795,6 +795,7 @@ class OrderController extends Controller
         $today = Carbon::today()->toDateString();
         $todayOrders = Order::with(['customer', 'services', 'payments'])
             ->whereDate('date', $today)
+            ->where('status', 'approved')
             ->latest()
             ->get();
 
