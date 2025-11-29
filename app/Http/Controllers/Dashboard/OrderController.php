@@ -75,7 +75,14 @@ class OrderController extends Controller
 
         $this->authorize('viewAny', Order::class);
 
-        $validStatuses = ['completed', 'rejected', 'canceled', 'delayed'];
+        $validStatuses = [
+            'pending_and_show_price',
+            'pending_and_Initial_reservation',
+            'approved',
+            'canceled',
+            'delayed',
+            'completed'
+        ];
         $status = request()->query('status');
         $customerId = request()->query('customer_id');
 
@@ -96,10 +103,6 @@ class OrderController extends Controller
 
         if (in_array($status, $validStatuses)) {
             $query->where('status', $status);
-        } elseif ($status == 'pending') {
-            $query->where(fn($q) => $q->whereIn('status', ['pending_and_show_price', 'pending_and_Initial_reservation']));
-        } else if ($status == 'approved') {
-            $query->where(fn($q) => $q->whereIn('status', ['approved', 'delayed']));
         }
 
         if (!empty($customerId)) {
