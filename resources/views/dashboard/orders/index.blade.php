@@ -50,7 +50,7 @@
                     <div class="d-flex align-items-center position-relative me-5">
                         <i class="fas fa-calendar position-absolute ms-4"></i>
                         <input type="date" id="orderDateFilter" class="form-control form-control-solid w-200px ps-12" 
-                            placeholder="@lang('dashboard.filter_by_date')">
+                            placeholder="@lang('dashboard.filter_by_date')" value="{{ request('date') }}">
                     </div>
                     
                     <!--begin::Add customer-->
@@ -421,24 +421,38 @@
 </script>
 
 <script>
-    // Date filter: show only rows with matching data-date attribute (expects YYYY-MM-DD)
+    // Date filter: send selected date as query parameter to server so pagination works
     $(document).on('change', '#orderDateFilter', function() {
         var selected = $(this).val(); // format YYYY-MM-DD
-        if (!selected) {
-            // no date selected, show all rows
-            $('tbody tr').show();
-            return;
-        }
 
-        $('tbody tr').each(function() {
-            var $row = $(this);
-            var rowDate = $row.data('date') ? String($row.data('date')) : '';
-            if (rowDate === selected) {
-                $row.show();
+        try {
+            var url = new URL(window.location.href);
+            var params = url.searchParams;
+            if (!selected) {
+                // no date selected -> remove date filter param
+                params.delete('date');
             } else {
-                $row.hide();
+                params.set('date', selected);
             }
-        });
+
+            url.search = params.toString();
+            // Navigate to server-side filtered page
+            window.location.href = url.toString();
+        } catch (e) {
+            // Fallback for older browsers: build query string manually
+            var href = window.location.href.split('?')[0];
+            var qs = [];
+            var existing = window.location.search.replace(/^\?/, '').split('&').filter(Boolean);
+            existing.forEach(function(p) {
+                var parts = p.split('=');
+                var k = decodeURIComponent(parts[0]);
+                if (k === 'page' || k === 'date') return; // skip page and date
+                qs.push(p);
+            });
+            if (selected) qs.push('date=' + encodeURIComponent(selected));
+            var newUrl = href + (qs.length ? ('?' + qs.join('&')) : '');
+            window.location.href = newUrl;
+        }
     });
 </script>
 

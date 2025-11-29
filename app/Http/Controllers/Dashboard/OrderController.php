@@ -88,6 +88,12 @@ class OrderController extends Controller
 
         $query = Order::query();
 
+        // Date filter (YYYY-MM-DD) from query param
+        $dateFilter = request()->query('date');
+        if (!empty($dateFilter)) {
+            $query->where('date', $dateFilter);
+        }
+
         if (in_array($status, $validStatuses)) {
             $query->where('status', $status);
         } elseif ($status == 'pending') {
