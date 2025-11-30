@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Log\LogManager;
-
+use App\Events\GeneralPayment;
 class DeleteOrderRelatedData
 {
     private $log;
@@ -53,6 +53,7 @@ class DeleteOrderRelatedData
             $order->payments()->delete();
             $order->paymentLinks()->delete();
             $order->items()->delete();
+            GeneralPayment::where('order_id', $order->id)->delete();
             // $order->reports()->delete();
             // $order->internalNotes()->delete();
             $order->expenses()->delete();
