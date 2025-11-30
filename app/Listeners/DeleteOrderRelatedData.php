@@ -51,6 +51,7 @@ class DeleteOrderRelatedData
             // Delete other related records
             $order->transactions()->delete();
             $order->payments()->delete();
+            $order->paymentLinks()->delete();
             $order->items()->delete();
             // $order->reports()->delete();
             // $order->internalNotes()->delete();
