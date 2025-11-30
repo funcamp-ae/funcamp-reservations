@@ -24,6 +24,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\InsuranceVerified::class => [
             \App\Listeners\ProcessInsuranceVerification::class,
         ],
+        \App\Events\OrderCanceled::class => [
+            \App\Listeners\DeleteOrderRelatedData::class,
+        ],
     ];
 
     /**

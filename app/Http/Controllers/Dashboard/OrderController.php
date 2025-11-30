@@ -492,6 +492,11 @@ class OrderController extends Controller
 
             \DB::commit();
 
+            // If status changed to canceled, dispatch synchronous event to clean related data
+            if ($request->status === 'canceled' && $order->wasChanged('status')) {
+                event(new \App\Events\OrderCanceled($order));
+            }
+
             return response()->json(['success' => true, 'message' => 'Order updated successfully']);
         } catch (\Exception $e) {
             \DB::rollBack();

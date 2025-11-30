@@ -92,11 +92,7 @@ class Order extends Model
         return $this->belongsTo(User::class, 'insurance_handled_by');
     }
 
-    public function internalNote()
-    {
-        return $this->hasOne(OrderInternalNote::class)->with(['creator', 'internalNote'])->latest();
-    }
-
+    
     protected static function boot()
     {
         parent::boot();
@@ -106,7 +102,11 @@ class Order extends Model
             }
         });
     }
-
+    public function internalNote()
+    {
+        return $this->hasOne(OrderInternalNote::class)->with(['creator', 'internalNote'])->latest();
+    }
+    
     public static function generateOrderNumber()
     {
         $year = substr(date('Y'), -2);
@@ -159,22 +159,6 @@ class Order extends Model
     {
         return $this->hasMany(Payment::class);
     }
-
-    public function verifiedPayments()
-    {
-        return $this->payments()->where('verified', "1");
-    }
-
-    public function paymentLinks()
-    {
-        return $this->hasMany(PaymentLink::class);
-    }
-
-    public function termsSittng()
-    {
-        return $this->hasMany(TermsSittng::class);
-    }
-
     public function addons()
     {
         return $this->belongsToMany(Addon::class, 'order_addon')
@@ -182,25 +166,6 @@ class Order extends Model
             ->withPivot('verified','count', 'price', 'handled_by', 'description', 'id' , 'account_id' , 'payment_method')
             ->withTimestamps();
     }
-    public function addonsPrice()
-    {
-        return OrderAddon::where('order_id', $this->id)->sum('price');
-    }
-    public function verifiedAddons()
-    {
-       return $this->addons()->wherePivot('verified', true);
-    }
-
-    public function verifiedInsurance()
-    {
-        return $this->verifiedPayments()->where('statement', 'the_insurance');
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
     public function rate()
     {
         return $this->hasOne(OrderRate::class, 'order_id');
@@ -215,12 +180,6 @@ class Order extends Model
     {
         return $this->hasMany(OrderInternalNote::class)->latest();
     }
-
-    public function latestInternalNote()
-    {
-        return $this->hasOne(OrderInternalNote::class)->latestOfMany();
-    }
-
     public function internalNoteTemplates()
     {
         return $this->hasManyThrough(
@@ -237,90 +196,181 @@ class Order extends Model
     {
         return $this->hasMany(Expense::class);
     }
+    
+        // ✅ Accessors Hetzner - signin
+        public function getImageBeforeReceivingUrlAttribute()
+        {
+            return $this->image_before_receiving
+                ? Storage::disk('hetzner')->url($this->image_before_receiving)
+                : null;
+        }
+    
+        public function getImageAfterDeliveryUrlAttribute()
+        {
+            return $this->image_after_delivery
+                ? Storage::disk('hetzner')->url($this->image_after_delivery)
+                : null;
+        }
+    
+        public function getVoiceNoteUrlAttribute()
+        {
+            return $this->voice_note
+                ? Storage::disk('hetzner')->url($this->voice_note)
+                : null;
+        }
+    
+        public function getVideoNoteUrlAttribute()
+        {
+            return $this->video_note
+                ? Storage::disk('hetzner')->url($this->video_note)
+                : null;
+        }
+    
+        // ✅ Accessors Hetzner - logout
+        public function getVideoNoteLogoutUrlAttribute()
+        {
+            return $this->video_note_logout
+                ? Storage::disk('hetzner')->url($this->video_note_logout)
+                : null;
+        }
+    
+        public function getVoiceNoteLogoutUrlAttribute()
+        {
+            return $this->voice_note_logout
+            ? Storage::disk('hetzner')->url($this->voice_note_logout)
+            : null;
+        }        
+        
+        public function items()
+        {
+            return $this->hasMany(OrderItem::class);
+        }
+    
+        public function stocksItems()
+        {
+            return $this->belongsToMany(Stock::class, 'order_items')
+                ->withPivot(['unit_price','quantity'])
+                ->using(OrderItemPivot::class)
+                ->withTimestamps();
+        }
+        public function surveyResponses()
+        {
+            return $this->hasMany(SurveyResponse::class, 'reservation_id');
+        }
+    
+        public function surveyEmailLog()
+        {
+            return $this->hasOne(SurveyEmailLog::class);
+        }
+    
+        // App\Models\Order.php
+    public function signinPhotos()
+    {
+        return $this->hasMany(\App\Models\PreLoginImage::class, 'order_id')
+                    ->orderBy('id', 'desc');
+    }
+    
+    public function signoutPhotos()
+    {
+        return $this->hasMany(\App\Models\PreLogoutImage::class, 'order_id')
+                    ->orderBy('id', 'desc');
+    }
+    
+    public function signinVideos() {
+        return $this->hasMany(PreLoginVideo::class);
+    }
+    public function signoutVideos() {
+        return $this->hasMany(PreLogoutVideo::class);
+    }
+    
+    
+    public function signinAudios()
+    {
+        return $this->hasMany(PreLoginAudio::class, 'order_id');
+    }
+    
+    
+    
+        public function signoutAudios()
+        {
+            return $this->hasMany(PreLogoutAudio::class);
+        }
+
+
+    public function paymentLinks()
+    {
+        return $this->hasMany(PaymentLink::class);
+    }    
+    public function verifiedPayments()
+    {
+        return $this->payments()->where('verified', "1");
+    }    
+
+    
+    public function termsSittng()
+    {
+        return $this->hasMany(TermsSittng::class);
+    }        
+
+    public function addonsPrice()
+    {
+        return OrderAddon::where('order_id', $this->id)->sum('price');
+    }    
+    public function verifiedAddons()
+    {
+       return $this->addons()->wherePivot('verified', true); 
+    }   
+
+    public function verifiedInsurance()
+    {
+        return $this->verifiedPayments()->where('statement', 'the_insurance');
+    }    
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }    
+
+
+    public function latestInternalNote()
+    {
+        return $this->hasOne(OrderInternalNote::class)->latestOfMany();
+    }    
+
 
     public function verifiedExpenses()
     {
         return $this->expenses()->where('verified', true);
-    }
-
-    // ✅ Accessors Hetzner - signin
-    public function getImageBeforeReceivingUrlAttribute()
-    {
-        return $this->image_before_receiving
-            ? Storage::disk('hetzner')->url($this->image_before_receiving)
-            : null;
-    }
-
-    public function getImageAfterDeliveryUrlAttribute()
-    {
-        return $this->image_after_delivery
-            ? Storage::disk('hetzner')->url($this->image_after_delivery)
-            : null;
-    }
-
-    public function getVoiceNoteUrlAttribute()
-    {
-        return $this->voice_note
-            ? Storage::disk('hetzner')->url($this->voice_note)
-            : null;
-    }
-
-    public function getVideoNoteUrlAttribute()
-    {
-        return $this->video_note
-            ? Storage::disk('hetzner')->url($this->video_note)
-            : null;
-    }
-
-    // ✅ Accessors Hetzner - logout
-    public function getVideoNoteLogoutUrlAttribute()
-    {
-        return $this->video_note_logout
-            ? Storage::disk('hetzner')->url($this->video_note_logout)
-            : null;
-    }
-
-    public function getVoiceNoteLogoutUrlAttribute()
-    {
-        return $this->voice_note_logout
-            ? Storage::disk('hetzner')->url($this->voice_note_logout)
-            : null;
-    }
-
+    }        
     public function getPreLogoutImagesUrlsAttribute()
     {
         return $this->preLogoutImages->map(function ($img) {
             return $img->image ? Storage::disk('hetzner')->url($img->image) : null;
-        })->filter()->toArray();
-    }
+        })->filter()->toArray();    
+    }    
 
     public function scopeFilter(Builder $builder, $filters)
     {
         $builder->when($filters['price_min'] ?? false, fn($builder, $value) => $builder->where('price', '>=', $value));
         $builder->when($filters['price_max'] ?? false, fn($builder, $value) => $builder->where('price', '<=', $value));
         $builder->when($filters['price'] ?? false, fn($builder, $value) => $builder->where('price', 'like', "%{$value}%"));
-    }
-
-    public function items()
-    {
-        return $this->hasMany(OrderItem::class);
-    }
+    }    
 
     public function insuranceFromTransaction()
     {
         $payment = $this->verifiedPayments()->where('statement', 'the_insurance')->first();
         return $payment && $payment->transaction ? $payment->transaction->amount : 0;
-    }
+    }    
 
     public function verifiedInsuranceAmount()
     {
         return $this->verifiedPayments()->where('statement', 'the_insurance')->sum('price');
-    }
+    }    
 
     public function verifiedWarehouseSalesAmount()
     {
         return OrderItem::where('verified', true)->where("order_id", $this->id)->sum('total_price');
-    }
+    }    
 
     public function totalPaymentsPrice()
     {
@@ -329,7 +379,7 @@ class Order extends Model
         $addons = $this->verifiedAddons()->sum('order_addon.price');
         $warehouseSales = $this->verifiedWarehouseSalesAmount();
         return $this->price - $deposit + $insurances + $addons + $warehouseSales;
-    }
+    }    
 
     public function totalPaidAmount()
     {
@@ -337,73 +387,21 @@ class Order extends Model
         $totalWareHouse = OrderItem::where("order_id", $this->id)->sum('total_price');
         $addons = $this->addons()->where("verified", true)->sum('order_addon.price');
         return $totalPayment + $totalWareHouse + $addons;
-    }
+    }    
         public function totalPrice()
     {
         return $this->price + $this->insurance_amount + $this->addonsPrice();
-    }
+    }    
      
     public function verifiedItems()
     {
         return $this->items()->where('verified', true);
-    }
+    }    
 
-    public function stocksItems()
-    {
-        return $this->belongsToMany(Stock::class, 'order_items')
-            ->withPivot(['unit_price','quantity'])
-            ->using(OrderItemPivot::class)
-            ->withTimestamps();
-    }
 
     public function getItemsTotalAttribute()
     {
         return $this->items->sum('subtotal');
     }
-
-    public function surveyResponses()
-    {
-        return $this->hasMany(SurveyResponse::class, 'reservation_id');
-    }
-
-    public function surveyEmailLog()
-    {
-        return $this->hasOne(SurveyEmailLog::class);
-    }
-
-    // App\Models\Order.php
-public function signinPhotos()
-{
-    return $this->hasMany(\App\Models\PreLoginImage::class, 'order_id')
-                ->orderBy('id', 'desc');
-}
-
-public function signoutPhotos()
-{
-    return $this->hasMany(\App\Models\PreLogoutImage::class, 'order_id')
-                ->orderBy('id', 'desc');
-}
-
-public function signinVideos() {
-    return $this->hasMany(PreLoginVideo::class);
-}
-public function signoutVideos() {
-    return $this->hasMany(PreLogoutVideo::class);
-}
-
-
-public function signinAudios()
-{
-    return $this->hasMany(PreLoginAudio::class, 'order_id');
-}
-
-
-
-    public function signoutAudios()
-    {
-        return $this->hasMany(PreLogoutAudio::class);
-    }
-
-
 
 }
