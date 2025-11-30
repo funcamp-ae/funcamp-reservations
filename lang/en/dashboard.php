@@ -2446,4 +2446,10 @@ return [
     'is_available' => 'Is the page available',
     'is_authenticated' => 'Does it require login',
 
+    // Cancel confirmation for orders
+    'cancel_confirm_title' => 'Confirm cancellation',
+    'cancel_confirm_text' => 'All transactions related to this reservation will be deleted. Do you want to continue?',
+    'cancel_confirm_yes' => 'Yes, cancel',
+    'cancel_confirm_no' => 'No, keep',
+
 ];

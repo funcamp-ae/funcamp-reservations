@@ -2045,6 +2045,12 @@ return [
     'url' => 'اړیکه',
     'is_available' => 'آیا پاڼه شته',
     'is_authenticated' => 'آیا د داخلېدو ضرورت دی',
+
+    // د رزرو لغوه کولو تایید
+    'cancel_confirm_title' => 'د لغوه کولو تایید',
+    'cancel_confirm_text' => 'د دې ریزرویشن پورې ټولې معاملې به حذف شي. ایا غواړئ ادامه ورکړئ؟',
+    'cancel_confirm_yes' => 'هو، لغوه کړئ',
+    'cancel_confirm_no' => 'نه، وساتئ',
     'pages_display_settings' => 'د پاڼو د ښکاره کولو تنظیمات',
     'all_pages' => 'ټولې پاڼې',
     'create_new_page_display_settings' => 'د نوې پاڼې د ښکاره کولو تنظیمات جوړول',

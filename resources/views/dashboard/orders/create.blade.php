@@ -637,17 +637,58 @@
                 });
             });
 
-            // Status change handler
-            $('#status').on('change', function() {
-                if (this.value === 'pending_and_show_price') {
+            // Status change handler with cancel confirmation
+            let previousStatus = $('#status').val();
+            let suppressStatusConfirm = false;
+
+            function handleStatusUI(val) {
+                if (val === 'pending_and_show_price') {
                     $('#expired_price_offer').removeClass('d-none');
                     $('#delayed_reson').addClass('d-none');
-                } else if (this.value === 'delayed') {
+                } else if (val === 'delayed') {
                     $('#delayed_reson').removeClass('d-none');
                     $('#expired_price_offer').addClass('d-none');
                 } else {
                     $('#expired_price_offer,#delayed_reson').addClass('d-none');
                 }
+            }
+
+            $('#status').on('change', function() {
+                const newVal = this.value;
+
+                // Allow programmatic change to bypass confirmation once
+                if (suppressStatusConfirm) {
+                    suppressStatusConfirm = false;
+                    previousStatus = newVal;
+                    handleStatusUI(newVal);
+                    return;
+                }
+
+                if (newVal === 'canceled') {
+                    // Ask for confirmation before accepting canceled
+                    Swal.fire({
+                        title: @json(__('dashboard.cancel_confirm_title')),
+                        text:  @json(__('dashboard.cancel_confirm_text')),
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: @json(__('dashboard.cancel_confirm_yes')),
+                        cancelButtonText: @json(__('dashboard.cancel_confirm_no'))
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // user confirmed, keep canceled
+                            previousStatus = newVal;
+                            handleStatusUI(newVal);
+                        } else {
+                            // revert to previous value
+                            suppressStatusConfirm = true;
+                            $('#status').val(previousStatus).trigger('change');
+                        }
+                    });
+                    return;
+                }
+
+                previousStatus = newVal;
+                handleStatusUI(newVal);
             });
             let first = false ;
             // Price recalculation

@@ -2063,6 +2063,12 @@ return [
     'url' => 'الرابط',
     'is_available' => 'هل الصفحه متاحة',
     'is_authenticated' => 'هل يلزم تسجيل الدخول',
+
+    // تأكيد الإلغاء للحجوزات
+    'cancel_confirm_title' => 'تأكيد الإلغاء',
+    'cancel_confirm_text' => 'سيتم حذف جميع المعاملات المتعلقة بهذا الحجز. هل تريد المتابعة؟',
+    'cancel_confirm_yes' => 'نعم، إلغاء',
+    'cancel_confirm_no' => 'لا، احتفظ',
     'pages_display_settings' => 'إعدادات عرض الصفحات',
     'all_pages' => 'جميع الصفحات',
     'create_new_page_display_settings' => 'إنشاء إعدادات عرض صفحة جديدة',
