@@ -133,11 +133,7 @@ class TaskController extends Controller
             }
             // Try sending via WhatsApp if a template exists for this notification
             try {
-                if ( $task->assignedUser && !empty($task->assignedUser->phone)) {
-                    $whatsApp = new WhatsAppService();
-                    $message = "تم تعيين مهمة جديدة لك: " . $task->title;
-                    $whatsApp->sendTextMessage($task->assignedUser->phone, $message);
-                }
+                $this->sendTaskWhatsAppToAssignee($task, 'created');
             } catch (\Throwable $e) {
                 // ignore WhatsApp errors to avoid breaking the flow
             }
@@ -236,11 +232,7 @@ class TaskController extends Controller
             }   
                 // Try sending via WhatsApp if a template exists for this notification
             try {
-                if ($task->assignedUser && !empty($task->assignedUser->phone)) {
-                    $whatsApp = new WhatsAppService();
-                    $message = "تم تعيين مهمة جديدة لك: " . $task->title;
-                    $whatsApp->sendTextMessage($task->assignedUser->phone, $message);
-                }
+                $this->sendTaskWhatsAppToAssignee($task, 'updated');
             } catch (\Throwable $e) {
                 // ignore WhatsApp errors to avoid breaking the flow
             }
@@ -417,6 +409,40 @@ class TaskController extends Controller
             request('date_from'),
             request('date_to')
         ), 'tasks-report.xlsx');
+    }
+
+    private function sendTaskWhatsAppToAssignee(Task $task, string $action = 'created'): void
+    {
+        try {
+            if (!$task->assignedUser || empty($task->assignedUser->phone)) {
+                return;
+            }
+
+            $whatsApp = new WhatsAppService();
+            $title = (string) $task->title;
+            $due = $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('Y-m-d') : 'N/A';
+            $priority = $task->priority ? ucfirst($task->priority) : 'N/A';
+            $status = $task->status ? ucfirst($task->status) : 'N/A';
+            $type = optional($task->taskType)->name ?? 'General';
+            $assignedBy = optional($task->creator)->name ?? 'System';
+            $description = $task->description ? "\nDescription: " . trim($task->description) : '';
+            $prefix = $action === 'created' ? 'New task assigned to you' : 'Task updated';
+            $link = route('employee.tasks') ?? ""; 
+            $linkLine = $link ? "\nOpen: " . $link : '';
+
+            $message = $prefix . "\n" .
+                "Title: {$title}\n" .
+                "Type: {$type}\n" .
+                "Due Date: {$due}\n" .
+                "Priority: {$priority}\n" .
+                "Status: {$status}\n" .
+                "Assigned By: {$assignedBy}" .
+                $description .
+                $linkLine;
+
+            $whatsApp->sendTextMessage($task->assignedUser->phone, $message);
+        } catch (\Throwable $e) {
+        }
     }
 
     /**
