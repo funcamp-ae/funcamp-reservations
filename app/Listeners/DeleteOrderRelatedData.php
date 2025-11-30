@@ -25,35 +25,35 @@ class DeleteOrderRelatedData
         $order = $event->order;
 
         try {
-            // Delete uploaded files attached directly to the order (hetzner disk)
-            $hetzner = Storage::disk('hetzner');
-            foreach (['image_before_receiving','image_after_delivery','voice_note','video_note','video_note_direct_key','video_note_logout','voice_note_logout'] as $col) {
-                if (!empty($order->$col) && $hetzner->exists($order->$col)) {
-                    $hetzner->delete($order->$col);
-                }
-            }
+            // // Delete uploaded files attached directly to the order (hetzner disk)
+            // $hetzner = Storage::disk('hetzner');
+            // foreach (['image_before_receiving','image_after_delivery','voice_note','video_note','video_note_direct_key','video_note_logout','voice_note_logout'] as $col) {
+            //     if (!empty($order->$col) && $hetzner->exists($order->$col)) {
+            //         $hetzner->delete($order->$col);
+            //     }
+            // }
 
-            // Delete pre-login / pre-logout images (these use public disk in controller)
-            foreach ($order->preLoginImages()->get() as $img) {
-                try { Storage::disk('public')->delete($img->image); } catch (\Throwable $e) {}
-                $img->delete();
-            }
-            foreach ($order->preLogoutImages()->get() as $img) {
-                try { Storage::disk('public')->delete($img->image); } catch (\Throwable $e) {}
-                $img->delete();
-            }
+            // // Delete pre-login / pre-logout images (these use public disk in controller)
+            // foreach ($order->preLoginImages()->get() as $img) {
+            //     try { Storage::disk('public')->delete($img->image); } catch (\Throwable $e) {}
+            //     $img->delete();
+            // }
+            // foreach ($order->preLogoutImages()->get() as $img) {
+            //     try { Storage::disk('public')->delete($img->image); } catch (\Throwable $e) {}
+            //     $img->delete();
+            // }
 
             // Remove related models / pivots
-            $order->services()->detach();
+            // $order->services()->detach();
             $order->addons()->detach();
-            $order->stocks()->detach();
+            // $order->stocks()->detach();
 
             // Delete other related records
             $order->transactions()->delete();
             $order->payments()->delete();
             $order->items()->delete();
-            $order->reports()->delete();
-            $order->internalNotes()->delete();
+            // $order->reports()->delete();
+            // $order->internalNotes()->delete();
             $order->expenses()->delete();
             $order->surveyResponses()->delete();
             if ($order->surveyEmailLog) $order->surveyEmailLog->delete();
