@@ -7,12 +7,17 @@ use App\Http\Controllers\Controller;
 use App\Models\Task;
 use App\Models\TaskType;
 use App\Models\User;
+use App\Models\WhatsappMessageType;
+use App\Models\WhatsappMessageTemplate;
+use App\Services\WhatsAppService;
 use App\Repositories\IUserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Notifications\TaskAssignedNotification;
 
 class TaskController extends Controller
 {
@@ -123,6 +128,19 @@ class TaskController extends Controller
                 $task->attachments()->create(['type' => 'video', 'path' => $key]);
             }
         });
+            if ($task->assignedUser) {
+                Notification::send($task->assignedUser, new TaskAssignedNotification($task));
+            }
+            // Try sending via WhatsApp if a template exists for this notification
+            try {
+                if ( $task->assignedUser && !empty($task->assignedUser->phone)) {
+                    $whatsApp = new WhatsAppService();
+                    $message = "تم تعيين مهمة جديدة لك: " . $task->title;
+                    $whatsApp->sendTextMessage($task->assignedUser->phone, $message);
+                }
+            } catch (\Throwable $e) {
+                // ignore WhatsApp errors to avoid breaking the flow
+            }
 
         return redirect()->route('tasks.index', $task)->with('success', 'تم إنشاء المهمة بنجاح.');
     }
@@ -210,6 +228,25 @@ class TaskController extends Controller
                 $task->attachments()->create(['type' => 'video', 'path' => $key]);
             }
         });
+
+        // Ensure WhatsApp template exists and notify the assigned user about update
+        try {
+            if ($task->assignedUser) {
+                Notification::send($task->assignedUser, new TaskAssignedNotification($task));
+            }   
+                // Try sending via WhatsApp if a template exists for this notification
+            try {
+                if ($task->assignedUser && !empty($task->assignedUser->phone)) {
+                    $whatsApp = new WhatsAppService();
+                    $message = "تم تعيين مهمة جديدة لك: " . $task->title;
+                    $whatsApp->sendTextMessage($task->assignedUser->phone, $message);
+                }
+            } catch (\Throwable $e) {
+                // ignore WhatsApp errors to avoid breaking the flow
+            }
+        } catch (\Throwable $e) {
+            // avoid breaking the normal flow on notification errors
+        }
 
         return back()->with('success', 'تم تحديث المهمة بنجاح.');
     }

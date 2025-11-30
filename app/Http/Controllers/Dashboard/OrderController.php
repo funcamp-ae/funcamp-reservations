@@ -51,6 +51,7 @@ use Endroid\QrCode\Writer\PngWriter;
 use App\Http\Requests\UpdateOrderSignInRequest;
 use Illuminate\Validation\Rule;
 use App\Models\WhatsappMessageType ;
+use App\Models\User;
 
 class OrderController extends Controller
 {
@@ -308,6 +309,10 @@ class OrderController extends Controller
             $this->handleInventoryWithdrawal($order);
         }
 
+        if ($order->status === 'approved') {
+            $this->notifyAdminsOrderApproved($order);
+        }
+
         return response()->json([
             'success' => true,
             'message' => __('Order created successfully'),
@@ -488,6 +493,8 @@ class OrderController extends Controller
             // Send WhatsApp reservation data message if status changed to approved
             if ($request->status === 'approved' && $order->wasChanged('status')) {
                 $this->sendReservationDataWhatsApp($order);
+                $this->notifyAdminsOrderApproved($order);
+
             }
 
             \DB::commit();
@@ -1623,6 +1630,37 @@ $request->validate($rules);
     private function cleanupTempFiles($orderId, $documents)
     {
         return $this->pdfService->cleanupTempFiles($orderId, $documents);
+    }
+
+    private function notifyAdminsOrderApproved(Order $order)
+    {
+        try {
+            $admins = User::role('admin')->get();
+            if ($admins->isEmpty()) {
+                return;
+            }
+
+            $whatsApp = new WhatsAppService();
+            $message = "New order approved\n" .
+                "Order #: {$order->id}\n" .
+                (optional($order->customer)->name ? "Customer: {$order->customer->name}\n" : '') .
+                ($order->date ? "Date: {$order->date}\n" : '') .
+                ($order->time_from ? "From: {$order->time_from}\n" : '') .
+                ($order->time_to ? "To: {$order->time_to}\n" : '') .
+                (isset($order->price) ? "Total: {$order->price}\n" : '') .
+                "Link: " . route('orders.edit', $order->id);
+
+            foreach ($admins as $admin) {
+                if (!empty($admin->phone)) {
+                    $whatsApp->sendTextMessage($admin->phone, $message);
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to notify admins via WhatsApp for approved order', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
