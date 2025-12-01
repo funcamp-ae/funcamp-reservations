@@ -45,6 +45,7 @@ use App\Models\Transaction;
 use App\Models\StockAdjustment;
 use App\Models\OrderAsset;
 use App\Services\StockAdjustmentService;
+use App\Services\OrderAddonService;
 //use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
@@ -57,18 +58,21 @@ class OrderController extends Controller
 {
     private $orderRepository;
     private $pdfService;
+    private $orderAddonService;
 
     public function __construct(
         IOrderRepository $orderRepository,
         IUserRepository $Iuser,
         ICategoryRepository $Icat,
         PdfGeneratorService $pdfService
+        , OrderAddonService $orderAddonService
     ) {
 
         $this->orderRepository = $orderRepository;
         $this->Iuser = $Iuser;
         $this->Icat = $Icat;
         $this->pdfService = $pdfService;
+        $this->orderAddonService = $orderAddonService;
     }
 
     public function index()
@@ -648,30 +652,13 @@ class OrderController extends Controller
 
     public function removeAddon($pivotId)
     {
-        $existingAddon = DB::table('order_addon')->where('id', $pivotId)->first();
-        $order = Order::findOrFail($existingAddon->order_id);
-
-        if (!$existingAddon) {
+        try {
+            $result = $this->orderAddonService->removeAddon((int) $pivotId);
+            return back()->with('success', __('dashboard.success'));
+        } catch (\Exception $e) {
+            \Log::error('Failed to remove addon: ' . $e->getMessage(), ['pivotId' => $pivotId]);
             return back()->with('error', __('dashboard.addon_not_found'));
         }
-        if ($existingAddon->verified) {
-            BankAccount::findOrFail($existingAddon->account_id)->decrement('balance', $existingAddon->price);
-        }
-        // Handle transaction deletion if it exists
-        if ($existingAddon->transaction_id) {
-            $transaction = \App\Models\Transaction::find($existingAddon->transaction_id);
-            if ($transaction) {
-                $transaction->delete();
-            }
-        }
-        // Calculate the price difference
-        $priceDifference = $existingAddon->price;
-
-
-        // Delete the pivot record
-        DB::table('order_addon')->where('id', $pivotId)->delete();
-
-        return back()->with('success', __('dashboard.success'));
     }
 
     public function addons($id)

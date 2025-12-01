@@ -13,6 +13,7 @@ use App\Exports\ExpensesExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use DB;
+use App\Services\FinancialDeletionService;
 
 
 class ExpensesController extends Controller
@@ -336,40 +337,12 @@ class ExpensesController extends Controller
      */
     public function destroy($expense)
     {
-        $expense = Expense::findOrFail($expense);
-        $this->authorize('delete', $expense);
-
-        DB::beginTransaction();
-
-        try {
-            if ($expense->verified) {
-                    $bankAccount = BankAccount::findOrFail($expense->account_id);
-                    $bankAccount->increment('balance', $expense->price);
-            }
-
-            // Delete multiple images if they exist
-            if ($expense->images && is_array($expense->images)) {
-                $expense->deleteMultipleImages($expense->images);
-            }
-            
-            // Delete old single images for backward compatibility
-            if ($expense->image && \Storage::disk('public')->exists($expense->image)) {
-                \Storage::disk('public')->delete($expense->image);
-            }
-            if ($expense->image_path && \Storage::disk('public')->exists($expense->image_path)) {
-                \Storage::disk('public')->delete($expense->image_path);
-            }
-
-            $expense->delete();
-
-            DB::commit();
-            return response()->json(["success" => true,"deleted_expense_amount" => $expense->price]);
-
-        } catch (\Exception $e) {
-            DB::rollback();
-            \Log::error('Expense destroy transaction failed: ' . $e->getMessage());
-            return response()->json(["success" => false, "message" => "Delete failed"], 500);
+        $service = new FinancialDeletionService();
+        $res = $service->deleteExpenseById((int) $expense);
+        if ($res['success']) {
+            return response()->json(['success' => true, 'deleted_expense_amount' => $res['deleted_expense_amount']]);
         }
+        return response()->json(['success' => false, 'message' => $res['message'] ?? 'Delete failed'], 500);
     }
 
     /**

@@ -7,14 +7,18 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Log\LogManager;
-use App\Events\GeneralPayment;
+use App\Models\GeneralPayment;
+use App\Services\OrderAddonService;
 class DeleteOrderRelatedData
 {
     private $log;
+    private $orderAddonService;
 
-    public function __construct(LogManager $log)
+    public function __construct(LogManager $log , OrderAddonService $orderAddonService = null)
     {
         $this->log = $log;
+        $this->orderAddonService = $orderAddonService ?? app(OrderAddonService::class);
+
     }
 
     /**
@@ -45,18 +49,75 @@ class DeleteOrderRelatedData
 
             // Remove related models / pivots
             // $order->services()->detach();
-            $order->addons()->detach();
+
+            // Use the OrderAddonService to remove addon pivot rows safely
+            $addons = $order->addons()->get();
+            foreach ($addons as $addon) {
+                try {
+                    $pivot = $addon->pivot;
+                    if ($pivot && !empty($pivot->id)) {
+                        $res = $this->orderAddonService->removeAddon((int) $pivot->id);
+                        $this->log->info('Removed order addon via service during order cancel', [
+                            'order_id' => $order->id,
+                            'addon_pivot_id' => $pivot->id,
+                            'result' => $res,
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    $this->log->error('Error removing addon via service during order cancel: ' . $e->getMessage(), [
+                        'order_id' => $order->id,
+                        'addon_id' => $addon->id ?? null,
+                    ]);
+                }
+            }
             // $order->stocks()->detach();
 
-            // Delete other related records
-            $order->transactions()->delete();
-            $order->payments()->delete();
+            // Delete other related records using FinancialDeletionService so balances and transactions
+            // are handled consistently.
+            $financialDeletion = app(\App\Services\FinancialDeletionService::class);
+
+            // Payments
+            foreach ($order->payments()->get() as $payment) {
+                try {
+                    $res = $financialDeletion->deletePaymentById((int) $payment->id);
+                } catch (\Throwable $e) {
+                    $this->log->error('Failed deleting payment during order cancel: ' . $e->getMessage(), ['order_id' => $order->id, 'payment_id' => $payment->id]);
+                }
+            }
+
+            // Order items (warehouse sales)
+            foreach ($order->items()->get() as $item) {
+                try {
+                    $res = $financialDeletion->deleteOrderItemById((int) $item->id);
+                } catch (\Throwable $e) {
+                    $this->log->error('Failed deleting order item during order cancel: ' . $e->getMessage(), ['order_id' => $order->id, 'item_id' => $item->id]);
+                }
+            }
+
+            // Expenses
+            foreach ($order->expenses()->get() as $expense) {
+                try {
+                    $res = $financialDeletion->deleteExpenseById((int) $expense->id);
+                } catch (\Throwable $e) {
+                    $this->log->error('Failed deleting expense during order cancel: ' . $e->getMessage(), ['order_id' => $order->id, 'expense_id' => $expense->id]);
+                }
+            }
+
+            // General payments related to this order
+            $generalPayments = \App\Models\GeneralPayment::where('order_id', $order->id)->get();
+            foreach ($generalPayments as $gp) {
+                try {
+                    $res = $financialDeletion->deleteGeneralPaymentById((int) $gp->id);
+                } catch (\Throwable $e) {
+                    $this->log->error('Failed deleting general payment during order cancel: ' . $e->getMessage(), ['order_id' => $order->id, 'general_payment_id' => $gp->id]);
+                }
+            }
+
+            // Other relations: payment links & transactions (fallback cleanup)
             $order->paymentLinks()->delete();
-            $order->items()->delete();
-            GeneralPayment::where('order_id', $order->id)->delete();
+            $order->transactions()->delete();
             // $order->reports()->delete();
             // $order->internalNotes()->delete();
-            $order->expenses()->delete();
             $order->surveyResponses()->delete();
             if ($order->surveyEmailLog) $order->surveyEmailLog->delete();
 

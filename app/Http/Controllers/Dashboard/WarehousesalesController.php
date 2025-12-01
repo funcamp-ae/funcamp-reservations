@@ -9,6 +9,7 @@ use App\Models\Transaction;
 use App\Models\BankAccount;
 use App\Models\StockAdjustment;
 use DB;
+use App\Services\FinancialDeletionService;
 
 class WarehousesalesController extends Controller
 {
@@ -148,30 +149,11 @@ class WarehousesalesController extends Controller
 
     public function destroy($id)
     {
-        DB::beginTransaction();
-
-        try {
-            $item = OrderItem::findOrFail($id);
-            $stock = Stock::findOrFail($item->stock_id);
-
-            // Return stock quantity and reverse bank account balance
-            if ($item->verified) {
-                $stock->increment('quantity', $item->quantity);
-                BankAccount::findOrFail($item->account_id)->decrement('balance', $item->total_price);
-            }
-
-            // Delete related transaction
-            Transaction::where('order_item_id', $item->id)->delete();
-
-            $item->delete();
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            \Log::error('Warehouse sale destroy transaction failed: ' . $e->getMessage());
-            return redirect()->back()->withErrors(['error' => 'Delete failed. Please try again.']);
+        $service = new FinancialDeletionService();
+        $res = $service->deleteOrderItemById((int) $id);
+        if ($res['success']) {
+            return redirect()->back()->with('success', __('dashboard.success'));
         }
-
-        return redirect()->back()->with('success', __('dashboard.success'));
+        return redirect()->back()->withErrors(['error' => $res['message'] ?? 'Delete failed. Please try again.']);
     }
 }

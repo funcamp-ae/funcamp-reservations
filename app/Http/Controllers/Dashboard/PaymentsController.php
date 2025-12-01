@@ -13,6 +13,7 @@ use App\Models\Expense;
 use App\Models\GeneralPayment;
 use App\Services\InsuranceVerificationService;
 use App\Traits\ImageUploadTrait;
+use App\Services\FinancialDeletionService;
 use Illuminate\Http\Request;
 use PDF;
 use DB;
@@ -471,31 +472,12 @@ public function moneyTransfer(Request $request)
      */
     public function destroy($payment)
     {
-        $payment = Payment::findOrFail($payment);
-        $this->authorize('delete', $payment);
-
-        DB::beginTransaction();
-
-        try {
-            // If payment is verified, discount from the bank account
-            if ($payment->verified && $payment->statement !== "the_insurance") {
-                $bankAccount = BankAccount::find($payment->account_id);
-                if ($bankAccount) {
-                    $bankAccount->decrement('balance', $payment->price);
-                }
-            }else if ($payment->verified && $payment->statement === "the_insurance") {
-                $insuranceService = new InsuranceVerificationService();
-                $insuranceService->insurnaceDeleted($payment);
-            }
-            $payment->delete();
-            DB::commit();
-            return response()->json(["success" => true,"deleted_amount" => $payment->price]);
-
-        } catch (\Exception $e) {
-            DB::rollback();
-            \Log::error('Payment destroy transaction failed: ' . $e->getMessage());
-            return response()->json(["success" => false, "message" => "Delete failed"], 500);
+        $service = new FinancialDeletionService();
+        $res = $service->deletePaymentById((int) $payment);
+        if ($res['success']) {
+            return response()->json(['success' => true, 'deleted_amount' => $res['deleted_amount']]);
         }
+        return response()->json(['success' => false, 'message' => $res['message'] ?? 'Delete failed'], 500);
     }
 
 
