@@ -165,26 +165,18 @@
                                 <!--begin::Time From-->
                                 <td>{{ $order->time_from ? \Carbon\Carbon::createFromFormat('H:i:s', $order->time_from)->format('h:i A') : '' }}</td>
                                 <!--end::Time From-->
-                                @php
-                                $totalPaid = $order->totalPaidAmount();
-                                $totalPrice = $order->totalPrice();
-                                $remaining = $order->remainingAmount();
-                                if ($order->id == 6) {
-                                    \Log::info("Order ID 6 - Total Paid: $totalPaid, Total Price: $totalPrice, Remaining: $remaining");
-                                }
-                                @endphp
                                 <!--begin::Payments-->
                                 <td>
                                     <span class="text-success">
                                         {{ __('dashboard.paied') }}
-                                        {{ number_format( $totalPaid ) }}
+                                        {{ number_format( $order->totalPaidAmount() ) }}
                                     </span>
                                     {{ __('dashboard.out of') }}
-                                    {{ number_format($totalPrice) }}
+                                    {{ number_format($order->totalPrice()) }}
 
                                     <span class="text-danger">
                                         {{ __('dashboard.remaining') }}
-                                        <span class="remaining-amount" data-remaining="{{ $remaining }}">{{ number_format($remaining) }}</span>
+                                        <span class="remaining-amount" data-remaining="{{ $remaining }}">{{ number_format($order->remainingAmount()) }}</span>
                                     </span>
                                 </td>
                                 <!--end::Payments-->
