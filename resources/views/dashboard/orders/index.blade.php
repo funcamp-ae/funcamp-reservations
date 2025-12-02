@@ -187,7 +187,7 @@
                                         <!-- @if ($order->insurance_status == 'returned')
                                             {{ number_format($order->insurance_amount) }}
                                         @else -->
-                                        {{ number_format($remaining) }}
+                                        {{$remaining}}
 
                                         <!-- @endif -->
                                     </span>
