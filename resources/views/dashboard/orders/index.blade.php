@@ -168,7 +168,7 @@
                                 @php
                                 $totalPaid = $order->totalPaidAmount();
                                 $totalPrice = $order->totalPrice();
-                                $remaining = $totalPrice - $totalPaid;
+                                $remaining = intval($totalPrice - $totalPaid);
                                 @endphp
                                 <!--begin::Payments-->
                                 <td>
