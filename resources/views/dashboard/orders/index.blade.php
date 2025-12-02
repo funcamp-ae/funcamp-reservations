@@ -176,7 +176,7 @@
 
                                     <span class="text-danger">
                                         {{ __('dashboard.remaining') }}
-                                        <span class="remaining-amount" data-remaining="{{ $remaining }}">{{ number_format($order->remainingAmount()) }}</span>
+                                        <span class="remaining-amount">{{ number_format($order->remainingAmount()) }}</span>
                                     </span>
                                 </td>
                                 <!--end::Payments-->
