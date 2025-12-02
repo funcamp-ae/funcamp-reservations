@@ -404,4 +404,15 @@ class Order extends Model
         return $this->items->sum('subtotal');
     }
 
+    /**
+     * Remaining amount the customer owes for this order.     *
+     * @return float
+     */
+    public function remainingAmount(): float
+    {
+        $totalPaid = (float) $this->totalPaidAmount();
+        $totalPrice = (float) $this->totalPrice();
+        return max(0, $totalPrice - $totalPaid);
+    }
+
 }
