@@ -169,6 +169,9 @@
                                 $totalPaid = $order->totalPaidAmount();
                                 $totalPrice = $order->totalPrice();
                                 $remaining = $order->remainingAmount();
+                                if ($order->id == 6) {
+                                    \Log::info("Order ID 6 - Total Paid: $totalPaid, Total Price: $totalPrice, Remaining: $remaining");
+                                }
                                 @endphp
                                 <!--begin::Payments-->
                                 <td>
