@@ -28,7 +28,7 @@
                 <tbody>
                     @if(isset($transactions) && $transactions->count())
                         @foreach($transactions as $t)
-                            <!-- @php
+                            @php
                                 // Determine linked item id and type for verification route
                                 $linkId = null; $linkType = null;
                                 if(isset($t->payment_id) && $t->payment_id) { $linkId = $t->payment_id; $linkType = 'payment'; }
@@ -36,7 +36,7 @@
                                 elseif(isset($t->order_addon_id) && $t->order_addon_id) { $linkId = $t->order_addon_id; $linkType = 'addon'; }
                                 elseif(isset($t->order_item_id) && $t->order_item_id) { $linkId = $t->order_item_id; $linkType = 'warehouse_sales'; }
                                 elseif(isset($t->general_payment_id) && $t->general_payment_id) { $linkId = $t->general_payment_id; $linkType = 'general_revenue_deposit'; }
-                            @endphp -->
+                            @endphp 
                             <tr>
                                 <td>{{$loop->iteration }}</td>
                                 <td>{!! nl2br(e($t->getDetailedSource() ?? '-')) !!}</td>
