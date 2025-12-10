@@ -110,7 +110,7 @@
                         <tbody class="fw-bold ">
                             @foreach ($orders as $order)
                             <!--begin::Table row-->
-                            <tr data-date="{{ $order->date }}" data-id="{{$order->id}}" data-phone="{{ $order->customer->phone ?? '' }}" data-email="{{ $order->customer->email ?? '' }}">
+                            <tr data-date="{{ $order->date }}" data-id="{{$order->id}}" data-customer-name="{{ $order->customer->name ?? '' }}" data-phone="{{ $order->customer->phone ?? '' }}" data-email="{{ $order->customer->email ?? '' }}">
                                 <td>{{ $orders->firstItem() + $loop->index }}</td>
                                 <td>
                                     @can('bookings.edit')
@@ -378,7 +378,7 @@
         $('tbody tr').each(function() {
             var $row = $(this);
             var orderId = $row.find('td:eq(1)').text().toLowerCase();
-            var customerName = $row.find('td:eq(2)').text().toLowerCase();
+            var customerName = $row.data('customer-name') ? $row.data('customer-name').toString().toLowerCase() : '';
             var phone = $row.data('phone') ? $row.data('phone').toString().toLowerCase() : '';
             var email = $row.data('email') ? $row.data('email').toLowerCase() : '';
             
