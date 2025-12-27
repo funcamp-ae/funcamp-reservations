@@ -73,7 +73,7 @@
                                 </td>
                                 <td>
                                     @if($paymentLink->customer)
-                                        <a href="{{ route('customers.show', $paymentLink->customer->id) }}" class="text-hover-primary">
+                                        <a href="{{ route('customers.index') }}" class="text-hover-primary">
                                             {{ $paymentLink->customer->name }}
                                         </a>
                                     @else
