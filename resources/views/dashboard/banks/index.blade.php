@@ -254,8 +254,8 @@
     @endif
 @endsection
     
-    @can('transactions.index')
-            @push('js')
+@can('transactions.index')
+    @push('js')
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
                     try {
@@ -269,5 +269,5 @@
                     }
                 });
             </script>
-    @endcan
     @endpush
+@endcan
