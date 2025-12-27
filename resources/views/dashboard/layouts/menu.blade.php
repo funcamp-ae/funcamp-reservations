@@ -1374,6 +1374,18 @@
                         </div>
                         @endcan
 
+                        @can('transactions.index')
+                        <!-- Payment Links Report -->
+                        <div class="menu-item">
+                            <a href="{{ route('bank.payment-links.transactions.index') }}" class="menu-link py-3 {{ isActiveRoute('bank.payment-links.transactions.index') }}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">@lang('dashboard.payment_links_report')</span>
+                            </a>
+                        </div>
+                        @endcan
+
                         <!--end::Menu item-->
 
                         @can('transactions.index')

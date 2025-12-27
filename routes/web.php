@@ -1005,6 +1005,13 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
         'title' => 'dashboard.unapproved_transactions'
     ]);
 
+    # payment links report (paid via electronic payment links)
+    Route::get('bank/payment-links', [
+        'uses' => 'BankAccountsController@transactionsViaPaymentLinks',
+        'as' => 'bank.payment-links.transactions.index',
+        'title' => 'dashboard.payment_links_report'
+    ]);
+
     # payments store
     Route::post('accounts/store', [
         'uses' => 'PaymentsController@accountsStore',

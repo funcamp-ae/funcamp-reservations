@@ -7,6 +7,7 @@ use App\Models\BankAccount;
 use App\Models\Transaction;
 use App\Models\Expense;
 use App\Models\Payment;
+use App\Models\PaymentLink;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
@@ -167,5 +168,24 @@ class BankAccountsController extends Controller
         $bank = BankAccount::findOrFail($bankAccount);
         $bank->delete();
         return response()->json();
+    }
+
+    /**
+     * Display transactions via payment links report (paid via electronic payment links)
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function transactionsViaPaymentLinks()
+    {
+        // $this->authorize('viewAny', BankAccount::class);
+        
+        $transactionsViaPaymentLinks = PaymentLink::with(['order', 'customer', 'handledBy'])
+            ->where('status', 'paid')
+            ->orderBy('paid_at', 'desc')
+            ->get();
+
+        return view('dashboard.banks.transactions-via-payment-links', [
+            'paymentLinks' => $transactionsViaPaymentLinks,
+        ]);
     }
 }
