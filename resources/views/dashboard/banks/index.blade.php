@@ -253,19 +253,21 @@
 
     @endif
 @endsection
-
-    @push('js')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            try {
-                var modalEl = document.getElementById('unapprovedTransactionsModal');
-                if(modalEl){
-                    var modal = new bootstrap.Modal(modalEl);
-                    modal.show();
-                }
-            } catch (e) {
-                console.warn('Modal show failed', e);
-            }
-        });
-    </script>
+    
+    @can('transactions.index')
+            @push('js')
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    try {
+                        var modalEl = document.getElementById('unapprovedTransactionsModal');
+                        if(modalEl){
+                            var modal = new bootstrap.Modal(modalEl);
+                            modal.show();
+                        }
+                    } catch (e) {
+                        console.warn('Modal show failed', e);
+                    }
+                });
+            </script>
+    @endcan
     @endpush

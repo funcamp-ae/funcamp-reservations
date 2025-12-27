@@ -227,7 +227,7 @@
                             <td>
                             <input type="text" name="available_quantity" class="form-control" value="" readonly>
                             </td>
-                            <td class="d-flex flex-row gap-4">
+                            <td class="d-flex flex-row gap-4 border-0">
                                 <div class="form-group d-flex align-items-center mb-0">
                                     <div class="ml-2">
                                         <button type="button" class="btn btn-outline-danger mr-2" id="btn-decrement-main">{{ __('dashboard.decrement') }}</button>
@@ -280,7 +280,7 @@
                             <td class="min-w-200">
                                 <input type="datetime-local" name="date_time" class="form-control w-auto" required>
                             </td>
-                            <td class="d-flex flex-row width auto flex-nowrap gap-4">
+                            <td class="d-flex flex-row width auto flex-nowrap gap-4 border-0">
                             <input type="hidden" name="verified" value="0" id="verified-input">
                                 <button type="button" class="btn btn-outline-danger text-nowrap" id="btn-draft-switch">{{ __('dashboard.stockTaking.draft') }}</button>
                                 <button type="button" class="btn btn-outline-success verified text-nowrap" id="btn-approved-switch">{{ __('dashboard.stockTaking.approved') }}</button>
