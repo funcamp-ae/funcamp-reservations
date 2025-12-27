@@ -1134,7 +1134,7 @@ $request->validate($rules);
             } elseif ($type == 'insurance') {
                 $this->authorize('approveInsurance',Order::class);
                 $item = Order::findOrFail($id);
-                if(!$item->insurance_status){
+                if($item->insurance_status === null){
                     return redirect()->back()->with('error', __('dashboard.insurance_not_set'));
                 }
                 // If insurance is being approved, trigger the verification process
