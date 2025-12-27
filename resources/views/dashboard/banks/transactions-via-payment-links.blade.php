@@ -139,7 +139,7 @@
                                         
                                         @if($paymentLink->customer)
                                         <div class="menu-item px-3">
-                                            <a href="{{ route('customers.show', $paymentLink->customer->id) }}" class="menu-link px-3">
+                                            <a href="{{ route('customers.index') }}" class="menu-link px-3">
                                                 <i class="bi bi-person fs-5 me-2"></i>@lang('dashboard.view_customer')
                                             </a>
                                         </div>
