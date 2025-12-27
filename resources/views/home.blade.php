@@ -479,7 +479,6 @@
                 </div>
 
                 <!-- Begin Recent Add Funds Table -->
-                <!-- @can('transactions.view') -->
                 <div class="col-12 mb-10">
                     <div class="card card-flush">
                         <div class="card-header pt-7">
@@ -545,8 +544,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- @endcan -->
-
             </div>
 
         </div>
