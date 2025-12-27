@@ -108,7 +108,6 @@
             <!--end::Card header-->
             <!--begin::Card body-->
             <div class="card-body pt-0">
-                {{$customers->links('pagination::bootstrap-5')}}
                 <!--begin::Table-->
                 <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_category_table">
                     <!--begin::Table head-->
@@ -207,6 +206,8 @@
                     <!--end::Table body-->
                 </table>
                 <!--end::Table-->
+                 {{$customers->links('pagination::bootstrap-5')}}
+
             </div>
             <!--end::Card body-->
         </div>
