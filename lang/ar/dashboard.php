@@ -1135,7 +1135,7 @@ return [
     'back_to_order' => 'العودة للحجز',
     'view_payment_links' => 'عرض روابط الدفع',
     'payment_links_show' => 'عرض رابط الدفع',
-    'payment_links_report' => 'تقرير روابط الدفع الإلكترونية',
+    'payment_link_transactions' => 'معاملات روابط الدفع',
     'paid_via_link' => 'مدفوع عبر رابط إلكتروني',
     'payment_method' => 'طريقة الدفع',
     'handled_by' => 'تمت المعالجة بواسطة',

@@ -1148,7 +1148,7 @@ return [
     'qr_code_placeholder' => 'QR Code will be generated here',
     'back_to_order' => 'Back to Order',
     'view_payment_links' => 'View Payment Links',
-    'payment_links_report' => 'Payment Links Report',
+    'payment_link_transactions' => 'Transactions via Payment Links',
     'paid_via_link' => 'Paid via Link',
     'payment_method' => 'Payment Method',
     'handled_by' => 'Handled By',

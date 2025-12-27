@@ -1381,7 +1381,7 @@
                                 <span class="menu-bullet">
                                     <span class="bullet bullet-dot"></span>
                                 </span>
-                                <span class="menu-title">@lang('dashboard.payment_links_report')</span>
+                                <span class="menu-title">@lang('dashboard.payment_link_transactions')</span>
                             </a>
                         </div>
                         @endcan

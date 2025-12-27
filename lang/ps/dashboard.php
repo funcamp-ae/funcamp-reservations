@@ -1109,7 +1109,7 @@ return [
     'back_to_order' => 'امانت ته راستنیدنه',
     'view_payment_links' => 'د تادیې لینکونه لیدل',
     'payment_links_show' => 'د تادیې لینک لیدل',
-    'payment_links_report' => 'د بریښنایی تادیې لینکونو راپور',
+    'payment_link_transactions' => 'د تادیې لینکونو معاملې',
     'paid_via_link' => 'د بریښنایی لینک له لارې تادیه شوی',
     'payment_method' => 'د تادیې میتود',
     'handled_by' => 'د چا لخوا پروسس شوی',

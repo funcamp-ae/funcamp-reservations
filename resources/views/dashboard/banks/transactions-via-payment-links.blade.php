@@ -1,4 +1,4 @@
-@section('pageTitle' , __('dashboard.payment_links_report'))
+@section('pageTitle' , __('dashboard.payment_link_transactions'))
 
 @extends('dashboard.layouts.app')
 @section('content')
@@ -14,19 +14,7 @@
             <div class="card-header align-items-center py-5 gap-2 gap-md-5">
                 <!--begin::Card title-->
                 <div class="card-title">
-                    <!--begin::Search-->
-                    <div class="d-flex align-items-center position-relative my-1">
-                        <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
-                        <span class="svg-icon svg-icon-1 position-absolute ms-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
-                                <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
-                            </svg>
-                        </span>
-                        <!--end::Svg Icon-->
-                        <input type="text" data-kt-ecommerce-category-filter="search" class="form-control form-control-solid w-250px ps-14" placeholder="@lang('dashboard.search')" />
-                    </div>
-                    <!--end::Search-->
+                    <h3>@lang('dashboard.payment_link_transactions')</h3>
                 </div>
                 <!--end::Card title-->
             </div>
@@ -41,7 +29,6 @@
                         <!--begin::Table row-->
                         <tr class="text-center fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                             <th class="fw-bolder">#</th>
-                            <th class="fw-bolder">@lang('dashboard.checkout_id')</th>
                             <th class="fw-bolder">@lang('dashboard.order_id')</th>
                             <th class="fw-bolder">@lang('dashboard.customer_name')</th>
                             <th class="fw-bolder">@lang('dashboard.amount')</th>
@@ -59,9 +46,6 @@
                         @forelse ($paymentLinks as $index => $paymentLink)
                             <tr>
                                 <td class="text-center">{{ $index + 1 }}</td>
-                                <td>
-                                    <span class="badge badge-light-info">{{ $paymentLink->checkout_id ?? '-' }}</span>
-                                </td>
                                 <td>
                                     @if($paymentLink->order)
                                         <a href="{{ route('orders.show', $paymentLink->order->id) }}" class="text-hover-primary">
@@ -145,11 +129,6 @@
                                         </div>
                                         @endif
 
-                                        <div class="menu-item px-3">
-                                            <a href="{{ $paymentLink->payment_url }}" target="_blank" class="menu-link px-3">
-                                                <i class="bi bi-link-45deg fs-5 me-2"></i>@lang('dashboard.open_payment_link')
-                                            </a>
-                                        </div>
                                     </div>
                                     <!--end::Menu-->
                                 </td>

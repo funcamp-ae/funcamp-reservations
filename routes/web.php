@@ -1009,7 +1009,7 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
     Route::get('bank/payment-links', [
         'uses' => 'BankAccountsController@transactionsViaPaymentLinks',
         'as' => 'bank.payment-links.transactions.index',
-        'title' => 'dashboard.payment_links_report'
+        'title' => 'dashboard.payment_link_transactions'
     ]);
 
     # payments store
