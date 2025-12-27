@@ -71,7 +71,6 @@
             <!--end::Card header-->
             <!--begin::Card body-->
             <div class="card-body pt-0">
-                {{$orders->links()}}
                 <!--begin::Table-->
                 <div class="table-responsive">
                     <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_ecommerce_category_table">
@@ -322,6 +321,10 @@
                     </table>
                 </div>
                 <!--end::Table-->
+                
+            <div class="d-flex justify-content-end mt-4">
+                {{ $orders->links('pagination::bootstrap-5') }}
+            </div>
             </div>
             <!--end::Card body-->
         </div>
