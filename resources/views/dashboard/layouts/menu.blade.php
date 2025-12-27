@@ -1374,7 +1374,7 @@
                         </div>
                         @endcan
 
-                        @can('transactions.index')
+                        @can('bank.payment-links.transactions.index')
                         <!-- Payment Links Report -->
                         <div class="menu-item">
                             <a href="{{ route('bank.payment-links.transactions.index') }}" class="menu-link py-3 {{ isActiveRoute('bank.payment-links.transactions.index') }}">
