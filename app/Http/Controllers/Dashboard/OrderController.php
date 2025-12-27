@@ -256,6 +256,7 @@ class OrderController extends Controller
             ->whereHas('services', function ($query) use ($request) {
                 $query->whereIn('service_id', $request->service_ids);
             })
+            ->whereNotIn('status', ['canceled'])
             ->exists();
 
         if ($existingOrders) {
