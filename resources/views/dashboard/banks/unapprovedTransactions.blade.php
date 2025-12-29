@@ -40,7 +40,11 @@
                             <tr>
                                 <td>{{$loop->iteration }}</td>
                                 <td>{!! nl2br(e($t->getDetailedSource() ?? '-')) !!}</td>
-                                <td>{{ $t->type == 'deposit' ? __('dashboard.moneyDeposit') : __('dashboard.' . $t->type) ?? '-' }}</td>
+                                <td>
+                                    <span class="fw-bold {{ $t->type == 'deposit' ? 'text-success' : 'text-danger' }}">
+                                        {{ $t->type == 'deposit' ? __('dashboard.moneyDeposit') : __('dashboard.' . $t->type) ?? '-' }}
+                                    </span>
+                                </td>
                                 <td>
                                     <span class="fw-bold {{ $t->type == 'deposit' ? 'text-success' : 'text-danger' }}">
                                         {{ $t->amount ?? '-' }}
