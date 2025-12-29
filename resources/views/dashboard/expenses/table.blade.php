@@ -28,7 +28,7 @@
                                 <label for="end_date" class="text-right d-block">@lang('dashboard.date_to')</label>
                                 <input type="date" name="end_date" id="end_date" class="form-control" placeholder="إلى تاريخ" value="{{ request('end_date') }}">
                             </div>
-                            <button type="submit" class="mt-5 btn btn-primary mb-2" style="width:20%">
+                            <button type="submit" class="mt-5 btn btn-primary mb-2" style="width:40%">
                             @lang('dashboard.search') <i class="fa fa-search"></i>
                             </button>
                             @if(count(request()->all()))
