@@ -18,6 +18,47 @@ class PaymentLink extends Model
         'last_status_check' => 'datetime',
     ];
 
+    /**
+     * Calculate payment gateway fees
+     * Fees: 2.5% + 1 AED
+     * + 5% VAT on the fees
+     * 
+     * @return float
+     */
+    public function getPaymentGatewayFeeAttribute()
+    {
+        if (!$this->amount) {
+            return 0;
+        }
+
+        // Base fee: 2.5% + 1 AED
+        $baseFee = ($this->amount * 0.025) + 1;
+        
+        // VAT 5% on the fees
+        $vat = $baseFee * 0.05;
+        
+        // Total fees
+        $totalFee = $baseFee + $vat;
+        
+        return round($totalFee, 2);
+    }
+
+    /**
+     * Calculate net amount received after deducting company fees
+     * 
+     * @return float
+     */
+    public function getNetAmountAfterFeesAttribute()
+    {
+        if (!$this->amount) {
+            return 0;
+        }
+
+        $netAmount = $this->amount - $this->payment_gateway_fee;
+        
+        return round($netAmount, 2);
+    }
+
     public function order()
     {
         return $this->belongsTo(Order::class);

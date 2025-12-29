@@ -32,6 +32,7 @@
                             <th class="fw-bolder">@lang('dashboard.order_id')</th>
                             <th class="fw-bolder">@lang('dashboard.customer_name')</th>
                             <th class="fw-bolder">@lang('dashboard.amount')</th>
+                            <th class="fw-bolder">@lang('dashboard.net_amount_after_fees')</th>
                             <th class="fw-bolder">@lang('dashboard.account_type')</th>
                             <th class="fw-bolder">@lang('dashboard.paid_at')</th>
                             <th class="fw-bolder">@lang('dashboard.handled_by')</th>
@@ -67,6 +68,14 @@
                                 <td>
                                     <span class="fw-bolder">{{ number_format($paymentLink->amount, 2) }}</span>
                                     <small class="text-muted">@lang('dashboard.currency_aed')</small>
+                                </td>
+                                <td>
+                                    <span class="fw-bolder text-success">{{ number_format($paymentLink->net_amount_after_fees, 2) }}</span>
+                                    <small class="text-muted">@lang('dashboard.currency_aed')</small>
+                                    <br>
+                                    <small class="text-muted" style="font-size: 0.85em;">
+                                        (@lang('dashboard.fee'): {{ number_format($paymentLink->payment_gateway_fee, 2) }} @lang('dashboard.currency_aed'))
+                                    </small>
                                 </td>
                                 <td>
                                     @if($paymentLink->order && $paymentLink->order->payment)
@@ -135,7 +144,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center py-10">
+                                <td colspan="10" class="text-center py-10">
                                     <div class="d-flex flex-column align-items-center">
                                         <i class="bi bi-inbox fs-3x text-muted mb-3"></i>
                                         <span class="text-muted fs-5">@lang('dashboard.no_data')</span>

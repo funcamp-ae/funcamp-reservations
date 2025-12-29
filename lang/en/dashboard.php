@@ -1158,6 +1158,8 @@ return [
     'no_data' => 'No Data Available',
     'create_new_payment_link' => 'Create New Payment Link',
     'create_another_payment_link' => 'Create Another Payment Link',
+    'net_amount_after_fees' => 'Net Amount After Fees',
+    'fee' => 'Fee',
     'view_all_payment_links' => 'View All Payment Links',
     'payment_link_copied_successfully' => 'Payment link copied to clipboard successfully!',
     'back_to_list' => 'Back to List',

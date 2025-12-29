@@ -1154,6 +1154,8 @@ return [
 
     // Payment Link Fields
     'currency_aed' => 'درهم إماراتي',
+    'net_amount_after_fees' => 'المبلغ المستلم بعد خصم رسوم الشركة',
+    'fee' => 'الرسوم',
     'checkout_id' => 'معرف الدفع',
     'checkout_key' => 'مفتاح الدفع',
     'payment_url' => 'رابط الدفع',

@@ -1128,6 +1128,8 @@ return [
 
     // Payment Link Fields
     'currency_aed' => 'د متحده عربي اماراتو درهم',
+    'net_amount_after_fees' => 'د شرکت فیسونو څخه وروسته خالص رقم',
+    'fee' => 'فیس',
     'checkout_id' => 'د تادیې پیژندنه',
     'checkout_key' => 'د تادیې کیلي',
     'payment_url' => 'د تادیې لینک',
