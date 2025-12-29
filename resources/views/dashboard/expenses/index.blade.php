@@ -48,11 +48,8 @@
 
             <!--end::Card header-->
             <!--begin::Card body-->
-            <div class="card-body pt-0">
-
-
-            @include('dashboard.expenses.table')
-
+            <div class="card-body pt-0 table-responsive">
+                @include('dashboard.expenses.table')
             </div>
             <!--end::Card body-->
         </div>
