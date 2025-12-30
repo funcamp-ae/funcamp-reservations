@@ -156,7 +156,7 @@
                     <!--end::Table body-->
                 </table>
                 <!--end::Table-->
-                    <div class="d-flex justify-content-end mt-5">
+                    <div class="d-flex justify-content-between mt-5">
                         {{ $paymentLinks->links('pagination::bootstrap-5') }}
                     </div>
             </div>
