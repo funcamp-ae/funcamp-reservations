@@ -182,7 +182,7 @@ class BankAccountsController extends Controller
         $transactionsViaPaymentLinks = PaymentLink::with(['order', 'customer', 'handledBy'])
             ->where('status', 'paid')
             ->orderBy('paid_at', 'desc')
-            ->get();
+            ->paginate(15);
 
         return view('dashboard.banks.transactions-via-payment-links', [
             'paymentLinks' => $transactionsViaPaymentLinks,

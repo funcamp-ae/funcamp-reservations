@@ -46,7 +46,7 @@
                     <tbody class="fw-bold text-gray-600">
                         @forelse ($paymentLinks as $index => $paymentLink)
                             <tr>
-                                <td class="text-center">{{ $index + 1 }}</td>
+                                <td class="text-center">{{ ($paymentLinks->firstItem() ?? 0) + $index }}</td>
                                 <td>
                                     @if($paymentLink->order)
                                         <a href="{{ route('orders.show', $paymentLink->order->id) }}" class="text-hover-primary">
@@ -156,6 +156,10 @@
                     <!--end::Table body-->
                 </table>
                 <!--end::Table-->
+
+                    <div class="d-flex justify-content-end mt-5">
+                        {{ $paymentLinks->links('pagination::bootstrap-5') }}
+                    </div>
             </div>
             <!--end::Card body-->
         </div>
@@ -168,16 +172,3 @@
 
 @endsection
 
-@section('js')
-<script>
-    $(document).ready(function() {
-        // Search functionality
-        $('[data-kt-ecommerce-category-filter="search"]').on('keyup', function() {
-            var value = $(this).val().toLowerCase();
-            $('#kt_payment_links_table tbody tr').filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-            });
-        });
-    });
-</script>
-@endsection
