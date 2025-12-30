@@ -1,6 +1,13 @@
 @section('pageTitle' , __('dashboard.payment_link_transactions'))
 
 @extends('dashboard.layouts.app')
+@push('css')
+<style>
+nav.d-flex.justify-items-center.justify-content-between {
+    width: 100%;
+}
+</style>
+@endpush
 @section('content')
 
 <!--begin::Post-->
