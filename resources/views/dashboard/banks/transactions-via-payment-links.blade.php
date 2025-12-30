@@ -81,7 +81,7 @@ nav.d-flex.justify-items-center.justify-content-between {
                                     <small class="text-muted">@lang('dashboard.currency_aed')</small>
                                     <br>
                                     <small class="text-muted" style="font-size: 0.85em;">
-                                        (@lang('dashboard.fee'): {{ number_format($paymentLink->payment_gateway_fee, 2) }} @lang('dashboard.currency_aed'))
+                                        (@lang('dashboard.fee'): <span class="text-danger">{{ number_format($paymentLink->payment_gateway_fee, 2) }}</span> @lang('dashboard.currency_aed'))
                                     </small>
                                 </td>
                                 <td>
