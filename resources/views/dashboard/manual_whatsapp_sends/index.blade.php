@@ -70,7 +70,7 @@
                             </div>
                         </td>
                         <td>
-                            <span>{{ $send->creator->name }}</span>
+                            <span>{{ $send->creator?->name }}</span>
                         </td>
                         <td>
                             <span>{{ $send->created_at->format('Y-m-d H:i') }}</span>
