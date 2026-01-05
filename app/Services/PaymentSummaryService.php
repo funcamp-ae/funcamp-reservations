@@ -40,6 +40,7 @@ class PaymentSummaryService
                 'payment',
                 'expense'
             ])
+            ->where('amount', '>', 0)
             ->latest()
             ->paginate($limit);
     }
