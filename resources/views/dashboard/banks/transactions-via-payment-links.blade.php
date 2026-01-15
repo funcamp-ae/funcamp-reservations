@@ -183,9 +183,24 @@ nav.d-flex.justify-items-center.justify-content-between {
                                                     <label class="form-label">@lang('dashboard.note')</label>
                                                     <textarea name="note" class="form-control" rows="3" placeholder="@lang('dashboard.reason_optional')" required></textarea>
                                                 </div>
+                                                
+                                                <div class="alert alert-info mb-3">
+                                                    <h6 class="fw-bold mb-2">@lang('dashboard.refund_conditions_title')</h6>
+                                                    <ul class="mb-0">
+                                                        <li>@lang('dashboard.refund_condition_90_days')</li>
+                                                        <li>@lang('dashboard.refund_condition_balance')</li>
+                                                    </ul>
+                                                </div>
+                                                
+                                                <div class="alert alert-light mb-3">
+                                                    <h6 class="fw-bold mb-2">@lang('dashboard.refund_processing_time')</h6>
+                                                    <p class="mb-0">@lang('dashboard.refund_processing_description')</p>
+                                                </div>
+                                                
                                                 <div class="alert alert-warning">
                                                     <i class="bi bi-exclamation-triangle me-2"></i>
                                                     @lang('dashboard.refund_irreversible_confirm')
+
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
