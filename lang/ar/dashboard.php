@@ -1173,6 +1173,7 @@ return [
     'deposit' => 'عربون',
     'complete the amount' => 'تكملة المبلغ',
     'the_insurance' => 'التأمين',
+    'refund' => 'إرجاع الأموال',
     
     'payment_url' => 'رابط الدفع',
     'request_id' => 'معرف الطلب',

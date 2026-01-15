@@ -1144,6 +1144,7 @@ return [
     'deposit' => 'مخکینۍ تادیه',
     'complete the amount' => 'د مقدار بشپړول',
     'the_insurance' => 'بیمه',
+    'refund' => 'د پیسو بیرته ورکول',
     'checkout_key' => 'د تادیې کیلي',
     'payment_url' => 'د تادیې لینک',
     'request_id' => 'د غوښتنې پیژندنه',

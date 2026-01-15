@@ -1126,6 +1126,7 @@ return [
     'deposit' => 'Deposit',
     'complete the amount' => 'Complete the Amount',
     'the_insurance' => 'Insurance',
+    'refund' => 'Return Funds',
     'payment_link_payment_url' => 'Payment URL',
     'payment_link_customer' => 'Customer',
     'payment_link_order' => 'Order',
