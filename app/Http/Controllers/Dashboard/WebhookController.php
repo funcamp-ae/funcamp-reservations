@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PaymentLink;
+use App\Models\Payment;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -113,6 +114,39 @@ class WebhookController extends Controller
                 'amount' => $data['grandtotal'] ?? 'N/A',
                 'currency' => $data['currency'] ?? 'N/A'
             ]);
+
+            // Create payment record with net amount after fees
+            if ($paymentLink->order_id && $paymentLink->account_id) {
+                $netAmount = $paymentLink->net_amount_after_fees;
+                
+                $statement = $paymentLink->description ?? 'Payment via Paymennt - Checkout ID: ' . $checkoutId;
+                
+                $payment = Payment::create([
+                    'order_id' => $paymentLink->order_id,
+                    'account_id' => $paymentLink->account_id,
+                    'price' => $netAmount,
+                    'payment_method' => 'payment_link',
+                    'statement' => $statement,
+                    'notes' => 'Auto-created from payment link. Original amount: ' . $paymentLink->amount . ' AED, Gateway fees: ' . $paymentLink->payment_gateway_fee . ' AED, Checkout ID: ' . $checkoutId,
+                    'verified' => false,
+                    'handled_by' => $paymentLink->handled_by,
+                    'image_path' => null
+                ]);
+
+                Log::info("Payment record created", [
+                    'payment_id' => $payment->id,
+                    'order_id' => $paymentLink->order_id,
+                    'net_amount' => $netAmount,
+                    'original_amount' => $paymentLink->amount,
+                    'gateway_fee' => $paymentLink->payment_gateway_fee
+                ]);
+            } else {
+                Log::warning("Cannot create payment record - missing order_id or account_id", [
+                    'payment_link_id' => $paymentLink->id,
+                    'order_id' => $paymentLink->order_id,
+                    'account_id' => $paymentLink->account_id
+                ]);
+            }
 
             // Here you can add additional logic:
             // - Update order status

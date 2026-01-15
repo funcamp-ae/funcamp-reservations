@@ -22,6 +22,8 @@ class PaymentLinkController extends Controller
     public function __construct(PaymenntService $paymenntService)
     {
         $this->paymenntService = $paymenntService;
+        // Ensure permission check at controller level as well
+        $this->middleware('permission:financial.payment-links.transactions.refund')->only('refund');
     }
 
     /**
@@ -54,6 +56,7 @@ class PaymentLinkController extends Controller
     {
         $orders = Order::with('customer')->get();
         $customers = Customer::all();
+        $bankAccounts = \App\Models\BankAccount::all();
 
         // If order_id is passed from query parameter
         $selectedOrderId = $request->query('order_id');
@@ -63,7 +66,7 @@ class PaymentLinkController extends Controller
             $selectedOrder = Order::with('customer')->find($selectedOrderId);
         }
 
-        return view('dashboard.payment_links.create', compact('orders', 'customers', 'selectedOrder'));
+        return view('dashboard.payment_links.create', compact('orders', 'customers', 'selectedOrder', 'bankAccounts'));
     }
 
     /**
@@ -74,7 +77,8 @@ class PaymentLinkController extends Controller
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'order_id' => 'required|exists:orders,id',
-            'description' => 'nullable|string|max:500',
+            'account_id' => 'required|exists:bank_accounts,id',
+            'statement' => 'nullable|string|max:500',
             'expires_at' => 'nullable|date|after:now',
         ]);
 
@@ -109,6 +113,7 @@ class PaymentLinkController extends Controller
                 'customer_email' => $customer->email ?? 'customer@example.com',
                 'customer_phone' => $customer->phone ?? '+971500000000',
                 'order_id' => $request->order_id ?? uniqid('ORD-'),
+                'account_id' => $request->account_id,
                 'currency' => 'AED',
                 'send_email' => filter_var($request->send_email, FILTER_VALIDATE_BOOLEAN),
                 // 'send_whatsapp' => filter_var($request->send_whatsapp, FILTER_VALIDATE_BOOLEAN),
@@ -140,9 +145,10 @@ class PaymentLinkController extends Controller
                 'order_id' => $request->order_id,
                 'customer_id' => $customer->id,
                 'amount' => $request->amount,
-                'description' => $request->description,
+                'description' => $request->statement ?? $request->description,
                 'checkout_id' => $result['checkout_id'],
                 'checkout_key' => $result['checkout_key'],
+                'account_id' => $request->account_id,
                 'payment_url' => $result['checkout_url'],
                 'status' => 'pending',
                 'expires_at' => $request->expires_at,
@@ -640,6 +646,47 @@ class PaymentLinkController extends Controller
                 'success' => false,
                 'message' => __('dashboard.payment_link_whatsapp_resent_error')
             ]);
+        }
+    }
+
+    /**
+     * Refund a paid payment link (full or partial)
+     */
+    public function refund(Request $request, PaymentLink $paymentLink)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'currency' => 'required|string|size:3',
+            'note' => 'required|string|max:500',
+        ]);
+
+        try {
+            if ($paymentLink->status !== 'paid') {
+                return back()->with('error', __('dashboard.payment_link_errors.refund_not_paid'));
+            }
+
+            if (!$paymentLink->checkout_id) {
+                return back()->with('error', __('dashboard.payment_link_errors.checkout_missing'));
+            }
+
+            $amount = $request->input('amount');
+            $currency = strtoupper($request->input('currency', 'AED'));
+            $note = $request->input('note');
+
+            $result = $this->paymenntService->refundCheckout($paymentLink->checkout_id, $amount, $currency, $note);
+
+            if ($result['success']) {
+                return back()->with('success', __('dashboard.payment_link_refund_success'));
+            }
+
+            return back()->with('error', $result['error'] ?? __('dashboard.payment_link_errors.refund_failed'));
+        } catch (\Exception $e) {
+            Log::error('Payment Link Refund Error', [
+                'payment_link_id' => $paymentLink->id,
+                'message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', __('dashboard.payment_link_errors.refund_error'));
         }
     }
 }

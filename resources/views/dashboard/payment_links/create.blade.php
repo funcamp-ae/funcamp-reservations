@@ -94,6 +94,54 @@
                         </div>
                     </div>
 
+                    <!-- Account ID Select -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">{{ __('dashboard.bank_account') }}</label>
+                            <select name="account_id"
+                                class="form-control form-control-lg @error('account_id') is-invalid @enderror"
+                                required
+                                style="background-color: white; border: 1px solid #e4e6ea;">
+                                <option value="">{{ __('dashboard.select_bank_account') }}</option>
+                                @if(isset($bankAccounts) && $bankAccounts->count() > 0)
+                                    @foreach($bankAccounts as $account)
+                                    <option value="{{ $account->id }}" {{ old('account_id') == $account->id ? 'selected' : '' }}>
+                                        {{ $account->name }} - {{ $account->account_number }}
+                                    </option>
+                                    @endforeach
+                                @else
+                                    <option value="" disabled>{{ __('dashboard.no_bank_accounts_available') }}</option>
+                                @endif
+                            </select>
+                            @error('account_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- Payment Statement/Description -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">{{ __('dashboard.payment_statement') }}</label>
+                            <select name="statement"
+                                class="form-control form-control-lg @error('statement') is-invalid @enderror"
+                                style="background-color: white; border: 1px solid #e4e6ea;">
+                                <option value="">{{ __('dashboard.select_statement') }}</option>
+                                @foreach(statements() as $statement)
+                                <option value="{{ $statement }}" {{ old('statement') == $statement ? 'selected' : '' }}>
+                                    {{ __('dashboard.' . $statement) }}
+                                </option>
+                                @endforeach
+                            </select>
+                            @error('statement')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">
+                                {{ __('dashboard.payment_statement_help') }}
+                            </small>
+                        </div>
+                    </div>
+
                     <!-- Second Row: Create Link Button -->
                     <div class="row mb-4">
                         <div class="col-12 text-center">

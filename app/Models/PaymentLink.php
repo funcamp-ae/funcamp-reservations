@@ -67,7 +67,10 @@ class PaymentLink extends Model
     {
         return $this->belongsTo(User::class, 'handled_by');
     }
-
+    public function account()
+    {
+        return $this->belongsTo(BankAccount::class, 'account_id');
+    }
     public function customer()
     {
         return $this->belongsTo(Customer::class);

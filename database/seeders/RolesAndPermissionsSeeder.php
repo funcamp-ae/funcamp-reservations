@@ -108,6 +108,10 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => 'financial.transactions.edit', 'nickname_ar' => 'تعديل معاملة مالية', 'nickname_en' => 'Edit Financial Transaction', 'group' => 'financial'],
             ['name' => 'financial.transactions.delete', 'nickname_ar' => 'حذف معاملة مالية', 'nickname_en' => 'Delete Financial Transaction', 'group' => 'financial'],
 
+            // Financial - Payment Links Transactions
+            ['name' => 'financial.payment-links.transactions.index', 'nickname_ar' => 'عرض معاملات روابط الدفع', 'nickname_en' => 'View Payment Link Transactions', 'group' => 'financial'],
+            ['name' => 'financial.payment-links.transactions.refund', 'nickname_ar' => 'استرجاع عملية روابط الدفع', 'nickname_en' => 'Refund Payment Link Transaction', 'group' => 'financial'],
+
             // Expense Items
             ['name' => 'expense-items.index', 'nickname_ar' => 'عرض بنود المصاريف', 'nickname_en' => 'View Expense Items', 'group' => 'expenses'],
             ['name' => 'expense-items.create', 'nickname_ar' => 'إضافة بند مصاريف', 'nickname_en' => 'Create Expense Item', 'group' => 'expenses'],
@@ -169,6 +173,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 [
                     'nickname_ar' => $permissionData['nickname_ar'],
                     'nickname_en' => $permissionData['nickname_en'],
+                    'group' => $permissionData['group'] ?? null,
                     'guard_name' => 'web'
                 ]
             );

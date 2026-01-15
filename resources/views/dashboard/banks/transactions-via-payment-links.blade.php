@@ -94,7 +94,7 @@ nav.d-flex.justify-items-center.justify-content-between {
                                             <span class="text-muted">-</span>
                                         @endif
                                     @else
-                                        <span class="badge badge-light-warning">@lang('dashboard.paid_via_link')</span>
+                                        <span class="badge badge-light-warning">{{ __($paymentLink->account->name) }}</span>
                                     @endif
                                 </td>
                                 <td>
@@ -145,10 +145,58 @@ nav.d-flex.justify-items-center.justify-content-between {
                                         </div>
                                         @endif
 
+                                        @can('financial.payment-links.transactions.refund')
+                                            @if(($paymentLink->status ?? 'paid') === 'paid')
+                                            <div class="menu-item px-3">
+                                                <a href="#" class="menu-link px-3 text-danger" data-bs-toggle="modal" data-bs-target="#refundModal-{{ $paymentLink->id }}">
+                                                    <i class="bi bi-arrow-counterclockwise fs-5 me-2"></i>@lang('dashboard.refund')
+                                                </a>
+                                            </div>
+                                            @endif
+                                        @endcan
+
                                     </div>
                                     <!--end::Menu-->
                                 </td>
                             </tr>
+                            <!-- Refund Modal -->
+                            @can('financial.payment-links.transactions.refund')
+                            <div class="modal fade" id="refundModal-{{ $paymentLink->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">@lang('dashboard.refund_payment')</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form method="POST" action="{{ route('financial.payment-links.transactions.refund', $paymentLink->id) }}">
+                                            @csrf
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">@lang('dashboard.amount')</label>
+                                                    <input type="number" name="amount" step="0.01" min="0.01" class="form-control" placeholder="{{ number_format($paymentLink->amount, 2) }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">@lang('dashboard.currency')</label>
+                                                    <input type="text" name="currency" class="form-control" value="AED" maxlength="3" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">@lang('dashboard.note')</label>
+                                                    <textarea name="note" class="form-control" rows="3" placeholder="@lang('dashboard.reason_optional')" required></textarea>
+                                                </div>
+                                                <div class="alert alert-warning">
+                                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                                    @lang('dashboard.refund_irreversible_confirm')
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">@lang('dashboard.cancel')</button>
+                                                <button type="submit" class="btn btn-danger">@lang('dashboard.refund')</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            @endcan
                         @empty
                             <tr>
                                 <td colspan="10" class="text-center py-10">

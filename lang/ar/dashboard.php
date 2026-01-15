@@ -1154,10 +1154,26 @@ return [
 
     // Payment Link Fields
     'currency_aed' => 'درهم إماراتي',
+    'bank_account' => 'الحساب البنكي',
+    'select_bank_account' => 'اختر الحساب البنكي',
+    'no_bank_accounts_available' => 'لا توجد حسابات بنكية متاحة',
+    'bank_account_help' => 'اختر الحساب البنكي الذي سيتم استلام الدفع فيه',
+    'payment_statement' => 'بيان الدفع',
+    'select_statement' => 'اختر بيان الدفع',
+    'payment_statement_help' => 'اختر نوع بيان الدفع',
+    'account_id' => 'رقم الحساب',
+    'account_id_placeholder' => 'أدخل رقم الحساب',
+    'account_id_help' => 'رقم الحساب البنكي',
     'net_amount_after_fees' => 'المبلغ المستلم بعد خصم رسوم الشركة',
     'fee' => 'الرسوم',
     'checkout_id' => 'معرف الدفع',
     'checkout_key' => 'مفتاح الدفع',
+    
+    // Payment Statement Types
+    'deposit' => 'عربون',
+    'complete the amount' => 'تكملة المبلغ',
+    'the_insurance' => 'التأمين',
+    
     'payment_url' => 'رابط الدفع',
     'request_id' => 'معرف الطلب',
     'order_id_paymennt' => 'معرف الطلب في Paymennt',

@@ -247,4 +247,72 @@ class PaymenntService
             ];
         }
     }
+
+    /**
+     * Refund a checkout (full or partial)
+     *
+     * @param string $checkoutId
+     * @param float|null $amount If null, provider will attempt full refund
+     * @param string|null $currency 3-letter ISO, e.g., AED
+     * @param string|null $note Optional note for the refund
+     * @return array{success:bool,data?:mixed,error?:string}
+     */
+    public function refundCheckout(string $checkoutId, ?float $amount = null, ?string $currency = null, ?string $note = null)
+    {
+        try {
+            // According to docs, parameters are sent as query parameters
+            $query = [];
+            if (!is_null($amount)) {
+                $query['amount'] = $amount;
+            }
+            if (!is_null($currency)) {
+                $query['currency'] = $currency;
+            }
+            if (!is_null($note)) {
+                $query['note'] = $note;
+            }else {
+                $query['note'] = 'the reservation was canceled';
+            }
+
+            $url = $this->baseUrl . '/checkout/' . $checkoutId . '/refund';
+            if (!empty($query)) {
+                $url .= '?' . http_build_query($query);
+            }
+
+            Log::info('Paymennt refund request', [
+                'url' => $url,
+                'query' => $query,
+            ]);
+
+            // Send POST with query string (no JSON body needed according to docs)
+            $response = $this->getHttpClient()->post($url);
+
+            Log::info('Paymennt refund response', [
+                'status' => $response->status(),
+                'json' => $response->json(),
+            ]);
+
+            if ($response->successful()) {
+                $result = $response->json();
+                return [
+                    'success' => $result['success'] ?? false,
+                    'data' => $result['result'] ?? null,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'error' => 'Failed to refund checkout',
+            ];
+        } catch (\Exception $e) {
+            Log::error('Paymennt Refund Error', [
+                'message' => $e->getMessage(),
+            ]);
+
+            return [
+                'success' => false,
+                'error' => 'Service error: ' . $e->getMessage(),
+            ];
+        }
+    }
 }

@@ -1009,7 +1009,16 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
     Route::get('bank/payment-links', [
         'uses' => 'BankAccountsController@transactionsViaPaymentLinks',
         'as' => 'financial.payment-links.transactions.index',
-        'title' => 'dashboard.payment_link_transactions'
+        'title' => 'dashboard.payment_link_transactions',
+        'middleware' => ['auth', 'permission:financial.payment-links.transactions.index']
+    ]);
+
+    # refund a paid payment link
+    Route::post('bank/payment-links/{paymentLink}/refund', [
+        'uses' => 'PaymentLinkController@refund',
+        'as' => 'financial.payment-links.transactions.refund',
+        'title' => ['actions.refund', 'dashboard.payment_link_transactions'],
+        'middleware' => ['auth', 'permission:financial.payment-links.transactions.refund']
     ]);
 
     # payments store
