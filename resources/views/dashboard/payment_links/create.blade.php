@@ -78,7 +78,7 @@
                                 name="amount"
                                 class="form-control form-control-lg @error('amount') is-invalid @enderror"
                                 step="0.01"
-                                min="0.01"
+                                min="1.50"
                                 value="{{ old('amount') }}"
                                 placeholder="{{ __('dashboard.payment_link_amount_placeholder') }}"
                                 required

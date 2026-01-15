@@ -75,7 +75,7 @@ class PaymentLinkController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:0.01',
+            'amount' => 'required|numeric|min:1.50',
             'order_id' => 'required|exists:orders,id',
             'account_id' => 'required|exists:bank_accounts,id',
             'statement' => 'nullable|string|max:500',
