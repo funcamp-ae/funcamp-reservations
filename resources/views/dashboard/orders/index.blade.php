@@ -43,7 +43,7 @@
                     <div class="d-flex align-items-center position-relative me-3">
                         <i class="fas fa-search position-absolute ms-4"></i>
                         <input type="text" id="orderSearchInput" class="form-control form-control-solid w-250px ps-12" 
-                            placeholder="@lang('dashboard.search_orders_placeholder')">
+                            placeholder="@lang('dashboard.search_orders_placeholder')" value="{{ request('search') }}">
                     </div>
 
                     <!-- Date filter (date-only) -->
@@ -374,42 +374,44 @@
 </style>
 
 <script>
-    // Search functionality
+    // Search functionality with debounce
+    let searchTimeout;
     $(document).on('keyup', '#orderSearchInput', function() {
-        var searchText = $(this).val().toLowerCase();
+        clearTimeout(searchTimeout);
+        var searchText = $(this).val();
         
-        $('tbody tr').each(function() {
-            var $row = $(this);
-            var orderId = $row.find('td:eq(1)').text().toLowerCase();
-            var customerName = $row.data('customer-name') ? $row.data('customer-name').toString().toLowerCase() : '';
-            var phone = $row.data('phone') ? $row.data('phone').toString().toLowerCase() : '';
-            var email = $row.data('email') ? $row.data('email').toLowerCase() : '';
-            
-            if (orderId.includes(searchText) || 
-                customerName.includes(searchText) || 
-                phone.includes(searchText) || 
-                email.includes(searchText)) {
-                $row.show();
+        searchTimeout = setTimeout(function() {
+            try {
+                var url = new URL(window.location.href);
+                var params = url.searchParams;
                 
-                // Highlight matching text
-         //       if (searchText) {
-         //           $row.find('td').each(function() {
-        //                var text = $(this).text();
-        //                var regex = new RegExp('(' + searchText + ')', 'gi');
-        //                $(this).html(text.replace(regex, '<span class="highlight">$1</span>'));
-         //           });
-           //     }
-            } else {
-                $row.hide();
+                if (!searchText) {
+                    params.delete('search');
+                } else {
+                    params.set('search', searchText);
+                }
+                
+                // Reset to page 1 when searching
+                params.delete('page');
+                
+                url.search = params.toString();
+                window.location.href = url.toString();
+            } catch (e) {
+                // Fallback for older browsers
+                var href = window.location.href.split('?')[0];
+                var qs = [];
+                var existing = window.location.search.replace(/^\?/, '').split('&').filter(Boolean);
+                existing.forEach(function(p) {
+                    var parts = p.split('=');
+                    var k = decodeURIComponent(parts[0]);
+                    if (k === 'page' || k === 'search') return;
+                    qs.push(p);
+                });
+                if (searchText) qs.push('search=' + encodeURIComponent(searchText));
+                var newUrl = href + (qs.length ? ('?' + qs.join('&')) : '');
+                window.location.href = newUrl;
             }
-        });
-        
-        // Remove highlights when search is cleared
-        //if (!searchText) {
-            //$('.highlight').each(function() {
-               // $(this).replaceWith($(this).text());
-            //});
-      //  }
+        }, 500); // 500ms debounce delay
     });
 </script>
 

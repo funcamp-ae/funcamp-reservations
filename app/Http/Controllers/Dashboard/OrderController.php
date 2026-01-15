@@ -96,6 +96,7 @@ class OrderController extends Controller
             'price_min' => request()->query('price_min'),
             'price_max' => request()->query('price_max'),
             'price' => request()->query('price'),
+            'search' => request()->query('search'),
         ];
 
         $query = Order::query();

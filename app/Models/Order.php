@@ -354,6 +354,18 @@ class Order extends Model
         $builder->when($filters['price_min'] ?? false, fn($builder, $value) => $builder->where('price', '>=', $value));
         $builder->when($filters['price_max'] ?? false, fn($builder, $value) => $builder->where('price', '<=', $value));
         $builder->when($filters['price'] ?? false, fn($builder, $value) => $builder->where('price', 'like', "%{$value}%"));
+        
+        // Search by order ID, customer name, phone, or email
+        $builder->when($filters['search'] ?? false, function($builder, $value) {
+            $builder->where(function($query) use ($value) {
+                $query->where('id', 'like', "%{$value}%")
+                    ->orWhereHas('customer', function($q) use ($value) {
+                        $q->where('name', 'like', "%{$value}%")
+                          ->orWhere('phone', 'like', "%{$value}%")
+                          ->orWhere('email', 'like', "%{$value}%");
+                    });
+            });
+        });
     }    
 
     public function insuranceFromTransaction()
