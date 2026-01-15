@@ -94,7 +94,7 @@ nav.d-flex.justify-items-center.justify-content-between {
                                             <span class="text-muted">-</span>
                                         @endif
                                     @else
-                                        <span class="badge badge-light-warning">{{ __($paymentLink->account->name) }}</span>
+                                        <span class="badge badge-light-warning">{{ __($paymentLink->account?->name ?? __('dashboard.paid_via_link')) }}</span>
                                     @endif
                                 </td>
                                 <td>
