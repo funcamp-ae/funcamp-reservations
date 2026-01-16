@@ -117,24 +117,26 @@ class WebhookController extends Controller
 
             // Create payment record with net amount after fees
             if ($paymentLink->order_id && $paymentLink->account_id) {
-                $netAmount = $paymentLink->net_amount_after_fees;
-                
-                $statement = $paymentLink->description ?? 'Payment via Paymennt - Checkout ID: ' . $checkoutId;
-                
+                $netAmount = $paymentLink->net_amount_after_fees;                
                 $payment = Payment::create([
                     'order_id' => $paymentLink->order_id,
                     'account_id' => $paymentLink->account_id,
                     'price' => $netAmount,
                     'payment_method' => 'payment_link',
-                    'statement' => $statement,
-                    'notes' => 'Auto-created from payment link. Original amount: ' . $paymentLink->amount . ' AED, Gateway fees: ' . $paymentLink->payment_gateway_fee . ' AED, Checkout ID: ' . $checkoutId,
+                    'statement' => $paymentLink->statement ?? " ",
                     'verified' => false,
                     'handled_by' => $paymentLink->handled_by,
                     'image_path' => null
                 ]);
 
-                Log::info("Payment record created", [
+                // Update payment link with the payment_id for future refund operations
+                $paymentLink->update([
+                    'payment_id' => $payment->id
+                ]);
+
+                Log::info("Payment record created and linked", [
                     'payment_id' => $payment->id,
+                    'payment_link_id' => $paymentLink->id,
                     'order_id' => $paymentLink->order_id,
                     'net_amount' => $netAmount,
                     'original_amount' => $paymentLink->amount,

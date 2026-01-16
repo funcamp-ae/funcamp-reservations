@@ -4,16 +4,17 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-
+use App\Models\PaymentLink ;
 class PaymenntService
 {
+    protected $financialDeletionService;
     protected $apiKey;
     protected $apiSecret;
     protected $apiId;
     protected $baseUrl;
     protected $isTest;
 
-    public function __construct()
+    public function __construct(FinancialDeletionService $financialDeletionService)
     {
         $this->apiKey = config('services.paymennt.api_key'); // pk_live_...
         $this->apiSecret = config('services.paymennt.api_secret'); // mer_...
@@ -22,6 +23,7 @@ class PaymenntService
         $this->baseUrl = $this->isTest
             ? 'https://api.test.paymennt.com/mer/v2.0'
             : 'https://api.paymennt.com/mer/v2.0';
+        $this->financialDeletionService = $financialDeletionService;
     }
 
     /**
@@ -72,7 +74,10 @@ class PaymenntService
                     'zip' => $data['zip'] ?? '00000',
                     'country' => $data['country'] ?? 'AE'
                 ],
-                'language' => app()->getLocale() === 'ar' ? 'ar' : 'en'
+                'language' => app()->getLocale() === 'ar' ? 'ar' : 'en',
+                'metadata' => [
+                    'payment_id' => $data['payment_id'] ?? null
+                ]
             ];
 
             // إضافة العناصر إذا كانت متوفرة
@@ -249,7 +254,7 @@ class PaymenntService
     }
 
     /**
-     * Refund a checkout (full or partial)
+     * Refund money from Paymennt gateway
      *
      * @param string $checkoutId
      * @param float|null $amount If null, provider will attempt full refund
@@ -257,7 +262,7 @@ class PaymenntService
      * @param string|null $note Optional note for the refund
      * @return array{success:bool,data?:mixed,error?:string}
      */
-    public function refundCheckout(string $checkoutId, ?float $amount = null, ?string $currency = null, ?string $note = null)
+    private function refundMoney(string $checkoutId, ?float $amount = null, ?string $currency = null, ?string $note = null)
     {
         try {
             // According to docs, parameters are sent as query parameters
@@ -270,7 +275,7 @@ class PaymenntService
             }
             if (!is_null($note)) {
                 $query['note'] = $note;
-            }else {
+            } else {
                 $query['note'] = 'the reservation was canceled';
             }
 
@@ -314,5 +319,94 @@ class PaymenntService
                 'error' => 'Service error: ' . $e->getMessage(),
             ];
         }
+    }
+
+    /**
+     * Refund a checkout (full or partial) and delete the payment record
+     *
+     * @param string $checkoutId
+     * @param float|null $amount If null, provider will attempt full refund
+     * @param string|null $currency 3-letter ISO, e.g., AED
+     * @param string|null $note Optional note for the refund
+     * @return array{success:bool,data?:mixed,error?:string,deleted_amount?:float}
+     */
+    public function refundCheckout(string $checkoutId, ?float $amount = null, ?string $currency = null, ?string $note = null)
+    {
+        // First, find the payment link and get payment_id from it
+        $paymentLink = PaymentLink::where('checkout_id', $checkoutId)->first();
+        $paymentId = null;
+
+        if ($paymentLink && $paymentLink->payment_id) {
+            $paymentId = $paymentLink->payment_id;
+            
+            Log::info('Retrieved payment_id from payment link', [
+                'checkout_id' => $checkoutId,
+                'payment_link_id' => $paymentLink->id,
+                'payment_id' => $paymentId
+            ]);
+        } else {
+            Log::warning('Payment link or payment_id not found for refund', [
+                'checkout_id' => $checkoutId,
+                'payment_link_exists' => $paymentLink ? true : false
+            ]);
+        }
+
+        // Attempt to refund money from the gateway
+        $refundResult = $this->refundMoney($checkoutId, $amount, $currency, $note);
+
+        if (!$refundResult['success']) {
+            return $refundResult;
+        }
+
+        // Update payment link status to refunded
+        if ($paymentLink) {
+            $paymentLink->update([
+                'status' => 'refunded'
+            ]);
+
+            Log::info('Payment link status updated to refunded', [
+                'checkout_id' => $checkoutId,
+                'payment_link_id' => $paymentLink->id
+            ]);
+        }
+
+        // If refund was successful and paymentId is available, delete the payment record
+        if ($paymentId) {
+            $deletionResult = $this->financialDeletionService->deletePaymentById((int) $paymentId);
+
+            if (!$deletionResult['success']) {
+                Log::warning('Refund successful but payment deletion failed', [
+                    'checkout_id' => $checkoutId,
+                    'payment_id' => $paymentId,
+                    'deletion_message' => $deletionResult['message'] ?? 'Unknown error'
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => $refundResult['data'],
+                    'warning' => 'Refund successful but payment deletion failed: ' . ($deletionResult['message'] ?? 'Unknown error')
+                ];
+            }
+
+            Log::info('Refund and payment deletion completed successfully', [
+                'checkout_id' => $checkoutId,
+                'payment_id' => $paymentId,
+                'deleted_amount' => $deletionResult['deleted_amount'] ?? 0
+            ]);
+
+            return [
+                'success' => true,
+                'data' => $refundResult['data'],
+                'deleted_amount' => $deletionResult['deleted_amount'] ?? 0
+            ];
+        }
+
+        // If no paymentId found, just return the refund result
+        Log::info('Refund completed without payment deletion', [
+            'checkout_id' => $checkoutId,
+            'reason' => 'No payment_id found in payment link'
+        ]);
+        
+        return $refundResult;
     }
 }
