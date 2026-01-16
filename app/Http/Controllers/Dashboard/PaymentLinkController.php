@@ -658,7 +658,7 @@ class PaymentLinkController extends Controller
     public function refund(Request $request, PaymentLink $paymentLink)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:0.01',
+            'amount' => 'required|numeric|min:1',
             'currency' => 'required|string|size:3',
             'note' => 'nullable|string|max:500',
         ]);
