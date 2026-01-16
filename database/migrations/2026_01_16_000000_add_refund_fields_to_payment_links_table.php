@@ -15,25 +15,12 @@ return new class extends Migration
     {
         Schema::table('payment_links', function (Blueprint $table) {
             // Add refunded_amount column (nullable, defaults to 0)
-            $table->decimal('refunded_amount', 10, 2)->nullable()->default(0)->after('amount');
-            
-            // Add payment_id column to link with payments table
-            $table->foreignId('payment_id')->nullable()->after('customer_id')->constrained('payments')->onDelete('set null');
-            
+            $table->decimal('refunded_amount', 10, 2)->nullable()->default(0)->after('amount');            
             // Add account_id column if not exists (for bank account tracking)
             if (!Schema::hasColumn('payment_links', 'account_id')) {
                 $table->foreignId('account_id')->nullable()->after('payment_id')->constrained('bank_accounts')->onDelete('set null');
             }
             
-            // Add handled_by column if not exists
-            if (!Schema::hasColumn('payment_links', 'handled_by')) {
-                $table->foreignId('handled_by')->nullable()->after('order_id_paymennt')->constrained('users')->onDelete('set null');
-            }
-            
-            // Add last_status_check column if not exists
-            if (!Schema::hasColumn('payment_links', 'last_status_check')) {
-                $table->timestamp('last_status_check')->nullable()->after('expires_at');
-            }
         });
 
         // Update the status enum to include new statuses
