@@ -51,12 +51,12 @@ class PaymentLink extends Model
     public function getNetAmountAfterFeesAttribute()
     {
         if (!$this->amount) {
-            return 0;
+            return 0.00;
         }
 
         $netAmount = $this->amount - $this->payment_gateway_fee;
         
-        return round($netAmount, 2);
+        return round((float) $netAmount, 2);
     }
 
     public function order()

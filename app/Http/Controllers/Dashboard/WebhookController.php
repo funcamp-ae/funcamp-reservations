@@ -117,7 +117,7 @@ class WebhookController extends Controller
 
             // Create payment record with net amount after fees
             if ($paymentLink->order_id && $paymentLink->account_id) {
-                $netAmount = $paymentLink->net_amount_after_fees;                
+                $netAmount = $paymentLink->net_amount_after_fees;
                 $payment = Payment::create([
                     'order_id' => $paymentLink->order_id,
                     'account_id' => $paymentLink->account_id,
