@@ -7,14 +7,14 @@ use Illuminate\Support\Facades\Log;
 use App\Models\PaymentLink ;
 class PaymenntService
 {
-    protected $financialDeletionService;
+    protected $refundService;
     protected $apiKey;
     protected $apiSecret;
     protected $apiId;
     protected $baseUrl;
     protected $isTest;
 
-    public function __construct(FinancialDeletionService $financialDeletionService)
+    public function __construct(RefundService $refundService)
     {
         $this->apiKey = config('services.paymennt.api_key'); // pk_live_...
         $this->apiSecret = config('services.paymennt.api_secret'); // mer_...
@@ -23,7 +23,7 @@ class PaymenntService
         $this->baseUrl = $this->isTest
             ? 'https://api.test.paymennt.com/mer/v2.0'
             : 'https://api.paymennt.com/mer/v2.0';
-        $this->financialDeletionService = $financialDeletionService;
+        $this->refundService = $refundService;
     }
 
     /**
@@ -322,91 +322,92 @@ class PaymenntService
     }
 
     /**
-     * Refund a checkout (full or partial) and delete the payment record
+     * Refund a checkout (full or partial) using RefundService
      *
      * @param string $checkoutId
      * @param float|null $amount If null, provider will attempt full refund
      * @param string|null $currency 3-letter ISO, e.g., AED
      * @param string|null $note Optional note for the refund
-     * @return array{success:bool,data?:mixed,error?:string,deleted_amount?:float}
+     * @return array{success:bool,data?:mixed,error?:string,refund_info?:array}
      */
     public function refundCheckout(string $checkoutId, ?float $amount = null, ?string $currency = null, ?string $note = null)
     {
-        // First, find the payment link and get payment_id from it
+        // Find the payment link
         $paymentLink = PaymentLink::where('checkout_id', $checkoutId)->first();
-        $paymentId = null;
 
-        if ($paymentLink && $paymentLink->payment_id) {
-            $paymentId = $paymentLink->payment_id;
-            
-            Log::info('Retrieved payment_id from payment link', [
-                'checkout_id' => $checkoutId,
-                'payment_link_id' => $paymentLink->id,
-                'payment_id' => $paymentId
+        if (!$paymentLink) {
+            Log::error('Payment link not found for refund', [
+                'checkout_id' => $checkoutId
             ]);
-        } else {
-            Log::warning('Payment link or payment_id not found for refund', [
+            return [
+                'success' => false,
+                'error' => 'Payment link not found'
+            ];
+        }
+
+        // If amount is null, refund the full remaining amount
+        if ($amount === null) {
+            $currentRefundedAmount = $paymentLink->refunded_amount ?? 0;
+            $amount = $paymentLink->amount - $currentRefundedAmount;
+        }
+
+        // Validate refund request using RefundService
+        $validation = $this->refundService->validateRefundRequest($paymentLink, $amount);
+        if (!$validation['valid']) {
+            Log::error('Refund validation failed', [
                 'checkout_id' => $checkoutId,
-                'payment_link_exists' => $paymentLink ? true : false
+                'errors' => $validation['errors']
             ]);
+            return [
+                'success' => false,
+                'error' => implode(', ', $validation['errors']),
+                'validation' => $validation
+            ];
         }
 
         // Attempt to refund money from the gateway
         $refundResult = $this->refundMoney($checkoutId, $amount, $currency, $note);
 
         if (!$refundResult['success']) {
+            Log::error('Gateway refund failed', [
+                'checkout_id' => $checkoutId,
+                'error' => $refundResult['error'] ?? 'Unknown error'
+            ]);
             return $refundResult;
         }
 
-        // Update payment link status to refunded
-        if ($paymentLink) {
-            $paymentLink->update([
-                'status' => 'refunded'
-            ]);
+        // Process refund using RefundService (handles payment link and payment record updates)
+        $processResult = $this->refundService->processRefund($paymentLink, $amount, [
+            'currency' => $currency,
+            'note' => $note,
+            'gateway_response' => $refundResult['data'] ?? null
+        ]);
 
-            Log::info('Payment link status updated to refunded', [
+        if (!$processResult['success']) {
+            Log::error('Refund processing failed after gateway success', [
                 'checkout_id' => $checkoutId,
-                'payment_link_id' => $paymentLink->id
+                'error' => $processResult['error'] ?? 'Unknown error'
             ]);
-        }
-
-        // If refund was successful and paymentId is available, delete the payment record
-        if ($paymentId) {
-            $deletionResult = $this->financialDeletionService->deletePaymentById((int) $paymentId);
-
-            if (!$deletionResult['success']) {
-                Log::warning('Refund successful but payment deletion failed', [
-                    'checkout_id' => $checkoutId,
-                    'payment_id' => $paymentId,
-                    'deletion_message' => $deletionResult['message'] ?? 'Unknown error'
-                ]);
-
-                return [
-                    'success' => true,
-                    'data' => $refundResult['data'],
-                    'warning' => 'Refund successful but payment deletion failed: ' . ($deletionResult['message'] ?? 'Unknown error')
-                ];
-            }
-
-            Log::info('Refund and payment deletion completed successfully', [
-                'checkout_id' => $checkoutId,
-                'payment_id' => $paymentId,
-                'deleted_amount' => $deletionResult['deleted_amount'] ?? 0
-            ]);
-
             return [
-                'success' => true,
-                'data' => $refundResult['data'],
-                'deleted_amount' => $deletionResult['deleted_amount'] ?? 0
+                'success' => false,
+                'error' => $processResult['error'] ?? 'Failed to process refund',
+                'gateway_refund_successful' => true,
+                'warning' => 'Gateway refund succeeded but local processing failed. Manual intervention may be required.'
             ];
         }
 
-        // If no paymentId found, just return the refund result
-        Log::info('Refund completed without payment deletion', [
+        Log::info('Refund completed successfully', [
             'checkout_id' => $checkoutId,
-            'reason' => 'No payment_id found in payment link'
+            'refund_type' => $processResult['refund_type'] ?? 'unknown',
+            'refunded_amount' => $processResult['refunded_amount'] ?? 0,
+            'total_refunded_amount' => $processResult['total_refunded_amount'] ?? 0,
+            'payment_link_status' => $processResult['payment_link_status'] ?? 'unknown'
         ]);
-        
-        return $refundResult;
+
+        return [
+            'success' => true,
+            'data' => $refundResult['data'],
+            'refund_info' => $processResult
+        ];
     }
 }

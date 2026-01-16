@@ -128,7 +128,18 @@ class WebhookController extends Controller
                     'handled_by' => $paymentLink->handled_by,
                     'image_path' => null
                 ]);
-
+                Transaction::create([
+                    'account_id' => $paymentLink->account_id,
+                    'amount' => $netAmount,
+                    'type' => 'deposit',
+                    'source'=> "payment_link #{$paymentLink->id} for order #{$paymentLink->order_id} - {$paymentLink->statement}",
+                    'date' => now(),
+                    'payment_id' => $payment->id,
+                    'verified' => 0, // Changed from false to true so it appears in general payments
+                    'order_id' => $paymentLink->order_id,
+                    'handled_by' => $paymentLink->handled_by,
+                    'customer_id' => $paymentLink->customer_id ?? null
+                ]);
                 // Update payment link with the payment_id for future refund operations
                 $paymentLink->update([
                     'payment_id' => $payment->id

@@ -14,6 +14,7 @@ use App\Models\GeneralPayment;
 use App\Services\InsuranceVerificationService;
 use App\Traits\ImageUploadTrait;
 use App\Services\FinancialDeletionService;
+use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use PDF;
 use DB;
@@ -26,6 +27,15 @@ use Illuminate\Support\Collection;
 class PaymentsController extends Controller
 {
     use ImageUploadTrait;
+
+    protected $paymentService;
+    protected $financialDeletionService;
+
+    public function __construct(PaymentService $paymentService, FinancialDeletionService $financialDeletionService)
+    {
+        $this->paymentService = $paymentService;
+        $this->financialDeletionService = $financialDeletionService;
+    }
 
 
     public function transactions()
@@ -431,37 +441,59 @@ public function moneyTransfer(Request $request)
             'notes' => 'nullable|string',
              'image' => 'nullable|image'
         ]);
-            // Handle image upload
-            if ($request->hasFile('image')) {
-                $validatedData['image'] = $this->uploadImage(
-                    $request->file('image'), 
-                    'payments',
-                    $payment->image
-                );
-            }
-        $validatedData['verified'] = 0;
-        if ($payment->verified) {
-            $bankAccount = BankAccount::find($payment->account_id);
-            if ($bankAccount) {
-                $bankAccount->decrement('balance', $payment->price);
-            }
+        
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $validatedData['image'] = $this->uploadImage(
+                $request->file('image'), 
+                'payments',
+                $payment->image
+            );
         }
-        $validatedData['handled_by'] = auth()->id();
-        $payment->update($validatedData);
-        Transaction::where('payment_id', $payment->id)->update([
-            'account_id' => $request->account_id,
-            'amount' => $request->price,
-            'type' => 'deposit',
-            'source'=> $request->source,
-            'date' => now(),
-            'description' => $request->notes ?? "",
-            'image_path' => $validatedData['image'] ?? null,
-            'images' => isset($validatedData['image']) ? json_encode([$validatedData['image']]) : null,
-            'verified' => 0,
-            'handled_by' =>auth()->id()
-        ]);
-
-        return back()->withSuccess(__('dashboard.success'));
+        
+        DB::beginTransaction();
+        try {
+            $originalPrice = $payment->price;
+            $newPrice = $request->price; 
+            // If payment was verified and price changed, reverse the original amount from bank account
+            // or If price didn't change but account changed, still need to reverse
+            if (($payment->verified && $originalPrice != $newPrice) || ($payment->verified && $payment->account_id != $request->account_id)) {
+                // Reverse original amount from bank account
+                $balanceResult = $this->paymentService->reversePaymentAmountFromBankAccount($payment, $originalPrice);
+                
+                if (!$balanceResult['success']) {
+                    DB::rollBack();
+                    return back()->withError(__('dashboard.bank_account_update_failed'));
+                }
+            } 
+            
+            // Update payment with new data
+            $validatedData['verified'] = 0;
+            $validatedData['handled_by'] = auth()->id();
+            $payment->update($validatedData);
+            
+            // Update transaction
+            Transaction::where('payment_id', $payment->id)->update([
+                'account_id' => $request->account_id,
+                'amount' => $request->price,
+                'type' => 'deposit',
+                'source'=> $request->source,
+                'date' => now(),
+                'description' => $request->notes ?? "",
+                'image_path' => $validatedData['image'] ?? null,
+                'images' => isset($validatedData['image']) ? json_encode([$validatedData['image']]) : null,
+                'verified' => 0,
+                'handled_by' => auth()->id()
+            ]);
+            
+            DB::commit();
+            return back()->withSuccess(__('dashboard.success'));
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Payment update failed: ' . $e->getMessage());
+            return back()->withError(__('dashboard.error'));
+        }
     }
 
     /**

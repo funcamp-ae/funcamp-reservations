@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Customer;
 use App\Services\PaymenntService;
 use App\Services\WhatsAppService;
+use App\Services\RefundService;
 use App\Models\WhatsappMessageTemplate;
 use App\Mail\PaymentLinkCreated;
 use Illuminate\Http\Request;
@@ -18,10 +19,12 @@ use Illuminate\Support\Facades\Config;
 class PaymentLinkController extends Controller
 {
     protected $paymenntService;
+    protected $refundService;
 
-    public function __construct(PaymenntService $paymenntService)
+    public function __construct(PaymenntService $paymenntService, RefundService $refundService)
     {
         $this->paymenntService = $paymenntService;
+        $this->refundService = $refundService;
         // Ensure permission check at controller level as well
         $this->middleware('permission:financial.payment-links.transactions.refund')->only('refund');
     }
@@ -661,29 +664,88 @@ class PaymentLinkController extends Controller
         ]);
 
         try {
-            if ($paymentLink->status !== 'paid') {
-                return back()->with('error', __('dashboard.payment_link_errors.refund_not_paid'));
-            }
-
-            if (!$paymentLink->checkout_id) {
-                return back()->with('error', __('dashboard.payment_link_errors.checkout_missing'));
-            }
-
             $amount = $request->input('amount');
             $currency = strtoupper($request->input('currency', 'AED'));
             $note = $request->input('note');
 
-            $result = $this->paymenntService->refundCheckout($paymentLink->checkout_id, $amount, $currency, $note);
-
-            if ($result['success']) {
-                return back()->with('success', __('dashboard.payment_link_refund_success'));
+            // Validate using RefundService
+            $validation = $this->refundService->validateRefundRequest($paymentLink, $amount);
+            
+            if (!$validation['valid']) {
+                return back()->with('error', implode(' ', $validation['errors']));
             }
 
-            return back()->with('error', $result['error'] ?? __('dashboard.payment_link_errors.refund_failed'));
+            // // Get refund summary before processing
+            // $summaryBefore = $this->refundService->getRefundSummary($paymentLink);
+            
+            // Log::info('Processing refund request', [
+            //     'payment_link_id' => $paymentLink->id,
+            //     'checkout_id' => $paymentLink->checkout_id,
+            //     'requested_amount' => $amount,
+            //     'currency' => $currency,
+            //     'current_status' => $paymentLink->status,
+            //     'summary_before' => $summaryBefore
+            // ]);
+
+            // Process refund through PaymenntService (which uses RefundService internally)
+            $result = $this->paymenntService->refundCheckout(
+                $paymentLink->checkout_id, 
+                $amount, 
+                $currency, 
+                $note
+            );
+
+            if ($result['success']) {
+                $refundInfo = $result['refund_info'] ?? [];
+                $refundType = $refundInfo['refund_type'] ?? 'unknown';
+                $totalRefunded = $refundInfo['total_refunded_amount'] ?? 0;
+                $remainingAmount = $refundInfo['remaining_amount'] ?? 0;
+
+                // Get updated summary
+                $paymentLink->refresh();
+                $summaryAfter = $this->refundService->getRefundSummary($paymentLink);
+
+                Log::info('Refund processed successfully', [
+                    'payment_link_id' => $paymentLink->id,
+                    'refund_type' => $refundType,
+                    'refunded_amount' => $amount,
+                    'total_refunded' => $totalRefunded,
+                    'remaining_amount' => $remainingAmount,
+                    'new_status' => $paymentLink->status,
+                    'summary_after' => $summaryAfter
+                ]);
+
+                $successMessage = $refundType === 'full' 
+                    ? __('dashboard.payment_link_refund_full_success', ['amount' => $amount, 'currency' => $currency])
+                    : __('dashboard.payment_link_refund_partial_success', [
+                        'amount' => $amount, 
+                        'currency' => $currency,
+                        'remaining' => $remainingAmount
+                    ]);
+
+                return back()->with('success', $successMessage);
+            }
+
+            // Handle failure
+            $errorMessage = $result['error'] ?? __('dashboard.payment_link_errors.refund_failed');
+            
+            // Check if there's a warning (gateway succeeded but local processing failed)
+            if (isset($result['warning'])) {
+                Log::critical('Refund gateway succeeded but processing failed', [
+                    'payment_link_id' => $paymentLink->id,
+                    'warning' => $result['warning'],
+                    'error' => $errorMessage
+                ]);
+                return back()->with('error', __('dashboard.payment_link_errors.refund_gateway_success_but_processing_failed'));
+            }
+
+            return back()->with('error', $errorMessage);
+            
         } catch (\Exception $e) {
             Log::error('Payment Link Refund Error', [
                 'payment_link_id' => $paymentLink->id,
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
 
             return back()->with('error', __('dashboard.payment_link_errors.refund_error'));
