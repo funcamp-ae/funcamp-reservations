@@ -46,6 +46,7 @@ use App\Models\StockAdjustment;
 use App\Models\OrderAsset;
 use App\Services\StockAdjustmentService;
 use App\Services\OrderAddonService;
+use App\Services\PaymentService;
 //use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
@@ -59,13 +60,15 @@ class OrderController extends Controller
     private $orderRepository;
     private $pdfService;
     private $orderAddonService;
+    private $paymentService;
 
     public function __construct(
         IOrderRepository $orderRepository,
         IUserRepository $Iuser,
         ICategoryRepository $Icat,
-        PdfGeneratorService $pdfService
-        , OrderAddonService $orderAddonService
+        PdfGeneratorService $pdfService,
+        OrderAddonService $orderAddonService,
+        PaymentService $paymentService
     ) {
 
         $this->orderRepository = $orderRepository;
@@ -73,6 +76,7 @@ class OrderController extends Controller
         $this->Icat = $Icat;
         $this->pdfService = $pdfService;
         $this->orderAddonService = $orderAddonService;
+        $this->paymentService = $paymentService;
     }
 
     public function index()
@@ -1145,10 +1149,14 @@ $request->validate($rules);
                     $item->update(['is_insurance_verified' => false]);
                 }
                 else if ($item->insurance_status && !$item->is_insurance_verified) {
-                    $item->update(['is_insurance_verified' => true]);
-                    $item->update(["insurance_handled_by" => auth()->user()->id]);
-
-                    event(new \App\Events\InsuranceVerified($item));
+                    $verificationResult = $this->paymentService->makeVerficationTotheReservation($item);
+                    
+                    if (!$verificationResult['success']) {
+                        Log::warning('Insurance verification failed', [
+                            'order_id' => $item->id,
+                            'error' => $verificationResult['message'] ?? 'Unknown error'
+                        ]);
+                    }
                 }elseif ($item->is_insurance_verified) {
                     $item->update(['is_insurance_verified' => false]);
                     $item->update(["insurance_status" => null]);

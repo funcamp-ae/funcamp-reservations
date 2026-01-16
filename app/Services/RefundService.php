@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\PaymentLink;
 use App\Models\Payment;
+use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -11,11 +12,17 @@ class RefundService
 {
     protected $financialDeletionService;
     protected $paymentService;
+    protected $insuranceVerificationService;
 
-    public function __construct(FinancialDeletionService $financialDeletionService, PaymentService $paymentService)
+    public function __construct(
+        FinancialDeletionService $financialDeletionService, 
+        PaymentService $paymentService,
+        InsuranceVerificationService $insuranceVerificationService
+    )
     {
         $this->financialDeletionService = $financialDeletionService;
         $this->paymentService = $paymentService;
+        $this->insuranceVerificationService = $insuranceVerificationService;
     }
 
     /**
@@ -55,7 +62,7 @@ class RefundService
             // Update payment link with refund information
             $paymentLink->update([
                 'refunded_amount' => $totalRefundedAmount,
-                'status' => $isFullRefund ? 'refunded' : 'partially_refunded'
+                'status' => $isFullRefund ? 'refunded' : 'partially_refunded',
             ]);
 
             Log::info('Payment link refund updated', [
@@ -69,50 +76,48 @@ class RefundService
 
             // Handle payment record if exists
             $paymentResult = null;
+            $insuranceUpdateResult = null;
+            
             if ($paymentLink->payment_id) {
                 $payment = Payment::find($paymentLink->payment_id);
                 
                 if ($payment) {
-                    if ($isFullRefund) {
-                        // Full refund: delete the payment record
-                        $paymentResult = $this->financialDeletionService->deletePaymentById((int) $paymentLink->payment_id);
+                    // Update insurance status if payment is insurance-related
+                    if ($payment->statement === 'the_insurance') {
+                        $insuranceUpdateResult = $this->updateInsuranceStatusAfterRefund($paymentLink, $payment, $refundAmount, $isFullRefund , $refundData['note'] ?? null);
                         
-                        if (!$paymentResult['success']) {
-                            DB::rollBack();
-                            return [
-                                'success' => false,
-                                'error' => 'Payment deletion failed: ' . ($paymentResult['message'] ?? 'Unknown error')
-                            ];
+                        // Verify the order insurance
+                        if ($insuranceUpdateResult['success'] && $payment->order) {
+                            $verificationResult = $this->paymentService->makeVerficationTotheReservation($payment->order);                   
+                            if (!$verificationResult['success']) {
+                                Log::warning('Insurance verification failed', [
+                                    'order_id' => $payment->order->id,
+                                    'error' => $verificationResult['message'] ?? 'Unknown error'
+                                ]);
+                            }
                         }
-
-                        Log::info('Full refund: Payment deleted', [
-                            'payment_id' => $paymentLink->payment_id,
-                            'deleted_amount' => $paymentResult['deleted_amount'] ?? 0
-                        ]);
-                    } else {
-                        // Partial refund: update the payment record
-                        $newPaymentAmount = $payment->price - $refundAmount;
-                        $paymentResult = $this->paymentService->updatePaymentAmount(
-                            (int) $paymentLink->payment_id, 
-                            $newPaymentAmount,
-                            $refundAmount
+                        
+                        if (!$insuranceUpdateResult['success']) {
+                            Log::warning('Insurance status update failed but continuing with refund', [
+                                'payment_id' => $payment->id,
+                                'error' => $insuranceUpdateResult['error'] ?? 'Unknown error'
+                            ]);
+                        }
+                    }
+                    
+                    // Handle non-insurance payment refunds
+                    if ($payment->statement !== 'the_insurance') {
+                        $paymentResult = $this->handleNonInsurancePaymentRefund(
+                            $paymentLink,
+                            $payment,
+                            $refundAmount,
+                            $isFullRefund
                         );
 
                         if (!$paymentResult['success']) {
                             DB::rollBack();
-                            return [
-                                'success' => false,
-                                'error' => 'Payment update failed: ' . ($paymentResult['message'] ?? 'Unknown error')
-                            ];
+                            return $paymentResult;
                         }
-
-                        Log::info('Partial refund: Payment updated', [
-                            'payment_id' => $paymentLink->payment_id,
-                            'original_amount' => $payment->price,
-                            'refund_amount' => $refundAmount,
-                            'new_amount' => $newPaymentAmount,
-                            'updated_balance' => $paymentResult['updated_balance'] ?? 0
-                        ]);
                     }
                 }
             }
@@ -126,7 +131,8 @@ class RefundService
                 'total_refunded_amount' => $totalRefundedAmount,
                 'remaining_amount' => $paymentLink->amount - $totalRefundedAmount,
                 'payment_link_status' => $paymentLink->status,
-                'payment_result' => $paymentResult
+                'payment_result' => $paymentResult,
+                'insurance_update_result' => $insuranceUpdateResult
             ];
         } catch (\Exception $e) {
             DB::rollBack();
@@ -176,7 +182,9 @@ class RefundService
         if ($refundAmount > $remainingAmount) {
             $errors[] = "Refund amount ({$refundAmount}) exceeds remaining amount ({$remainingAmount})";
         }
-
+        if ($paymentLink->order->is_insurance_verified) {
+            $errors[] = 'Cannot process refund while there is reservation insurance verified';
+        }
         return [
             'valid' => empty($errors),
             'errors' => $errors,
@@ -209,5 +217,137 @@ class RefundService
             'is_partially_refunded' => $refundedAmount > 0 && $refundedAmount < $paymentLink->amount,
             'can_refund' => in_array($paymentLink->status, ['paid', 'partially_refunded']) && $remainingAmount > 0
         ];
+    }
+
+    /**
+     * Handle refund for non-insurance payments
+     * Deletes payment for full refunds, updates for partial refunds
+     *
+     * @param PaymentLink $paymentLink
+     * @param Payment $payment
+     * @param float $refundAmount
+     * @param bool $isFullRefund
+     * @return array
+     */
+    private function handleNonInsurancePaymentRefund(
+        PaymentLink $paymentLink,
+        Payment $payment,
+        float $refundAmount,
+        bool $isFullRefund
+    ): array
+    {
+        try {
+            if ($isFullRefund) {
+                // Full refund: delete the payment record
+                $paymentResult = $this->financialDeletionService->deletePaymentById((int) $paymentLink->payment_id);
+                
+                if (!$paymentResult['success']) {
+                    return [
+                        'success' => false,
+                        'error' => 'Payment deletion failed: ' . ($paymentResult['message'] ?? 'Unknown error')
+                    ];
+                }
+
+                Log::info('Full refund: Payment deleted', [
+                    'payment_id' => $paymentLink->payment_id,
+                    'deleted_amount' => $paymentResult['deleted_amount'] ?? 0
+                ]);
+
+                return $paymentResult;
+            } else {
+                // Partial refund: update the payment record
+                $newPaymentAmount = $payment->price - $refundAmount;
+                $paymentResult = $this->paymentService->updatePaymentAmount(
+                    (int) $paymentLink->payment_id, 
+                    $newPaymentAmount,
+                    $refundAmount
+                );
+
+                if (!$paymentResult['success']) {
+                    return [
+                        'success' => false,
+                        'error' => 'Payment update failed: ' . ($paymentResult['message'] ?? 'Unknown error')
+                    ];
+                }
+
+                Log::info('Partial refund: Payment updated', [
+                    'payment_id' => $paymentLink->payment_id,
+                    'original_amount' => $payment->price,
+                    'refund_amount' => $refundAmount,
+                    'new_amount' => $newPaymentAmount,
+                    'updated_balance' => $paymentResult['updated_balance'] ?? 0
+                ]);
+
+                return $paymentResult;
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to handle non-insurance payment refund', [
+                'payment_id' => $payment->id,
+                'refund_amount' => $refundAmount,
+                'error' => $e->getMessage()
+            ]);
+
+            return [
+                'success' => false,
+                'error' => 'Failed to process non-insurance payment refund: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Update order insurance status after refund
+     * Resets insurance verification and related fields
+     *
+     * @param Payment $payment
+     * @param float $refundAmount
+     * @param bool $isFullRefund
+     * @return array
+     */
+    public function updateInsuranceStatusAfterRefund( PaymentLink $paymentLink, Payment $payment, float $refundAmount, bool $isFullRefund , ?string $refundNote = null): array
+    {
+        try {
+            // Only process if payment is insurance-related
+            if ($payment->statement !== 'the_insurance') {
+                return [
+                    'success' => true,
+                    'message' => 'Payment is not insurance-related, no insurance update needed'
+                ];
+            }
+
+            $order = $payment->order;
+            if (!$order) {
+                return [
+                    'success' => false,
+                    'error' => 'Order not found for payment'
+                ];
+            }
+
+            DB::beginTransaction();
+            try {
+                $order->update([
+                    'insurance_status' => $isFullRefund ? 'returned' : 'confiscated_partial',
+                    'confiscation_description' => $refundNote ?? " ",
+                    'partial_confiscation_amount' => $isFullRefund ? null : $paymentLink->amount - $refundAmount,
+                    ]);
+                DB::commit();
+
+                return [
+                    'success' => true,
+                ];
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to update insurance status after refund', [
+                'payment_id' => $payment->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return [
+                'success' => false,
+                'error' => 'Failed to update insurance status: ' . $e->getMessage()
+            ];
+        }
     }
 }

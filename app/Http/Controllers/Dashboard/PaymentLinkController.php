@@ -660,13 +660,13 @@ class PaymentLinkController extends Controller
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
             'currency' => 'required|string|size:3',
-            'note' => 'required|string|max:500',
+            'note' => 'nullable|string|max:500',
         ]);
 
         try {
             $amount = $request->input('amount');
             $currency = strtoupper($request->input('currency', 'AED'));
-            $note = $request->input('note');
+            $note = $request->input('note' , ' ');
 
             // Validate using RefundService
             $validation = $this->refundService->validateRefundRequest($paymentLink, $amount);

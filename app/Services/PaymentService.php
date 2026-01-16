@@ -140,4 +140,42 @@ class PaymentService
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
+
+    /**
+     * Make verification to the reservation
+     * Updates insurance verification status and triggers verification event
+     *
+     * @param \App\Models\Order $order The order to verify
+     * @return array
+     */
+    public function makeVerficationTotheReservation($order): array
+    {
+        try {
+            if ($order->insurance_status && !$order->is_insurance_verified) {
+                $order->update(['is_insurance_verified' => true]);
+                $order->update(["insurance_handled_by" => auth()->user()->id]);
+                event(new \App\Events\InsuranceVerified($order));
+                
+                \Log::info('Insurance verification completed for order', [
+                    'order_id' => $order->id,
+                    'handled_by' => auth()->user()->id
+                ]);
+
+                return [
+                    'success' => true,
+                    'message' => 'Insurance verification completed'
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Order does not meet verification criteria'
+            ];
+        } catch (\Exception $e) {
+            \Log::error('makeVerficationTotheReservation failed: ' . $e->getMessage(), [
+                'order_id' => $order->id ?? null
+            ]);
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
 }
