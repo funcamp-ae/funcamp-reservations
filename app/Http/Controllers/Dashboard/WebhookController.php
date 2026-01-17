@@ -132,7 +132,7 @@ class WebhookController extends Controller
                     'account_id' => $paymentLink->account_id,
                     'amount' => $netAmount,
                     'type' => 'deposit',
-                    'source'=> "payment_link #{$paymentLink->id} for order #{$paymentLink->order_id} - {$paymentLink->statement}",
+                    'source'=> "reservation_payments",
                     'date' => now(),
                     'payment_id' => $payment->id,
                     'verified' => 0, // Changed from false to true so it appears in general payments
