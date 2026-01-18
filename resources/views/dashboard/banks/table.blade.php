@@ -155,7 +155,7 @@
                 </span>
                 @endif
             </td>
-            <td class="text-center">
+            <td class="text-center d-flex p-6 border-0 gap-1">
 
                 @if($transaction->receiver)
                 <span class="badge  badge-primary">
