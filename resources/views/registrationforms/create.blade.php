@@ -781,7 +781,7 @@
 
     {{-- Header --}}
     <div class="glass header mb-3">
-        <a href="https://funcamp.ae" class="logo-section" style="text-decoration: none; color: inherit;">
+        <a href="https://funcamp.ae" class="logo-section" style="cursor: pointer; text-decoration: none; color: inherit;">
             <img src="{{ asset('images/logo.png') }}" class="logo" alt="Logo"
                  onerror="this.replaceWith(Object.assign(document.createElement('div'),{textContent:'Company',className:'fw-bold fs-4'}));">
             <div class="brand-text">
