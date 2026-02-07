@@ -781,14 +781,14 @@
 
     {{-- Header --}}
     <div class="glass header mb-3">
-        <div class="logo-section">
+        <a href="https://funcamp.ae" class="logo-section" style="text-decoration: none; color: inherit;">
             <img src="{{ asset('images/logo.png') }}" class="logo" alt="Logo"
                  onerror="this.replaceWith(Object.assign(document.createElement('div'),{textContent:'Company',className:'fw-bold fs-4'}));">
             <div class="brand-text">
                 <div class="company-name">{{ env('APP_NAME') }}</div>
                 <div class="tagline">Book your appointment in seconds</div>
             </div>
-        </div>
+        </a>
     </div>
 
     {{-- Hero --}}
