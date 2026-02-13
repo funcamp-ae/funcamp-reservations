@@ -2,7 +2,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\Repositories\IPermissionRepository;
-use Spatie\Permission\Models\Permission;
+use App\Models\Permission;
 
 
 class PermissionRepository extends BaseRepository implements IPermissionRepository

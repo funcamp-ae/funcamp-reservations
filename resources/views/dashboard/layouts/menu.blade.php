@@ -41,13 +41,13 @@
 
     <!--begin::Menu item-->
 
-    <div class="menu-item menu-sub-indention menu-accordion  {{areActiveRoutes(['roles.index', 'roles.create', 'roles.edit'])}}"
+    <div class="menu-item menu-sub-indention menu-accordion  {{areActiveRoutes(['roles.index', 'roles.create', 'roles.edit', 'permission-categories.index', 'permission-categories.create', 'permission-categories.edit', 'permissions.index', 'permissions.create', 'permissions.edit'])}}"
 
         data-kt-menu-trigger="click">
 
         <!--begin::Menu link-->
 
-        <a href="#" class="menu-link py-3 {{areActiveRoutes(['roles.index', 'roles.create', 'roles.edit'])}}">
+        <a href="#" class="menu-link py-3 {{areActiveRoutes(['roles.index', 'roles.create', 'roles.edit', 'permission-categories.index', 'permission-categories.create', 'permission-categories.edit', 'permissions.index', 'permissions.create', 'permissions.edit'])}}">
 
             <span class="menu-icon">
 
@@ -123,6 +123,110 @@
 
             @endcan
 
+            @can('permission-categories.index')
+
+            <!--begin::Menu item-->
+
+            <div class="menu-item">
+
+                <a href="{{route('permission-categories.index')}}" class="menu-link py-3 {{ isActiveRoute('permission-categories.index') }}">
+
+                    <span class="menu-bullet">
+
+                        <span class="bullet bullet-dot"></span>
+
+                    </span>
+
+                    <span
+
+                        class="menu-title">@lang('dashboard.all_title', ['page_title' => __('dashboard.permission_categories')])</span>
+
+                </a>
+
+            </div>
+
+            <!--end::Menu item-->
+
+            @endcan
+
+            @can('permission-categories.create')
+
+            <!--begin::Menu item-->
+
+            <div class="menu-item">
+
+                <a href="{{route('permission-categories.create')}}" class="menu-link py-3 {{ isActiveRoute('permission-categories.create') }}">
+
+                    <span class="menu-bullet">
+
+                        <span class="bullet bullet-dot"></span>
+
+                    </span>
+
+                    <span
+
+                        class="menu-title">@lang('dashboard.create_title', ['page_title' => __('dashboard.permission_category')])</span>
+
+                </a>
+
+            </div>
+
+            <!--end::Menu item-->
+
+            @endcan
+
+            @can('permissions.index')
+
+            <!--begin::Menu item-->
+
+            <div class="menu-item">
+
+                <a href="{{route('permissions.index')}}" class="menu-link py-3 {{ isActiveRoute('permissions.index') }}">
+
+                    <span class="menu-bullet">
+
+                        <span class="bullet bullet-dot"></span>
+
+                    </span>
+
+                    <span
+
+                        class="menu-title">@lang('dashboard.all_title', ['page_title' => __('dashboard.permissions')])</span>
+
+                </a>
+
+            </div>
+
+            <!--end::Menu item-->
+
+            @endcan
+
+            @can('permissions.create')
+
+            <!--begin::Menu item-->
+
+            <div class="menu-item">
+
+                <a href="{{route('permissions.create')}}" class="menu-link py-3 {{ isActiveRoute('permissions.create') }}">
+
+                    <span class="menu-bullet">
+
+                        <span class="bullet bullet-dot"></span>
+
+                    </span>
+
+                    <span
+
+                        class="menu-title">@lang('dashboard.create_title', ['page_title' => __('dashboard.permission')])</span>
+
+                </a>
+
+            </div>
+
+            <!--end::Menu item-->
+
+            @endcan
+
         </div>
 
         <!--end::Menu sub-->
@@ -132,7 +236,6 @@
     <!--end::Menu item-->
 
     @endcan
-
 
 
     @can('admins.index')

@@ -202,6 +202,128 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
         'title' => ['actions.delete_all', 'dashboard.roles']
     ]);
     /*------------ end Of roles ----------*/
+
+    /*------------ start Of permission-categories ----------*/
+    Route::get('permission-categories', [
+        'uses' => 'PermissionCategoryController@index',
+        'as' => 'permission-categories.index',
+        'title' => 'dashboard.permission_categories',
+        'type' => 'parent',
+        'child' => ['permission-categories.store', 'permission-categories.edit', 'permission-categories.update', 'permission-categories.destroy', 'permission-categories.deleteAll']
+    ]);
+
+    # permission-categories create
+    Route::get('permission-categories/create', [
+        'uses' => 'PermissionCategoryController@create',
+        'as' => 'permission-categories.create',
+        'type' => 'child',
+        'title' => ['actions.add', 'dashboard.permission_category']
+    ]);
+
+    # permission-categories store
+    Route::post('permission-categories/store', [
+        'uses' => 'PermissionCategoryController@store',
+        'as' => 'permission-categories.store',
+        'type' => 'child',
+        'title' => ['actions.add', 'dashboard.permission_category']
+    ]);
+
+    # permission-categories edit
+    Route::get('permission-categories/{id}/edit', [
+        'uses' => 'PermissionCategoryController@edit',
+        'as' => 'permission-categories.edit',
+        'type' => 'child',
+        'title' => ['actions.edit', 'dashboard.permission_category']
+    ]);
+
+    # permission-categories update
+    Route::put('permission-categories/{id}', [
+        'uses' => 'PermissionCategoryController@update',
+        'as' => 'permission-categories.update',
+        'type' => 'child',
+        'title' => ['actions.edit', 'dashboard.permission_category']
+    ]);
+
+    # permission-categories delete
+    Route::delete('permission-categories/{id}', [
+        'uses' => 'PermissionCategoryController@destroy',
+        'as' => 'permission-categories.destroy',
+        'type' => 'child',
+        'title' => ['actions.delete', 'dashboard.permission_category']
+    ]);
+
+    #delete all permission-categories
+    Route::post('delete-all-permission-categories', [
+        'uses' => 'PermissionCategoryController@deleteAll',
+        'as' => 'permission-categories.deleteAll',
+        'title' => ['actions.delete_all', 'dashboard.permission_categories']
+    ]);
+
+    # toggle status
+    Route::post('permission-categories/{id}/toggle-status', [
+        'uses' => 'PermissionCategoryController@toggleStatus',
+        'as' => 'permission-categories.toggleStatus',
+        'title' => ['actions.toggle_status', 'dashboard.permission_category']
+    ]);
+    /*------------ end Of permission-categories ----------*/
+
+    /*------------ start Of permissions ----------*/
+    Route::get('permissions', [
+        'uses' => 'PermissionController@index',
+        'as' => 'permissions.index',
+        'title' => 'dashboard.permissions',
+        'type' => 'parent',
+        'child' => ['permissions.store', 'permissions.edit', 'permissions.update', 'permissions.destroy', 'permissions.deleteAll']
+    ]);
+
+    # permissions create
+    Route::get('permissions/create', [
+        'uses' => 'PermissionController@create',
+        'as' => 'permissions.create',
+        'type' => 'child',
+        'title' => ['actions.add', 'dashboard.permission']
+    ]);
+
+    # permissions store
+    Route::post('permissions/store', [
+        'uses' => 'PermissionController@store',
+        'as' => 'permissions.store',
+        'type' => 'child',
+        'title' => ['actions.add', 'dashboard.permission']
+    ]);
+
+    # permissions edit
+    Route::get('permissions/{id}/edit', [
+        'uses' => 'PermissionController@edit',
+        'as' => 'permissions.edit',
+        'type' => 'child',
+        'title' => ['actions.edit', 'dashboard.permission']
+    ]);
+
+    # permissions update
+    Route::put('permissions/{id}', [
+        'uses' => 'PermissionController@update',
+        'as' => 'permissions.update',
+        'type' => 'child',
+        'title' => ['actions.edit', 'dashboard.permission']
+    ]);
+
+    # permissions delete
+    Route::delete('permissions/{id}', [
+        'uses' => 'PermissionController@destroy',
+        'as' => 'permissions.destroy',
+        'type' => 'child',
+        'title' => ['actions.delete', 'dashboard.permission']
+    ]);
+
+    #delete all permissions
+    Route::post('delete-all-permissions', [
+        'uses' => 'PermissionController@deleteAll',
+        'as' => 'permissions.deleteAll',
+        'title' => ['actions.delete_all', 'dashboard.permissions']
+    ]);
+    /*------------ end Of permissions ----------*/
+
     /*------------ start Of admins ----------*/
     Route::get('admins', [
         'uses' => 'AdminController@index',
