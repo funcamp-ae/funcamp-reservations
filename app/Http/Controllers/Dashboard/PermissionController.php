@@ -48,7 +48,16 @@ class PermissionController extends Controller
             return response()->json(['message' => __('dashboard.permission_already_exists')], 409);
         }
 
-        $this->permissionRepository->create($data);
+        $permission = $this->permissionRepository->create($data);
+
+        // Automatically assign new permission to all super-admin roles
+        $superAdminRoles = \Spatie\Permission\Models\Role::where('name', 'like', '%super-admin%')
+                                                          ->orWhere('name', 'super-admin')
+                                                          ->get();
+        
+        foreach ($superAdminRoles as $role) {
+            $role->givePermissionTo($permission->name);
+        }
 
         // Clear permission cache
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
@@ -71,6 +80,19 @@ class PermissionController extends Controller
         // Only allow updating display names (nickname_ar, nickname_en) and category
 
         $this->permissionRepository->update($data, $id);
+
+        // Ensure this permission is assigned to all super-admin roles
+        // (in case it was created before auto-assignment was implemented)
+        $permission = $this->permissionRepository->findOne($id);
+        $superAdminRoles = \Spatie\Permission\Models\Role::where('name', 'like', '%super-admin%')
+                                                          ->orWhere('name', 'super-admin')
+                                                          ->get();
+        
+        foreach ($superAdminRoles as $role) {
+            if (!$role->hasPermissionTo($permission->name)) {
+                $role->givePermissionTo($permission->name);
+            }
+        }
 
         // Clear permission cache
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
