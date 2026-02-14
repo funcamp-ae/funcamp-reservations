@@ -1536,6 +1536,8 @@ return [
     'three_stars' => '۳ ستورې',
     'four_stars' => '۴ ستورې',
     'five_stars' => '۵ ستورې',
+    'out_of' => 'د',
+    'stars' => 'ستورې',
     'ratings_count' => 'د ارزونو شمېر',
     'short_text' => 'لنډ متن',
     'long_text' => 'اوږد متن',

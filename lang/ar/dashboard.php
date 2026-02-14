@@ -1587,6 +1587,8 @@ return [
     'three_stars' => '3 نجوم',
     'four_stars' => '4 نجوم',
     'five_stars' => '5 نجوم',
+    'out_of' => 'من',
+    'stars' => 'نجوم',
     'ratings_count' => 'عدد التقييمات',
     'short_text' => 'نص قصير',
     'long_text' => 'نص طويل',

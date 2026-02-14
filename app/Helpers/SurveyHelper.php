@@ -497,20 +497,12 @@ class SurveyHelper
                 return '<input type="datetime-local" class="rating-form-input" value="' . $value . '" disabled>';
             case "stars":
                 $points = 5;
-                $stars = '';
-                // Generate stars in reverse order (5 to 1) for proper RTL display
-                for ($i = $points; $i >= 1; $i--) {
-                    $checked = ($i == $value) ? 'checked' : '';
-                    $stars .= '
-                        <input type="radio" id="field_' . $question->id . '_' . $i . '" name="field_' . $question->id . '" value="' . $i . '" ' . $checked . ' disabled>
-                        <label for="field_' . $question->id . '_' . $i . '">★</label>
-                    ';
+                // For PDF compatibility, show as text instead of Unicode stars
+                if (isset($value) && $value > 0) {
+                    $starText = $value . ' ' . __('dashboard.out_of') . ' ' . $points . ' ' . __('dashboard.stars');
+                    return '<div style="padding: 5px; font-weight: bold;">' . $starText . '</div>';
                 }
-                return '
-                    <div class="rating-form-stars">
-                        ' . $stars . '
-                    </div>
-                ';
+                return '<div style="padding: 5px;">-</div>';
             case "rating":
                 $points = 5;
                 $ratingOptions = '';

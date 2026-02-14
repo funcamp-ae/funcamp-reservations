@@ -1552,6 +1552,8 @@ return [
     'three_stars' => '3 Stars',
     'four_stars' => '4 Stars',
     'five_stars' => '5 Stars',
+    'out_of' => 'out of',
+    'stars' => 'stars',
     'ratings_count' => 'Ratings Count',
     'question_answers' => 'Question Answers',
     'question_answers_desc' => 'Distribution of answers for each question type',
