@@ -83,7 +83,7 @@
                                 <td >{{ $orderAddon->pivot->count }}</td>
                                 <td>{{ $orderAddon->pivot->price }}</td>
                                 <td>{{__('dashboard.'. $orderAddon->pivot->payment_method )}}</td>
-                                <td>{{ $orderAddon->pivot->statement ? __('dashboard.'. $orderAddon->pivot->statement) : '-' }}</td>
+                                <td>{{ $orderAddon->pivot->statement ? __('dashboard.'. str_replace(' ', '_', $orderAddon->pivot->statement)) : '-' }}</td>
                                 <td>{{ $orderAddon->pivot->account->name }}</td>
                                 <td>
                                     {{ $orderAddon->pivot->verified ? __('dashboard.yes') : __('dashboard.no') }} <br>

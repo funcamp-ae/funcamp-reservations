@@ -73,7 +73,7 @@
                             <td>{{ (int) $item?->quantity }}</td>
                             <td class="fw-bold">{{ $item?->total_price % 1 === 0 ? (int) $item?->total_price : $item?->total_price }}</td>
                             <td>{{__('dashboard.'. $item->payment_method )}}</td>
-                            <td>{{ $item->statement ? __('dashboard.'. $item->statement) : '-' }}</td>
+                            <td>{{ $item->statement ? __('dashboard.'. str_replace(' ', '_', $item->statement)) : '-' }}</td>
                             <td>{{ $item?->account->name }}</td>
                             <td>
                                 {{ $item->verified ? __('dashboard.yes') : __('dashboard.no') }} <br>
