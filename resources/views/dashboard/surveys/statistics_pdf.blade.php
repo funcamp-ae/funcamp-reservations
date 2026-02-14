@@ -370,7 +370,7 @@
                         {{ SurveyHelper::getLocalizedText($answer->question->question_text) }}
                     </div>
                     <div style="padding-left: 10px; color: #555;">
-                        {!! SurveyHelper::getResponseHtml($answer) !!}
+                        {!! SurveyHelper::getResponseHtml($answer, true) !!}
                     </div>
                 </div>
             @endforeach

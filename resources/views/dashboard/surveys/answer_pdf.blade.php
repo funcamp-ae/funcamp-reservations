@@ -106,7 +106,7 @@
         @foreach ($response->answers as $answer)
             <div class="answer-item">
                 <div class="question">{{ SurveyHelper::getLocalizedText($answer->question->question_text) }}</div>
-                <div class="answer">{!! SurveyHelper::getResponseHtml($answer) !!}</div>
+                <div class="answer">{!! SurveyHelper::getResponseHtml($answer, true) !!}</div>
             </div>
         @endforeach
     </div>

@@ -405,9 +405,10 @@ class SurveyHelper
      * Generate HTML for a survey answer response
      *
      * @param \App\Models\SurveyAnswer $answer
+     * @param bool $forPdf Whether output is for PDF (affects star rendering)
      * @return string
      */
-    public static function getResponseHtml($answer)
+    public static function getResponseHtml($answer, $forPdf = false)
     {
         $question = $answer->question;
         $type = $question->question_type;
@@ -497,12 +498,31 @@ class SurveyHelper
                 return '<input type="datetime-local" class="rating-form-input" value="' . $value . '" disabled>';
             case "stars":
                 $points = 5;
-                // For PDF compatibility, show as text instead of Unicode stars
-                if (isset($value) && $value > 0) {
-                    $starText = $value . ' ' . __('dashboard.out_of') . ' ' . $points . ' ' . __('dashboard.stars');
-                    return '<div style="padding: 5px; font-weight: bold;">' . $starText . '</div>';
+                
+                // For PDF, show as text instead of Unicode stars
+                if ($forPdf) {
+                    if (isset($value) && $value > 0) {
+                        $starText = $value . ' ' . __('dashboard.out_of') . ' ' . $points . ' ' . __('dashboard.stars');
+                        return '<div style="padding: 5px; font-weight: bold;">' . $starText . '</div>';
+                    }
+                    return '<div style="padding: 5px;">-</div>';
                 }
-                return '<div style="padding: 5px;">-</div>';
+                
+                // For web view, show interactive stars
+                $stars = '';
+                // Generate stars in reverse order (5 to 1) for proper RTL display
+                for ($i = $points; $i >= 1; $i--) {
+                    $checked = ($i == $value) ? 'checked' : '';
+                    $stars .= '
+                        <input type="radio" id="field_' . $question->id . '_' . $i . '" name="field_' . $question->id . '" value="' . $i . '" ' . $checked . ' disabled>
+                        <label for="field_' . $question->id . '_' . $i . '">★</label>
+                    ';
+                }
+                return '
+                    <div class="rating-form-stars">
+                        ' . $stars . '
+                    </div>
+                ';
             case "rating":
                 $points = 5;
                 $ratingOptions = '';
