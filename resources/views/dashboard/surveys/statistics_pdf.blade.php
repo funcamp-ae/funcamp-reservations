@@ -353,6 +353,30 @@
         </div>
     @endforeach
 
+    <h2 style="margin-top: 30px; page-break-before: always;">{{ __('dashboard.client_answers') }}</h2>
+    
+    @foreach($responses as $response)
+        <div class="question-section" style="page-break-inside: avoid;">
+            <div class="question-title">
+                {{ __('dashboard.response_id') }}: {{ $response->id }} | 
+                {{ __('dashboard.customer_name') }}: {{ $response->order->customer->name ?? __('dashboard.not_available') }} | 
+                {{ __('dashboard.order_id') }}: {{ $response->order_id }} | 
+                {{ __('dashboard.date') }}: {{ $response->created_at->format('Y-m-d H:i') }}
+            </div>
+            
+            @foreach($response->answers as $answer)
+                <div style="margin-bottom: 15px; padding: 10px; background-color: #f9f9f9; border-radius: 3px;">
+                    <div style="font-weight: bold; margin-bottom: 5px; color: #333;">
+                        {{ SurveyHelper::getLocalizedText($answer->question->question_text) }}
+                    </div>
+                    <div style="padding-left: 10px; color: #555;">
+                        {!! SurveyHelper::getResponseHtml($answer) !!}
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endforeach
+
     <div class="footer">
         <p>{{ __('dashboard.generated_by_icamp_system') }}</p>
     </div>

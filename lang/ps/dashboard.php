@@ -319,6 +319,7 @@ return [
     'addons' => 'اضافات',
     'normal_items' => 'عادي توکي',
     'complete the amount' => 'د ریزرویشن پاتې مبلغ بشپړول',
+    'complete_the_amount' => 'د ریزرویشن پاتې مبلغ بشپړول',
     'full_amount' => 'بشپړ مقدار',
     'full_camp_amount' => 'د کیمپ بشپړ مقدار',
     'full_addon_amount' => 'د اضافې بشپړ مقدار',
@@ -1515,6 +1516,8 @@ return [
     'generated_on' => 'جوړ شو په',
     'total_responses' => 'ټول ځوابونه',
     'generated_by_icamp_system' => 'د icamp سیسټم لخوا جوړ شو',
+    'client_answers' => 'د پیرودونکو ځوابونه',
+    'response_id' => 'د ځواب پیژندنه',
 
     // Survey Statistics Section
     'total_surveys' => 'ټول پوښتنلیکونه',

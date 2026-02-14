@@ -335,6 +335,7 @@ return [
     'addons' => 'الإضافات',
     'normal_items' => 'عناصر عادية',
     'complete the amount' => 'استكمال باقي مبلغ الحجز',
+    'complete_the_amount' => 'استكمال باقي مبلغ الحجز',
     'full_amount' => 'المبلغ كامل',
     'full_camp_amount' => 'مبلغ المخيم كامل',
     'full_addon_amount' => 'مبلغ الإضافة كاملة',
@@ -1564,6 +1565,8 @@ return [
     'generated_on' => 'أنشئت في',
     'total_responses' => 'إجمالي الإجابات',
     'generated_by_icamp_system' => 'أنشئت من قبل نظام icamp',
+    'client_answers' => 'إجابات العملاء',
+    'response_id' => 'معرف الاستجابة',
 
 
 
