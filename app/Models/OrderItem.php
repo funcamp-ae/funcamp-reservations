@@ -18,8 +18,8 @@ class OrderItem extends Model
         'handled_by',
         'account_id',
         'payment_method',
-        'verified'
-
+        'verified',
+        'statement'
     ];
 
 

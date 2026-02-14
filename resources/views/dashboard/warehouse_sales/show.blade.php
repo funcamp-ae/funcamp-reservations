@@ -165,6 +165,16 @@
                                             </div>
 
                                             <div class="form-group mt-3">
+                                                <label>{{ __('dashboard.statement') }}</label>
+                                                <select name="statement" class="form-select">
+                                                    <option value="">{{ __('dashboard.select') }}</option>
+                                                    @foreach(warehouseStatements() as $statement)
+                                                        <option @selected($item->statement == $statement) value="{{$statement}}">{{__('dashboard.'. $statement )}}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group mt-3">
                                                 <label>{{ __('dashboard.total_amount') }}</label>
                                                 <input type="number" step="0.01" name="total_price" class="form-control js-total"
                                                     value="{{ $item->total_price }}">
@@ -240,6 +250,16 @@
                                     <div class="form-group mt-3">
                                         <label>{{ __('dashboard.quantity') }}</label>
                                         <input type="number" name="quantity" class="form-control js-qty" value="1">
+                                    </div>
+
+                                    <div class="form-group mt-3">
+                                        <label>{{ __('dashboard.statement') }}</label>
+                                        <select name="statement" class="form-select">
+                                            <option value="">{{ __('dashboard.select') }}</option>
+                                            @foreach(warehouseStatements() as $statement)
+                                                <option value="{{$statement}}">{{__('dashboard.'. $statement )}}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
 
                                     <div class="form-group mt-3">

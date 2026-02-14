@@ -33,6 +33,7 @@ class AddonsController extends Controller
             'name' => 'required|max:255',
             'price' => 'nullable|numeric',
             'description' => 'nullable',
+            'statement' => 'nullable|string|in:deposit,complete the amount,the_insurance,full_addon_amount',
         ]);
 
         Addon::create($validatedData);
@@ -75,6 +76,7 @@ class AddonsController extends Controller
             'name' => 'required|max:255',
             'price' => 'required|numeric',
             'description' => 'nullable',
+            'statement' => 'nullable|string|in:deposit,complete the amount,the_insurance,full_addon_amount',
         ]);
 
 

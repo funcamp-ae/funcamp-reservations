@@ -34,7 +34,8 @@ class WarehousesalesController extends Controller
             'payment_method' => 'required|string',
             'account_id' => 'required|exists:bank_accounts,id',
             'total_price' => 'required|numeric|min:0',
-            'notes' => 'nullable|string|max:255'
+            'notes' => 'nullable|string|max:255',
+            'statement' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
@@ -96,7 +97,8 @@ class WarehousesalesController extends Controller
             'total_price' => 'required|numeric|min:0',
             'payment_method' => 'required|string',
             'account_id' => 'required|exists:bank_accounts,id',
-            'notes' => 'nullable|string|max:255'
+            'notes' => 'nullable|string|max:255',
+            'statement' => 'nullable|string',
         ]);
 
         DB::beginTransaction();

@@ -116,7 +116,49 @@ function statements($select = null)
         'deposit',
         'complete the amount',
         'the_insurance',
-        'full_amount'
+        'full_camp_amount'
+    ];
+
+    if ($select) {
+        foreach ($rows as $row) {
+            if ($row == $select) {
+                return $row;
+            }
+        }
+        return null;
+    }
+
+    return $rows;
+}
+
+function addonStatements($select = null)
+{
+    $rows =  [
+        'deposit',
+        'complete the amount',
+        'the_insurance',
+        'full_addon_amount'
+    ];
+
+    if ($select) {
+        foreach ($rows as $row) {
+            if ($row == $select) {
+                return $row;
+            }
+        }
+        return null;
+    }
+
+    return $rows;
+}
+
+function warehouseStatements($select = null)
+{
+    $rows =  [
+        'deposit',
+        'complete the amount',
+        'the_insurance',
+        'full_warehouse_amount'
     ];
 
     if ($select) {

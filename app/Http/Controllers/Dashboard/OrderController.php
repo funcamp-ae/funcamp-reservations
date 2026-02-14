@@ -225,8 +225,10 @@ class OrderController extends Controller
             'time_from' => 'nullable',
             'time_to' => 'nullable',
             'time_of_receipt' => 'nullable',
+            'signin_date' => 'nullable|date',
             'image_before_receiving' => 'nullable',
             'delivery_time' => 'nullable',
+            'signout_date' => 'nullable|date',
             'image_after_delivery' => 'nullable',
             'status' => 'required|in:pending_and_show_price,pending_and_Initial_reservation,approved,canceled,delayed,completed',
             'expired_price_offer' => 'required_if:status,pending_and_show_price',
@@ -251,6 +253,20 @@ class OrderController extends Controller
         unset($validatedData['service_ids']);
         $validatedData['price'] = $request->price;
 
+        // Set date to today if not provided
+        if (empty($validatedData['date'])) {
+            $validatedData['date'] = now()->format('Y-m-d');
+        }
+
+        // Set time_of_receipt to now() if not provided
+        if (empty($validatedData['time_of_receipt'])) {
+            $validatedData['time_of_receipt'] = now()->format('H:i:s');
+        }
+
+        // Set delivery_time to now() if not provided
+        if (empty($validatedData['delivery_time'])) {
+            $validatedData['delivery_time'] = now()->format('H:i:s');
+        }
 
         $validatedData['show_price_notes'] = $request->show_price_notes;
         $validatedData['order_data_notes'] = $request->order_data_notes;
@@ -434,8 +450,10 @@ class OrderController extends Controller
             'time_to' => 'nullable',
             'expired_price_offer' => 'required_if:status,pending_and_show_price',
             'time_of_receipt' => 'nullable',
+            'signin_date' => 'nullable|date',
             'image_before_receiving' => 'nullable|image',
             'delivery_time' => 'nullable',
+            'signout_date' => 'nullable|date',
             'image_after_delivery' => 'nullable|image',
             'status' => 'required|in:pending_and_show_price,pending_and_Initial_reservation,approved,canceled,delayed,completed',
             'delayed_reson' => 'nullable',
@@ -456,6 +474,21 @@ class OrderController extends Controller
 
         try {
             unset($validatedData['service_ids']);
+
+            // Set date to today if not provided
+            if (empty($validatedData['date'])) {
+                $validatedData['date'] = now()->format('Y-m-d');
+            }
+
+            // Set time_of_receipt to now() if not provided
+            if (empty($validatedData['time_of_receipt'])) {
+                $validatedData['time_of_receipt'] = now()->format('H:i:s');
+            }
+
+            // Set delivery_time to now() if not provided
+            if (empty($validatedData['delivery_time'])) {
+                $validatedData['delivery_time'] = now()->format('H:i:s');
+            }
 
             $validatedData['show_price_notes'] = $request->show_price_notes;
             $validatedData['order_data_notes'] = $request->order_data_notes;
@@ -577,6 +610,7 @@ class OrderController extends Controller
             'price' => 'required|numeric',
             'payment_method' => 'nullable|string',
             'description' => 'nullable|string',
+            'statement' => 'nullable|string|in:deposit,complete the amount,the_insurance,full_addon_amount',
         ]);
         $order = Order::findOrFail($orderId);
         $order->addons()->attach($validatedData['addon_id'], [
@@ -585,6 +619,7 @@ class OrderController extends Controller
             'payment_method' => $validatedData['payment_method'] ?? null,
             'account_id' => $validatedData['account_id'] ?? null,
             'description' => $validatedData['description'] ?? '',
+            'statement' => $validatedData['statement'] ?? null,
             'handled_by' => auth()->id()
         ]);
         // add transaction linked to the newly created pivot row
@@ -620,7 +655,7 @@ class OrderController extends Controller
             'account_id' => 'nullable|exists:bank_accounts,id',
             'payment_method' => 'nullable|string',
             'description' => 'nullable|string',
-
+            'statement' => 'nullable|string|in:deposit,complete the amount,the_insurance,full_addon_amount',
         ]);
 
         // Get the existing addon data to find the transaction
@@ -638,6 +673,7 @@ class OrderController extends Controller
             'payment_method' => $validatedData['payment_method'] ?? null,
             'price' => $validatedData['price'],
             'description' => $validatedData['description'] ?? '',
+            'statement' => $validatedData['statement'] ?? null,
             'verified' => 0, // Reset verified status on update
             'handled_by' => auth()->id()
         ]);
@@ -864,7 +900,10 @@ public function updatesignin(Request $request, $id)
     $order = Order::findOrFail($id);
 
     // تحديث وقت الاستلام + ملاحظات
-    $order->time_of_receipt = $request->input('time_of_receipt');
+    // Set signin_date to today if not provided
+    $order->signin_date = $request->input('signin_date') ?: now()->format('Y-m-d');
+    // Set time_of_receipt to now() if not provided
+    $order->time_of_receipt = $request->input('time_of_receipt') ?: now()->format('H:i:s');
     $order->time_of_receipt_notes = $request->input('time_of_receipt_notes');
 
     // ================== PHOTO ==================
@@ -946,8 +985,11 @@ $request->validate($rules);
 
 
     // تحديث الحقول النصية
+    // Set signout_date to today if not provided
+    // Set delivery_time to now() if not provided
     $order->update([
-        'delivery_time'       => $request->delivery_time,
+        'signout_date'        => $request->signout_date ?: now()->format('Y-m-d'),
+        'delivery_time'       => $request->delivery_time ?: now()->format('H:i:s'),
         'delivery_time_notes' => $request->delivery_time_notes,
     ]);
 

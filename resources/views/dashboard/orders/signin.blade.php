@@ -76,9 +76,14 @@
 
             <div class="card-body pt-0">
                 <div class="form-group mb-4">
+                    <label for="signin_date">{{ __('dashboard.signin_date') }}</label>
+                    <input type="date" name="signin_date" id="signin_date" class="form-control"
+                        value="{{ old('signin_date', $order->signin_date ?? now()->format('Y-m-d')) }}">
+                </div>
+                <div class="form-group mb-4">
                     <label for="time_of_receipt">{{ __('dashboard.signin_time') }}</label>
                     <input type="time" name="time_of_receipt" id="time_of_receipt" class="form-control"
-                        value="{{ old('time_of_receipt', $order->time_of_receipt) }}">
+                        value="{{ old('time_of_receipt', $order->time_of_receipt ?? now()->format('H:i')) }}">
                 </div>
                 <div class="form-group mb-5">
                     <label for="time_of_receipt_notes">{{ __('dashboard.receiving_time_notes') }}</label>

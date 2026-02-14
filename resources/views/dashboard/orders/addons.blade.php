@@ -194,6 +194,15 @@
                                                     </select>
                                                 </div>
                                                 <div class="mb-5 fv-row col-md-12">
+                                                    <label class="form-label">{{ __('dashboard.statement') }}</label>
+                                                    <select name="statement" class="form-select">
+                                                        <option value="">{{ __('dashboard.select') }}</option>
+                                                        @foreach(addonStatements() as $statement)
+                                                            <option @selected($orderAddon->pivot->statement == $statement) value="{{$statement}}">{{__('dashboard.'. $statement )}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="mb-5 fv-row col-md-12">
                                                     <label class="required form-label">{{ __('dashboard.bank_account') }}</label>
                                                     <select name="account_id" id="edit_account_id_{{ $orderAddon->pivot->id }}" class="form-select " required>
                                                         <option value="">{{__('dashboard.choose_account')}}</option>
@@ -269,6 +278,15 @@
 
                                 @foreach(paymentMethod() as $paymentSelect)
                                     <option value="{{$paymentSelect}}">{{__('dashboard.'. $paymentSelect )}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-5 fv-row col-md-12">
+                            <label class="form-label">{{ __('dashboard.statement') }}</label>
+                            <select name="statement" class="form-select">
+                                <option value="">{{ __('dashboard.select') }}</option>
+                                @foreach(addonStatements() as $statement)
+                                    <option value="{{$statement}}">{{__('dashboard.'. $statement )}}</option>
                                 @endforeach
                             </select>
                         </div>
