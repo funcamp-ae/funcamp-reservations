@@ -353,7 +353,7 @@
         </div>
     @endforeach
 
-    <h2 style="margin-top: 30px; page-break-before: always;">{{ __('dashboard.client_answers') }}</h2>
+    <h2 style="margin-top: 30px;">{{ __('dashboard.client_answers') }}</h2>
     
     @foreach($responses as $response)
         <div class="question-section" style="page-break-inside: avoid;">
