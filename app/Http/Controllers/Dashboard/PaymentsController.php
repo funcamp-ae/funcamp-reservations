@@ -12,6 +12,7 @@ use App\Models\BankAccount;
 use App\Models\Expense;
 use App\Models\GeneralPayment;
 use App\Services\InsuranceVerificationService;
+use App\Services\Insurance\InsuranceReturnsHandler;
 use App\Traits\ImageUploadTrait;
 use App\Services\FinancialDeletionService;
 use App\Services\PaymentService;
@@ -30,11 +31,16 @@ class PaymentsController extends Controller
 
     protected $paymentService;
     protected $financialDeletionService;
+    protected $insuranceReturnsHandler;
 
-    public function __construct(PaymentService $paymentService, FinancialDeletionService $financialDeletionService)
-    {
+    public function __construct(
+        PaymentService $paymentService, 
+        FinancialDeletionService $financialDeletionService,
+        InsuranceReturnsHandler $insuranceReturnsHandler
+    ) {
         $this->paymentService = $paymentService;
         $this->financialDeletionService = $financialDeletionService;
+        $this->insuranceReturnsHandler = $insuranceReturnsHandler;
     }
 
 
@@ -545,5 +551,187 @@ public function moneyTransfer(Request $request)
             \Log::error('Payment delete all transaction failed: ' . $e->getMessage());
             return response()->json('failed', 500);
         }
+    }
+
+    /**
+     * Display insurance returns page
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function insuranceReturns(Request $request)
+    {
+        $this->authorize('viewAny', Payment::class);
+
+        $query = Payment::with(['order.customer', 'transaction', 'account', 'insuranceHandledBy'])
+        //  ->where('verified', "1")
+            ->where('statement', 'the_insurance');
+
+        // Filter by customer
+        if ($request->customer_id) {
+            $query->whereHas('order.customer', function ($q) use ($request) {
+                $q->where('id', $request->customer_id);
+            });
+        }
+
+        // Filter by order
+        if ($request->order_id) {
+            $query->where('order_id', $request->order_id);
+        }
+
+        // Filter by insurance status
+        if ($request->insurance_status) {
+            if ($request->insurance_status === 'not_returned') {
+                // Filter for null insurance_status (not returned)
+                $query->whereHas('order', function ($q) {
+                    $q->whereNull('insurance_status');
+                });
+            } else {
+                $query->whereHas('order', function ($q) use ($request) {
+                    $q->where('insurance_status', $request->insurance_status);
+                });
+            }
+        }
+
+        // Filter by date range
+        if ($request->date_from && $request->date_to) {
+            $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo = Carbon::parse($request->date_to)->endOfDay();
+            $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+        }
+
+        $payments = $query->latest()->paginate(100);
+
+        // Calculate totals using handler
+        $allPayments = $query->get();
+        $totals = $this->insuranceReturnsHandler->calculateTotals($allPayments);
+        $statusCounts = $this->insuranceReturnsHandler->getStatusCounts($allPayments);
+
+        $totalInsurancePaid = $totals['total_insurance_paid'];
+        $totalDeducted = $totals['total_deducted'];
+        $totalReturned = $totals['total_returned'];
+
+        // Extract unique orders from all payments for the filter dropdown
+        $orders = $allPayments->pluck('order')->unique('id')->filter();
+        
+        // Get all customers for the filter dropdown
+        $customers = Customer::orderBy('name')->get(['id', 'name']);
+
+        return view('dashboard.banks.returns', compact(
+            'payments',
+            'orders',
+            'customers',
+            'totalInsurancePaid',
+            'totalDeducted',
+            'totalReturned',
+            'statusCounts'
+        ));
+    }
+
+    /**
+     * Export insurance returns to Excel/PDF
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function exportInsuranceReturns(Request $request)
+    {
+        $this->authorize('viewAny', Payment::class);
+
+        $format = $request->get('format', 'xlsx');
+
+        // Build the query
+        $query = Payment::with(['order.customer', 'transaction', 'account', 'insuranceHandledBy'])
+            ->where('statement', 'the_insurance')
+            ->where('verified', "1");
+
+        // Apply filters
+        if ($request->customer_id) {
+            $query->whereHas('order.customer', function ($q) use ($request) {
+                $q->where('id', $request->customer_id);
+            });
+        }
+
+        if ($request->order_id) {
+            $query->where('order_id', $request->order_id);
+        }
+
+        if ($request->insurance_status) {
+            if ($request->insurance_status === 'not_returned') {
+                $query->whereHas('order', function ($q) {
+                    $q->whereNull('insurance_status');
+                });
+            } else {
+                $query->whereHas('order', function ($q) use ($request) {
+                    $q->where('insurance_status', $request->insurance_status);
+                });
+            }
+        }
+
+        if ($request->date_from && $request->date_to) {
+            $dateFrom = Carbon::parse($request->date_from)->startOfDay();
+            $dateTo = Carbon::parse($request->date_to)->endOfDay();
+            $query->whereBetween('created_at', [$dateFrom, $dateTo]);
+        }
+
+        $payments = $query->latest()->get();
+
+        // Calculate totals
+        $allPayments = $payments;
+        $totals = $this->insuranceReturnsHandler->calculateTotals($allPayments);
+
+        // Handle PDF export with mPDF
+        if ($format === 'pdf') {
+            // Prepare filters for display
+            $filters = [];
+            if ($request->customer_id) {
+                $customer = Customer::find($request->customer_id);
+                $filters['customer_name'] = $customer ? $customer->name : '';
+            }
+            if ($request->order_id) {
+                $filters['order_id'] = $request->order_id;
+            }
+            if ($request->insurance_status) {
+                $statusKey = 'insurance_' . $request->insurance_status;
+                $filters['insurance_status'] = __('dashboard.' . $statusKey);
+            }
+            if ($request->date_from) {
+                $filters['date_from'] = $request->date_from;
+            }
+            if ($request->date_to) {
+                $filters['date_to'] = $request->date_to;
+            }
+
+            $html = view('dashboard.banks.insurance_returns_pdf', compact('payments', 'totals', 'filters'))->render();
+
+            $mpdf = new Mpdf([
+                'mode' => 'utf-8',
+                'format' => 'A4-L', // Landscape for better table display
+                'margin_left' => 10,
+                'margin_right' => 10,
+                'margin_top' => 10,
+                'margin_bottom' => 10,
+                'default_font' => 'dejavusans'
+            ]);
+
+            $mpdf->WriteHTML($html);
+            $fileName = 'insurance_returns_' . now()->format('Y-m-d_His') . '.pdf';
+            $mpdf->Output($fileName, 'D'); // D = Download
+            return;
+        }
+
+        // Handle Excel export
+        $fileName = 'insurance_returns_' . now()->format('Y-m-d_His') . '.' . $format;
+
+        return \Excel::download(
+            new \App\Exports\InsuranceReturnsExport(
+                $request->customer_id,
+                $request->order_id,
+                $request->insurance_status,
+                $request->date_from,
+                $request->date_to
+            ),
+            $fileName
+        );
     }
 }

@@ -1363,7 +1363,7 @@
 
                 <!--begin::Menu item-->
 
-                <div class="menu-item menu-sub-indention menu-accordion  {{areActiveRoutes(['bank-accounts.index', 'bank-accounts.create', 'payments.create', 'payments.edit', 'payments.create-bank-account', 'transactions.index', 'bank-accounts.edit', 'bank-accounts.show'])}}"
+                <div class="menu-item menu-sub-indention menu-accordion  {{areActiveRoutes(['bank-accounts.index', 'bank-accounts.create', 'payments.create', 'payments.edit', 'payments.create-bank-account', 'transactions.index', 'bank-accounts.edit', 'bank-accounts.show', 'bank-accounts.returns'])}}"
 
                     data-kt-menu-trigger="click">
 
@@ -1371,7 +1371,7 @@
 
                     <a href="#"
 
-                        class="menu-link py-3 {{areActiveRoutes(['bank-accounts.index', 'bank-accounts.create', 'payments.create-bank-account', 'bank-accounts.edit'])}}">
+                        class="menu-link py-3 {{areActiveRoutes(['bank-accounts.index', 'bank-accounts.create', 'payments.create-bank-account', 'bank-accounts.edit', 'bank-accounts.returns'])}}">
 
                         <span class="menu-icon">
 
@@ -1515,6 +1515,19 @@
 
                         </div>
 
+                        @endcan
+
+                        @can('bank-accounts.returns')
+                        <!--begin::Menu item-->
+                        <div class="menu-item">
+                            <a href="{{route('bank-accounts.returns')}}" class="menu-link py-3 {{isActiveRoute('bank-accounts.returns')}}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">@lang('dashboard.insurance_returns')</span>
+                            </a>
+                        </div>
+                        <!--end::Menu item-->
                         @endcan
 
                     </div>

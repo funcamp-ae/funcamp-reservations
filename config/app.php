@@ -127,6 +127,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Currency
+    |--------------------------------------------------------------------------
+    |
+    | This value is the currency code used throughout the application.
+    | You can set this in your .env file using the APP_CURRENCY key.
+    |
+    */
+
+    'currency' => env('APP_CURRENCY', 'AED'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Maintenance Mode Driver
     |--------------------------------------------------------------------------
     |

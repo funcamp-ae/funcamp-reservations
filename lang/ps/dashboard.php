@@ -1957,6 +1957,7 @@ return [
     'download' => 'ډاونلوډ',
     'back' => 'بیرته',
     'pending' => 'په انتظار کې',
+    'AED' => 'AED',
     'sending' => 'لېږي',
     'completed' => 'بشپړ',
     'unknown' => 'نامعلوم',

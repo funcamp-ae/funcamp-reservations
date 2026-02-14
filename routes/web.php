@@ -1266,6 +1266,22 @@ Route::group(['middleware' => ['auth', 'admin-lang', 'web', 'check-role'], 'name
         'title' => ['actions.delete_all', 'dashboard.payments']
     ]);
 
+    # insurance returns list
+    Route::get('insurance/returns', [
+        'uses' => 'PaymentsController@insuranceReturns',
+        'as' => 'bank-accounts.returns',
+        'title' => 'dashboard.insurance_returns',
+        'type' => 'parent',
+    ]);
+
+    # insurance returns export
+    Route::get('insurance/returns/export', [
+        'uses' => 'PaymentsController@exportInsuranceReturns',
+        'as' => 'bank-accounts.returns.export',
+        'act-as' => 'bank-accounts.returns',
+        'title' => ['actions.export', 'dashboard.insurance_returns']
+    ]);
+
     /*------------ end Of payments ----------*/
     /*------------ start Of payment-links ----------*/
     Route::get('payment-links', [
