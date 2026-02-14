@@ -67,6 +67,7 @@
                             <th class="fw-bolder">{{ __('dashboard.quantity') }}</th>
                             <th class="fw-bolder">{{ __('dashboard.total_price') }}</th>
                             <th class="fw-bolder">{{ __('dashboard.payment_method') }}</th>
+                            <th class="fw-bolder">{{ __('dashboard.statement') }}</th>
                             <th class="fw-bolder">{{ __('dashboard.bank_account') }}</th>
                             <th class="fw-bolder">{{ __('dashboard.verified') }}</th>
                             <th class="fw-bolder">{{ __('dashboard.handled_by') }}</th>
@@ -82,6 +83,7 @@
                                 <td >{{ $orderAddon->pivot->count }}</td>
                                 <td>{{ $orderAddon->pivot->price }}</td>
                                 <td>{{__('dashboard.'. $orderAddon->pivot->payment_method )}}</td>
+                                <td>{{ $orderAddon->pivot->statement ? __('dashboard.'. $orderAddon->pivot->statement) : '-' }}</td>
                                 <td>{{ $orderAddon->pivot->account->name }}</td>
                                 <td>
                                     {{ $orderAddon->pivot->verified ? __('dashboard.yes') : __('dashboard.no') }} <br>
