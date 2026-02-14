@@ -19,7 +19,7 @@ class Addon extends Model
     {
         return $this->belongsToMany(Order::class, 'order_addon')
             ->using(OrderAddon::class)
-            ->withPivot('verified', 'count', 'price', 'handled_by', 'description', 'id', 'account_id', 'payment_method')
+            ->withPivot('verified', 'count', 'price', 'handled_by', 'description', 'id', 'account_id', 'payment_method' , 'statement')
             ->withTimestamps();
     }
 
