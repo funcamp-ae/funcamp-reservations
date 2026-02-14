@@ -210,7 +210,7 @@
                                     <!--begin::Customer-->
                                     <td>
                                         @if($payment->order && $payment->order->customer)
-                                            <div class="d-flex align-items-center">
+                                            <div>
                                                 <div class="d-flex flex-column">
                                                     <span class="text-gray-800 fw-bolder">{{ $payment->order->customer->name }}</span>
                                                     <span class="text-muted fs-7">{{ $payment->order->customer->phone ?? '' }}</span>
