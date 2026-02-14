@@ -529,7 +529,7 @@ class SurveyController extends Controller
     {
         $this->authorize('view', $survey);
 
-        $responses = $survey->responses()->with(['answers.question', 'order.customer'])->latest()->paginate(10);
+        $responses = $survey->responses()->with(['answers.question', 'order.customer'])->latest()->paginate(100);
         return view('dashboard.surveys.results', compact('survey', 'responses'));
     }
 
