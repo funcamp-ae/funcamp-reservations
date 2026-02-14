@@ -116,6 +116,7 @@ function statements($select = null)
         'deposit',
         'complete the amount',
         'the_insurance',
+        'full_amount'
     ];
 
     if ($select) {
