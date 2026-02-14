@@ -147,7 +147,7 @@
                     <!--end::Table body-->
                 </table>
                 <!--end::Table-->
-                {{ $responses->links() }}
+                {{ $responses->links('pagination::bootstrap-5') }}
             </div>
             <!--end::Card body-->
         </div>

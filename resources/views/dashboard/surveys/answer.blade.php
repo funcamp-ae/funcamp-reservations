@@ -45,7 +45,11 @@
                                     <tbody class="fs-6 fw-semibold   ">
                                         <tr>
                                             <td class="  ">@lang('dashboard.order_number'):</td>
-                                            <td class="fw-bolder   ">{{ $response->order? $response->order->id : __('dashboard.not_available') }}</td>
+                                            <td class="fw-bolder   ">
+                                                <a href="{{ $response->order ? route('orders.edit', $response->order->id) : '#' }}" class="badge bg-primary">
+                                                    {{ $response->order? $response->order->id : __('dashboard.not_available') }}
+                                                </a>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td class="  ">@lang('dashboard.customer_name'):</td>
