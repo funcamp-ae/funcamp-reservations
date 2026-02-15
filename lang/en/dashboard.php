@@ -1750,6 +1750,7 @@ return [
     'total_insurance_paid' => 'Total Insurance Paid',
     'total_deducted' => 'Total Deducted',
     'total_returned' => 'Total Returned',
+    'total_not_returned' => 'Total Not Returned',
     'total_records' => 'Total Records',
     'all_customers' => 'All Customers',
     'all_orders' => 'All Orders',

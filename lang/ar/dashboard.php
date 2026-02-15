@@ -1381,6 +1381,7 @@ return [
     'total_insurance_paid' => 'إجمالي التأمينات المسددة',
     'total_deducted' => 'إجمالي المستقطع',
     'total_returned' => 'إجمالي المرتجع',
+    'total_not_returned' => 'إجمالي غير المرتجع',
     'total_records' => 'إجمالي السجلات',
     'all_customers' => 'جميع العملاء',
     'all_orders' => 'جميع الحجوزات',

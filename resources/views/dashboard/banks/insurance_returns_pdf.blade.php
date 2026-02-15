@@ -130,6 +130,10 @@
             <span class="summary-value">{{ number_format($totals['total_returned'], 2) }} {{ __('dashboard.' . config('app.currency')) }}</span>
         </div>
         <div class="summary-row">
+            <span class="summary-label">{{ __('dashboard.total_not_returned') }}:</span>
+            <span class="summary-value">{{ number_format($totals['total_not_returned'], 2) }} {{ __('dashboard.' . config('app.currency')) }}</span>
+        </div>
+        <div class="summary-row">
             <span class="summary-label">{{ __('dashboard.total_records') }}:</span>
             <span class="summary-value">{{ $payments->count() }}</span>
         </div>

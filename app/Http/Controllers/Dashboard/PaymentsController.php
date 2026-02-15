@@ -610,6 +610,7 @@ public function moneyTransfer(Request $request)
         $totalInsurancePaid = $totals['total_insurance_paid'];
         $totalDeducted = $totals['total_deducted'];
         $totalReturned = $totals['total_returned'];
+        $totalNotReturned = $totals['total_not_returned'];
 
         // Extract unique orders from all payments for the filter dropdown
         $orders = $allPayments->pluck('order')->unique('id')->filter();
@@ -624,6 +625,7 @@ public function moneyTransfer(Request $request)
             'totalInsurancePaid',
             'totalDeducted',
             'totalReturned',
+            'totalNotReturned',
             'statusCounts'
         ));
     }

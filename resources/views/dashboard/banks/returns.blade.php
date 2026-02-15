@@ -108,7 +108,7 @@
             <!--begin::Summary Cards-->
             <div class="card-body pt-0">
                 <div class="row g-5 mb-7">
-                    <div class="col-md-3">
+                    <div class="col-md-6 col-lg-4 col-xl">
                         <div class="card card-flush h-100">
                             <div class="card-body d-flex flex-column justify-content-between">
                                 <div class="fs-6 fw-bold text-gray-400">{{ __('dashboard.total_insurance_paid') }}</div>
@@ -117,7 +117,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 col-lg-4 col-xl">
                         <div class="card card-flush h-100">
                             <div class="card-body d-flex flex-column justify-content-between">
                                 <div class="fs-6 fw-bold text-gray-400">{{ __('dashboard.total_deducted') }}</div>
@@ -126,7 +126,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 col-lg-4 col-xl">
                         <div class="card card-flush h-100">
                             <div class="card-body d-flex flex-column justify-content-between">
                                 <div class="fs-6 fw-bold text-gray-400">{{ __('dashboard.total_returned') }}</div>
@@ -135,7 +135,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6 col-lg-4 col-xl">
+                        <div class="card card-flush h-100">
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <div class="fs-6 fw-bold text-gray-400">{{ __('dashboard.total_not_returned') }}</div>
+                                <div class="fs-2 fw-bolder text-warning">{{ number_format($totalNotReturned, 2) }}</div>
+                                <div class="fs-7 text-gray-600">{{ __('dashboard.' . config('app.currency')) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4 col-xl">
                         <div class="card card-flush h-100">
                             <div class="card-body d-flex flex-column justify-content-between">
                                 <div class="fs-6 fw-bold text-gray-400">{{ __('dashboard.total_records') }}</div>
@@ -295,7 +304,7 @@
 
                 <!--begin::Pagination-->
                 <div class="d-flex justify-content-center mt-5">
-                    {{ $payments->appends(request()->all())->links() }}
+                    {{ $payments->links('pagination::bootstrap-5') }}
                 </div>
                 <!--end::Pagination-->
             </div>

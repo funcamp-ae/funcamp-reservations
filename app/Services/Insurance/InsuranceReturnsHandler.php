@@ -23,13 +23,16 @@ class InsuranceReturnsHandler
             }
             return $payment->transaction ? $payment->transaction->amount : 0;
         });
-        
-        $totalReturned = $totalInsurancePaid - $totalDeducted;
+        $totalNotReturned = $payments->filter(function ($payment) {
+            return !$payment->order->insurance_status ;
+        })->sum('price');
+        $totalReturned = $totalInsurancePaid - $totalDeducted - $totalNotReturned;
 
         return [
             'total_insurance_paid' => $totalInsurancePaid,
             'total_deducted' => $totalDeducted,
             'total_returned' => $totalReturned,
+            'total_not_returned' => $totalNotReturned,
         ];
     }
 
