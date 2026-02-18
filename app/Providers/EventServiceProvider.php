@@ -27,6 +27,10 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\OrderCanceled::class => [
             \App\Listeners\DeleteOrderRelatedData::class,
         ],
+        SocialiteProviders\Manager\SocialiteWasCalled::class => [
+            // add your listeners (aka providers) here
+            \SocialiteProviders\Google\GoogleExtendSocialite::class,
+        ],
     ];
 
     /**
