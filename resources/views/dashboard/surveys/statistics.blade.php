@@ -548,8 +548,8 @@
                         @foreach($response->answers as $answer)
                             {
                                 question_id: {{ $answer->survey_question_id }},
-                                answer_text: '{{ addslashes($answer->answer_text) }}',
-                                answer_option: {!! is_array($answer->answer_option) ? json_encode($answer->answer_option) : "'".addslashes($answer->answer_option)."'" !!}
+                                answer_text: {!! json_encode($answer->answer_text) !!},
+                                answer_option: {!! json_encode($answer->answer_option) !!}
                             },
                         @endforeach
                     ]
