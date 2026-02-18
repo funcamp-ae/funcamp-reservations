@@ -213,7 +213,7 @@ return [
 
 
         Spatie\Permission\PermissionServiceProvider::class,
-        // Laravel\Socialite\SocialiteServiceProvider::class,
+        \SocialiteProviders\Manager\ServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         JildertMiedema\LaravelPlupload\LaravelPluploadServiceProvider::class,
     ],
