@@ -20,17 +20,17 @@
         </div>
         <div class="card-toolbar">
           <ul class="nav nav-tabs nav-line-tabs">
-            @can('bookings.reservations.board')
+            @can('pages.reservations.board.today')
             <li class="nav-item">
               <a class="nav-link {{ ($activeTab ?? 'today') === 'today' ? 'active' : '' }}" href="{{ route('pages.reservations.board', ['from' => $selectedFrom ?? null, 'to' => $selectedTo ?? null]) }}">@lang('dashboard.today_reservations')</a>
             </li>
             @endcan
-            @can('bookings.reservations.board.upcoming')
+            @can('pages.reservations.board.upcoming')
             <li class="nav-item">
               <a class="nav-link {{ ($activeTab ?? 'today') === 'upcoming' ? 'active' : '' }}" href="{{ route('pages.reservations.board.upcoming', ['from' => $selectedFrom ?? null, 'to' => $selectedTo ?? null]) }}">@lang('dashboard.upcoming_reservations')</a>
             </li>
             @endcan
-            @can('bookings.tasks.index')
+            @can('pages.tasks.index')
             <li class="nav-item">
               <a class="nav-link {{ ($activeTab ?? 'today') === 'tasks' ? 'active' : '' }}" href="{{ route('pages.tasks.index') }}">@lang('dashboard.tasks')</a>
             </li>
