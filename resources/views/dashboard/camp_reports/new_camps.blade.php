@@ -33,7 +33,7 @@
                                 class="form-control"
                                 name="new_camp_name"
                                 value="{{ old('new_camp_name', $editingPlan->new_camp_name ?? '') }}"
-                                placeholder="@lang('dashboard.new_camp_name')">
+                                placeholder="@lang('dashboard.new_camp_name')" required>
                                 <button type="button" class="btn btn-light-primary text-nowrap d-inline-flex align-items-center" id="add-row-btn">
                                     <i class="bi bi-plus-circle"></i> @lang('dashboard.add_row')
                                 </button>
@@ -67,10 +67,10 @@
                             <tr class="text-center">
                                 <td class="fw-bold">{{ $i }}</td>
                                 <td>
-                                    <input type="text" class="form-control" name="items[{{ $i }}][item_name]" value="{{ $row['item_name'] ?? '' }}">
+                                    <input type="text" class="form-control" name="items[{{ $i }}][item_name]" value="{{ $row['item_name'] ?? '' }}" required>
                                 </td>
                                 <td>
-                                    <select class="form-select" name="items[{{ $i }}][sales_status]">
+                                    <select class="form-select" name="items[{{ $i }}][sales_status]" required>
                                         <option value="">—</option>
                                         <option value="buy" {{ ($row['sales_status'] ?? '') === 'buy' ? 'selected' : '' }}>@lang('dashboard.sales_status_buy')</option>
                                         <option value="available" {{ ($row['sales_status'] ?? '') === 'available' ? 'selected' : '' }}>@lang('dashboard.sales_status_available')</option>
@@ -78,10 +78,10 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="number" min="0" step="1" class="form-control" name="items[{{ $i }}][requested_qty]" value="{{ $row['requested_qty'] ?? '' }}">
+                                    <input type="number" min="0" step="1" class="form-control" name="items[{{ $i }}][requested_qty]" value="{{ $row['requested_qty'] ?? '' }}"  required>
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control" name="items[{{ $i }}][notes]" value="{{ $row['notes'] ?? '' }}">
+                                    <input type="text" class="form-control" name="items[{{ $i }}][notes]" value="{{ $row['notes'] ?? '' }}" required>
                                 </td>
                             </tr>
                         @endfor
@@ -186,17 +186,17 @@
                 row.className = 'text-center';
                 row.innerHTML = `
                     <td class="fw-bold">${i}</td>
-                    <td><input type="text" class="form-control" name="items[${i}][item_name]"></td>
+                    <td><input type="text" class="form-control" name="items[${i}][item_name]" required></td>
                     <td>
-                        <select class="form-select" name="items[${i}][sales_status]">
+                        <select class="form-select" name="items[${i}][sales_status]" required>
                             <option value="">—</option>
                             <option value="buy">{{ __('dashboard.sales_status_buy') }}</option>
                             <option value="available">{{ __('dashboard.sales_status_available') }}</option>
                             <option value="partial">{{ __('dashboard.sales_status_partial') }}</option>
                         </select>
                     </td>
-                    <td><input type="number" min="0" step="1" class="form-control" name="items[${i}][requested_qty]"></td>
-                    <td><input type="text" class="form-control" name="items[${i}][notes]"></td>
+                    <td><input type="number" min="0" step="1" class="form-control" name="items[${i}][requested_qty]" required></td>
+                    <td><input type="text" class="form-control" name="items[${i}][notes]" required></td>
                 `;
                 tableBody.appendChild(row);
             });

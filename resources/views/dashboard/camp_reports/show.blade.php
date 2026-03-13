@@ -38,10 +38,6 @@
                 </div>
                 <div class="col-md-6">
                     <div class="mb-4">
-                        <span class="fw-bold">@lang('dashboard.camp_name'):</span>
-                        <span>{{ $campReport->camp_name ?? '-' }}</span>
-                    </div>
-                    <div class="mb-4">
                         <span class="fw-bold">@lang('dashboard.created_by'):</span>
                         <span>{{ $campReport->creator->name }}</span>
                     </div>

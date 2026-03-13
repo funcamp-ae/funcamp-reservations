@@ -52,7 +52,7 @@
                             </a>
                             @endcan
                             @can('camp-reports.edit')
-                            <a href="{{ route('camp-reports.edit', $report) }}" class="btn btn-sm btn-primary">
+                            <a href="{{ route('camp-reports.edit', $report) }}" class="btn btn-sm btn-secondary">
                                 @lang('dashboard.edit')
                             </a>
                             @endcan
