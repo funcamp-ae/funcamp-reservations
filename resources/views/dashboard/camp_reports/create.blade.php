@@ -125,19 +125,12 @@
                                                     value="{{ $isModel ? $item->item_name : $item['item_name'] ?? '' }}">
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label">ملاحظات إضافية</label>
-                                                <textarea name="items[{{ $index }}][notes]" rows="1" class="form-control">{{ $isModel ? $item->notes ?? '' : $item['notes'] ?? '' }}</textarea>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
                                                 <label class="form-label required">@lang('dashboard.item_status')</label>
                                                 <select name="items[{{ $index }}][item_status]" class="form-select item-status-select" required>
                                                     <option value="">@lang('dashboard.select_item_status')</option>
                                                     @foreach (itemStatuses() as $statusValue => $statusLabel)
-                                                        <option value="{{ $statusValue }}" {{ $itemStatus === $statusValue ? 'selected' : '' }}>
-                                                            {{ __($statusLabel) }}
+                                                    <option value="{{ $statusValue }}" {{ $itemStatus === $statusValue ? 'selected' : '' }}>
+                                                        {{ __($statusLabel) }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -146,14 +139,19 @@
                                                         <label class="form-label">@lang('dashboard.item_status')</label>
                                                         <input type="text" name="items[{{ $index }}][item_status_other]"
                                                             class="form-control item-status-other-input" value="{{ $itemStatusOther }}">
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">@lang('dashboard.damaged_count')</label>
-                                                <input type="number" min="0" step="1" name="items[{{ $index }}][damaged_count]"
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">@lang('dashboard.damaged_count')</label>
+                                                    <input type="number" min="0" step="1" name="items[{{ $index }}][damaged_count]"
                                                     class="form-control" value="{{ $damagedCount }}">
                                             </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">ملاحظات إضافية</label>
+                                                <textarea name="items[{{ $index }}][notes]" rows="1" class="form-control">{{ $isModel ? $item->notes ?? '' : $item['notes'] ?? '' }}</textarea>
+                                            </div>
+                                        </div>
                                         </div>
 
 
@@ -162,12 +160,12 @@
                                             <div class="col-md-4">
                                                 <label class="form-label">@lang('dashboard.photo_attachment')</label>
                                                 <div class="media-upload-container photo-box" data-type="photo"
-                                                    data-existing='@json(json_decode($photoUrls, true))'>
-                                                    <input type="hidden" name="items[{{ $index }}][remove_photos]"
-                                                        value="0" class="remove-flag">
-
-                                                    {{-- Slider --}}
-                                                    <div class="photo-slider mb-2 d-none">
+                                                data-existing='@json(json_decode($photoUrls, true))'>
+                                                <input type="hidden" name="items[{{ $index }}][remove_photos]"
+                                                value="0" class="remove-flag">
+                                                
+                                                {{-- Slider --}}
+                                                <div class="photo-slider mb-2 d-none">
                                                         <div class="slider-viewport">
                                                             <img class="slider-img" alt="photo">
                                                         </div>

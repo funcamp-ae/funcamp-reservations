@@ -1067,6 +1067,7 @@ return [
     'additional_notes' => 'ملاحظات إضافية',
     'report_items' => 'عناصر التقرير',
     'item_status' => 'حالة الصنف',
+    'itemStatus' => 'حالة العنصر',
     'select_item_status' => 'اختر حالة الصنف',
     'item_status_fully_damaged_replace' => 'تالف ويحتاج تبديل',
     'item_status_partially_damaged' => 'تالف جزئيا',

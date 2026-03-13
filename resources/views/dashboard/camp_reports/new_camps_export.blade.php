@@ -35,7 +35,7 @@
                 <tr>
                     <th style="width: 42px;">{{ __('dashboard.serial') }}</th>
                     <th>{{ __('dashboard.item_name') }}</th>
-                    <th style="width: 140px;">{{ __('dashboard.sales_status') }}</th>
+                    <th style="width: 140px;">{{ __('dashboard.itemStatus') }}</th>
                     <th style="width: 120px;">{{ __('dashboard.requested_qty') }}</th>
                     <th>{{ __('dashboard.additional_notes') }}</th>
                 </tr>
