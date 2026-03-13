@@ -56,14 +56,14 @@
                                 @lang('dashboard.edit')
                             </a>
                             @endcan
-                            @can('camp-reports.destroy')
+                           @can('camp-reports.destroy')
                             <form action="{{ route('camp-reports.destroy', $report) }}" method="POST" class="d-inline">
                                 @csrf @method('DELETE')
-                                <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(this)">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('@lang('dashboard.confirm_delete')')">
                                     @lang('dashboard.delete')
                                 </button>
                             </form>
-                            @endcan
+                           @endcan
                         </td>
                     </tr>
                 @endforeach
@@ -73,22 +73,3 @@
     </div>
 @endsection
 
-@section('scripts')
-<script>
-    function confirmDelete(button) {
-        Swal.fire({
-            text: "@lang('dashboard.confirm_delete')",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: "@lang('dashboard.delete')",
-            cancelButtonText: "@lang('dashboard.cancel')"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                button.closest('form').submit();
-            }
-        });
-    }
-</script>
-@endsection
