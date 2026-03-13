@@ -1028,6 +1028,7 @@ return [
     'create_camp_report' => 'د کمپ راپور جوړول',
     'create_camp_reports_new_camps' => 'نوي کمپونه جوړول',
     'edit_camp_report' => 'د کمپ راپور بدلول',
+    'edit_and_add_items' => 'سمون او د توکو زياتول',
     'camp_report_details' => 'د کمپ راپور تفصیلات',
     'report_date' => 'د راپور نیټه',
     'camp_name' => 'د کمپ نوم',

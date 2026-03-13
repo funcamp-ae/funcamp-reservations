@@ -15,31 +15,26 @@
                 @csrf
                 <input type="hidden" name="editing_plan_id" value="{{ old('editing_plan_id', $editingPlan->id ?? '') }}">
 
-                    @if (isset($editingPlan))
-                        <a href="{{ route('camp-reports.new-camps') }}" class="btn btn-light-danger">
-                            @lang('dashboard.cancel')
-                        </a>
-                    @endif
-
+                
                 <div class="row g-4 mb-4">
-                        <label class="form-label">@lang('dashboard.new_camp_name')</label>
-                        <div class="d-flex gap-2 justify-content-between">
-                            <input type="text"
-                                class="form-control"
-                                name="new_camp_name"
-                                value="{{ old('new_camp_name', $editingPlan->new_camp_name ?? '') }}"
-                                placeholder="@lang('dashboard.new_camp_name')" required>
-                                <button type="button" class="btn btn-light-primary text-nowrap d-inline-flex align-items-center" id="add-row-btn">
-                                    <i class="bi bi-plus-circle"></i> @lang('dashboard.add_row')
-                                </button>
+                    <label class="form-label">@lang('dashboard.new_camp_name')</label>
+                    <div class="d-flex gap-2 justify-content-between">
+                        <input type="text"
+                        class="form-control"
+                        name="new_camp_name"
+                        value="{{ old('new_camp_name', $editingPlan->new_camp_name ?? '') }}"
+                        placeholder="@lang('dashboard.new_camp_name')" required>
+                        <button type="button" class="btn btn-light-primary text-nowrap d-inline-flex align-items-center" id="add-row-btn">
+                            <i class="bi bi-plus-circle"></i> @lang('dashboard.add_row')
+                        </button>
                         </div>
                 </div>
-
-
+                
+                
                 <div class="table-responsive">
                     <table class="table align-middle table-row-dashed fs-6 gy-5" id="new-camps-table">
                         <thead>
-                        <tr class="text-center fw-bolder fs-6 text-uppercase gs-0"
+                            <tr class="text-center fw-bolder fs-6 text-uppercase gs-0"
                             style="background-color: #f8f9fa; font-weight: 900 !important;">
                             <th style="width: 60px;">@lang('dashboard.serial')</th>
                             <th class="fw-bolder">@lang('dashboard.item_name')</th>
@@ -48,30 +43,26 @@
                             <th class="fw-bolder">@lang('dashboard.additional_notes')</th>
                             <th class="fw-bolder" style="width: 90px;">@lang('dashboard.actions')</th>
                         </tr>
-                        </thead>
-                        <tbody>
+                    </thead>
+                    <tbody>
                         @php
-                            $rows = old('items', $editingPlan->items ?? []);
-                            $rows = is_array($rows) ? $rows : [];
-                            $rowsCount = max(1, count($rows));
+                        $rows = old('items', $editingPlan->items ?? []);
+                        $rows = is_array($rows) ? $rows : [];
                         @endphp
-
-                        @for ($i = 1; $i <= $rowsCount; $i++)
-                            @php
-                                $row = $rows[$i] ?? $rows[$i - 1] ?? [];
-                            @endphp
-                            <tr class="text-center">
-                                <td class="fw-bold">{{ $i }}</td>
-                                <td>
-                                    <input type="text" class="form-control" name="items[{{ $i }}][item_name]" data-field="item_name" value="{{ $row['item_name'] ?? '' }}" required>
-                                </td>
-                                <td>
-                                    <select class="form-select" name="items[{{ $i }}][sales_status]" data-field="sales_status" required>
-                                        <option value="">—</option>
-                                        <option value="buy" {{ ($row['sales_status'] ?? '') === 'buy' ? 'selected' : '' }}>@lang('dashboard.sales_status_buy')</option>
-                                        <option value="available" {{ ($row['sales_status'] ?? '') === 'available' ? 'selected' : '' }}>@lang('dashboard.sales_status_available')</option>
-                                        <option value="partial" {{ ($row['sales_status'] ?? '') === 'partial' ? 'selected' : '' }}>@lang('dashboard.sales_status_partial')</option>
-                                    </select>
+                        
+                        @foreach($rows as $i => $row)
+                        <tr class="text-center">
+                            <td class="fw-bold">{{ $i }}</td>
+                            <td>
+                                <input type="text" class="form-control" name="items[{{ $i }}][item_name]" data-field="item_name" value="{{ $row['item_name'] ?? '' }}" required>
+                            </td>
+                            <td>
+                                <select class="form-select" name="items[{{ $i }}][sales_status]" data-field="sales_status" required>
+                                    <option value="">—</option>
+                                    <option value="buy" {{ ($row['sales_status'] ?? '') === 'buy' ? 'selected' : '' }}>@lang('dashboard.sales_status_buy')</option>
+                                    <option value="available" {{ ($row['sales_status'] ?? '') === 'available' ? 'selected' : '' }}>@lang('dashboard.sales_status_available')</option>
+                                    <option value="partial" {{ ($row['sales_status'] ?? '') === 'partial' ? 'selected' : '' }}>@lang('dashboard.sales_status_partial')</option>
+                                </select>
                                 </td>
                                 <td>
                                     <input type="number" min="0" step="1" class="form-control" name="items[{{ $i }}][requested_qty]" data-field="requested_qty" value="{{ $row['requested_qty'] ?? '' }}"  required>
@@ -85,19 +76,24 @@
                                     </button>
                                 </td>
                             </tr>
-                        @endfor
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
-                <div class="d-flex justify-content-end mt-4">
+                <div class="d-flex justify-content-end mt-4 gap-2" >
+                    @if (isset($editingPlan))
+                        <a href="{{ route('camp-reports.new-camps') }}" class="btn btn-light-danger">
+                            @lang('dashboard.cancel')
+                        </a>
+                    @endif
                     <button type="submit" class="btn btn-primary text-nowrap d-inline-flex align-items-center px-4">
                         <i class="bi bi-check2-circle me-2"></i> @lang('dashboard.save_changes')
                     </button>
                 </div>
             </form>
-
+            
             <div class="separator my-8"></div>
-
+            
             <h4 class="mb-4">@lang('dashboard.camp_reports_new_camps')</h4>
             @php
                 $nonEmptyPlans = collect($plans ?? [])->filter(function ($createdPlan) {
