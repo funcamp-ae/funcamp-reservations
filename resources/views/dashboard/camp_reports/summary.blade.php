@@ -66,7 +66,7 @@
                             <th>#</th>
                             <th>@lang('dashboard.report_type')</th>
                             <th>@lang('dashboard.report_subtype')</th>
-                            <th>@lang('dashboard.item_name')</th>
+                            <th>@lang('dashboard.itemName')</th>
                             <th>@lang('dashboard.item_status')</th>
                             <th>@lang('dashboard.photos')</th>
                             <th>@lang('dashboard.damaged_count')</th>
@@ -81,7 +81,7 @@
                             <td>{{ $row->report_subtype ?? '-' }}</td>
                             <td>
                                 @if($row->report_id)
-                                    <a href="{{ route('camp-reports.show', $row->report_id) }}">{{ $row->item_name }}</a>
+                                    <a href="{{ route('camp-reports.edit', $row->report_id) }}">{{ $row->item_name }}</a>
                                 @else
                                     {{ $row->item_name }}
                                 @endif

@@ -5,15 +5,10 @@
     <div class="card card-flush">
         <div class="card-header align-items-center py-5 gap-2 gap-md-5">
             <h3 class="mb-0">@lang('dashboard.create_camp_reports_new_camps')</h3>
-            <button type="submit"
-                    class="btn btn-success"
-                    form="new-camps-form"
-                    formmethod="GET"
-                    formtarget="_blank"
-                    formaction="{{ route('camp-reports.new-camps.export') }}">
+            <a href="{{ route('camp-reports.new-camps.export') }}" class="btn btn-success me-2">
                 <i class="bi bi-file-earmark-pdf"></i> @lang('dashboard.export_pdf')
-            </button>
-    </div>
+            </a>
+        </div>
 
         <div class="card-body pt-0">
             <form method="POST" action="{{ route('camp-reports.new-camps.store') }}" class="mb-0" id="new-camps-form">
@@ -51,6 +46,7 @@
                             <th class="fw-bolder">@lang('dashboard.item_status')</th>
                             <th class="fw-bolder">@lang('dashboard.requested_qty')</th>
                             <th class="fw-bolder">@lang('dashboard.additional_notes')</th>
+                            <th class="fw-bolder" style="width: 90px;">@lang('dashboard.actions')</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -67,10 +63,10 @@
                             <tr class="text-center">
                                 <td class="fw-bold">{{ $i }}</td>
                                 <td>
-                                    <input type="text" class="form-control" name="items[{{ $i }}][item_name]" value="{{ $row['item_name'] ?? '' }}" required>
+                                    <input type="text" class="form-control" name="items[{{ $i }}][item_name]" data-field="item_name" value="{{ $row['item_name'] ?? '' }}" required>
                                 </td>
                                 <td>
-                                    <select class="form-select" name="items[{{ $i }}][sales_status]" required>
+                                    <select class="form-select" name="items[{{ $i }}][sales_status]" data-field="sales_status" required>
                                         <option value="">—</option>
                                         <option value="buy" {{ ($row['sales_status'] ?? '') === 'buy' ? 'selected' : '' }}>@lang('dashboard.sales_status_buy')</option>
                                         <option value="available" {{ ($row['sales_status'] ?? '') === 'available' ? 'selected' : '' }}>@lang('dashboard.sales_status_available')</option>
@@ -78,10 +74,15 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="number" min="0" step="1" class="form-control" name="items[{{ $i }}][requested_qty]" value="{{ $row['requested_qty'] ?? '' }}"  required>
+                                    <input type="number" min="0" step="1" class="form-control" name="items[{{ $i }}][requested_qty]" data-field="requested_qty" value="{{ $row['requested_qty'] ?? '' }}"  required>
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control" name="items[{{ $i }}][notes]" value="{{ $row['notes'] ?? '' }}" required>
+                                    <input type="text" class="form-control" name="items[{{ $i }}][notes]" data-field="notes" value="{{ $row['notes'] ?? '' }}" required>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-light-danger js-remove-row" title="@lang('dashboard.delete')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                         @endfor
@@ -175,9 +176,63 @@
             const tableBody = document.querySelector('#new-camps-table tbody');
             const addBtn = document.getElementById('add-row-btn');
             const deleteForms = document.querySelectorAll('.js-delete-camp-plan-form');
+            const autoWidthInputSelector = '#new-camps-form input[type="text"]';
+            const fixedWidthFieldSelector = '#new-camps-form select, #new-camps-form input[type="number"]';
+
+            function applyFixedWidth(scope = document) {
+                scope.querySelectorAll(fixedWidthFieldSelector).forEach((field) => {
+                    field.style.width = '100px';
+                    field.style.minWidth = '100px';
+                    field.style.maxWidth = '100px';
+                });
+            }
+
+            function updateInputWidth(input) {
+                const sourceValue = input.value || input.getAttribute('placeholder') || '';
+                const widthInCh = Math.max(8, sourceValue.length + 1);
+
+                input.style.width = `${widthInCh}ch`;
+                input.style.minWidth = '15ch';
+                input.style.maxWidth = '100%';
+            }
+
+            function bindAutoWidthToInput(input) {
+                if (input.dataset.autoWidthBound === '1') {
+                    return;
+                }
+
+                input.dataset.autoWidthBound = '1';
+                updateInputWidth(input);
+                input.addEventListener('input', () => updateInputWidth(input));
+                input.addEventListener('change', () => updateInputWidth(input));
+            }
+
+            function initAutoWidth(scope = document) {
+                scope.querySelectorAll(autoWidthInputSelector).forEach((input) => {
+                    bindAutoWidthToInput(input);
+                });
+            }
 
             function nextIndex() {
                 return (tableBody?.querySelectorAll('tr')?.length || 0) + 1;
+            }
+
+            function renumberRows() {
+                const rows = tableBody?.querySelectorAll('tr') || [];
+
+                rows.forEach((row, index) => {
+                    const rowNumber = index + 1;
+                    const serialCell = row.querySelector('td.fw-bold');
+
+                    if (serialCell) {
+                        serialCell.textContent = rowNumber;
+                    }
+
+                    row.querySelectorAll('[data-field]').forEach((field) => {
+                        const key = field.getAttribute('data-field');
+                        field.setAttribute('name', `items[${rowNumber}][${key}]`);
+                    });
+                });
             }
 
             addBtn?.addEventListener('click', () => {
@@ -186,19 +241,51 @@
                 row.className = 'text-center';
                 row.innerHTML = `
                     <td class="fw-bold">${i}</td>
-                    <td><input type="text" class="form-control" name="items[${i}][item_name]" required></td>
+                    <td><input type="text" class="form-control" name="items[${i}][item_name]" data-field="item_name" required></td>
                     <td>
-                        <select class="form-select" name="items[${i}][sales_status]" required>
+                        <select class="form-select" name="items[${i}][sales_status]" data-field="sales_status" required>
                             <option value="">—</option>
                             <option value="buy">{{ __('dashboard.sales_status_buy') }}</option>
                             <option value="available">{{ __('dashboard.sales_status_available') }}</option>
                             <option value="partial">{{ __('dashboard.sales_status_partial') }}</option>
                         </select>
                     </td>
-                    <td><input type="number" min="0" step="1" class="form-control" name="items[${i}][requested_qty]" required></td>
-                    <td><input type="text" class="form-control" name="items[${i}][notes]" required></td>
+                    <td><input type="number" min="0" step="1" class="form-control" name="items[${i}][requested_qty]" data-field="requested_qty" required></td>
+                    <td><input type="text" class="form-control" name="items[${i}][notes]" data-field="notes" required></td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-light-danger js-remove-row" title="{{ __('dashboard.delete') }}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
                 `;
                 tableBody.appendChild(row);
+                initAutoWidth(row);
+                applyFixedWidth(row);
+            });
+
+            tableBody?.addEventListener('click', (event) => {
+                const removeBtn = event.target.closest('.js-remove-row');
+
+                if (!removeBtn) {
+                    return;
+                }
+
+                const rows = tableBody.querySelectorAll('tr');
+
+                if (rows.length <= 1) {
+                    const firstRow = rows[0];
+                    firstRow?.querySelectorAll('input').forEach((input) => {
+                        input.value = '';
+                        updateInputWidth(input);
+                    });
+                    firstRow?.querySelectorAll('select').forEach((select) => {
+                        select.value = '';
+                    });
+                    return;
+                }
+
+                removeBtn.closest('tr')?.remove();
+                renumberRows();
             });
 
             deleteForms.forEach((form) => {
@@ -220,6 +307,9 @@
                     });
                 });
             });
+
+            initAutoWidth();
+            applyFixedWidth();
         });
     </script>
 @endpush

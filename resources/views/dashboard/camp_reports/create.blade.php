@@ -1498,14 +1498,14 @@
             document.querySelectorAll('.audio-box').forEach(initAudioBox);
             document.querySelectorAll('.video-box').forEach(initVideoBox);
             function handleOtherItemStatus() {
-                    document.querySelectorAll('.item-status-select').forEach(s => {
+                document.querySelectorAll('.item-status-select').forEach((s) => {
                     s.addEventListener('change', function() {
-                                    const isOther = s.value === 'other';
-                                    s.nextElementSibling.classList.toggle('d-none', !isOther);
-                                });
-                            }); 
-                    }
-                    handleOtherItemStatus();
+                        const isOther = s.value === 'other';
+                        s.nextElementSibling.classList.toggle('d-none', !isOther);
+                    });
+                });
+            }
+            handleOtherItemStatus();
             // ====== إضافة عنصر جديد ======
             const itemsContainer = document.getElementById('items-container');
             const addItemBtn = document.getElementById('add-item');
@@ -1513,118 +1513,113 @@
 
             addItemBtn?.addEventListener('click', function() {
                 const tpl = `
-<div class="card mb-4 item-row" data-index="\${itemIndex}">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">#${itemIndex + 1}</h5>
-    <button type="button" class="btn btn-sm btn-icon btn-danger remove-item"><i class="bi bi-trash"></i></button>
-  </div>
-  <div class="card-body">
-    <div class="row">
-      <div class="col-md-6 mb-3">
-        <label class="form-label required">اسم الصنف</label>
-        <input type="text" name="items[\${itemIndex}][item_name]" class="form-control" required>
-      </div>
-      <div class="col-md-6 mb-3">
-                <label class="form-label">{{ __('dashboard.additional_notes') }}</label>
-        <textarea name="items[\${itemIndex}][notes]" rows="1" class="form-control"></textarea>
-      </div>
-    </div>
+                                <div class="card mb-4 item-row" data-index="\${itemIndex}">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h5 class="mb-0">#${itemIndex + 1}</h5>
+                                                <button type="button" class="btn btn-sm btn-icon btn-danger remove-item"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                        <div class="card-body">
+                                                <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                                <label class="form-label required">{{ __('dashboard.item_status') }}</label>
+                                                                <select name="items[\${itemIndex}][item_status]" class="form-select item-status-select" required>
+                                                                        <option value="">{{ __('dashboard.select_item_status') }}</option>
+                                                                        @foreach (itemStatuses() as $statusValue => $statusLabel)
+                                                                                <option value="{{ $statusValue }}">{{ __($statusLabel) }}</option>
+                                                                        @endforeach
+                                                                </select>
+                                                                <div class="row item-status-other-row d-none">
+                                                                        <div class="col-md-6 mb-3">
+                                                                                <label class="form-label">{{ __('dashboard.item_status') }}</label>
+                                                                                <input type="text" name="items[\${itemIndex}][item_status_other]" class="form-control item-status-other-input">
+                                                                        </div>
+                                                                </div>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                                <label class="form-label required">اسم الصنف</label>
+                                                                <input type="text" name="items[\${itemIndex}][item_name]" class="form-control" required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                                <label class="form-label">{{ __('dashboard.damaged_count') }}</label>
+                                                                <input type="number" min="0" step="1" name="items[\${itemIndex}][damaged_count]" class="form-control">
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                                <label class="form-label">{{ __('dashboard.additional_notes') }}</label>
+                                                                <textarea name="items[\${itemIndex}][notes]" rows="1" class="form-control"></textarea>
+                                                        </div>
+                                                </div>
 
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label required">{{ __('dashboard.item_status') }}</label>
-                <select name="items[\${itemIndex}][item_status]" class="form-select item-status-select" required>
-                    <option value="">{{ __('dashboard.select_item_status') }}</option>
-                    @foreach (itemStatuses() as $statusValue => $statusLabel)
-                        <option value="{{ $statusValue }}">{{ __($statusLabel) }}</option>
-                    @endforeach
-                </select>
-                <div class="row item-status-other-row d-none">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ __('dashboard.item_status') }}</label>
-                        <input type="text" name="items[\${itemIndex}][item_status_other]" class="form-control item-status-other-input">
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">{{ __('dashboard.damaged_count') }}</label>
-                <input type="number" min="0" step="1" name="items[\${itemIndex}][damaged_count]" class="form-control">
-            </div>
-        </div>
+                                                <div class="row g-4">
+                                                        <!-- PHOTOS -->
+                                                        <div class="col-md-4">
+                                                                <label class="form-label">{{ __('dashboard.photo_attachment') }}</label>
+                                                                <div class="media-upload-container photo-box" data-type="photo" data-existing="[]">
+                                                                        <input type="hidden" name="items[\${itemIndex}][remove_photos]" value="0" class="remove-flag">
+                                                                        <div class="photo-slider mb-2 d-none">
+                                                                                <div class="slider-viewport"><img class="slider-img" alt="photo"></div>
+                                                                                <button type="button" class="slider-nav prev" aria-label="Prev">‹</button>
+                                                                                <button type="button" class="slider-nav next" aria-label="Next">›</button>
+                                                                                <div class="slider-dots"></div>
+                                                                        </div>
+                                                                        <div class="d-grid gap-2">
+                                                                                <button type="button" class="btn btn-sm btn-primary capture-media w-100"><i class="bi bi-camera"></i> @lang('dashboard.capture_photo')</button>
+                                                                                <button type="button" class="btn btn-sm btn-secondary upload-media w-100"><i class="bi bi-upload"></i> @lang('dashboard.upload')</button>
+                                                                                <button type="button" class="btn btn-sm btn-danger remove-media-all w-100"><i class="bi bi-trash"></i> @lang('dashboard.delete')</button>
+                                                                        </div>
+                                                                        <input type="file" name="items[\${itemIndex}][photos][]" class="media-input d-none" accept="image/*" multiple>
+                                                                        <input type="file" class="d-none camera-photo-input" accept="image/*" capture="environment" multiple>
+                                                                </div>
+                                                        </div>
 
+                                                        <!-- AUDIOS -->
+                                                        <div class="col-md-4">
+                                                                <label class="form-label">{{ __('dashboard.audio_attachment') }}</label>
+                                                                <div class="media-upload-container audio-box" data-type="audio" data-existing="[]">
+                                                                        <input type="hidden" name="items[\${itemIndex}][remove_audios]" value="0" class="remove-flag">
+                                                                        <div class="preview-audio-container mb-2" style="display:none;">
+                                                                                <div class="preview-audio-list"></div>
+                                                                        </div>
+                                                                        <div class="d-grid gap-2">
+                                                                                <button type="button" class="btn btn-sm btn-primary capture-media w-100"><i class="bi bi-mic"></i> @lang('dashboard.record')</button>
+                                                                                <button type="button" class="btn btn-sm btn-secondary upload-media w-100"><i class="bi bi-upload"></i> @lang('dashboard.upload')</button>
+                                                                                <button type="button" class="btn btn-sm btn-danger remove-media w-100"><i class="bi bi-trash"></i> @lang('dashboard.delete')</button>
+                                                                        </div>
+                                                                        <input type="file" name="items[\${itemIndex}][audios][]" class="media-input d-none" accept="audio/*" multiple>
+                                                                </div>
+                                                        </div>
 
-    <div class="row g-4">
-      <!-- PHOTOS -->
-      <div class="col-md-4">
-        <label class="form-label">{{ __('dashboard.photo_attachment') }}</label>
-        <div class="media-upload-container photo-box" data-type="photo" data-existing="[]">
-          <input type="hidden" name="items[\${itemIndex}][remove_photos]" value="0" class="remove-flag">
-          <div class="photo-slider mb-2 d-none">
-            <div class="slider-viewport"><img class="slider-img" alt="photo"></div>
-            <button type="button" class="slider-nav prev" aria-label="Prev">‹</button>
-            <button type="button" class="slider-nav next" aria-label="Next">›</button>
-            <div class="slider-dots"></div>
-          </div>
-          <div class="d-grid gap-2">
-            <button type="button" class="btn btn-sm btn-primary capture-media w-100"><i class="bi bi-camera"></i> @lang('dashboard.capture_photo')</button>
-            <button type="button" class="btn btn-sm btn-secondary upload-media w-100"><i class="bi bi-upload"></i> @lang('dashboard.upload')</button>
-            <button type="button" class="btn btn-sm btn-danger remove-media-all w-100"><i class="bi bi-trash"></i> @lang('dashboard.delete')</button>
-          </div>
-          <input type="file" name="items[\${itemIndex}][photos][]" class="media-input d-none" accept="image/*" multiple>
-          <input type="file" class="d-none camera-photo-input" accept="image/*" capture="environment" multiple>
-        </div>
-      </div>
+                                                        <!-- VIDEOS -->
+                                                        <div class="col-md-4">
+                                                                <label class="form-label">{{ __('dashboard.video_attachment') }}</label>
+                                                                <div class="media-upload-container video-box" data-type="video" data-index="\${itemIndex}" data-existing="[]">
+                                                                        <input type="hidden" name="items[\${itemIndex}][remove_videos]" value="0" class="remove-flag">
 
-      <!-- AUDIOS -->
-      <div class="col-md-4">
-        <label class="form-label">{{ __('dashboard.audio_attachment') }}</label>
-        <div class="media-upload-container audio-box" data-type="audio" data-existing="[]">
-          <input type="hidden" name="items[\${itemIndex}][remove_audios]" value="0" class="remove-flag">
-          <div class="preview-audio-container mb-2" style="display:none;">
-            <div class="preview-audio-list"></div>
-          </div>
-          <div class="d-grid gap-2">
-            <button type="button" class="btn btn-sm btn-primary capture-media w-100"><i class="bi bi-mic"></i> @lang('dashboard.record')</button>
-            <button type="button" class="btn btn-sm btn-secondary upload-media w-100"><i class="bi bi-upload"></i> @lang('dashboard.upload')</button>
-            <button type="button" class="btn btn-sm btn-danger remove-media w-100"><i class="bi bi-trash"></i> @lang('dashboard.delete')</button>
-          </div>
-          <input type="file" name="items[\${itemIndex}][audios][]" class="media-input d-none" accept="audio/*" multiple>
-        </div>
-      </div>
+                                                                        <div class="video-slider mb-2 d-none">
+                                                                                <div class="slider-viewport"><video class="slider-video" controls playsinline></video></div>
+                                                                                <button type="button" class="slider-nav prev" aria-label="Prev">‹</button>
+                                                                                <button type="button" class="slider-nav next" aria-label="Next">›</button>
+                                                                                <div class="slider-dots"></div>
+                                                                        </div>
 
-      <!-- VIDEOS -->
-      <div class="col-md-4">
-        <label class="form-label">{{ __('dashboard.video_attachment') }}</label>
-        <div class="media-upload-container video-box" data-type="video" data-index="\${itemIndex}" data-existing="[]">
-          <input type="hidden" name="items[\${itemIndex}][remove_videos]" value="0" class="remove-flag">
+                                                                        <div class="d-grid gap-2 mb-2">
+                                                                                <button type="button" class="btn btn-sm btn-primary capture-media w-100" id="capture-video-btn-\${itemIndex}">
+                                                                                        🎥 @lang('dashboard.start_recording_video')
+                                                                                </button>
+                                                                                <input type="file" class="pond-video" accept="video/*" multiple />
+                                                                                <button type="button" class="btn btn-sm btn-danger remove-video-all w-100"><i class="bi bi-trash"></i> @lang('dashboard.delete')</button>
+                                                                        </div>
 
-          <div class="video-slider mb-2 d-none">
-            <div class="slider-viewport"><video class="slider-video" controls playsinline></video></div>
-            <button type="button" class="slider-nav prev" aria-label="Prev">‹</button>
-            <button type="button" class="slider-nav next" aria-label="Next">›</button>
-            <div class="slider-dots"></div>
-          </div>
+                                                                        <input type="file" name="items[\${itemIndex}][videos][]" class="media-input d-none" accept="video/*" multiple>
+                                                                        <input type="file" class="d-none camera-video-input" accept="video/*" capture="environment" multiple>
 
-          <div class="d-grid gap-2 mb-2">
-            <button type="button" class="btn btn-sm btn-primary capture-media w-100" id="capture-video-btn-\${itemIndex}">
-              🎥 @lang('dashboard.start_recording_video')
-            </button>
-            <input type="file" class="pond-video" accept="video/*" multiple />
-            <button type="button" class="btn btn-sm btn-danger remove-video-all w-100"><i class="bi bi-trash"></i> @lang('dashboard.delete')</button>
-          </div>
-
-          <input type="file" name="items[\${itemIndex}][videos][]" class="media-input d-none" accept="video/*" multiple>
-          <input type="file" class="d-none camera-video-input" accept="video/*" capture="environment" multiple>
-
-          <div class="uploaded-keys"></div>
-          <input type="hidden" class="remove-video-flag" value="0">
-          <div class="text-danger small d-none video-error"></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>`;
+                                                                        <div class="uploaded-keys"></div>
+                                                                        <input type="hidden" class="remove-video-flag" value="0">
+                                                                        <div class="text-danger small d-none video-error"></div>
+                                                                </div>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>`;
                 itemsContainer.insertAdjacentHTML('beforeend', tpl);
 
                 const newCard = itemsContainer.lastElementChild;
