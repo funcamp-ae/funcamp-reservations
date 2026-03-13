@@ -450,7 +450,6 @@ class CampReportController extends Controller
                 Storage::disk('hetzner')->deleteDirectory($itemFolder);
             }
         }
-        $campReport->items()->forceDelete();
         $campReport->forceDelete();
 
 
