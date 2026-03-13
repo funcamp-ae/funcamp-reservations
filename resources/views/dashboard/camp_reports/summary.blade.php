@@ -63,7 +63,7 @@
                     <tr class="text-center fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                         <th>#</th>
                         <th>@lang('dashboard.report_type')</th>
-                        <th>@lang('dashboard.report_subtype')</th>
+                        <th>@lang('dashboard.camp_type')</th>
                         <th>@lang('dashboard.item_name')</th>
                         <th>@lang('dashboard.item_status')</th>
                         <th>@lang('dashboard.photos')</th>
@@ -75,8 +75,8 @@
                     @forelse($rows as $index => $row)
                         <tr class="text-center">
                             <td>{{ $index + 1 }}</td>
-                            <td>{{ $row->report_type_label }}</td>
-                            <td>{{ $row->report_subtype ?: '-' }}</td>
+                            <td>{{ __('dashboard.' . $row->report_type) }}</td>
+                            <td>{{ $row->camp_name ?: '-' }}</td>
                             <td>
                                 @if($row->report_id)
                                     <a href="{{ route('camp-reports.show', $row->report_id) }}">{{ $row->item_name }}</a>

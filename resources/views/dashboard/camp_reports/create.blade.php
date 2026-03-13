@@ -24,6 +24,22 @@
                                 value="{{ old('report_date', isset($campReport) ? $campReport->report_date->format('Y-m-d') : '') }}">
                         </div>
 
+                        <div class="mb-6">
+                            <label class="form-label required">@lang('dashboard.report_type')</label>
+                            <div class="report-type-options">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input report-type-radio" type="radio" name="report_type" id="report_type_camp" value="camp"
+                                        {{ old('report_type', isset($campReport) ? $campReport->report_type : '') == 'camp' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="report_type_camp">@lang('dashboard.camp')</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input report-type-radio" type="radio" name="report_type" id="report_type_general" value="general"
+                                        {{ old('report_type', isset($campReport) ? $campReport->report_type : '') == 'general' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="report_type_general">@lang('dashboard.general')</label>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mb-6" id="service-field" style="display: none;">
                             <label class="form-label">@lang('dashboard.service')</label>
                             <select name="service_id" class="form-select">
@@ -45,22 +61,6 @@
                     </div>
 
                     <div class="col-md-6">
-                        <div class="mb-6">
-                            <label class="form-label required">@lang('dashboard.report_type')</label>
-                            <div class="report-type-options">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input report-type-radio" type="radio" name="report_type" id="report_type_camp" value="camp"
-                                        {{ old('report_type', isset($campReport) ? $campReport->report_type : '') == 'camp' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="report_type_camp">@lang('dashboard.camp')</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input report-type-radio" type="radio" name="report_type" id="report_type_general" value="general"
-                                        {{ old('report_type', isset($campReport) ? $campReport->report_type : '') == 'general' ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="report_type_general">@lang('dashboard.general')</label>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="mb-6">
                             <label class="form-label">@lang('dashboard.additional_notes')</label>
                             <textarea name="additional_notes" rows="1" class="form-control">{{ old('additional_notes', isset($campReport) ? $campReport->general_notes : '') }}</textarea>

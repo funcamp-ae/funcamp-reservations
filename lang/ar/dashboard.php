@@ -1050,6 +1050,7 @@ return [
     'edit_camp_report' => 'تعديل تقرير مخيم',
     'camp_report_details' => 'تفاصيل تقرير المخيم',
     'report_date' => 'تاريخ التقرير',
+    'camp_name' => 'اسم المخيم',
     'report_type' => 'نوع التقرير',
     'camp' => 'مخيم',
     'general' => 'عام',

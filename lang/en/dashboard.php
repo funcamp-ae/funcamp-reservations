@@ -1020,6 +1020,7 @@ return [
     'edit_camp_report' => 'Edit Camp Report',
     'camp_report_details' => 'Camp Report Details',
     'report_date' => 'Report Date',
+    'camp_name' => 'Camp Name',
     'report_type' => 'Report Type',
     'camp' => 'Camp',
     'general' => 'General',

@@ -1025,6 +1025,7 @@ return [
     'edit_camp_report' => 'د کمپ راپور بدلول',
     'camp_report_details' => 'د کمپ راپور تفصیلات',
     'report_date' => 'د راپور نیټه',
+    'camp_name' => 'د کمپ نوم',
     'report_type' => 'د راپور ډول',
     'camp' => 'کمپ',
     'general' => 'عمومي',

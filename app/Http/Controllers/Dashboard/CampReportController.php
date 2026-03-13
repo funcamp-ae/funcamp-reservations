@@ -37,8 +37,6 @@ class CampReportController extends Controller
 
     public function summary(Request $request)
     {
-        $this->authorize('viewAny', CampReport::class);
-
         $rows = $this->buildSummaryRows($request);
         $reportSubtypes = CampReport::with('service')
             ->get()
@@ -421,6 +419,7 @@ class CampReportController extends Controller
                     'report_type' => $report?->report_type,
                     'report_type_label' => $report?->report_type ? __('dashboard.' . $report->report_type) : '-',
                     'report_subtype' => $report ? $this->formatReportSubtype($report) : '-',
+                    'camp_name' => $report?->service?->name ?? '-',
                     'item_name' => $item->item_name,
                     'item_status' => $itemStatus,
                     'item_status_label' => $itemStatusLabel,
