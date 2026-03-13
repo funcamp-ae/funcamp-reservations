@@ -135,7 +135,7 @@
                                                     @endforeach
                                                 </select>
                                                 <div class="row item-status-other-row {{ $itemStatus === 'other' ? '' : 'd-none' }}">
-                                                    <div class="col-md-6 mb-3">
+                                                    <div class="my-3">
                                                         <label class="form-label">@lang('dashboard.item_status')</label>
                                                         <input type="text" name="items[{{ $index }}][item_status_other]"
                                                             class="form-control item-status-other-input" value="{{ $itemStatusOther }}">
