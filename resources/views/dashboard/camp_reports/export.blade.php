@@ -92,9 +92,7 @@
             </tr>
             <tr>
                 <th>@lang('dashboard.report_subtype')</th>
-                <td>{{ $report->report_type === 'camp' ? ($report->service->name ?? '-') : ($report->custom_report_type ?? '-') }}</td>
-                <th>@lang('dashboard.camp_name')</th>
-                <td>{{ $report->camp_name ?? '-' }}</td>
+                <td colspan="3">{{ $report->report_type === 'camp' ? ($report->service->name ?? '-') : ($report->custom_report_type ?? '-') }}</td>
             </tr>
             <tr>
                 <th>@lang('dashboard.created_by')</th>
