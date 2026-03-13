@@ -36,6 +36,12 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        <div class="mb-6" id="custom-report-type-field" style="display: none;">
+                            <label class="form-label">@lang('dashboard.custom_report_type')</label>
+                            <input type="text" name="custom_report_type" class="form-control"
+                                value="{{ old('custom_report_type', isset($campReport) ? $campReport->custom_report_type : '') }}">
+                        </div>
                     </div>
 
                     <div class="col-md-6">
@@ -58,16 +64,6 @@
                         <div class="mb-6">
                             <label class="form-label">@lang('dashboard.additional_notes')</label>
                             <textarea name="additional_notes" rows="1" class="form-control">{{ old('additional_notes', isset($campReport) ? $campReport->general_notes : '') }}</textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-5 mb-8" id="conditional-fields">
-                    <div class="col-md-6" id="custom-report-type-field" style="display: none;">
-                        <div class="mb-6">
-                            <label class="form-label">@lang('dashboard.custom_report_type')</label>
-                            <input type="text" name="custom_report_type" class="form-control"
-                                value="{{ old('custom_report_type', isset($campReport) ? $campReport->custom_report_type : '') }}">
                         </div>
                     </div>
                 </div>
