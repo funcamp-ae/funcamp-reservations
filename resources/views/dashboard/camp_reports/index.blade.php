@@ -33,7 +33,6 @@
                 <tr class="text-center  fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                     <th class="fw-bolder">@lang('dashboard.report_date')</th>
                     <th class="fw-bolder">@lang('dashboard.service')</th>
-                    <th class="fw-bolder">@lang('dashboard.camp_name')</th>
                     <th class="fw-bolder">@lang('dashboard.report_created_by')</th>
                     <th class="fw-bolder">@lang('dashboard.actions')</th>
                 </tr>
@@ -43,7 +42,6 @@
                     <tr>
                         <td>{{ $report->report_date->format('Y-m-d') }}</td>
                         <td>{{ $report->service->name ?? '' }}</td>
-                        <td>{{$report->service?->name ?? ''}}</td>
                         <td>{{ $report->creator->name }}</td>
                         <td>
                             @can('camp-reports.show')
