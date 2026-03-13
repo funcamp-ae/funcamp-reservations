@@ -45,7 +45,7 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">@lang('dashboard.item_name')</label>
+                    <label class="form-label">@lang('dashboard.itemName')</label>
                     <input type="text" name="item_name" class="form-control" value="{{ $filters['item_name'] ?? '' }}" list="item-name-options">
                     <datalist id="item-name-options">
                         @foreach ($itemNames as $itemName)
