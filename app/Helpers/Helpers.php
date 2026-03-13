@@ -130,6 +130,16 @@ function statements($select = null)
 
     return $rows;
 }
+ function itemStatuses(): array
+    {
+        return [
+            'fully_damaged_replace' => 'dashboard.item_status_fully_damaged_replace',
+            'partially_damaged' => 'dashboard.item_status_partially_damaged',
+            'maintenance_repair' => 'dashboard.item_status_maintenance_repair',
+            'other' => 'dashboard.item_status_other',
+        ];
+    }
+
 
 function addonStatements($select = null)
 {

@@ -8,7 +8,6 @@
         </div>
 
         <div class="card-body">
-            @php($itemStatusOptions = \App\Helpers\CampReportHelper::itemStatuses())
             <form method="POST"
                 action="{{ isset($campReport) ? route('camp-reports.update', $campReport) : route('camp-reports.store') }}"
                 enctype="multipart/form-data">
@@ -140,7 +139,7 @@
                                                 <label class="form-label required">@lang('dashboard.item_status')</label>
                                                 <select name="items[{{ $index }}][item_status]" class="form-select item-status-select" required>
                                                     <option value="">@lang('dashboard.select_item_status')</option>
-                                                    @foreach ($itemStatusOptions as $statusValue => $statusLabel)
+                                                    @foreach (itemStatuses() as $statusValue => $statusLabel)
                                                         <option value="{{ $statusValue }}" {{ $itemStatus === $statusValue ? 'selected' : '' }}>
                                                             {{ __($statusLabel) }}
                                                         </option>
@@ -1525,7 +1524,7 @@
                 <label class="form-label required">{{ __('dashboard.item_status') }}</label>
                 <select name="items[\${itemIndex}][item_status]" class="form-select item-status-select" required>
                     <option value="">{{ __('dashboard.select_item_status') }}</option>
-                    @foreach ($itemStatusOptions as $statusValue => $statusLabel)
+                    @foreach (itemStatuses() as $statusValue => $statusLabel)
                         <option value="{{ $statusValue }}">{{ __($statusLabel) }}</option>
                     @endforeach
                 </select>
