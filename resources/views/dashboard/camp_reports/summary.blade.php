@@ -8,9 +8,11 @@
                 <h3 class="mb-0">@lang('dashboard.camp_reports_summary')</h3>
             </div>
             <div class="card-toolbar">
-                <a href="{{ route('camp-reports.summary.export', request()->query()) }}" class="btn btn-success">
-                    <i class="bi bi-file-earmark-pdf"></i> @lang('dashboard.export_pdf')
-                </a>
+                @can('camp-reports.summary.export')
+                    <a href="{{ route('camp-reports.summary.export', request()->query()) }}" class="btn btn-success">
+                        <i class="bi bi-file-earmark-pdf"></i> @lang('dashboard.export_pdf')
+                    </a>
+                @endcan
             </div>
         </div>
 
@@ -60,19 +62,19 @@
             <div class="table-responsive">
                 <table class="table align-middle table-row-dashed fs-6 gy-5">
                     <thead>
-                    <tr class="text-center fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
-                        <th>#</th>
-                        <th>@lang('dashboard.report_type')</th>
-                        <th>@lang('dashboard.camp_type')</th>
-                        <th>@lang('dashboard.item_name')</th>
-                        <th>@lang('dashboard.item_status')</th>
-                        <th>@lang('dashboard.photos')</th>
-                        <th>@lang('dashboard.damaged_count')</th>
-                        <th>@lang('dashboard.additional_notes')</th>
-                    </tr>
+                        <tr class="text-center fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
+                            <th>#</th>
+                            <th>@lang('dashboard.report_type')</th>
+                            <th>@lang('dashboard.camp_type')</th>
+                            <th>@lang('dashboard.item_name')</th>
+                            <th>@lang('dashboard.item_status')</th>
+                            <th>@lang('dashboard.photos')</th>
+                            <th>@lang('dashboard.damaged_count')</th>
+                            <th>@lang('dashboard.additional_notes')</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    @forelse($rows as $index => $row)
+                        @forelse($rows as $index => $row)
                         <tr class="text-center">
                             <td>{{ $index + 1 }}</td>
                             <td>{{ __('dashboard.' . $row->report_type) }}</td>

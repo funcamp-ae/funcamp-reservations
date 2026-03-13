@@ -34,11 +34,11 @@
                     <thead>
                         <tr class="text-start  fw-bolder fs-7 text-uppercase gs-0">
                             <th>#</th>
-                            <th class="min-w-100px">@lang('dashboard.item_type')</th>
-                            <th class="min-w-100px">@lang('dashboard.item_name')</th>
+                            <th class="min-w-100px">@lang('dashboard.item_name_short')</th>
+                            <th class="min-w-100px">@lang('dashboard.item_contents')</th>
                             <th class="min-w-100px">@lang('dashboard.location')</th>
                             <th class="min-w-100px">@lang('dashboard.quantity')</th>
-                            <th class="min-w-100px">@lang('dashboard.notes')</th>
+                            <th class="min-w-100px">@lang('dashboard.additional_notes')</th>
                             <th class="min-w-100px">@lang('dashboard.creator') / @lang('dashboard.date')</th>
                             <th class="min-w-100px">@lang('dashboard.media')</th>
                             <th class="min-w-100px">@lang('dashboard.directory_status')</th>
@@ -49,8 +49,8 @@
                         @foreach ($items as $item)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $item->type }}</td>
                                 <td>{{ $item->name }}</td>
+                                <td>{{ $item->contents }}</td>
                                 <td>{{ $item->location }}</td>
                                 <td>{{ $item->quantity }}</td>
                                 <td>{{ Str::limit($item->notes, 30) }}</td>
@@ -73,8 +73,8 @@
                                         {{ $item->is_active ? __('dashboard.active') : __('dashboard.inactive') }}
                                     </span>
                                 </td>
-                                <td class="text-end">
-    <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap">
+                                <td class="text-end actions-cell">
+    <div class="d-flex justify-content-end align-items-center gap-2 actions-buttons">
         @if (Gate::allows('equipment.edit'))
             <a href="{{ route('equipment-directories.items.edit', [$equipmentDirectory, $item]) }}"
                class="btn btn-sm btn-icon btn-primary" title="@lang('dashboard.edit')">
@@ -286,23 +286,36 @@ document.querySelectorAll('[data-bs-toggle="tab"]').forEach(function(tab){
         });
     });
 });
-
-/* أيقونات أزرار داخل الجداول: حجم ثابت ومحاذاة مثالية */
-.table .btn.btn-icon{
-  width: 34px; height: 34px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1; /* يمنع القص */
-}
-.table .btn.btn-icon.btn-sm{
-  width: 30px; height: 30px; /* أصغر في حجم sm لكن بدون قص */
-}
-.table .btn.btn-icon i{
-  line-height: 1; /* مهم مع بعض خطوط الأيقونات */
-}
-
 </script>
 
-@endphp
+<style>
+/* Action buttons in items table */
+.actions-cell {
+        white-space: nowrap;
+}
+
+.actions-buttons {
+        flex-wrap: nowrap;
+}
+
+.actions-buttons .btn.btn-icon {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+}
+
+.actions-buttons .btn.btn-icon.btn-sm {
+        width: 30px;
+        height: 30px;
+}
+
+.actions-buttons .btn.btn-icon i {
+        line-height: 1;
+}
+</style>
+
+@endpush

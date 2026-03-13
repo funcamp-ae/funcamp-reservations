@@ -2280,6 +2280,17 @@
             </div>
             @endcan
 
+            @can('camp-reports.new_camps.index')
+            <div class="menu-item">
+                <a href="{{ route('camp-reports.new-camps') }}" class="menu-link py-3 {{ isActiveRoute('camp-reports.new-camps') }}">
+                    <span class="menu-bullet">
+                        <span class="bullet bullet-dot"></span>
+                    </span>
+                    <span class="menu-title">@lang('dashboard.camp_reports_new_camps')</span>
+                </a>
+            </div>
+            @endcan
+
             <!--end::Menu item-->
 
 

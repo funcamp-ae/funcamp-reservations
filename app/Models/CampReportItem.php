@@ -23,7 +23,7 @@ class CampReportItem extends Model
 
     public function report(): BelongsTo
     {
-        return $this->belongsTo(CampReport::class);
+        return $this->belongsTo(CampReport::class , 'camp_report_id');
     }
 
     public function media(): HasMany

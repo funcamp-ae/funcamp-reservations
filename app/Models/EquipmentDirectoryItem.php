@@ -13,7 +13,7 @@ class EquipmentDirectoryItem extends Model
 
     protected $fillable = [
         'directory_id', 'type', 'name', 'location',
-        'quantity', 'notes', 'is_active', 'created_by'
+        'quantity', 'contents', 'notes', 'is_active', 'created_by'
     ];
 
     public function directory(): BelongsTo

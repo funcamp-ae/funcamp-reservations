@@ -2075,6 +2075,18 @@ Route::get('equipment-directories/{equipmentDirectory}/items/export', [Equipment
 Route::resource('camp-reports', 'Dashboard\CampReportController')
     ->except(['show'])
     ->middleware(['auth', 'permission:camp-reports.index|camp-reports.create|camp-reports.edit|camp-reports.destroy']);
+Route::get('camp-reports/new-camps', [CampReportController::class, 'upcomingcamping'])
+    ->name('camp-reports.new-camps')
+    ->middleware(['auth', 'permission:camp-reports.index']);
+Route::post('camp-reports/new-camps', [CampReportController::class, 'storeUpcomingcamping'])
+    ->name('camp-reports.new-camps.store')
+    ->middleware(['auth', 'permission:camp-reports.create|camp-reports.edit']);
+Route::delete('camp-reports/new-camps/{newCampPlan}', [CampReportController::class, 'destroyUpcomingcamping'])
+    ->name('camp-reports.new-camps.destroy')
+    ->middleware(['auth', 'permission:camp-reports.destroy']);
+Route::get('camp-reports/new-camps/export/pdf', [CampReportController::class, 'upcomingcampingPdf'])
+    ->name('camp-reports.new-camps.export')
+    ->middleware(['auth', 'permission:camp-reports.index']);
 Route::get('camp-reports/summary', [CampReportController::class, 'summary'])
     ->name('camp-reports.summary')->middleware(['auth', 'permission:camp-reports.summary']);
 Route::get('camp-reports/summary/export/pdf', [CampReportController::class, 'exportSummaryPdf'])

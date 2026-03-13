@@ -92,8 +92,8 @@ class EquipmentDirectoryController extends Controller
     {
         // ✅ فاليديشن على نفس ستايل OrderCheckinController
         $request->validate([
-            'type'        => ['required', 'string', 'max:255'],
             'name'        => ['required', 'string', 'max:255'],
+            'contents'    => ['nullable', 'string'],
             'location'    => ['required', 'string', 'max:255'],
             'quantity'    => ['required', 'integer', 'min:1'],
             'notes'       => ['nullable', 'string'],
@@ -133,8 +133,9 @@ class EquipmentDirectoryController extends Controller
         try {
             $item = EquipmentDirectoryItem::create([
                 'directory_id' => $equipmentDirectory->id,
-                'type'         => $request->type,
+                'type'         => '',
                 'name'         => $request->name,
+                'contents'     => $request->contents,
                 'location'     => $request->location,
                 'quantity'     => $request->quantity,
                 'notes'        => $request->notes,
@@ -163,8 +164,8 @@ class EquipmentDirectoryController extends Controller
     {
         // ✅ نفس الفاليديشن كما في storeItem (نفس ستايل OrderCheckinController)
         $request->validate([
-            'type'        => ['required', 'string', 'max:255'],
             'name'        => ['required', 'string', 'max:255'],
+            'contents'    => ['nullable', 'string'],
             'location'    => ['required', 'string', 'max:255'],
             'quantity'    => ['required', 'integer', 'min:1'],
             'notes'       => ['nullable', 'string'],
@@ -203,8 +204,9 @@ class EquipmentDirectoryController extends Controller
         ]);
 
         $item->update([
-            'type'      => $request->type,
+            'type'      => $item->type ?? '',
             'name'      => $request->name,
+            'contents'  => $request->contents,
             'location'  => $request->location,
             'quantity'  => $request->quantity,
             'notes'     => $request->notes,

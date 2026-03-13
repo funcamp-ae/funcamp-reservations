@@ -48,21 +48,20 @@
                     @method('PUT')
                 @endisset
 
-                {{-- TYPE --}}
-                <div class="row mb-6">
-                    <label class="col-lg-4 col-form-label required fw-bold fs-6">@lang('dashboard.item_type')</label>
-                    <div class="col-lg-8">
-                        <input type="text" name="type" class="form-control"
-                            value="{{ old('type', $item->type ?? '') }}" required>
-                    </div>
-                </div>
-
                 {{-- NAME --}}
                 <div class="row mb-6">
-                    <label class="col-lg-4 col-form-label required fw-bold fs-6">@lang('dashboard.item_name')</label>
+                    <label class="col-lg-4 col-form-label required fw-bold fs-6">@lang('dashboard.item_name_short')</label>
                     <div class="col-lg-8">
                         <input type="text" name="name" class="form-control"
                             value="{{ old('name', $item->name ?? '') }}" required>
+                    </div>
+                </div>
+
+                {{-- ITEM CONTENTS --}}
+                <div class="row mb-6">
+                    <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.item_contents')</label>
+                    <div class="col-lg-8">
+                        <textarea name="contents" rows="3" class="form-control">{{ old('contents', $item->contents ?? '') }}</textarea>
                     </div>
                 </div>
 
@@ -86,7 +85,7 @@
 
                 {{-- NOTES --}}
                 <div class="row mb-6">
-                    <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.notes')</label>
+                    <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.additional_notes')</label>
                     <div class="col-lg-8">
                         <textarea name="notes" rows="3" class="form-control">{{ old('notes', $item->notes ?? '') }}</textarea>
                     </div>

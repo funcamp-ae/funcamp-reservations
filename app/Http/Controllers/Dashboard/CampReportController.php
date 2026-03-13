@@ -6,6 +6,7 @@ use App\Helpers\CampReportHelper;
 use App\Http\Controllers\Controller;
 use App\Models\CampReport;
 use App\Models\CampReportItem;
+use App\Models\NewCampPlan;
 use App\Models\Service;
 use Closure;
 use Illuminate\Http\Request;
@@ -55,10 +56,199 @@ class CampReportController extends Controller
         ]);
     }
 
-    public function exportSummaryPdf(Request $request)
+
+    /**
+     * New Camps page (upcoming camping): record future camps and needed purchases.
+     */
+    public function upcomingcamping(Request $request)
     {
         $this->authorize('viewAny', CampReport::class);
 
+        $plans = NewCampPlan::query()
+            ->latest()
+            ->get();
+        $editingPlan = null;
+        $editPlanId = $request->integer('edit_plan') ?? null;
+
+        if ($editPlanId > 0) {
+            $editingPlan = NewCampPlan::query()->find($editPlanId) ?? null;
+        }
+
+        return view('dashboard.camp_reports.new_camps', compact('plans', 'editingPlan'));
+    }
+
+    public function storeUpcomingcamping(Request $request)
+    {
+        $this->authorize('create', CampReport::class);
+
+        $validated = $request->validate([
+            'editing_plan_id' => ['nullable', 'integer'],
+            'new_camp_name' => ['nullable', 'string', 'max:255'],
+            'items' => ['nullable', 'array'],
+            'items.*.item_name' => ['nullable', 'string', 'max:255'],
+            'items.*.sales_status' => ['nullable', Rule::in(['buy', 'available', 'partial'])],
+            'items.*.requested_qty' => ['nullable', 'integer', 'min:0'],
+            'items.*.notes' => ['nullable', 'string'],
+        ]);
+
+        $items = collect($validated['items'] ?? [])
+            ->map(function ($row) {
+                $row = is_array($row) ? $row : [];
+
+                return [
+                    'item_name' => trim((string) ($row['item_name'] ?? '')),
+                    'sales_status' => (string) ($row['sales_status'] ?? ''),
+                    'requested_qty' => $row['requested_qty'] ?? null,
+                    'notes' => trim((string) ($row['notes'] ?? '')),
+                ];
+            })
+            ->filter(function (array $row) {
+                return $row['item_name'] !== '' || $row['sales_status'] !== '' || $row['requested_qty'] !== null || $row['notes'] !== '';
+            })
+            ->values()
+            ->all();
+
+        $editingPlanId = (int) ($validated['editing_plan_id'] ?? 0);
+        $plan = null;
+
+        if ($editingPlanId > 0) {
+            $plan = NewCampPlan::query()
+                ->find($editingPlanId) ;
+        }
+
+        if ($plan) {
+            $plan->update([
+                'new_camp_name' => $validated['new_camp_name'] ?? null,
+                'items' => $items,
+            ]);
+        } else {
+            $plan = NewCampPlan::query()->create([
+                'new_camp_name' => $validated['new_camp_name'] ?? null,
+                'items'         => $items,
+                'created_by'    => auth()->id(),
+            ]);
+        }
+
+        return redirect()
+            ->route('camp-reports.new-camps')
+            ->with('success', __('dashboard.save_changes'));
+    }
+
+    public function destroyUpcomingcamping(NewCampPlan $newCampPlan)
+    {
+        $newCampPlan->delete();
+        return redirect()
+            ->route('camp-reports.new-camps')
+            ->with('success', __('dashboard.deleted_successfully'));
+    }
+
+    public function upcomingcampingPdf(Request $request)
+    {
+        $this->authorize('viewAny', CampReport::class);
+
+        $campName = $request->string('new_camp_name')->toString();
+        $editingPlanId = $request->integer('editing_plan_id') ?: $request->integer('edit_plan');
+        $plansForExport = collect();
+        $items = collect($request->input('items', []))
+            ->map(function ($row) {
+                $row = is_array($row) ? $row : [];
+                return (object) [
+                    'item_name' => trim((string) ($row['item_name'] ?? '')),
+                    'sales_status' => (string) ($row['sales_status'] ?? ''),
+                    'requested_qty' => $row['requested_qty'] ?? null,
+                    'notes' => trim((string) ($row['notes'] ?? '')),
+                ];
+            })
+            ->filter(function ($row) {
+                return $row->item_name !== '' || $row->sales_status !== '' || $row->requested_qty !== null || $row->notes !== '';
+            })
+            ->values();
+
+        // If form is empty, export edited plan or all saved plans for this user.
+        if ($items->isEmpty()) {
+            $planQuery = NewCampPlan::query()->where('created_by', auth()->id());
+
+            if ($editingPlanId > 0) {
+                $plan = (clone $planQuery)->whereKey($editingPlanId)->first();
+
+                if ($plan) {
+                    if ($campName === '') {
+                        $campName = (string) ($plan->new_camp_name ?? '');
+                    }
+
+                    $items = collect($plan->items ?? [])
+                        ->map(function ($row) {
+                            $row = is_array($row) ? $row : [];
+
+                            return (object) [
+                                'item_name' => trim((string) ($row['item_name'] ?? '')),
+                                'sales_status' => (string) ($row['sales_status'] ?? ''),
+                                'requested_qty' => $row['requested_qty'] ?? null,
+                                'notes' => trim((string) ($row['notes'] ?? '')),
+                            ];
+                        })
+                        ->filter(function ($row) {
+                            return $row->item_name !== '' || $row->sales_status !== '' || $row->requested_qty !== null || $row->notes !== '';
+                        })
+                        ->values();
+                }
+            } else {
+                $plansForExport = (clone $planQuery)
+                    ->latest()
+                    ->get()
+                    ->map(function (NewCampPlan $plan) {
+                        $planItems = collect($plan->items ?? [])
+                            ->map(function ($row) {
+                                $row = is_array($row) ? $row : [];
+
+                                return (object) [
+                                    'item_name' => trim((string) ($row['item_name'] ?? '')),
+                                    'sales_status' => (string) ($row['sales_status'] ?? ''),
+                                    'requested_qty' => $row['requested_qty'] ?? null,
+                                    'notes' => trim((string) ($row['notes'] ?? '')),
+                                ];
+                            })
+                            ->filter(function ($row) {
+                                return $row->item_name !== '' || $row->sales_status !== '' || $row->requested_qty !== null || $row->notes !== '';
+                            })
+                            ->values();
+
+                        return (object) [
+                            'camp_name' => (string) ($plan->new_camp_name ?? ''),
+                            'items' => $planItems,
+                        ];
+                    })
+                    ->filter(fn ($plan) => $plan->items->isNotEmpty())
+                    ->values();
+            }
+        }
+
+        $html = view('dashboard.camp_reports.new_camps_export', [
+            'campName' => $campName,
+            'items' => $items,
+            'plansForExport' => $plansForExport,
+        ])->render();
+
+        $mpdf = new Mpdf([
+            'mode'           => 'utf-8',
+            'format'         => 'A4',
+            'orientation'    => 'P',
+            'margin_left'    => 12,
+            'margin_right'   => 12,
+            'margin_top'     => 14,
+            'margin_bottom'  => 14,
+            'dir'            => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
+            'default_font'   => 'DejaVuSans',
+        ]);
+
+        $mpdf->WriteHTML($html);
+
+        $filename = __('dashboard.camp_reports_new_camps') . '-' . date('Y-m-d') . '.pdf';
+        return $mpdf->Output($filename, 'D');
+    }
+
+    public function exportSummaryPdf(Request $request)
+    {
         $rows = $this->buildSummaryRows($request, true);
         $html = view('dashboard.camp_reports.summary_export', compact('rows'))->render();
 
@@ -74,6 +264,7 @@ class CampReportController extends Controller
             'default_font' => 'DejaVuSans',
         ]);
 
+        $mpdf->shrink_tables_to_fit = 1;
         $mpdf->showImageErrors = true;
         $mpdf->WriteHTML($html);
 
@@ -412,7 +603,6 @@ class CampReportController extends Controller
                 if ($itemStatus === 'other' && $item->item_status_other) {
                     $itemStatusLabel = $itemStatusLabel . ' - ' . $item->item_status_other;
                 }
-
                 return (object) [
                     'id' => $item->id,
                     'report_id' => $report?->id,
