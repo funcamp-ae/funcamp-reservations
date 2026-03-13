@@ -1053,6 +1053,7 @@ return [
     'create_camp_report' => 'إنشاء تقرير مخيم',
     'create_camp_reports_new_camps' => 'إنشاء المخيمات المستحدث',
     'edit_camp_report' => 'تعديل تقرير مخيم',
+    'edit_and_add_items' => 'تعديل وإضافة عناصر',
     'camp_report_details' => 'تفاصيل تقرير المخيم',
     'report_date' => 'تاريخ التقرير',
     'camp_name' => 'اسم المخيم',

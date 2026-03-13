@@ -53,7 +53,7 @@
                             @endcan
                             @can('camp-reports.edit')
                             <a href="{{ route('camp-reports.edit', $report) }}" class="btn btn-sm btn-secondary">
-                                @lang('dashboard.edit')
+                                @lang('dashboard.edit_and_add_items')
                             </a>
                             @endcan
                            @can('camp-reports.destroy')

@@ -1022,6 +1022,7 @@ return [
     'create_camp_report' => 'Create Camp Report',
     'create_camp_reports_new_camps' => 'Create New Camps',
     'edit_camp_report' => 'Edit Camp Report',
+    'edit_and_add_items' => 'Edit and Add Items',
     'camp_report_details' => 'Camp Report Details',
     'no_created_camps_yet' => 'No created camps yet.',
     'report_date' => 'Report Date',
