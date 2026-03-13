@@ -87,21 +87,21 @@
             <tr>
                 <th width="20%">@lang('dashboard.report_date')</th>
                 <td width="30%">{{ $report->report_date->format('Y-m-d') }}</td>
-                <th width="20%">@lang('dashboard.service')</th>
-                <td width="30%">{{ $report->service->name ?? __('dashboard.not_available') }}</td>
+                <th width="20%">@lang('dashboard.report_type')</th>
+                <td width="30%">{{ __('dashboard.' . $report->report_type) }}</td>
             </tr>
             <tr>
+                <th>@lang('dashboard.report_subtype')</th>
+                <td>{{ $report->report_type === 'camp' ? ($report->service->name ?? '-') : ($report->custom_report_type ?? '-') }}</td>
                 <th>@lang('dashboard.camp_name')</th>
-                <td>{{ $report->camp_name ?? __('dashboard.not_available') }}</td>
+                <td>{{ $report->camp_name ?? '-' }}</td>
+            </tr>
+            <tr>
                 <th>@lang('dashboard.created_by')</th>
                 <td>{{ $report->creator->name }}</td>
+                <th>@lang('dashboard.general_notes')</th>
+                <td>{{ $report->general_notes ?? '-' }}</td>
             </tr>
-            @if($report->general_notes)
-                <tr>
-                    <th>@lang('dashboard.general_notes')</th>
-                    <td colspan="3">{{ $report->general_notes }}</td>
-                </tr>
-            @endif
         </table>
 
         @if($report->items->count() > 0)
@@ -109,28 +109,36 @@
             <table class="item-table">
                 <thead>
                 <tr>
-                    <th width="25%">@lang('dashboard.item_name')</th>
-                    <th width="35%">@lang('dashboard.notes')</th>
-                    <th width="40%">@lang('dashboard.attachments')</th>
+                    <th width="20%">@lang('dashboard.item_name')</th>
+                    <th width="15%">@lang('dashboard.item_status')</th>
+                    <th width="10%">@lang('dashboard.damaged_count')</th>
+                    <th width="30%">@lang('dashboard.notes')</th>
+                    <th width="25%">@lang('dashboard.attachments')</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($report->items as $item)
+                    @php
+                        $statusKey = \App\Helpers\CampReportHelper::itemStatuses()[$item->item_status] ?? null;
+                        $itemStatusText = $statusKey ? __($statusKey) : ($item->item_status ?: '-');
+                        $hasAttachments = $item->media->count() > 0;
+                    @endphp
                     <tr>
                         <td>{{ $item->item_name }}</td>
-                        <td>{{ $item->notes ?? __('dashboard.not_available') }}</td>
+                        <td>{{ $itemStatusText }}</td>
+                        <td>{{ $item->damaged_count ?? '-' }}</td>
+                        <td>{{ $item->notes ?? '-' }}</td>
                         <td class="attachments-cell">
                             {{-- Display Photo --}}
-                            @if($item->photo_path && isset($item->photo_base64))
+                            @if(isset($item->photo_base64))
                                 <div>
                                     <img src="data:image/jpeg;base64,{{ $item->photo_base64 }}"
                                          class="item-image" alt="@lang('dashboard.item_photo')">
                                     <div class="attachment-info">@lang('dashboard.photo')</div>
                                 </div>
-                            @endif
-
-                            {{-- No attachments message --}}
-                            @if(!$item->photo_path && !$item->audio_path && !$item->video_path)
+                            @elseif($hasAttachments)
+                                <div class="attachment-info">@lang('dashboard.attachments_available_in_system')</div>
+                            @else
                                 <div class="attachment-info">@lang('dashboard.no_attachments')</div>
                             @endif
                         </td>
@@ -144,7 +152,7 @@
     </div>
 
     @if(!$loop->last)
-        <div class="page-break"></div>
+        <hr>
     @endif
 @endforeach
 </body>

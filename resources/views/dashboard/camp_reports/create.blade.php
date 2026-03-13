@@ -141,6 +141,13 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
+                                                <div class="row item-status-other-row {{ $itemStatus === 'other' ? '' : 'd-none' }}">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">@lang('dashboard.item_status')</label>
+                                                        <input type="text" name="items[{{ $index }}][item_status_other]"
+                                                            class="form-control item-status-other-input" value="{{ $itemStatusOther }}">
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label class="form-label">@lang('dashboard.damaged_count')</label>
@@ -149,13 +156,6 @@
                                             </div>
                                         </div>
 
-                                        <div class="row item-status-other-row {{ $itemStatus === 'other' ? '' : 'd-none' }}">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label">@lang('dashboard.other_item_status_details')</label>
-                                                <input type="text" name="items[{{ $index }}][item_status_other]"
-                                                    class="form-control item-status-other-input" value="{{ $itemStatusOther }}">
-                                            </div>
-                                        </div>
 
                                         <div class="row g-4">
                                             {{-- PHOTOS --}}
@@ -727,6 +727,7 @@
                     }
 
                     const toggleOtherField = () => {
+                        console.log('Selected status:', select.value);
                         const isOther = select.value === 'other';
                         otherRow.classList.toggle('d-none', !isOther);
                         otherInput.required = isOther;
@@ -1493,11 +1494,18 @@
             }
 
             // ====== INIT لكل العناصر الحالية ======
-            initItemStatusFields();
             document.querySelectorAll('.photo-box').forEach(initPhotoBox);
             document.querySelectorAll('.audio-box').forEach(initAudioBox);
             document.querySelectorAll('.video-box').forEach(initVideoBox);
-
+            function handleOtherItemStatus() {
+                    document.querySelectorAll('.item-status-select').forEach(s => {
+                    s.addEventListener('change', function() {
+                                    const isOther = s.value === 'other';
+                                    s.nextElementSibling.classList.toggle('d-none', !isOther);
+                                });
+                            }); 
+                    }
+                    handleOtherItemStatus();
             // ====== إضافة عنصر جديد ======
             const itemsContainer = document.getElementById('items-container');
             const addItemBtn = document.getElementById('add-item');
@@ -1531,6 +1539,12 @@
                         <option value="{{ $statusValue }}">{{ __($statusLabel) }}</option>
                     @endforeach
                 </select>
+                <div class="row item-status-other-row d-none">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ __('dashboard.item_status') }}</label>
+                        <input type="text" name="items[\${itemIndex}][item_status_other]" class="form-control item-status-other-input">
+                    </div>
+                </div>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">{{ __('dashboard.damaged_count') }}</label>
@@ -1538,12 +1552,6 @@
             </div>
         </div>
 
-        <div class="row item-status-other-row d-none">
-            <div class="col-md-6 mb-3">
-                <label class="form-label">{{ __('dashboard.other_item_status_details') }}</label>
-                <input type="text" name="items[\${itemIndex}][item_status_other]" class="form-control item-status-other-input">
-            </div>
-        </div>
 
     <div class="row g-4">
       <!-- PHOTOS -->
@@ -1621,6 +1629,7 @@
 
                 const newCard = itemsContainer.lastElementChild;
                 initItemStatusFields(newCard);
+                handleOtherItemStatus();
                 initPhotoBox(newCard.querySelector('.photo-box'));
                 initAudioBox(newCard.querySelector('.audio-box'));
                 initVideoBox(newCard.querySelector('.video-box'));

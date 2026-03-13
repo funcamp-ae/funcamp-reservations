@@ -34,7 +34,7 @@
                 <thead>
                 <tr class="text-center  fw-bolder fs-6 text-uppercase gs-0" style="background-color: #f8f9fa; font-weight: 900 !important;">
                     <th class="fw-bolder">@lang('dashboard.report_date')</th>
-                    <th class="fw-bolder">@lang('dashboard.service')</th>
+                    <th class="fw-bolder">@lang('dashboard.report_subtype')</th>
                     <th class="fw-bolder">@lang('dashboard.report_created_by')</th>
                     <th class="fw-bolder">@lang('dashboard.actions')</th>
                 </tr>
@@ -43,7 +43,7 @@
                 @foreach($reports as $report)
                     <tr>
                         <td>{{ $report->report_date->format('Y-m-d') }}</td>
-                        <td>{{ $report->service->name ?? '' }}</td>
+                        <td>{{ $report->service->name ?? $report->custom_report_type ?? '' }}</td>
                         <td>{{ $report->creator->name }}</td>
                         <td>
                             @can('camp-reports.show')
@@ -59,7 +59,7 @@
                             @can('camp-reports.destroy')
                             <form action="{{ route('camp-reports.destroy', $report) }}" method="POST" class="d-inline">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('@lang('dashboard.confirm_delete')')">
+                                <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(this)">
                                     @lang('dashboard.delete')
                                 </button>
                             </form>
@@ -71,4 +71,24 @@
             </table>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+<script>
+    function confirmDelete(button) {
+        Swal.fire({
+            text: "@lang('dashboard.confirm_delete')",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: "@lang('dashboard.delete')",
+            cancelButtonText: "@lang('dashboard.cancel')"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                button.closest('form').submit();
+            }
+        });
+    }
+</script>
 @endsection
