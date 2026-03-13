@@ -181,9 +181,9 @@
 
             function applyFixedWidth(scope = document) {
                 scope.querySelectorAll(fixedWidthFieldSelector).forEach((field) => {
-                    field.style.width = '100px';
-                    field.style.minWidth = '100px';
-                    field.style.maxWidth = '100px';
+                    // field.style.width = '100px';
+                    field.style.minWidth = '150px';
+                    // field.style.maxWidth = '100px';
                 });
             }
 
@@ -202,7 +202,6 @@
                 }
 
                 input.dataset.autoWidthBound = '1';
-                updateInputWidth(input);
                 input.addEventListener('input', () => updateInputWidth(input));
                 input.addEventListener('change', () => updateInputWidth(input));
             }
@@ -276,7 +275,6 @@
                     const firstRow = rows[0];
                     firstRow?.querySelectorAll('input').forEach((input) => {
                         input.value = '';
-                        updateInputWidth(input);
                     });
                     firstRow?.querySelectorAll('select').forEach((select) => {
                         select.value = '';
