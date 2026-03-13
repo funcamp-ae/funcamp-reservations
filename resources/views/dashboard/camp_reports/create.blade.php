@@ -1519,6 +1519,10 @@
                                         <div class="card-body">
                                                 <div class="row">
                                                         <div class="col-md-6 mb-3">
+                                                                <label class="form-label required">اسم الصنف</label>
+                                                                <input type="text" name="items[\${itemIndex}][item_name]" class="form-control" required>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
                                                                 <label class="form-label required">{{ __('dashboard.item_status') }}</label>
                                                                 <select name="items[\${itemIndex}][item_status]" class="form-select item-status-select" required>
                                                                         <option value="">{{ __('dashboard.select_item_status') }}</option>
@@ -1532,10 +1536,6 @@
                                                                                 <input type="text" name="items[\${itemIndex}][item_status_other]" class="form-control item-status-other-input">
                                                                         </div>
                                                                 </div>
-                                                        </div>
-                                                        <div class="col-md-6 mb-3">
-                                                                <label class="form-label required">اسم الصنف</label>
-                                                                <input type="text" name="items[\${itemIndex}][item_name]" class="form-control" required>
                                                         </div>
                                                         <div class="col-md-6 mb-3">
                                                                 <label class="form-label">{{ __('dashboard.damaged_count') }}</label>
