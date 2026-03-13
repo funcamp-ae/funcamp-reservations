@@ -24,8 +24,8 @@
                                 value="{{ old('report_date', isset($campReport) ? $campReport->report_date->format('Y-m-d') : '') }}">
                         </div>
 
-                        <div class="mb-6">
-                            <label class="form-label ">@lang('dashboard.service')</label>
+                        <div class="mb-6" id="service-field" style="display: none;">
+                            <label class="form-label">@lang('dashboard.service')</label>
                             <select name="service_id" class="form-select">
                                 <option value="">@lang('dashboard.select_service')</option>
                                 @foreach ($services as $service)
@@ -644,19 +644,26 @@
         document.addEventListener('DOMContentLoaded', function() {
             // ===== تحكم الحقول الشرطية بناءً على نوع التقرير =====
             const customReportTypeField = document.getElementById('custom-report-type-field');
+            const serviceField = document.getElementById('service-field');
             const reportTypeRadios = document.querySelectorAll('.report-type-radio');
 
             function updateConditionalFields() {
                 const selected = document.querySelector('.report-type-radio:checked')?.value;
                 if (selected === 'camp') {
                     customReportTypeField.style.display = 'none';
+                    serviceField.style.display = 'block';
                     // إزالة القيمة من الحقل المخفي
                     const customInput = document.querySelector('input[name="custom_report_type"]');
                     if (customInput) customInput.value = '';
                 } else if (selected === 'general') {
                     customReportTypeField.style.display = 'block';
+                    serviceField.style.display = 'none';
+                    // مسح الخدمة المختارة عند إخفاء الحقل
+                    const serviceSelect = document.querySelector('select[name="service_id"]');
+                    if (serviceSelect) serviceSelect.value = '';
                 } else {
                     customReportTypeField.style.display = 'none';
+                    serviceField.style.display = 'none';
                 }
             }
 
