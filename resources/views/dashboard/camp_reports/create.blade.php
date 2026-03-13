@@ -8,6 +8,7 @@
         </div>
 
         <div class="card-body">
+            @php($itemStatusOptions = \App\Helpers\CampReportHelper::itemStatuses())
             <form method="POST"
                 action="{{ isset($campReport) ? route('camp-reports.update', $campReport) : route('camp-reports.store') }}"
                 enctype="multipart/form-data">
@@ -40,14 +41,34 @@
 
                     <div class="col-md-6">
                         <div class="mb-6">
-                            <label class="form-label ">@lang('dashboard.camp_name')</label>
-                            <input type="text" name="camp_name" class="form-control"
-                                value="{{ old('camp_name', $campReport->camp_name ?? '') }}">
+                            <label class="form-label required">@lang('dashboard.report_type')</label>
+                            <div class="report-type-options">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input report-type-radio" type="radio" name="report_type" id="report_type_camp" value="camp"
+                                        {{ old('report_type', isset($campReport) ? $campReport->report_type : '') == 'camp' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="report_type_camp">@lang('dashboard.camp')</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input report-type-radio" type="radio" name="report_type" id="report_type_general" value="general"
+                                        {{ old('report_type', isset($campReport) ? $campReport->report_type : '') == 'general' ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="report_type_general">@lang('dashboard.general')</label>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-6">
-                            <label class="form-label">@lang('dashboard.general_notes')</label>
-                            <textarea name="general_notes" rows="1" class="form-control">{{ old('general_notes', $campReport->general_notes ?? '') }}</textarea>
+                            <label class="form-label">@lang('dashboard.additional_notes')</label>
+                            <textarea name="additional_notes" rows="1" class="form-control">{{ old('additional_notes', isset($campReport) ? $campReport->general_notes : '') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-5 mb-8" id="conditional-fields">
+                    <div class="col-md-6" id="custom-report-type-field" style="display: none;">
+                        <div class="mb-6">
+                            <label class="form-label">@lang('dashboard.custom_report_type')</label>
+                            <input type="text" name="custom_report_type" class="form-control"
+                                value="{{ old('custom_report_type', isset($campReport) ? $campReport->custom_report_type : '') }}">
                         </div>
                     </div>
                 </div>
@@ -60,6 +81,9 @@
                                 @php
                                     $isModel = is_object($item) && method_exists($item, 'getAttribute');
                                     $itemId = $isModel ? $item->id : $item['id'] ?? null;
+                                    $itemStatus = $isModel ? $item->item_status : $item['item_status'] ?? null;
+                                    $itemStatusOther = $isModel ? $item->item_status_other : $item['item_status_other'] ?? null;
+                                    $damagedCount = $isModel ? $item->damaged_count : $item['damaged_count'] ?? null;
 
                                     // ✅ استخدم الأعمدة والقيم الجديدة
                                     $photos = $isModel ? $item->media->where('type', 'photo')->values() : collect();
@@ -100,14 +124,41 @@
 
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label required">@lang('dashboard.item_name')</label>
+                                                <label class="form-label required">اسم الصنف</label>
                                                 <input type="text" name="items[{{ $index }}][item_name]"
                                                     class="form-control" required
                                                     value="{{ $isModel ? $item->item_name : $item['item_name'] ?? '' }}">
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label">@lang('dashboard.notes')</label>
+                                                <label class="form-label">ملاحظات إضافية</label>
                                                 <textarea name="items[{{ $index }}][notes]" rows="1" class="form-control">{{ $isModel ? $item->notes ?? '' : $item['notes'] ?? '' }}</textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label required">@lang('dashboard.item_status')</label>
+                                                <select name="items[{{ $index }}][item_status]" class="form-select item-status-select" required>
+                                                    <option value="">@lang('dashboard.select_item_status')</option>
+                                                    @foreach ($itemStatusOptions as $statusValue => $statusLabel)
+                                                        <option value="{{ $statusValue }}" {{ $itemStatus === $statusValue ? 'selected' : '' }}>
+                                                            {{ __($statusLabel) }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">@lang('dashboard.damaged_count')</label>
+                                                <input type="number" min="0" step="1" name="items[{{ $index }}][damaged_count]"
+                                                    class="form-control" value="{{ $damagedCount }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="row item-status-other-row {{ $itemStatus === 'other' ? '' : 'd-none' }}">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">@lang('dashboard.other_item_status_details')</label>
+                                                <input type="text" name="items[{{ $index }}][item_status_other]"
+                                                    class="form-control item-status-other-input" value="{{ $itemStatusOther }}">
                                             </div>
                                         </div>
 
@@ -592,6 +643,32 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // ===== تحكم الحقول الشرطية بناءً على نوع التقرير =====
+            const customReportTypeField = document.getElementById('custom-report-type-field');
+            const reportTypeRadios = document.querySelectorAll('.report-type-radio');
+
+            function updateConditionalFields() {
+                const selected = document.querySelector('.report-type-radio:checked')?.value;
+                if (selected === 'camp') {
+                    customReportTypeField.style.display = 'none';
+                    // إزالة القيمة من الحقل المخفي
+                    const customInput = document.querySelector('input[name="custom_report_type"]');
+                    if (customInput) customInput.value = '';
+                } else if (selected === 'general') {
+                    customReportTypeField.style.display = 'block';
+                } else {
+                    customReportTypeField.style.display = 'none';
+                }
+            }
+
+            // إضافة event listeners لـ radio buttons
+            reportTypeRadios.forEach(radio => {
+                radio.addEventListener('change', updateConditionalFields);
+            });
+
+            // تحديث الحقول عند تحميل الصفحة
+            updateConditionalFields();
+
             const CSRF       = '{{ csrf_token() }}';
             const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -630,6 +707,37 @@
             function createHidden(name, value) {
                 const i = document.createElement('input');
                 i.type = 'hidden'; i.name = name; i.value = value; return i;
+            }
+
+            function initItemStatusFields(scope = document) {
+                scope.querySelectorAll('.item-row').forEach((row) => {
+                    if (row.dataset.itemStatusInit === '1') {
+                        return;
+                    }
+
+                    const select = row.querySelector('.item-status-select');
+                    const otherRow = row.querySelector('.item-status-other-row');
+                    const otherInput = row.querySelector('.item-status-other-input');
+
+                    if (!select || !otherRow || !otherInput) {
+                        row.dataset.itemStatusInit = '1';
+                        return;
+                    }
+
+                    const toggleOtherField = () => {
+                        const isOther = select.value === 'other';
+                        otherRow.classList.toggle('d-none', !isOther);
+                        otherInput.required = isOther;
+
+                        if (!isOther) {
+                            otherInput.value = '';
+                        }
+                    };
+
+                    select.addEventListener('change', toggleOtherField);
+                    toggleOtherField();
+                    row.dataset.itemStatusInit = '1';
+                });
             }
 
             // ====== PHOTO PER BOX ======
@@ -1383,6 +1491,7 @@
             }
 
             // ====== INIT لكل العناصر الحالية ======
+            initItemStatusFields();
             document.querySelectorAll('.photo-box').forEach(initPhotoBox);
             document.querySelectorAll('.audio-box').forEach(initAudioBox);
             document.querySelectorAll('.video-box').forEach(initVideoBox);
@@ -1402,14 +1511,37 @@
   <div class="card-body">
     <div class="row">
       <div class="col-md-6 mb-3">
-        <label class="form-label required">{{ __('dashboard.item_name') }}</label>
+        <label class="form-label required">اسم الصنف</label>
         <input type="text" name="items[\${itemIndex}][item_name]" class="form-control" required>
       </div>
       <div class="col-md-6 mb-3">
-        <label class="form-label">{{ __('dashboard.notes') }}</label>
+                <label class="form-label">{{ __('dashboard.additional_notes') }}</label>
         <textarea name="items[\${itemIndex}][notes]" rows="1" class="form-control"></textarea>
       </div>
     </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label required">{{ __('dashboard.item_status') }}</label>
+                <select name="items[\${itemIndex}][item_status]" class="form-select item-status-select" required>
+                    <option value="">{{ __('dashboard.select_item_status') }}</option>
+                    @foreach ($itemStatusOptions as $statusValue => $statusLabel)
+                        <option value="{{ $statusValue }}">{{ __($statusLabel) }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ __('dashboard.damaged_count') }}</label>
+                <input type="number" min="0" step="1" name="items[\${itemIndex}][damaged_count]" class="form-control">
+            </div>
+        </div>
+
+        <div class="row item-status-other-row d-none">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ __('dashboard.other_item_status_details') }}</label>
+                <input type="text" name="items[\${itemIndex}][item_status_other]" class="form-control item-status-other-input">
+            </div>
+        </div>
 
     <div class="row g-4">
       <!-- PHOTOS -->
@@ -1486,6 +1618,7 @@
                 itemsContainer.insertAdjacentHTML('beforeend', tpl);
 
                 const newCard = itemsContainer.lastElementChild;
+                initItemStatusFields(newCard);
                 initPhotoBox(newCard.querySelector('.photo-box'));
                 initAudioBox(newCard.querySelector('.audio-box'));
                 initVideoBox(newCard.querySelector('.video-box'));

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Helpers\CampReportHelper;
 use App\Http\Controllers\Controller;
 use App\Models\CampReport;
 use App\Models\CampReportItem;
 use App\Models\Service;
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -33,6 +35,53 @@ class CampReportController extends Controller
         return view('dashboard.camp_reports.create', compact('services'));
     }
 
+    public function summary(Request $request)
+    {
+        $this->authorize('viewAny', CampReport::class);
+
+        $rows = $this->buildSummaryRows($request);
+        $reportSubtypes = CampReport::with('service')
+            ->get()
+            ->map(fn (CampReport $report) => $this->formatReportSubtype($report))
+            ->filter()
+            ->unique()
+            ->values();
+        $itemNames = CampReportItem::query()->select('item_name')->distinct()->orderBy('item_name')->pluck('item_name');
+
+        return view('dashboard.camp_reports.summary', [
+            'rows' => $rows,
+            'itemStatuses' => CampReportHelper::itemStatuses(),
+            'itemNames' => $itemNames,
+            'reportSubtypes' => $reportSubtypes,
+            'filters' => $request->only(['report_type', 'report_subtype', 'item_status', 'item_name']),
+        ]);
+    }
+
+    public function exportSummaryPdf(Request $request)
+    {
+        $this->authorize('viewAny', CampReport::class);
+
+        $rows = $this->buildSummaryRows($request, true);
+        $html = view('dashboard.camp_reports.summary_export', compact('rows'))->render();
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4-L',
+            'orientation' => 'L',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 14,
+            'margin_bottom' => 14,
+            'dir' => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
+            'default_font' => 'DejaVuSans',
+        ]);
+
+        $mpdf->showImageErrors = true;
+        $mpdf->WriteHTML($html);
+
+        return $mpdf->Output(__('dashboard.camp_reports_summary') . '-' . date('Y-m-d') . '.pdf', 'D');
+    }
+
     public function store(Request $request)
     {
         $this->authorize('create', CampReport::class);
@@ -41,13 +90,19 @@ class CampReportController extends Controller
 
         $validated = $request->validate([
             'report_date'            => ['required','date'],
+            'report_type'            => ['required', Rule::in(['camp', 'general'])],
             'service_id'             => ['nullable', Rule::exists('services','id')],
+            'custom_report_type'     => ['nullable','string','max:255'],
             'camp_name'              => ['nullable','string','max:255'],
+            'additional_notes'       => ['nullable','string'],
             'general_notes'          => ['nullable','string'],
 
             'items'                  => ['nullable','array','min:1'],
             'items.*.item_name'      => ['required','string','max:255'],
             'items.*.notes'          => ['nullable','string'],
+            'items.*.item_status'    => ['nullable','string', Rule::in(CampReportHelper::itemStatusKeys())],
+            'items.*.item_status_other' => ['nullable','string'],
+            'items.*.damaged_count'  => ['nullable','integer','min:0'],
 
             // صور
             'items.*.photos'         => ['nullable','array'],
@@ -73,19 +128,18 @@ class CampReportController extends Controller
 
         $report = CampReport::create([
             'report_date'   => $validated['report_date'],
+            'report_type'   => $validated['report_type'],
             'service_id'    => $validated['service_id'] ?? null,
+            'custom_report_type' => $validated['custom_report_type'] ?? null,
             'camp_name'     => $validated['camp_name'] ?? null,
-            'general_notes' => $validated['general_notes'] ?? null,
+            'general_notes' => $validated['additional_notes'] ?? $validated['general_notes'] ?? null,
             'created_by'    => auth()->id(),
         ]);
 
         if (!empty($validated['items'])) {
             foreach ($validated['items'] as $itemData) {
                 /** @var \App\Models\CampReportItem $item */
-                $item = $report->items()->create([
-                    'item_name' => $itemData['item_name'],
-                    'notes'     => $itemData['notes'] ?? null,
-                ]);
+                $item = $report->items()->create($this->prepareItemPayload($itemData));
 
                 $this->handleItemAttachments($item, $itemData);
             }
@@ -120,14 +174,20 @@ class CampReportController extends Controller
 
         $validated = $request->validate([
             'report_date'            => ['required','date'],
+            'report_type'            => ['required', Rule::in(['camp', 'general'])],
             'service_id'             => ['nullable', Rule::exists('services','id')],
+            'custom_report_type'     => ['nullable','string','max:255'],
             'camp_name'              => ['nullable','string','max:255'],
+            'additional_notes'       => ['nullable','string'],
             'general_notes'          => ['nullable','string'],
 
             'items'                  => ['nullable','array','min:1'],
             'items.*.id'             => ['nullable', Rule::exists('camp_report_items','id')->where('camp_report_id', $campReport->id)],
             'items.*.item_name'      => ['required','string','max:255'],
             'items.*.notes'          => ['nullable','string'],
+            'items.*.item_status'    => ['nullable','string', Rule::in(CampReportHelper::itemStatusKeys())],
+            'items.*.item_status_other' => ['nullable','string'],
+            'items.*.damaged_count'  => ['nullable','integer','min:0'],
 
             'items.*.photos'         => ['nullable','array'],
             'items.*.photos.*'       => ['file', $this->mimeOrExtRule($imgMimes, $imgExts)],
@@ -151,9 +211,11 @@ class CampReportController extends Controller
 
         $campReport->update([
             'report_date'   => $validated['report_date'],
+            'report_type'   => $validated['report_type'],
             'service_id'    => $validated['service_id'] ?? null,
+            'custom_report_type' => $validated['custom_report_type'] ?? null,
             'camp_name'     => $validated['camp_name'] ?? null,
-            'general_notes' => $validated['general_notes'] ?? null,
+            'general_notes' => $validated['additional_notes'] ?? $validated['general_notes'] ?? null,
         ]);
 
         // حذف العناصر المزالة
@@ -171,16 +233,10 @@ class CampReportController extends Controller
                 if (!empty($itemData['id'])) {
                     /** @var \App\Models\CampReportItem $item */
                     $item = $campReport->items()->findOrFail($itemData['id']);
-                    $item->update([
-                        'item_name' => $itemData['item_name'],
-                        'notes'     => $itemData['notes'] ?? null,
-                    ]);
+                    $item->update($this->prepareItemPayload($itemData));
                     $this->handleItemAttachments($item, $itemData);
                 } else {
-                    $item = $campReport->items()->create([
-                        'item_name' => $itemData['item_name'],
-                        'notes'     => $itemData['notes'] ?? null,
-                    ]);
+                    $item = $campReport->items()->create($this->prepareItemPayload($itemData));
                     $this->handleItemAttachments($item, $itemData);
                 }
             }
@@ -309,6 +365,104 @@ class CampReportController extends Controller
             } catch (\Throwable $e) {}
             $m->delete();
         }
+    }
+
+    protected function prepareItemPayload(array $itemData): array
+    {
+        $itemStatus = $itemData['item_status'] ?? null;
+
+        return [
+            'item_name' => $itemData['item_name'],
+            'notes' => $itemData['notes'] ?? null,
+            'item_status' => $itemStatus,
+            'item_status_other' => $itemStatus === 'other' ? ($itemData['item_status_other'] ?? null) : null,
+            'damaged_count' => $itemData['damaged_count'] ?? null,
+        ];
+    }
+
+
+    protected function buildSummaryRows(Request $request, bool $forExport = false)
+    {
+        $statusLabels = CampReportHelper::itemStatuses();
+        $items = CampReportItem::with(['report.service', 'media'])->latest()->get();
+
+        return $items
+            ->map(function (CampReportItem $item) use ($statusLabels, $forExport) {
+                $report = $item->report;
+                $photos = $item->media->where('type', 'photo')->values();
+
+                $photoUrls = $photos
+                    ->map(fn ($photo) => Storage::disk('hetzner')->url($photo->path))
+                    ->values()
+                    ->all();
+
+                $photoBase64 = [];
+                if ($forExport) {
+                    foreach ($photos as $photo) {
+                        try {
+                            if (Storage::disk('hetzner')->exists($photo->path)) {
+                                $photoBase64[] = 'data:image/jpeg;base64,' . base64_encode(Storage::disk('hetzner')->get($photo->path));
+                            }
+                        } catch (\Throwable $e) {
+                        }
+                    }
+                }
+
+                $itemStatus = $item->item_status;
+                $itemStatusLabel = $itemStatus && isset($statusLabels[$itemStatus]) ? __($statusLabels[$itemStatus]) : '-';
+
+                if ($itemStatus === 'other' && $item->item_status_other) {
+                    $itemStatusLabel = $itemStatusLabel . ' - ' . $item->item_status_other;
+                }
+
+                return (object) [
+                    'id' => $item->id,
+                    'report_id' => $report?->id,
+                    'report_type' => $report?->report_type,
+                    'report_type_label' => $report?->report_type ? __('dashboard.' . $report->report_type) : '-',
+                    'report_subtype' => $report ? $this->formatReportSubtype($report) : '-',
+                    'item_name' => $item->item_name,
+                    'item_status' => $itemStatus,
+                    'item_status_label' => $itemStatusLabel,
+                    'damaged_count' => $item->damaged_count,
+                    'notes' => $item->notes,
+                    'photo_urls' => $photoUrls,
+                    'photo_base64' => $photoBase64,
+                ];
+            })
+            ->filter(function ($row) use ($request) {
+                if ($request->filled('report_type') && $row->report_type !== $request->string('report_type')->toString()) {
+                    return false;
+                }
+
+                if ($request->filled('report_subtype') && $row->report_subtype !== $request->string('report_subtype')->toString()) {
+                    return false;
+                }
+
+                if ($request->filled('item_status') && $row->item_status !== $request->string('item_status')->toString()) {
+                    return false;
+                }
+
+                if ($request->filled('item_name') && ! str_contains(mb_strtolower($row->item_name), mb_strtolower($request->string('item_name')->toString()))) {
+                    return false;
+                }
+
+                return true;
+            })
+            ->values();
+    }
+
+    protected function formatReportSubtype(CampReport $report): ?string
+    {
+        if ($report->report_type === 'camp') {
+            return $report->service->name;
+        }
+
+        if ($report->report_type === 'general') {
+            return $report->custom_report_type;
+        }
+
+        return $report->service->name ?? $report->custom_report_type;
     }
 
     public function exportPdf()

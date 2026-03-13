@@ -214,6 +214,7 @@ class NewPermissionsSeeder extends Seeder
             ['name' => 'camp-reports.edit', 'nickname_ar' => 'تعديل تقرير حالة المخيم', 'nickname_en' => 'Edit Camp Status Report', 'group' => 'camp-reports'],
             ['name' => 'camp-reports.update', 'nickname_ar' => 'تحديث تقرير حالة المخيم', 'nickname_en' => 'Update Camp Status Report', 'group' => 'camp-reports'],
             ['name' => 'camp-reports.destroy', 'nickname_ar' => 'حذف تقرير حالة المخيم', 'nickname_en' => 'Delete Camp Status Report', 'group' => 'camp-reports'],
+            ['name' => 'camp-reports.summary', 'nickname_ar' => 'عرض ملخص تقارير حالة المخيمات', 'nickname_en' => 'View Camps Status Reports Summary', 'group' => 'camp-reports'],
             ['name' => 'camp-reports.deleteAll', 'nickname_ar' => 'حذف جميع تقارير حالة المخيمات', 'nickname_en' => 'Delete All Camp Status Reports', 'group' => 'camp-reports'],
 
             // Terms Settings Module (New)

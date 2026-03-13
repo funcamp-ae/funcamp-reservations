@@ -2214,13 +2214,13 @@
 
     <!--begin::Menu item-->
 
-    <div class="menu-item menu-sub-indention menu-accordion {{areActiveRoutes(['camp-reports.index', 'camp-reports.create', 'camp-reports.edit', 'camp-reports.show'])}}"
+    <div class="menu-item menu-sub-indention menu-accordion {{areActiveRoutes(['camp-reports.index', 'camp-reports.create', 'camp-reports.edit', 'camp-reports.show', 'camp-reports.summary'])}}"
 
         data-kt-menu-trigger="click">
 
         <!--begin::Menu link-->
 
-        <a href="#" class="menu-link py-3 {{areActiveRoutes(['camp-reports.index', 'camp-reports.create', 'camp-reports.edit', 'camp-reports.show'])}}">
+        <a href="#" class="menu-link py-3 {{areActiveRoutes(['camp-reports.index', 'camp-reports.create', 'camp-reports.edit', 'camp-reports.show', 'camp-reports.summary'])}}">
 
             <span class="menu-icon">
 
@@ -2259,6 +2259,26 @@
                 </a>
 
             </div>
+
+            <!--end::Menu item-->
+
+            @can('camp-reports.summary')
+            <div class="menu-item">
+
+                <a href="{{ route('camp-reports.summary') }}" class="menu-link py-3 {{ isActiveRoute('camp-reports.summary') }}">
+
+                    <span class="menu-bullet">
+
+                        <span class="bullet bullet-dot"></span>
+
+                    </span>
+
+                    <span class="menu-title">@lang('dashboard.camp_reports_summary')</span>
+
+                </a>
+
+            </div>
+            @endcan
 
             <!--end::Menu item-->
 

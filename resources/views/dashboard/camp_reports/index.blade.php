@@ -11,6 +11,9 @@
                 </div>
             </div>
             <div class="card-toolbar">
+                <a href="{{ route('camp-reports.summary') }}" class="btn btn-light-primary me-2">
+                    <i class="bi bi-bar-chart-line"></i> @lang('dashboard.camp_reports_summary')
+                </a>
                 @can('camp-reports.export')
                     <a href="{{ route('camp-reports.export') }}" class="btn btn-success me-2">
                         <i class="bi bi-file-earmark-pdf"></i> @lang('dashboard.export_pdf')

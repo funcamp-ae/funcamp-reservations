@@ -12,6 +12,13 @@ class CampReportItem extends Model
         'camp_report_id',
         'item_name',
         'notes',
+        'item_status',
+        'item_status_other',
+        'damaged_count',
+    ];
+
+    protected $casts = [
+        'damaged_count' => 'integer',
     ];
 
     public function report(): BelongsTo

@@ -2075,6 +2075,10 @@ Route::get('equipment-directories/{equipmentDirectory}/items/export', [Equipment
 Route::resource('camp-reports', 'Dashboard\CampReportController')
     ->except(['show'])
     ->middleware(['auth', 'permission:camp-reports.index|camp-reports.create|camp-reports.edit|camp-reports.destroy']);
+Route::get('camp-reports/summary', [CampReportController::class, 'summary'])
+    ->name('camp-reports.summary')->middleware(['auth', 'permission:camp-reports.summary']);
+Route::get('camp-reports/summary/export/pdf', [CampReportController::class, 'exportSummaryPdf'])
+    ->name('camp-reports.summary.export')->middleware(['auth', 'permission:camp-reports.summary']);
 Route::get('camp-reports/{campReport}', 'Dashboard\CampReportController@show')
     ->name('camp-reports.show')->middleware(['auth']);
 Route::get('camp-reports/export/pdf', [CampReportController::class, 'exportPdf'])->name('camp-reports.export');

@@ -15,6 +15,8 @@ class CampReport extends Model
         'report_date',
         'service_id',
         'camp_name',
+        'report_type',
+        'custom_report_type',
         'created_by',
         'general_notes'
     ];
