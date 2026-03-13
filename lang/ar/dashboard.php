@@ -1094,6 +1094,7 @@ return [
     'sales_status_partial' => 'موجود جزئياً',
     'add_row' => 'إضافة صف',
     'report_subtype' => 'نوع المخيم / التقرير',
+    'general_notes' => 'ملاحظات عامة',
     'photos' => 'الصور',
     'filter' => 'تصفية',
     'reset' => 'إعادة تعيين',

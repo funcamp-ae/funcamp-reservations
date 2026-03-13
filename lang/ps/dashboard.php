@@ -1069,6 +1069,7 @@ return [
     'sales_status_partial' => 'نیمګړی شته',
     'add_row' => 'قطار اضافه کړئ',
     'report_subtype' => 'د کمپ / راپور ډول',
+    'general_notes' => 'عمومي یادښتونه',
     'photos' => 'انځورونه',
     'filter' => 'فلټر',
     'reset' => 'بیا تنظیم',

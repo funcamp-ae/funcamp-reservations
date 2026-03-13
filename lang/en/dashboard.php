@@ -1064,6 +1064,7 @@ return [
     'sales_status_partial' => 'Partially available',
     'add_row' => 'Add row',
     'report_subtype' => 'Camp / Report Type',
+    'general_notes' => 'General Notes',
     'photos' => 'Photos',
     'filter' => 'Filter',
     'reset' => 'Reset',
