@@ -91,6 +91,8 @@
             --bs-header-bg: #ffffff;
             --bs-toolbar-bg: #f9f9f9;
             --bs-box-shadow: 0 0 20px 0 rgba(76, 87, 125, 0.1);
+			--bs-button-bg: #ffffff;
+			color-scheme: light;
         }
 	@else
   :root {
@@ -107,6 +109,7 @@
             --bs-table-color: #e1e1f0;
             --bs-header-bg: #2b2b40;
             --bs-toolbar-bg: #323248;
+			--bs-button-bg: #918d8da6;
             --bs-box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.4);
             --bs-primary: #3699ff;
             --bs-secondary: #6c757d;

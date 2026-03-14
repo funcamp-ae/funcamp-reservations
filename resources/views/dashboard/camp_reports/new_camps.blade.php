@@ -113,17 +113,23 @@
                             <span class="text-muted">{{ optional($createdPlan->created_at)->format('Y-m-d H:i') }}</span>
                         </div>
                         <div class="d-flex gap-2">
-                            <a href="{{ route('camp-reports.new-camps', ['copy_plan' => $createdPlan->id]) }}#new-camps-form" class="btn btn-sm btn-secondary">
-                                @lang('dashboard.duplicate')
-                            </a>
-                            <a href="{{ route('camp-reports.new-camps', ['edit_plan' => $createdPlan->id]) }}#new-camps-form" class="btn btn-sm btn-light-primary">
-                                @lang('dashboard.edit')
-                            </a>
-                            <form method="POST" action="{{ route('camp-reports.new-camps.destroy', $createdPlan) }}" class="m-0 js-delete-camp-plan-form">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-light-danger">@lang('dashboard.delete')</button>
-                            </form>
+                            @can('new_camp.duplicate')
+                                <a href="{{ route('camp-reports.new-camps', ['copy_plan' => $createdPlan->id]) }}#new-camps-form" class="btn btn-sm btn-secondary">
+                                    @lang('dashboard.duplicate')
+                                </a>
+                            @endcan
+                            @can('new_camp.edit')
+                                <a href="{{ route('camp-reports.new-camps', ['edit_plan' => $createdPlan->id]) }}#new-camps-form" class="btn btn-sm btn-light-primary">
+                                    @lang('dashboard.edit')
+                                </a>
+                            @endcan
+                            @can('new_camp.destroy')
+                                <form method="POST" action="{{ route('camp-reports.new-camps.destroy', $createdPlan) }}" class="m-0 js-delete-camp-plan-form">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-light-danger">@lang('dashboard.delete')</button>
+                                </form>
+                            @endcan
                         </div>
                     </div>
 
@@ -294,6 +300,8 @@
                         text: window.deleteTranslations.delete_warning_message,
                         icon: 'warning',
                         showCancelButton: true,
+                        confirmButtonColor: '#8B5A2B',
+                        cancelButtonColor: 'var(--bs-button-bg)',
                         confirmButtonText: window.deleteTranslations.yes_delete,
                         cancelButtonText: window.deleteTranslations.cancel,
                         reverseButtons: true,
