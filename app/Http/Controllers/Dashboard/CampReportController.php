@@ -255,6 +255,8 @@ class CampReportController extends Controller
     public function exportSummaryPdf(Request $request)
     {
         $rows = $this->buildSummaryRows($request, true);
+        $html = view('dashboard.camp_reports.summary_export', compact('rows'))->render();
+
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             'format' => 'A4-L',
@@ -269,17 +271,13 @@ class CampReportController extends Controller
 
         $mpdf->shrink_tables_to_fit = 1;
         $mpdf->showImageErrors = true;
-        // Chunk by rows instead of splitting raw HTML by a marker string.
-        $rowChunks = $rows->isNotEmpty() ? $rows->chunk(60) : collect([collect()]);
-        $lastChunkIndex = $rowChunks->count() - 1;
-        
-        foreach ($rowChunks as $index => $rowChunk) {
-            $html = view('dashboard.camp_reports.summary_export', ['rows' => $rowChunk])->render();
-            $mpdf->WriteHTML($html);
-
-            if ($index < $lastChunkIndex) {
-                $mpdf->AddPage();
+        $chunks = explode('<!--PDF_CHUNK_SPLIT-->', $html);
+        foreach ($chunks as $chunk) {
+            if (trim($chunk) === '') {
+                continue;
             }
+
+            $mpdf->WriteHTML($chunk);
         }
 
         return $mpdf->Output(__('dashboard.camp_reports_summary') . '-' . date('Y-m-d') . '.pdf', 'D');

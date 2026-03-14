@@ -48,8 +48,10 @@
                                 <a href="{{ $photoLink }}" target="_blank">
                                     <img src="{{ $photo }}" alt="photo" class="photo-thumb">
                                 </a>
+                                <!--PDF_CHUNK_SPLIT-->
                             @else
                                 <img src="{{ $photo }}" alt="photo" class="photo-thumb">
+                                <!--PDF_CHUNK_SPLIT-->
                             @endif
                         @endforeach
                     </td>
