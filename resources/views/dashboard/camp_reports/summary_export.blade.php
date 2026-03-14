@@ -48,7 +48,6 @@
                                 <a href="{{ $photoLink }}" target="_blank">
                                     <img src="{{ $photo }}" alt="photo" class="photo-thumb">
                                 </a>
-                                chunk
                             @else
                                 <img src="{{ $photo }}" alt="photo" class="photo-thumb">
                             @endif
