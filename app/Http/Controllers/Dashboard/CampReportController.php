@@ -272,6 +272,7 @@ class CampReportController extends Controller
         $mpdf->shrink_tables_to_fit = 1;
         $mpdf->showImageErrors = true;
         $chunks = explode("chunk", $html);
+        dd($chunks);
         foreach ($chunks as $chunk) {
             $mpdf->WriteHTML($chunk);
         }
