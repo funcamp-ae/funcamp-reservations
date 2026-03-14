@@ -207,6 +207,46 @@
                     <div class="card-title">
                         <h3 class="fw-bolder">{{ __('dashboard.recent_expenses') }}</h3>
                     </div>
+                    <div class="card-toolbar">
+                        <form method="GET" action="{{ route('expenses.create') }}" class="d-flex flex-wrap align-items-end gap-3">
+                            @if(request()->has('expenseItem'))
+                                <input type="hidden" name="expenseItem" value="{{ request()->get('expenseItem') }}">
+                            @endif
+
+                            <div>
+                                <label for="from_date" class="form-label mb-1">From Date</label>
+                                <input
+                                    type="date"
+                                    id="from_date"
+                                    name="from_date"
+                                    class="form-control"
+                                    value="{{ $fromDateInput ?? request('from_date') }}"
+                                >
+                                @error('from_date')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label for="to_date" class="form-label mb-1">To Date</label>
+                                <input
+                                    type="date"
+                                    id="to_date"
+                                    name="to_date"
+                                    class="form-control"
+                                    value="{{ $toDateInput ?? request('to_date') }}"
+                                >
+                                @error('to_date')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                                <a href="{{ route('expenses.create', request()->has('expenseItem') ? ['expenseItem' => request()->get('expenseItem')] : []) }}" class="btn btn-sm btn-light">Reset</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <!--begin::Table-->

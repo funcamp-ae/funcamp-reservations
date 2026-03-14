@@ -106,22 +106,54 @@ class ExpensesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         $this->authorize('create', Expense::class);
 
         $expenseItems = ExpenseItem::orderBy('ordered_count', 'desc')->get();
         $bankAccounts = BankAccount::all();
 
-        // Get recent expenses (last 10 expenses)
-        $recentExpenses = Expense::with(['expenseItem', 'account'])
+        $fromDateInput = $request->input('from_date');
+        $toDateInput = $request->input('to_date');
+
+        if ($fromDateInput && !$this->isValidDate($fromDateInput)) {
+            return redirect()->back()->withErrors(['from_date' => 'تاريخ من غير صحيح.']);
+        }
+
+        if ($toDateInput && !$this->isValidDate($toDateInput)) {
+            return redirect()->back()->withErrors(['to_date' => 'تاريخ إلى غير صحيح.']);
+        }
+
+        $fromDate = $fromDateInput ? Carbon::parse($fromDateInput)->startOfDay() : null;
+        $toDate = $toDateInput ? Carbon::parse($toDateInput)->endOfDay() : null;
+
+        if ($fromDate && $toDate && $fromDate->gt($toDate)) {
+            [$fromDate, $toDate] = [$toDate->copy()->startOfDay(), $fromDate->copy()->endOfDay()];
+            [$fromDateInput, $toDateInput] = [$toDateInput, $fromDateInput];
+        }
+
+        $recentExpensesQuery = Expense::with(['expenseItem', 'account'])
             ->whereHas('transaction', function($q) {
                 $q->where('source', 'general_expenses');
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(100);
+            });
 
-        return view('dashboard.expenses.create', compact('expenseItems', 'bankAccounts', 'recentExpenses'));
+        if ($fromDate && $toDate) {
+            $recentExpensesQuery->whereBetween('created_at', [$fromDate, $toDate]);
+        } elseif ($fromDate) {
+            $recentExpensesQuery->where('created_at', '>=', $fromDate);
+        } elseif ($toDate) {
+            $recentExpensesQuery->where('created_at', '<=', $toDate);
+        }
+
+        $recentExpenses = $recentExpensesQuery
+            ->orderBy('created_at', 'desc')
+            ->paginate(100)
+            ->appends([
+                'from_date' => $fromDateInput,
+                'to_date' => $toDateInput,
+            ]);
+
+        return view('dashboard.expenses.create', compact('expenseItems', 'bankAccounts', 'recentExpenses', 'fromDateInput', 'toDateInput'));
     }
 
     /**
