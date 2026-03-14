@@ -68,7 +68,7 @@
                                     <input type="number" min="0" step="1" class="form-control" name="items[{{ $i }}][requested_qty]" data-field="requested_qty" value="{{ $row['requested_qty'] ?? '' }}"  required>
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control" name="items[{{ $i }}][notes]" data-field="notes" value="{{ $row['notes'] ?? '' }}" required>
+                                    <input type="text" class="form-control" name="items[{{ $i }}][notes]" data-field="notes" value="{{ $row['notes'] ?? '' }}">
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-sm btn-light-danger js-remove-row" title="@lang('dashboard.delete')">
@@ -255,7 +255,7 @@
                         </select>
                     </td>
                     <td><input type="number" min="0" step="1" class="form-control" name="items[${i}][requested_qty]" data-field="requested_qty" required></td>
-                    <td><input type="text" class="form-control" name="items[${i}][notes]" data-field="notes" required></td>
+                    <td><input type="text" class="form-control" name="items[${i}][notes]" data-field="notes"></td>
                     <td>
                         <button type="button" class="btn btn-sm btn-light-danger js-remove-row" title="{{ __('dashboard.delete') }}">
                             <i class="bi bi-trash"></i>
