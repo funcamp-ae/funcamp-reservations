@@ -152,7 +152,6 @@
                                                 <textarea name="items[{{ $index }}][notes]" rows="1" class="form-control">{{ $isModel ? $item->notes ?? '' : $item['notes'] ?? '' }}</textarea>
                                             </div>
                                         </div>
-                                        </div>
 
 
                                         <div class="row g-4">
