@@ -254,6 +254,8 @@ class CampReportController extends Controller
 
     public function exportSummaryPdf(Request $request)
     {
+        ini_set('max_execution_time', '300');
+        ini_set('pcre.backtrack_limit', '5000000');
         $rows = $this->buildSummaryRows($request, true);
         $html = view('dashboard.camp_reports.summary_export', compact('rows'))->render();
 
