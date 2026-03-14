@@ -37,10 +37,10 @@
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $row->report_type_label }}</td>
                     <td>{{ $row->report_subtype ?: '-' }}</td>
-                    <td>{{ $row->itemName }}</td>
+                    <td>{{ $row->item_name }}</td>
                     <td>{{ $row->item_status_label }}</td>
                     <td class="photos">
-                        @forelse(array_slice($row->photo_base64, 0, 3) as $photoIndex => $photo)
+                        @foreach($row->photo_base64 as $photoIndex => $photo)
                             @php
                                 $photoLink = $row->photo_urls[$photoIndex] ?? null;
                             @endphp
@@ -48,12 +48,11 @@
                                 <a href="{{ $photoLink }}" target="_blank">
                                     <img src="{{ $photo }}" alt="photo" class="photo-thumb">
                                 </a>
+                                chunk
                             @else
                                 <img src="{{ $photo }}" alt="photo" class="photo-thumb">
                             @endif
-                        @empty
-                            -
-                        @endforelse
+                        @endforeach
                     </td>
                     <td>{{ $row->damaged_count ?? '-' }}</td>
                     <td class="notes">{{ $row->notes ?: '-' }}</td>

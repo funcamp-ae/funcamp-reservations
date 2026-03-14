@@ -271,8 +271,10 @@ class CampReportController extends Controller
 
         $mpdf->shrink_tables_to_fit = 1;
         $mpdf->showImageErrors = true;
-        $mpdf->WriteHTML($html);
-
+        $chunks = explode("chunk", $html);
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         return $mpdf->Output(__('dashboard.camp_reports_summary') . '-' . date('Y-m-d') . '.pdf', 'D');
     }
 
