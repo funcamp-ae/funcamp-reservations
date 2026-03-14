@@ -578,44 +578,7 @@ class CampReportController extends Controller
     protected function buildSummaryRows(Request $request, bool $forExport = false)
     {
         $statusLabels = CampReportHelper::itemStatuses();
-        $itemsQuery = CampReportItem::with(['report.service', 'media'])->latest();
-
-        if ($request->filled('item_status')) {
-            $itemsQuery->where('item_status', $request->string('item_status')->toString());
-        }
-
-        if ($request->filled('item_name')) {
-            $itemName = trim($request->string('item_name')->toString());
-            $itemsQuery->where('item_name', 'like', '%' . $itemName . '%');
-        }
-
-        if ($request->filled('report_type')) {
-            $reportType = $request->string('report_type')->toString();
-            $itemsQuery->whereHas('report', function ($query) use ($reportType) {
-                $query->where('report_type', $reportType);
-            });
-        }
-
-        if ($request->filled('report_subtype')) {
-            $reportSubtype = $request->string('report_subtype')->toString();
-            $itemsQuery->whereHas('report', function ($query) use ($reportSubtype) {
-                $query->where(function ($subQuery) use ($reportSubtype) {
-                    $subQuery
-                        ->where(function ($campQuery) use ($reportSubtype) {
-                            $campQuery->where('report_type', 'camp')
-                                ->whereHas('service', function ($serviceQuery) use ($reportSubtype) {
-                                    $serviceQuery->where('name', $reportSubtype);
-                                });
-                        })
-                        ->orWhere(function ($generalQuery) use ($reportSubtype) {
-                            $generalQuery->where('report_type', 'general')
-                                ->where('custom_report_type', $reportSubtype);
-                        });
-                });
-            });
-        }
-
-        $items = $itemsQuery->get();
+        $items = CampReportItem::with(['report.service', 'media'])->latest()->get();
 
         return $items
             ->map(function (CampReportItem $item) use ($statusLabels, $forExport) {
@@ -629,9 +592,11 @@ class CampReportController extends Controller
 
                 $photoBase64 = [];
                 if ($forExport) {
-                    foreach ($photos->take(3) as $photo) {
+                    foreach ($photos as $photo) {
                         try {
-                            $photoBase64[] = 'data:image/jpeg;base64,' . base64_encode(Storage::disk('hetzner')->get($photo->path));
+                            if (Storage::disk('hetzner')->exists($photo->path)) {
+                                $photoBase64[] = 'data:image/jpeg;base64,' . base64_encode(Storage::disk('hetzner')->get($photo->path));
+                            }
                         } catch (\Throwable $e) {
                         }
                     }
@@ -658,6 +623,25 @@ class CampReportController extends Controller
                     'photo_urls' => $photoUrls,
                     'photo_base64' => $photoBase64,
                 ];
+            })
+            ->filter(function ($row) use ($request) {
+                if ($request->filled('report_type') && $row->report_type !== $request->string('report_type')->toString()) {
+                    return false;
+                }
+
+                if ($request->filled('report_subtype') && $row->report_subtype !== $request->string('report_subtype')->toString()) {
+                    return false;
+                }
+
+                if ($request->filled('item_status') && $row->item_status !== $request->string('item_status')->toString()) {
+                    return false;
+                }
+
+                if ($request->filled('item_name') && ! str_contains(mb_strtolower($row->item_name), mb_strtolower($request->string('item_name')->toString()))) {
+                    return false;
+                }
+
+                return true;
             })
             ->values();
     }
