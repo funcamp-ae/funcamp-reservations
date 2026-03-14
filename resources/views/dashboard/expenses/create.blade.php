@@ -214,7 +214,7 @@
                             @endif
 
                             <div>
-                                <label for="from_date" class="form-label mb-1">From Date</label>
+                                <label for="from_date" class="form-label mb-1">{{ __('dashboard.date_from') }}</label>
                                 <input
                                     type="date"
                                     id="from_date"
@@ -228,7 +228,7 @@
                             </div>
 
                             <div>
-                                <label for="to_date" class="form-label mb-1">To Date</label>
+                                <label for="to_date" class="form-label mb-1">{{ __('dashboard.date_to') }}</label>
                                 <input
                                     type="date"
                                     id="to_date"
@@ -242,8 +242,8 @@
                             </div>
 
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-sm btn-primary">Filter</button>
-                                <a href="{{ route('expenses.create', request()->has('expenseItem') ? ['expenseItem' => request()->get('expenseItem')] : []) }}" class="btn btn-sm btn-light">Reset</a>
+                                <button type="submit" class="btn btn-sm btn-primary">{{ __('dashboard.filter') }}</button>
+                                <a href="{{ route('expenses.create', request()->has('expenseItem') ? ['expenseItem' => request()->get('expenseItem')] : []) }}" class="btn btn-sm btn-light">{{ __('dashboard.reset') }}</a>
                             </div>
                         </form>
                     </div>
