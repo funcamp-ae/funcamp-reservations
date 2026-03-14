@@ -269,7 +269,6 @@ class CampReportController extends Controller
 
         $mpdf->shrink_tables_to_fit = 1;
         $mpdf->showImageErrors = true;
-        dd($rows);
         // Chunk by rows instead of splitting raw HTML by a marker string.
         $rowChunks = $rows->isNotEmpty() ? $rows->chunk(60) : collect([collect()]);
         $lastChunkIndex = $rowChunks->count() - 1;
