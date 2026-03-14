@@ -68,13 +68,18 @@ class CampReportController extends Controller
             ->latest()
             ->get();
         $editingPlan = null;
+        $isCopyMode = false;
         $editPlanId = $request->integer('edit_plan') ?? null;
+        $copyPlanId = $request->integer('copy_plan') ?? null;
 
-        if ($editPlanId > 0) {
+        if ($copyPlanId > 0) {
+            $editingPlan = NewCampPlan::query()->find($copyPlanId) ?? null;
+            $isCopyMode = $editingPlan !== null;
+        } elseif ($editPlanId > 0) {
             $editingPlan = NewCampPlan::query()->find($editPlanId) ?? null;
         }
 
-        return view('dashboard.camp_reports.new_camps', compact('plans', 'editingPlan'));
+        return view('dashboard.camp_reports.new_camps', compact('plans', 'editingPlan', 'isCopyMode'));
     }
 
     public function storeUpcomingcamping(Request $request)

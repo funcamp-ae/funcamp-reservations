@@ -13,7 +13,7 @@
         <div class="card-body pt-0">
             <form method="POST" action="{{ route('camp-reports.new-camps.store') }}" class="mb-0" id="new-camps-form">
                 @csrf
-                <input type="hidden" name="editing_plan_id" value="{{ old('editing_plan_id', $editingPlan->id ?? '') }}">
+                <input type="hidden" name="editing_plan_id" value="{{ old('editing_plan_id', ($isCopyMode ?? false) ? '' : ($editingPlan->id ?? '')) }}">
 
                 
                 <div class="row g-4 mb-4">
@@ -113,6 +113,9 @@
                             <span class="text-muted">{{ optional($createdPlan->created_at)->format('Y-m-d H:i') }}</span>
                         </div>
                         <div class="d-flex gap-2">
+                            <a href="{{ route('camp-reports.new-camps', ['copy_plan' => $createdPlan->id]) }}#new-camps-form" class="btn btn-sm btn-secondary">
+                                @lang('dashboard.duplicate')
+                            </a>
                             <a href="{{ route('camp-reports.new-camps', ['edit_plan' => $createdPlan->id]) }}#new-camps-form" class="btn btn-sm btn-light-primary">
                                 @lang('dashboard.edit')
                             </a>
