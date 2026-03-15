@@ -35,7 +35,18 @@ class ShowRedisFailedJobs extends Command
             return 1;
         }
 
-        $rawEntries = Redis::connection('default')->lrange('queue:failed_jobs', 0, $limit - 1);
+        if (config('database.redis.client') === 'phpredis' && ! class_exists(\Redis::class)) {
+            $this->warn('Redis extension is not installed. Use `php artisan queue:failed` to view failed jobs from database.');
+            return 0;
+        }
+
+        try {
+            $rawEntries = Redis::connection('default')->lrange('queue:failed_jobs', 0, $limit - 1);
+        } catch (\Throwable $e) {
+            $this->warn('Redis is unavailable: ' . $e->getMessage());
+            $this->line('Use `php artisan queue:failed` to view failed jobs from database.');
+            return 0;
+        }
 
         if (empty($rawEntries)) {
             $this->info('No failed jobs found in Redis key queue:failed_jobs.');

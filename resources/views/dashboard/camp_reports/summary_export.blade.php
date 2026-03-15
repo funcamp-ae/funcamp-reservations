@@ -60,19 +60,11 @@
                     <td>{{ $row->item_name }}</td>
                     <td>{{ $row->item_status_label }}</td>
                     <td class="photos">
-                        @foreach($row->photo_base64 as $photoIndex => $photo)
-                            @php
-                                $photoLink = $row->photo_urls[$photoIndex] ?? null;
-                            @endphp
-                            @if($photoLink)
+                        @foreach($row->photo_urls as $photoIndex => $photoLink)
                                 <a href="{{ $photoLink }}" target="_blank">
-                                    <img src="{{ $photo }}" alt="photo" class="photo-thumb">
+                                    <img src="{{ $photoLink }}" alt="photo" class="photo-thumb">
                                 </a>
                                 <!--PDF_CHUNK_SPLIT-->
-                            @else
-                                <img src="{{ $photo }}" alt="photo" class="photo-thumb">
-                                <!--PDF_CHUNK_SPLIT-->
-                            @endif
                         @endforeach
                     </td>
                     <td>{{ $row->damaged_count ?? '-' }}</td>

@@ -18,9 +18,6 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        \Illuminate\Queue\Events\JobFailed::class => [
-            \App\Listeners\StoreFailedQueueJobInRedis::class,
-        ],
         \App\Events\VerificationStatusChanged::class => [
             \App\Listeners\ApplyVerificationBankAdjustment::class,
         ],

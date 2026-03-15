@@ -57,47 +57,8 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
             $encodedPhotosCount = 0;
             $photoCounter = 0;
 
-            $rows = $this->buildSummaryRows($export)
-                ->map(function ($row) use (&$encodedPhotosCount, &$photoCounter) {
-                    if (!empty($row->photo_base64)) {
-                        return $row;
-                    }
-
-                    $row->photo_base64 = [];
-                    $photoPaths = (array) ($row->photo_paths ?? []);
-
-                    foreach ($photoPaths as $path) {
-                        $photoCounter++;
-
-                        // Keep the queue DB connection alive in long-running exports.
-                        if ($photoCounter % 20 === 0) {
-                            $this->keepDatabaseConnectionAlive();
-                        }
-
-                        try {
-                            if (!Storage::disk('hetzner')->exists($path)) {
-                                continue;
-                            }
-                            Storage::disk('hetzner')->setVisibility($path, 'public');
-                            $mime = Storage::disk('hetzner')->mimeType($path) ?: 'image/jpeg';
-                            $row->photo_base64[] = 'data:' . $mime . ';base64,' . base64_encode(Storage::disk('hetzner')->get($path));
-                            $encodedPhotosCount++;
-                        } catch (\Throwable $e) {
-                            Log::warning('Failed to encode export photo.', [
-                                'export_id' => $this->exportId,
-                                'path' => $path,
-                                'error' => $e->getMessage(),
-                            ]);
-                        }
-                    }
-
-                    return $row;
-                })
-                ->map(fn ($row) => (array) $row)
-                ->values()
-                ->all();
+            $rows = $this->buildSummaryRows($export);
             $exportUser = User::query()->find($export->user_id);
-
             $html = view('dashboard.camp_reports.summary_export', [
                 'rows' => collect($rows)->map(fn ($row) => (object) $row),
                 'generatedAt' => now()->format('Y-m-d H:i:s'),
