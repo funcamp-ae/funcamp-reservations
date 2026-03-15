@@ -258,6 +258,7 @@ class CampReportController extends Controller
         ini_set('max_execution_time', '300');
         ini_set('pcre.backtrack_limit', '5000000');
         $rows = $this->resolveSummaryRowsForExport($request);
+        $rows = $this->hydrateSummaryPhotoBase64($rows);
         $html = view('dashboard.camp_reports.summary_export', compact('rows'))->render();
 
         $mpdf = new Mpdf([
@@ -288,7 +289,8 @@ class CampReportController extends Controller
 
     public function prepareSummaryExport(Request $request)
     {
-        $rows = $this->buildSummaryRows($request, true)->toArray();
+        ini_set('max_execution_time', '300');
+        $rows = $this->buildSummaryRows($request, false)->toArray();
         $export = CampReportSummaryExport::query()->create([
             'user_id' => auth()->id(),
             'token' => (string) Str::uuid(),
@@ -322,6 +324,36 @@ class CampReportController extends Controller
         }
 
         return $this->buildSummaryRows($request, true);
+    }
+
+    protected function hydrateSummaryPhotoBase64($rows)
+    {
+        return collect($rows)
+            ->map(function ($row) {
+                $row = (object) $row;
+
+                if (!empty($row->photo_base64)) {
+                    return $row;
+                }
+
+                $row->photo_base64 = [];
+                $photoPaths = (array) ($row->photo_paths ?? []);
+
+                foreach ($photoPaths as $path) {
+                    try {
+                        if (!Storage::disk('hetzner')->exists($path)) {
+                            continue;
+                        }
+
+                        $mime = Storage::disk('hetzner')->mimeType($path) ?: 'image/jpeg';
+                        $row->photo_base64[] = 'data:' . $mime . ';base64,' . base64_encode(Storage::disk('hetzner')->get($path));
+                    } catch (\Throwable $e) {
+                    }
+                }
+
+                return $row;
+            })
+            ->values();
     }
     public function store(Request $request)
     {
@@ -632,6 +664,11 @@ class CampReportController extends Controller
                 $report = $item->report;
                 $photos = $item->media->where('type', 'photo')->values();
 
+                $photoPaths = $photos
+                    ->pluck('path')
+                    ->values()
+                    ->all();
+
                 $photoUrls = $photos
                     ->map(fn ($photo) => Storage::disk('hetzner')->url($photo->path))
                     ->values()
@@ -643,7 +680,7 @@ class CampReportController extends Controller
                         try {
                             if (Storage::disk('hetzner')->exists($photo->path)) {
                                 $mime = Storage::disk('hetzner')->mimeType($photo->path);
-                                $photoBase64[] = 'data:image/' . $mime . ';base64,' . base64_encode(Storage::disk('hetzner')->get($photo->path));
+                                $photoBase64[] = 'data:' . $mime . ';base64,' . base64_encode(Storage::disk('hetzner')->get($photo->path));
                             }
                         } catch (\Throwable $e) {
                         }
@@ -668,6 +705,7 @@ class CampReportController extends Controller
                     'item_status_label' => $itemStatusLabel,
                     'damaged_count' => $item->damaged_count,
                     'notes' => $item->notes,
+                    'photo_paths' => $photoPaths,
                     'photo_urls' => $photoUrls,
                     'photo_base64' => $photoBase64,
                 ];
