@@ -295,9 +295,9 @@ class CampReportController extends Controller
             'finished_at' => null,
             'expires_at' => now()->addHours(2),
         ]);
-
+        \Log::info('Created CampReportSummaryExport with ID: ' . $export->id . ' and token: ' . $export->token);
         PrepareCampReportSummaryExportJob::dispatch($export->id);
-
+        \Log::info('Dispatched PrepareCampReportSummaryExportJob for export ID: ' . $export->id);
         return response()->json([
             'success' => true,
             'message' => 'Preparing data...',
