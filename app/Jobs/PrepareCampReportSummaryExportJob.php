@@ -31,6 +31,7 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
 
     public function handle(): void
     {
+        \Log::info('Starting ' . date() );
         ini_set('max_execution_time', '300');
         ini_set('pcre.backtrack_limit', '5000000');
         $export = CampReportSummaryExport::query()->find($this->exportId);
@@ -115,6 +116,7 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                 'dir' => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
                 'default_font' => 'DejaVuSans',
             ]);
+        \Log::info('middle ' . date() );
 
             $mpdf->shrink_tables_to_fit = 1;
             $mpdf->showImageErrors = true;
