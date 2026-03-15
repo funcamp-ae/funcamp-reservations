@@ -167,7 +167,7 @@
                 const timeoutId = setTimeout(function () {
                     stopListening();
                     reject(new Error(timeoutMessage));
-                }, 240000);
+                }, 500000);
 
                 Echo.private(`user.${userId}`)
                     .listen('.camp-report-summary-export.ready', function (eventPayload) {
