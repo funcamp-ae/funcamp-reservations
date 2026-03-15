@@ -269,7 +269,7 @@ class CampReportController extends Controller
                 ->first();
 
         if (! $preparedExport || $preparedExport->status !== 'ready' || empty($preparedExport->pdf_path) || ! Storage::disk('local')->exists($preparedExport->pdf_path)) {
-            return back()->with('error', 'Export data is still preparing. Please try again in a moment.');
+            return back()->with('error', 'Please try again in a moment with export PDF.')->withInput();
         }
 
         return Storage::disk('local')->download(
