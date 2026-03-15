@@ -555,6 +555,7 @@ class CampReportController extends Controller
                 $item->media()->create([
                     'path' => $path,
                     'type' => 'photo',
+                    'full_url' => $this->resolveMediaFullUrl($path),
                 ]);
             }
         }
@@ -566,6 +567,7 @@ class CampReportController extends Controller
                 $item->media()->create([
                     'path' => $path,
                     'type' => 'audio',
+                    'full_url' => $this->resolveMediaFullUrl($path),
                 ]);
             }
         }
@@ -577,6 +579,7 @@ class CampReportController extends Controller
                 $item->media()->create([
                     'path' => $path,
                     'type' => 'video',
+                    'full_url' => $this->resolveMediaFullUrl($path),
                 ]);
             }
         }
@@ -588,8 +591,26 @@ class CampReportController extends Controller
                 $item->media()->create([
                     'path' => $key,
                     'type' => 'video',
+                    'full_url' => $this->resolveMediaFullUrl($key),
                 ]);
             }
+        }
+    }
+
+    protected function resolveMediaFullUrl(string $path): ?string
+    {
+        if ($path === '') {
+            return null;
+        }
+
+        if (preg_match('/^https?:\/\//i', $path)) {
+            return $path;
+        }
+
+        try {
+            return Storage::disk('hetzner')->url($path);
+        } catch (\Throwable $e) {
+            return null;
         }
     }
 
@@ -654,7 +675,7 @@ class CampReportController extends Controller
                     ->all();
 
                 $photoUrls = $photos
-                    ->map(fn ($photo) => Storage::disk('hetzner')->url($photo->path))
+                    ->map(fn ($photo) => $photo->full_url ?: Storage::disk('hetzner')->url($photo->path))
                     ->values()
                     ->all();
 

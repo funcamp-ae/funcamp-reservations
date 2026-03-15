@@ -14,6 +14,7 @@ class CampReportItemMedia extends Model
         'camp_report_item_id',
         'type',   // photo | video | audio
         'path',
+        'full_url',
     ];
 
     public function item(): BelongsTo
@@ -24,6 +25,10 @@ class CampReportItemMedia extends Model
     /* اختياري: رابط الملف على قرص hetzner */
     public function getUrlAttribute(): ?string
     {
+        if (! empty($this->full_url)) {
+            return $this->full_url;
+        }
+
         return $this->path ? Storage::disk('hetzner')->url($this->path) : null;
     }
 
