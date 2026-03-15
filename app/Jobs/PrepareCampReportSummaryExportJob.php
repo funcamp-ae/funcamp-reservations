@@ -80,7 +80,7 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
         \Log::info('middle ');
 
             $mpdf->shrink_tables_to_fit = 1;
-            $mpdf->showImageErrors = true;
+            $mpdf->showImageErrors = false;
             $mpdf->SetFooter('<div style="text-align:center;">{PAGENO} / {nbpg}</div>');          
             $chunks = explode('<!--PDF_CHUNK_SPLIT-->', $html);
             foreach ($chunks as $chunk) {
@@ -88,7 +88,18 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                     continue;
                 }
 
-                $mpdf->WriteHTML($chunk);
+                try {
+                    $mpdf->WriteHTML($chunk);
+                } catch (\Mpdf\MpdfImageException $imageException) {
+                    Log::warning('Skipping broken image while generating camp report summary PDF.', [
+                        'export_id' => $this->exportId,
+                        'error' => $imageException->getMessage(),
+                    ]);
+
+                    // Retry this chunk without <img> tags so the export can finish.
+                    $chunkWithoutImages = preg_replace('/<img\b[^>]*>/i', '', $chunk);
+                    $mpdf->WriteHTML((string) $chunkWithoutImages);
+                }
             }
 
             $pdfPath = sprintf(
