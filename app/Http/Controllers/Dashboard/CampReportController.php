@@ -604,7 +604,8 @@ class CampReportController extends Controller
                     foreach ($photos as $photo) {
                         try {
                             if (Storage::disk('hetzner')->exists($photo->path)) {
-                                $photoBase64[] = 'data:image/jpeg;base64,' . base64_encode(Storage::disk('hetzner')->get($photo->path));
+                                $mime = Storage::disk('hetzner')->mimeType($photo->path);
+                                $photoBase64[] = 'data:image/' . $mime . ';base64,' . base64_encode(Storage::disk('hetzner')->get($photo->path));
                             }
                         } catch (\Throwable $e) {
                         }
