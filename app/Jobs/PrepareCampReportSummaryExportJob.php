@@ -161,7 +161,7 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                 $photos = $item->media->where('type', 'photo')->values();
                 $photoPaths = $photos->pluck('path')->values()->all();
                 $photoUrls = $photos
-                    ->map(fn ($photo) => $photo->full_url ?: Storage::disk('hetzner')->url($photo->path))
+                    ->map(fn ($photo) => $photo->full_url ?: env('AWS_URL') . '/' . $photo->path)
                     ->values()
                     ->all();
 
