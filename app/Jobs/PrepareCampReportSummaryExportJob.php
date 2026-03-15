@@ -2,7 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Helpers\CampReportHelper;
 use App\Events\CampReportSummaryExportReady;
+use App\Models\CampReport;
+use App\Models\CampReportItem;
 use App\Models\CampReportSummaryExport;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -52,8 +55,7 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
             $encodedPhotosCount = 0;
             $photoCounter = 0;
 
-            $rows = collect($export->rows ?? [])
-                ->map(fn ($row) => (object) $row)
+            $rows = $this->buildSummaryRows($export)
                 ->map(function ($row) use (&$encodedPhotosCount, &$photoCounter) {
                     if (!empty($row->photo_base64)) {
                         return $row;
@@ -174,5 +176,86 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
             DB::purge();
             DB::reconnect();
         }
+    }
+
+    private function buildSummaryRows(CampReportSummaryExport $export)
+    {
+        $filters = is_array($export->filters) ? $export->filters : [];
+        $statusLabels = CampReportHelper::itemStatuses();
+
+        return CampReportItem::with(['report.service', 'media'])
+            ->latest()
+            ->get()
+            ->map(function (CampReportItem $item) use ($statusLabels) {
+                $report = $item->report;
+                $photos = $item->media->where('type', 'photo')->values();
+                $photoPaths = $photos->pluck('path')->values()->all();
+                $photoUrls = $photos
+                    ->map(fn ($photo) => Storage::disk('hetzner')->url($photo->path))
+                    ->values()
+                    ->all();
+
+                $itemStatus = $item->item_status;
+                $itemStatusLabel = $itemStatus && isset($statusLabels[$itemStatus]) ? __($statusLabels[$itemStatus]) : '-';
+
+                if ($itemStatus === 'other' && $item->item_status_other) {
+                    $itemStatusLabel = $itemStatusLabel . ' - ' . $item->item_status_other;
+                }
+
+                return (object) [
+                    'id' => $item->id,
+                    'report_id' => $report?->id,
+                    'report_type' => $report?->report_type,
+                    'report_type_label' => $report?->report_type ? __('dashboard.' . $report->report_type) : '-',
+                    'report_subtype' => $report ? $this->formatReportSubtype($report) : '-',
+                    'camp_name' => $report?->service?->name ?? '-',
+                    'item_name' => $item->item_name,
+                    'item_status' => $itemStatus,
+                    'item_status_label' => $itemStatusLabel,
+                    'damaged_count' => $item->damaged_count,
+                    'notes' => $item->notes,
+                    'photo_paths' => $photoPaths,
+                    'photo_urls' => $photoUrls,
+                    'photo_base64' => [],
+                ];
+            })
+            ->filter(function ($row) use ($filters) {
+                $reportType = trim((string) ($filters['report_type'] ?? ''));
+                $reportSubtype = trim((string) ($filters['report_subtype'] ?? ''));
+                $itemStatus = trim((string) ($filters['item_status'] ?? ''));
+                $itemName = mb_strtolower(trim((string) ($filters['item_name'] ?? '')));
+
+                if ($reportType !== '' && $row->report_type !== $reportType) {
+                    return false;
+                }
+
+                if ($reportSubtype !== '' && $row->report_subtype !== $reportSubtype) {
+                    return false;
+                }
+
+                if ($itemStatus !== '' && $row->item_status !== $itemStatus) {
+                    return false;
+                }
+
+                if ($itemName !== '' && ! str_contains(mb_strtolower((string) $row->item_name), $itemName)) {
+                    return false;
+                }
+
+                return true;
+            })
+            ->values();
+    }
+
+    private function formatReportSubtype(CampReport $report): ?string
+    {
+        if ($report->report_type === 'camp') {
+            return $report->service?->name;
+        }
+
+        if ($report->report_type === 'general') {
+            return $report->custom_report_type;
+        }
+
+        return $report->service?->name ?? $report->custom_report_type;
     }
 }

@@ -281,13 +281,11 @@ class CampReportController extends Controller
 
     public function prepareSummaryExport(Request $request)
     {
-        $rows = $this->buildSummaryRows($request, false)->toArray();
-
         $export = CampReportSummaryExport::query()->create([
             'user_id' => auth()->id(),
             'token' => (string) Str::uuid(),
             'filters' => $request->only(['report_type', 'report_subtype', 'item_status', 'item_name']),
-            'rows' => $rows,
+            'rows' => [],
             'status' => 'pending',
             'pdf_path' => null,
             'error_message' => null,
