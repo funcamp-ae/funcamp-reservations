@@ -1070,6 +1070,10 @@ return [
     'filter' => 'Filter',
     'reset' => 'Reset',
     'no_matching_records' => 'No matching records found',
+    'generated_at' => 'Generated At',
+    'user' => 'User',
+    'id' => 'ID',
+    'page' => 'Page',
 
     'meetings' => 'Meetings',
     'meeting' => 'Meeting',

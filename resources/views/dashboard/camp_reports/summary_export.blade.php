@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>@lang('dashboard.camp_reports_summary')</title>
     <style>
+        @page { margin: 14mm 8mm 18mm 8mm; }
         body { font-family: DejaVu Sans, sans-serif; font-size: 10px; color: #222; margin: 0; }
         h1 { text-align: center; margin: 0 0 8px 0; font-size: 14px; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -13,6 +14,26 @@
         .photos { white-space: nowrap; }
         .photo-thumb { width: 32px; height: 32px; margin: 1px; border: 1px solid #ccc; display: inline-block; }
         .notes { text-align: right; }
+        .footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: -12mm;
+            padding: 0 8mm;
+            font-size: 9px;
+            color: #444;
+        }
+        .footer-table, .footer-table td {
+            border: none;
+        }
+        .footer-table td {
+            padding: 0;
+            text-align: left;
+            white-space: nowrap;
+        }
+        .footer-table td:last-child {
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -65,5 +86,16 @@
             @endforelse
         </tbody>
     </table>
+
+    <div class="footer">
+        <table class="footer-table">
+            <tr>
+                <td>
+                    @lang('dashboard.generated_at'): {{ $generatedAt ?? '-' }} |
+                    @lang('dashboard.user'): {{ $generatedByName ?? '-' }} (@lang('dashboard.id'): {{ $generatedById ?? '-' }})
+                </td>
+            </tr>
+        </table>
+    </div>
 </body>
 </html>

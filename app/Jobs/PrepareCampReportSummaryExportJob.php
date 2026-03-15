@@ -7,6 +7,7 @@ use App\Events\CampReportSummaryExportReady;
 use App\Models\CampReport;
 use App\Models\CampReportItem;
 use App\Models\CampReportSummaryExport;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -76,7 +77,7 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                             if (!Storage::disk('hetzner')->exists($path)) {
                                 continue;
                             }
-
+                            Storage::disk('hetzner')->setVisibility($path, 'public');
                             $mime = Storage::disk('hetzner')->mimeType($path) ?: 'image/jpeg';
                             $row->photo_base64[] = 'data:' . $mime . ';base64,' . base64_encode(Storage::disk('hetzner')->get($path));
                             $encodedPhotosCount++;
@@ -94,8 +95,13 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                 ->map(fn ($row) => (array) $row)
                 ->values()
                 ->all();
+            $exportUser = User::query()->find(auth()->id()) ;
+
             $html = view('dashboard.camp_reports.summary_export', [
                 'rows' => collect($rows)->map(fn ($row) => (object) $row),
+                'generatedAt' => now()->format('Y-m-d H:i:s'),
+                'generatedByName' => $exportUser?->name ?? '-',
+                'generatedById' => $exportUser?->id ?? ($export->user_id ?? '-'),
             ])->render();
 
             $mpdf = new Mpdf([
@@ -109,7 +115,7 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                 'dir' => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
                 'default_font' => 'DejaVuSans',
             ]);
-
+            $mpdf->setFooter('{PAGENO}');
             $mpdf->shrink_tables_to_fit = 1;
             $mpdf->showImageErrors = true;
             $chunks = explode('<!--PDF_CHUNK_SPLIT-->', $html);

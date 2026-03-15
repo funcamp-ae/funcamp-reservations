@@ -1075,6 +1075,10 @@ return [
     'filter' => 'فلټر',
     'reset' => 'بیا تنظیم',
     'no_matching_records' => 'هیڅ برابر ریکارډ ونه موندل شو',
+    'generated_at' => 'د جوړېدو نېټه',
+    'user' => 'کارن',
+    'id' => 'پېژند',
+    'page' => 'پاڼه',
 
     'meetings' => 'غونډې',
     'meeting' => 'غونډه',
