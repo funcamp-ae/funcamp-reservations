@@ -95,13 +95,13 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                 ->map(fn ($row) => (array) $row)
                 ->values()
                 ->all();
-            $exportUser = $export->user_id ? User::query()->find($export->user_id) : null;
+            $exportUser = User::query()->find($export->user_id);
 
             $html = view('dashboard.camp_reports.summary_export', [
                 'rows' => collect($rows)->map(fn ($row) => (object) $row),
                 'generatedAt' => now()->format('Y-m-d H:i:s'),
-                'generatedByName' => $exportUser?->name ?? '-',
-                'generatedById' => $exportUser?->id ?? ($export->user_id ?? '-'),
+                'generatedByName' => $exportUser->name ?? '-',
+                'generatedById' => $exportUser->id ,
             ])->render();
 
             $mpdf = new Mpdf([
@@ -111,13 +111,14 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                 'margin_left' => 10,
                 'margin_right' => 10,
                 'margin_top' => 14,
-                'margin_bottom' => 14,
+                'margin_bottom' => 30,
                 'dir' => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
                 'default_font' => 'DejaVuSans',
             ]);
-            $mpdf->setFooter(__('dashboard.page') . ' {PAGENO}');
+
             $mpdf->shrink_tables_to_fit = 1;
             $mpdf->showImageErrors = true;
+            $mpdf->SetFooter('<div style="text-align:center;">{PAGENO} / {nbpg}</div>');          
             $chunks = explode('<!--PDF_CHUNK_SPLIT-->', $html);
             foreach ($chunks as $chunk) {
                 if (trim($chunk) === '') {

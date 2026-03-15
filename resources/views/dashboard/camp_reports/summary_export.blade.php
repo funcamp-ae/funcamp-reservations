@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>@lang('dashboard.camp_reports_summary')</title>
     <style>
-        @page { margin: 14mm 8mm 18mm 8mm; }
         body { font-family: DejaVu Sans, sans-serif; font-size: 10px; color: #222; margin: 0; }
         h1 { text-align: center; margin: 0 0 8px 0; font-size: 14px; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
