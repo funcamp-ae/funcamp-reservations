@@ -13,6 +13,7 @@
                         type="button"
                         class="btn btn-success"
                         id="prepare-summary-export-btn"
+                        data-user-id="{{ auth()->id() }}"
                         data-prepare-url="{{ route('camp-reports.summary.prepare') }}"
                         data-export-url="{{ route('camp-reports.summary.export') }}"
                         data-default-label="@lang('dashboard.export_pdf')"
@@ -133,6 +134,45 @@
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
         const originalLabel = button.dataset.defaultLabel || 'Export PDF';
         const loadingLabel = button.dataset.loadingLabel || 'Preparing data...';
+        const userId = button.dataset.userId;
+        let currentChannel = null;
+
+        function stopListening() {
+            if (currentChannel && typeof Echo !== 'undefined') {
+                Echo.leave(currentChannel);
+            }
+
+            currentChannel = null;
+        }
+
+        function waitUntilReadyByEvent(token, exportUrl) {
+            return new Promise(function (resolve, reject) {
+                if (typeof Echo === 'undefined' || !userId) {
+                    reject(new Error('Real-time export notifications are unavailable.'));
+                    return;
+                }
+
+                currentChannel = `private-user.${userId}`;
+                const timeoutId = setTimeout(function () {
+                    stopListening();
+                    reject(new Error('Export is taking too long. Please try again in a moment.'));
+                }, 240000);
+
+                Echo.private(`user.${userId}`)
+                    .listen('.camp-report-summary-export.ready', function (eventPayload) {
+                        if (!eventPayload || eventPayload.token !== token) {
+                            return;
+                        }
+                        clearTimeout(timeoutId);
+                        stopListening();
+                        button.disabled = false;
+                        button.querySelector('span').textContent = originalLabel;
+                        const downloadUrl = "/camp-reports/summary/export/pdf?token=" + token;
+                        window.location.href = downloadUrl;
+                        resolve();
+                    });
+            });
+        }
 
         button.addEventListener('click', async function () {
             if (button.disabled) {
@@ -164,20 +204,19 @@
                     throw new Error(payload.message || 'Failed to prepare export data.');
                 }
 
-                if (payload.export_url) {
-                    window.location.href = payload.export_url;
-                    return;
+                if (!payload.token) {
+                    throw new Error('Missing export token.');
                 }
 
-                if (payload.token) {
-                    const exportUrl = new URL(button.dataset.exportUrl, window.location.origin);
-                    exportUrl.searchParams.set('token', payload.token);
-                    window.location.href = exportUrl.toString();
-                    return;
-                }
+                const exportUrl = payload.export_url || (function () {
+                    const fallbackExportUrl = new URL(button.dataset.exportUrl, window.location.origin);
+                    fallbackExportUrl.searchParams.set('token', payload.token);
+                    return fallbackExportUrl.toString();
+                })();
 
-                throw new Error('Missing export token.');
+                await waitUntilReadyByEvent(payload.token, exportUrl);
             } catch (error) {
+                stopListening();
                 alert(error.message || 'Failed to prepare export data.');
                 button.disabled = false;
                 button.querySelector('span').textContent = originalLabel;

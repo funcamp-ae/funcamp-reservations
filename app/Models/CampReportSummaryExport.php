@@ -14,8 +14,13 @@ class CampReportSummaryExport extends Model
         'token',
         'filters',
         'rows',
+        'status',
+        'pdf_path',
+        'error_message',
         'locale',
         'prepared_at',
+        'started_at',
+        'finished_at',
         'expires_at',
     ];
 
@@ -23,6 +28,8 @@ class CampReportSummaryExport extends Model
         'filters' => 'array',
         'rows' => 'array',
         'prepared_at' => 'datetime',
+        'started_at' => 'datetime',
+        'finished_at' => 'datetime',
         'expires_at' => 'datetime',
     ];
 }

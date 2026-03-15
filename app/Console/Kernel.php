@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         Commands\SendWhatsAppEvaluationCommand::class,
         Commands\SendWhatsAppBookingReminderCommand::class,
         Commands\SendWhatsAppBookingEndingReminderCommand::class,
+        Commands\ShowRedisFailedJobs::class,
     ];
     /**
      * Define the application's command schedule.
@@ -47,6 +48,13 @@ class Kernel extends ConsoleKernel
         $schedule->command('whatsapp:send-booking-ending-reminder')
             ->everyMinute()
             ->appendOutputTo(storage_path('logs/whatsapp-booking-ending-reminder.log'));
+
+        // Process queued export jobs each minute via scheduler-triggered worker.
+        $schedule->command('queue:work redis --queue=default --stop-when-empty --tries=1 --timeout=1200')
+            ->everyMinute()
+            ->withoutOverlapping()
+            ->runInBackground()
+            ->appendOutputTo(storage_path('logs/laravel.log'));
 
         // Clear expired password reset tokens every hour
         $schedule->command('auth:clear-resets')->hourly();

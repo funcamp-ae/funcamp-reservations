@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Helpers\CampReportHelper;
 use App\Http\Controllers\Controller;
+use App\Jobs\PrepareCampReportSummaryExportJob;
 use App\Models\CampReport;
 use App\Models\CampReportItem;
 use App\Models\CampReportSummaryExport;
@@ -257,8 +258,29 @@ class CampReportController extends Controller
     {
         ini_set('max_execution_time', '300');
         ini_set('pcre.backtrack_limit', '5000000');
+
+        $token = trim((string) $request->query('token', ''));
+        if ($token !== '') {
+            $preparedExport = CampReportSummaryExport::query()
+                ->where('token', $token)
+                ->first();
+
+            if (! $preparedExport || $preparedExport->status !== 'ready' || empty($preparedExport->pdf_path) || ! Storage::disk('local')->exists($preparedExport->pdf_path)) {
+                return back()->with('error', 'Export data is still preparing. Please try again in a moment.');
+            }
+
+            return Storage::disk('local')->download(
+                $preparedExport->pdf_path,
+                __('dashboard.camp_reports_summary') . '-' . date('Y-m-d') . '.pdf'
+            );
+        }
+
         $rows = $this->resolveSummaryRowsForExport($request);
-        $rows = $this->hydrateSummaryPhotoBase64($rows);
+
+        if ($rows === null) {
+            return back()->with('error', 'Export data is still preparing. Please try again in a moment.');
+        }
+
         $html = view('dashboard.camp_reports.summary_export', compact('rows'))->render();
 
         $mpdf = new Mpdf([
@@ -289,71 +311,77 @@ class CampReportController extends Controller
 
     public function prepareSummaryExport(Request $request)
     {
-        ini_set('max_execution_time', '300');
         $rows = $this->buildSummaryRows($request, false)->toArray();
+
         $export = CampReportSummaryExport::query()->create([
             'user_id' => auth()->id(),
             'token' => (string) Str::uuid(),
+            'filters' => $request->only(['report_type', 'report_subtype', 'item_status', 'item_name']),
             'rows' => $rows,
+            'status' => 'pending',
+            'pdf_path' => null,
+            'error_message' => null,
             'locale' => app()->getLocale(),
-            'prepared_at' => now(),
+            'prepared_at' => null,
+            'started_at' => null,
+            'finished_at' => null,
             'expires_at' => now()->addHours(2),
         ]);
 
+        PrepareCampReportSummaryExportJob::dispatch($export->id);
+
         return response()->json([
             'success' => true,
-            'message' => __('dashboard.save_changes'),
+            'message' => 'Preparing data...',
             'token' => $export->token,
+            'status' => $export->status,
+            'status_url' => route('camp-reports.summary.export.status', ['token' => $export->token]),
             'export_url' => route('camp-reports.summary.export', ['token' => $export->token]),
         ]);
     }
+
+    public function summaryExportStatus(Request $request)
+    {
+        $token = trim((string) $request->query('token', ''));
+
+        if ($token === '') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Missing export token.',
+            ], 422);
+        }
+
+        $export = CampReportSummaryExport::query()
+            ->where('token', $token)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (! $export) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Export request not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'status' => $export->status,
+            'ready' => $export->status === 'ready',
+            'failed' => $export->status === 'failed',
+            'error_message' => $export->error_message,
+            'export_url' => route('camp-reports.summary.export', ['token' => $export->token]),
+        ]);
+    }
+
     protected function resolveSummaryRowsForExport(Request $request)
     {
         $token = trim((string) $request->query('token', ''));
 
         if ($token !== '') {
-            $preparedExport = CampReportSummaryExport::query()
-                ->where('token', $token)
-                ->first();
-
-            if ($preparedExport ) {
-                return collect($preparedExport->rows ?? [])
-                    ->map(fn ($row) => (object) $row)
-                    ->values();
-            }
+            return null;
         }
 
         return $this->buildSummaryRows($request, true);
-    }
-
-    protected function hydrateSummaryPhotoBase64($rows)
-    {
-        return collect($rows)
-            ->map(function ($row) {
-                $row = (object) $row;
-
-                if (!empty($row->photo_base64)) {
-                    return $row;
-                }
-
-                $row->photo_base64 = [];
-                $photoPaths = (array) ($row->photo_paths ?? []);
-
-                foreach ($photoPaths as $path) {
-                    try {
-                        if (!Storage::disk('hetzner')->exists($path)) {
-                            continue;
-                        }
-
-                        $mime = Storage::disk('hetzner')->mimeType($path) ?: 'image/jpeg';
-                        $row->photo_base64[] = 'data:' . $mime . ';base64,' . base64_encode(Storage::disk('hetzner')->get($path));
-                    } catch (\Throwable $e) {
-                    }
-                }
-
-                return $row;
-            })
-            ->values();
     }
     public function store(Request $request)
     {

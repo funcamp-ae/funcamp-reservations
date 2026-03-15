@@ -2091,6 +2091,8 @@ Route::get('camp-reports/summary', [CampReportController::class, 'summary'])
     ->name('camp-reports.summary')->middleware(['auth', 'permission:camp-reports.summary']);
 Route::post('camp-reports/summary/export/prepare', [CampReportController::class, 'prepareSummaryExport'])
     ->name('camp-reports.summary.prepare')->middleware(['auth', 'permission:camp-reports.summary']);
+Route::get('camp-reports/summary/export/status', [CampReportController::class, 'summaryExportStatus'])
+    ->name('camp-reports.summary.export.status')->middleware(['auth', 'permission:camp-reports.summary']);
 Route::get('camp-reports/summary/export/pdf', [CampReportController::class, 'exportSummaryPdf'])
     ->name('camp-reports.summary.export')->middleware(['auth', 'permission:camp-reports.summary']);
 Route::get('camp-reports/{campReport}', 'Dashboard\CampReportController@show')
