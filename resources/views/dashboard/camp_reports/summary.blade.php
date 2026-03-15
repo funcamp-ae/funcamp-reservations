@@ -9,9 +9,18 @@
             </div>
             <div class="card-toolbar">
                 @can('camp-reports.summary.export')
-                    <a href="{{ route('camp-reports.summary.export', request()->query()) }}" class="btn btn-success">
-                        <i class="bi bi-file-earmark-pdf"></i> @lang('dashboard.export_pdf')
-                    </a>
+                    <button
+                        type="button"
+                        class="btn btn-success"
+                        id="prepare-summary-export-btn"
+                        data-prepare-url="{{ route('camp-reports.summary.prepare') }}"
+                        data-export-url="{{ route('camp-reports.summary.export') }}"
+                        data-default-label="@lang('dashboard.export_pdf')"
+                        data-loading-label="Preparing data..."
+                    >
+                        <i class="bi bi-file-earmark-pdf"></i>
+                        <span>@lang('dashboard.export_pdf')</span>
+                    </button>
                 @endcan
             </div>
         </div>
@@ -112,3 +121,68 @@
         </div>
     </div>
 @endsection
+
+@push('js')
+<script>
+    (function () {
+        const button = document.getElementById('prepare-summary-export-btn');
+        if (!button) {
+            return;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        const originalLabel = button.dataset.defaultLabel || 'Export PDF';
+        const loadingLabel = button.dataset.loadingLabel || 'Preparing data...';
+
+        button.addEventListener('click', async function () {
+            if (button.disabled) {
+                return;
+            }
+
+            button.disabled = true;
+            button.querySelector('span').textContent = loadingLabel;
+
+            const params = new URLSearchParams(window.location.search);
+
+            try {
+                const response = await fetch(button.dataset.prepareUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: params.toString()
+                });
+
+                const payload = await response.json().catch(function () {
+                    return {};
+                });
+
+                if (!response.ok || !payload.success) {
+                    throw new Error(payload.message || 'Failed to prepare export data.');
+                }
+
+                if (payload.export_url) {
+                    window.location.href = payload.export_url;
+                    return;
+                }
+
+                if (payload.token) {
+                    const exportUrl = new URL(button.dataset.exportUrl, window.location.origin);
+                    exportUrl.searchParams.set('token', payload.token);
+                    window.location.href = exportUrl.toString();
+                    return;
+                }
+
+                throw new Error('Missing export token.');
+            } catch (error) {
+                alert(error.message || 'Failed to prepare export data.');
+                button.disabled = false;
+                button.querySelector('span').textContent = originalLabel;
+            }
+        });
+    })();
+</script>
+@endpush

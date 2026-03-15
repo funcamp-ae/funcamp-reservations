@@ -6,6 +6,7 @@ use App\Helpers\CampReportHelper;
 use App\Http\Controllers\Controller;
 use App\Models\CampReport;
 use App\Models\CampReportItem;
+use App\Models\CampReportSummaryExport;
 use App\Models\NewCampPlan;
 use App\Models\Service;
 use Closure;
@@ -256,7 +257,7 @@ class CampReportController extends Controller
     {
         ini_set('max_execution_time', '300');
         ini_set('pcre.backtrack_limit', '5000000');
-        $rows = $this->buildSummaryRows($request, true);
+        $rows = $this->resolveSummaryRowsForExport($request);
         $html = view('dashboard.camp_reports.summary_export', compact('rows'))->render();
 
         $mpdf = new Mpdf([
@@ -281,10 +282,47 @@ class CampReportController extends Controller
 
             $mpdf->WriteHTML($chunk);
         }
-
+        
         return $mpdf->Output(__('dashboard.camp_reports_summary') . '-' . date('Y-m-d') . '.pdf', 'D');
     }
 
+    public function prepareSummaryExport(Request $request)
+    {
+        $rows = $this->buildSummaryRows($request, true)->toArray();
+        $export = CampReportSummaryExport::query()->create([
+            'user_id' => auth()->id(),
+            'token' => (string) Str::uuid(),
+            'rows' => $rows,
+            'locale' => app()->getLocale(),
+            'prepared_at' => now(),
+            'expires_at' => now()->addHours(2),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('dashboard.save_changes'),
+            'token' => $export->token,
+            'export_url' => route('camp-reports.summary.export', ['token' => $export->token]),
+        ]);
+    }
+    protected function resolveSummaryRowsForExport(Request $request)
+    {
+        $token = trim((string) $request->query('token', ''));
+
+        if ($token !== '') {
+            $preparedExport = CampReportSummaryExport::query()
+                ->where('token', $token)
+                ->first();
+
+            if ($preparedExport ) {
+                return collect($preparedExport->rows ?? [])
+                    ->map(fn ($row) => (object) $row)
+                    ->values();
+            }
+        }
+
+        return $this->buildSummaryRows($request, true);
+    }
     public function store(Request $request)
     {
         $this->authorize('create', CampReport::class);
