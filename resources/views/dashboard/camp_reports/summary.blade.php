@@ -164,10 +164,6 @@
                 }
 
                 currentChannel = `user.${userId}`;
-                const timeoutId = setTimeout(function () {
-                    stopListening();
-                    reject(new Error(timeoutMessage));
-                }, 500000);
 
                 Echo.private(`user.${userId}`)
                     .listen('.camp-report-summary-export.ready', function (eventPayload) {
@@ -175,7 +171,6 @@
                         if (!eventPayload || eventPayload.token !== token) {
                             return;
                         }
-                        clearTimeout(timeoutId);
                         stopListening();
                         button.disabled = false;
                         button.querySelector('span').textContent = originalLabel;
