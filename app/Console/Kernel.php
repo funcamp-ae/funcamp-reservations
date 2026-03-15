@@ -50,7 +50,7 @@ class Kernel extends ConsoleKernel
             ->appendOutputTo(storage_path('logs/whatsapp-booking-ending-reminder.log'));
 
         // Process queued export jobs each minute via scheduler-triggered worker.
-        $schedule->command('queue:work redis --queue=default --stop-when-empty --tries=1 --timeout=1200')
+        $schedule->command('queue:work --queue=default --stop-when-empty --tries=1 --timeout=1200')
             ->everyMinute()
             ->withoutOverlapping()
             ->runInBackground()

@@ -256,57 +256,27 @@ class CampReportController extends Controller
 
     public function exportSummaryPdf(Request $request)
     {
-        ini_set('max_execution_time', '300');
-        ini_set('pcre.backtrack_limit', '5000000');
-
         $token = trim((string) $request->query('token', ''));
-        if ($token !== '') {
-            $preparedExport = CampReportSummaryExport::query()
+        $preparedExport = $token
+            ? CampReportSummaryExport::query()
                 ->where('token', $token)
+                ->where('user_id', auth()->id())
+                ->first()
+            : CampReportSummaryExport::query()
+                ->where('user_id', auth()->id())
+                ->where('status', 'ready')
+                ->latest()
                 ->first();
 
-            if (! $preparedExport || $preparedExport->status !== 'ready' || empty($preparedExport->pdf_path) || ! Storage::disk('local')->exists($preparedExport->pdf_path)) {
-                return back()->with('error', 'Export data is still preparing. Please try again in a moment.');
-            }
-
-            return Storage::disk('local')->download(
-                $preparedExport->pdf_path,
-                __('dashboard.camp_reports_summary') . '-' . date('Y-m-d') . '.pdf'
-            );
-        }
-
-        $rows = $this->resolveSummaryRowsForExport($request);
-
-        if ($rows === null) {
+        if (! $preparedExport || $preparedExport->status !== 'ready' || empty($preparedExport->pdf_path) || ! Storage::disk('local')->exists($preparedExport->pdf_path)) {
             return back()->with('error', 'Export data is still preparing. Please try again in a moment.');
         }
 
-        $html = view('dashboard.camp_reports.summary_export', compact('rows'))->render();
+        return Storage::disk('local')->download(
+            $preparedExport->pdf_path,
+            __('dashboard.camp_reports_summary') . '-' . date('Y-m-d') . '.pdf'
+        );
 
-        $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4-L',
-            'orientation' => 'L',
-            'margin_left' => 10,
-            'margin_right' => 10,
-            'margin_top' => 14,
-            'margin_bottom' => 14,
-            'dir' => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
-            'default_font' => 'DejaVuSans',
-        ]);
-
-        $mpdf->shrink_tables_to_fit = 1;
-        $mpdf->showImageErrors = true;
-        $chunks = explode('<!--PDF_CHUNK_SPLIT-->', $html);
-        foreach ($chunks as $chunk) {
-            if (trim($chunk) === '') {
-                continue;
-            }
-
-            $mpdf->WriteHTML($chunk);
-        }
-        
-        return $mpdf->Output(__('dashboard.camp_reports_summary') . '-' . date('Y-m-d') . '.pdf', 'D');
     }
 
     public function prepareSummaryExport(Request $request)
@@ -373,16 +343,6 @@ class CampReportController extends Controller
         ]);
     }
 
-    protected function resolveSummaryRowsForExport(Request $request)
-    {
-        $token = trim((string) $request->query('token', ''));
-
-        if ($token !== '') {
-            return null;
-        }
-
-        return $this->buildSummaryRows($request, true);
-    }
     public function store(Request $request)
     {
         $this->authorize('create', CampReport::class);

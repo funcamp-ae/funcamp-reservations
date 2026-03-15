@@ -7,21 +7,28 @@
             <div class="card-title">
                 <h3 class="mb-0">@lang('dashboard.camp_reports_summary')</h3>
             </div>
-            <div class="card-toolbar">
+            <div class="card-toolbar flex-row-fluid justify-content-end gap-3 direction-column flex-md-row align-items-md-center">
                 @can('camp-reports.summary.export')
+                    <div class="d-flex flex-wrap align-items-center gap-2">
                     <button
                         type="button"
-                        class="btn btn-success"
+                        class="btn btn-success d-inline-flex align-items-center gap-2"
                         id="prepare-summary-export-btn"
                         data-user-id="{{ auth()->id() }}"
                         data-prepare-url="{{ route('camp-reports.summary.prepare') }}"
                         data-export-url="{{ route('camp-reports.summary.export') }}"
                         data-default-label="@lang('dashboard.export_pdf')"
-                        data-loading-label="Preparing data..."
+                        data-loading-label="@lang('dashboard.preparing_data')"
+                        data-timeout-message="@lang('dashboard.export_taking_too_long')"
+                        data-realtime-unavailable-message="@lang('dashboard.export_realtime_unavailable')"
+                        data-prepare-failed-message="@lang('dashboard.export_prepare_failed')"
+                        data-missing-token-message="@lang('dashboard.export_missing_token')"
                     >
                         <i class="bi bi-file-earmark-pdf"></i>
                         <span>@lang('dashboard.export_pdf')</span>
                     </button>
+                    <a href="{{ route('camp-reports.summary.export') }}" class="btn btn-outline-secondary">@lang('dashboard.download_last_prepared_pdf')</a>
+                    </div>
                 @endcan
             </div>
         </div>
@@ -134,6 +141,10 @@
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
         const originalLabel = button.dataset.defaultLabel || 'Export PDF';
         const loadingLabel = button.dataset.loadingLabel || 'Preparing data...';
+        const timeoutMessage = button.dataset.timeoutMessage || 'Export is taking too long. Please try again in a moment.';
+        const realtimeUnavailableMessage = button.dataset.realtimeUnavailableMessage || 'Real-time export notifications are unavailable.';
+        const prepareFailedMessage = button.dataset.prepareFailedMessage || 'Failed to prepare export data.';
+        const missingTokenMessage = button.dataset.missingTokenMessage || 'Missing export token.';
         const userId = button.dataset.userId;
         let currentChannel = null;
 
@@ -148,14 +159,14 @@
         function waitUntilReadyByEvent(token, exportUrl) {
             return new Promise(function (resolve, reject) {
                 if (typeof Echo === 'undefined' || !userId) {
-                    reject(new Error('Real-time export notifications are unavailable.'));
+                    reject(new Error(realtimeUnavailableMessage));
                     return;
                 }
 
-                currentChannel = `private-user.${userId}`;
+                currentChannel = `user.${userId}`;
                 const timeoutId = setTimeout(function () {
                     stopListening();
-                    reject(new Error('Export is taking too long. Please try again in a moment.'));
+                    reject(new Error(timeoutMessage));
                 }, 240000);
 
                 Echo.private(`user.${userId}`)
@@ -167,7 +178,7 @@
                         stopListening();
                         button.disabled = false;
                         button.querySelector('span').textContent = originalLabel;
-                        const downloadUrl = "/camp-reports/summary/export/pdf?token=" + token;
+                        const downloadUrl = exportUrl || ("/camp-reports/summary/export/pdf?token=" + token);
                         window.location.href = downloadUrl;
                         resolve();
                     });
@@ -201,11 +212,11 @@
                 });
 
                 if (!response.ok || !payload.success) {
-                    throw new Error(payload.message || 'Failed to prepare export data.');
+                    throw new Error(payload.message || prepareFailedMessage);
                 }
 
                 if (!payload.token) {
-                    throw new Error('Missing export token.');
+                    throw new Error(missingTokenMessage);
                 }
 
                 const exportUrl = payload.export_url || (function () {
@@ -217,7 +228,7 @@
                 await waitUntilReadyByEvent(payload.token, exportUrl);
             } catch (error) {
                 stopListening();
-                alert(error.message || 'Failed to prepare export data.');
+                alert(error.message || prepareFailedMessage);
                 button.disabled = false;
                 button.querySelector('span').textContent = originalLabel;
             }
