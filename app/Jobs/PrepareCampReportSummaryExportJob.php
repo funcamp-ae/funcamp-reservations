@@ -95,7 +95,7 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                 ->map(fn ($row) => (array) $row)
                 ->values()
                 ->all();
-            $exportUser = User::query()->find(auth()->id()) ;
+            $exportUser = $export->user_id ? User::query()->find($export->user_id) : null;
 
             $html = view('dashboard.camp_reports.summary_export', [
                 'rows' => collect($rows)->map(fn ($row) => (object) $row),
@@ -115,7 +115,7 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                 'dir' => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
                 'default_font' => 'DejaVuSans',
             ]);
-            $mpdf->setFooter('{PAGENO}');
+            $mpdf->setFooter(__('dashboard.page') . ' {PAGENO}');
             $mpdf->shrink_tables_to_fit = 1;
             $mpdf->showImageErrors = true;
             $chunks = explode('<!--PDF_CHUNK_SPLIT-->', $html);
