@@ -6,7 +6,11 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 12px;
+            margin-bottom: 34px;
+        }
         h2 { margin: 0 0 12px 0; }
         .meta { margin-bottom: 14px; }
         table { width: 100%; border-collapse: collapse; }
@@ -15,7 +19,14 @@
         td { text-align: center; }
         .text-start { text-align: left; }
         [dir="rtl"] .text-start { text-align: right; }
-        .footer { margin-top: 16px; }
+        .footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            padding-top: 6px;
+        }
         .footer-table td {
             border: 0;
             text-align: left;
