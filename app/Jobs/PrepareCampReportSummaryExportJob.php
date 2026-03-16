@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Helpers\CampReportHelper;
 use App\Events\CampReportSummaryExportReady;
+use App\Events\CampReportSummaryExportProgressUpdated;
 use App\Models\CampReport;
 use App\Models\CampReportItem;
 use App\Models\CampReportSummaryExport;
@@ -54,7 +55,6 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                 app()->setLocale($export->locale);
             }
 
-            $encodedPhotosCount = 0;
             $photoCounter = 0;
 
             $rows = $this->buildSummaryRows($export);
@@ -82,11 +82,13 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
             $mpdf->shrink_tables_to_fit = 1;
             $mpdf->showImageErrors = false;
             $mpdf->SetFooter('<div style="text-align:center;">{PAGENO} / {nbpg}</div>');          
-            $chunks = explode('<!--PDF_CHUNK_SPLIT-->', $html);
-            foreach ($chunks as $chunk) {
-                if (trim($chunk) === '') {
-                    continue;
-                }
+            $chunks = array_values(array_filter(
+                explode('<!--PDF_CHUNK_SPLIT-->', $html),
+                static fn (string $chunk): bool => trim($chunk) !== ''
+            ));
+            $totalChunks = count($chunks);
+
+            foreach ($chunks as $index => $chunk) {
 
                 try {
                     $mpdf->WriteHTML($chunk);
@@ -99,6 +101,15 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                     // Retry this chunk without <img> tags so the export can finish.
                     $chunkWithoutImages = preg_replace('/<img\b[^>]*>/i', '', $chunk);
                     $mpdf->WriteHTML((string) $chunkWithoutImages);
+                }
+
+                if ($export->user_id && $export->token) {
+                    event(new CampReportSummaryExportProgressUpdated(
+                        (int) $export->user_id,
+                        (string) $export->token,
+                        $index + 1,
+                        $totalChunks
+                    ));
                 }
             }
 
@@ -131,7 +142,6 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
 
             Log::info('Camp report summary export prepared.', [
                 'export_id' => $this->exportId,
-                'encoded_photos' => $encodedPhotosCount,
                 'pdf_path' => $pdfPath,
             ]);
         } catch (\Throwable $e) {
@@ -173,8 +183,9 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                 $photoPaths = $photos->pluck('path')->values()->all();
                 $photoUrls = $photos
                     ->map(fn ($photo) => $photo->full_url ?: env('AWS_URL') . '/' . $photo->path)
-                    ->values()
-                    ->all();
+                    ->filter()
+                    ->unique()
+                    ->values();
 
                 $itemStatus = $item->item_status;
                 $itemStatusLabel = $itemStatus && isset($statusLabels[$itemStatus]) ? __($statusLabels[$itemStatus]) : '-';

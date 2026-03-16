@@ -9,26 +9,45 @@
             </div>
             <div class="card-toolbar flex-row-fluid justify-content-end gap-3 direction-column flex-md-row align-items-md-center">
                 @can('camp-reports.summary.export')
-                    <div class="d-flex flex-wrap align-items-center gap-2">
-                    <button
-                        type="button"
-                        class="btn btn-success d-inline-flex align-items-center gap-2"
-                        id="prepare-summary-export-btn"
-                        data-user-id="{{ auth()->id() }}"
-                        data-prepare-url="{{ route('camp-reports.summary.prepare') }}"
-                        data-export-url="{{ route('camp-reports.summary.export') }}"
-                        data-default-label="@lang('dashboard.export_pdf')"
-                        data-loading-label="@lang('dashboard.preparing_data')"
-                        data-timeout-message="@lang('dashboard.export_taking_too_long')"
-                        data-realtime-unavailable-message="@lang('dashboard.export_realtime_unavailable')"
-                        data-prepare-failed-message="@lang('dashboard.export_prepare_failed')"
-                        data-missing-token-message="@lang('dashboard.export_missing_token')"
-                    >
-                        <i class="bi bi-file-earmark-pdf"></i>
-                        <span>@lang('dashboard.export_pdf')</span>
-                    </button>
+                    <div class="d-flex flex-wrap gap-2">
+                    <div class="gap-2">
+                        <button
+                            type="button"
+                            class="btn btn-success d-inline-flex align-items-center gap-2"
+                            id="prepare-summary-export-btn"
+                            data-user-id="{{ auth()->id() }}"
+                            data-prepare-url="{{ route('camp-reports.summary.prepare') }}"
+                            data-export-url="{{ route('camp-reports.summary.export') }}"
+                            data-default-label="@lang('dashboard.export_pdf')"
+                            data-loading-label="@lang('dashboard.preparing_data')"
+                            data-timeout-message="@lang('dashboard.export_taking_too_long')"
+                            data-realtime-unavailable-message="@lang('dashboard.export_realtime_unavailable')"
+                            data-prepare-failed-message="@lang('dashboard.export_prepare_failed')"
+                            data-missing-token-message="@lang('dashboard.export_missing_token')"
+                        >
+                            <i class="bi bi-file-earmark-pdf"></i>
+                            <span>@lang('dashboard.export_pdf')</span>
+                        </button>
+                        <div id="summary-export-progress" class="mt-3 d-none">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small id="summary-export-progress-text" class="text-muted">Preparing export...</small>
+                                <small id="summary-export-progress-percent" class="text-muted">0%</small>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div
+                                id="summary-export-progress-bar"
+                                class="progress-bar progress-bar-striped progress-bar-animated"
+                                role="progressbar"
+                                style="width: 0%; transition: width 0.35s ease;"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                                aria-valuenow="0"
+                                ></div>
+                            </div>
+                        </div>
+                </div>
                     <a href="{{ route('camp-reports.summary.export') }}" class="btn btn-outline-secondary">@lang('dashboard.download_last_prepared_pdf')</a>
-                    </div>
+                </div>
                 @endcan
             </div>
         </div>
@@ -106,7 +125,7 @@
                             <td>{{ $row->item_status_label }}</td>
                             <td>
                                 <div class="d-flex gap-2 justify-content-center flex-wrap">
-                                    @forelse(array_slice($row->photo_urls, 0, 3) as $photoUrl)
+                                    @forelse($row->photo_urls as $photoUrl)
                                         <a href="{{ $photoUrl }}" target="_blank" rel="noopener noreferrer">
                                             <img src="{{ $photoUrl }}" alt="photo" style="width:52px;height:52px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">
                                         </a>
@@ -146,7 +165,51 @@
         const prepareFailedMessage = button.dataset.prepareFailedMessage || 'Failed to prepare export data.';
         const missingTokenMessage = button.dataset.missingTokenMessage || 'Missing export token.';
         const userId = button.dataset.userId;
+        const progressContainer = document.getElementById('summary-export-progress');
+        const progressBar = document.getElementById('summary-export-progress-bar');
+        const progressPercentText = document.getElementById('summary-export-progress-percent');
+        const progressText = document.getElementById('summary-export-progress-text');
         let currentChannel = null;
+
+        function setProgress(percent, labelText) {
+            const normalized = Math.max(0, Math.min(100, Number(percent) || 0));
+
+            if (progressContainer) {
+                progressContainer.classList.remove('d-none');
+            }
+
+            if (progressBar) {
+                progressBar.style.width = normalized + '%';
+                progressBar.setAttribute('aria-valuenow', String(normalized));
+            }
+
+            if (progressPercentText) {
+                progressPercentText.textContent = normalized + '%';
+            }
+
+            if (progressText && labelText) {
+                progressText.textContent = labelText;
+            }
+        }
+
+        function resetProgress() {
+            if (progressContainer) {
+                progressContainer.classList.add('d-none');
+            }
+
+            if (progressBar) {
+                progressBar.style.width = '0%';
+                progressBar.setAttribute('aria-valuenow', '0');
+            }
+
+            if (progressPercentText) {
+                progressPercentText.textContent = '0%';
+            }
+
+            if (progressText) {
+                progressText.textContent = 'Preparing export...';
+            }
+        }
 
         function stopListening() {
             if (currentChannel && typeof Echo !== 'undefined') {
@@ -166,12 +229,27 @@
                 currentChannel = `user.${userId}`;
 
                 Echo.private(`user.${userId}`)
+                    .listen('.camp-report-summary-export.progress', function (eventPayload) {
+                        if (!eventPayload || eventPayload.token !== token) {
+                            return;
+                        }
+
+                        const processed = Number(eventPayload.processed_chunks || 0);
+                        const total = Number(eventPayload.total_chunks || 0);
+                        const percent = Number(eventPayload.progress_percent || 0);
+                        const label = total > 0
+                            ? `Preparing PDF... (${processed}/${total} chunks)`
+                            : 'Preparing PDF...';
+
+                        setProgress(percent, label);
+                    })
                     .listen('.camp-report-summary-export.ready', function (eventPayload) {
                         console.log('Received event:', eventPayload);
                         if (!eventPayload || eventPayload.token !== token) {
                             return;
                         }
                         stopListening();
+                        setProgress(100, 'Export ready. Starting download...');
                         button.disabled = false;
                         button.querySelector('span').textContent = originalLabel;
                         const downloadUrl = exportUrl || ("/camp-reports/summary/export/pdf?token=" + token);
@@ -188,6 +266,7 @@
 
             button.disabled = true;
             button.querySelector('span').textContent = loadingLabel;
+            setProgress(0, 'Preparing PDF...');
 
             const params = new URLSearchParams(window.location.search);
 
@@ -227,6 +306,7 @@
                 alert(error.message || prepareFailedMessage);
                 button.disabled = false;
                 button.querySelector('span').textContent = originalLabel;
+                resetProgress();
             }
         });
     })();
