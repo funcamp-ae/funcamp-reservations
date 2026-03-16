@@ -173,7 +173,7 @@ class CampReportController extends Controller
 
         // If form is empty, export edited plan or all saved plans for this user.
         if ($items->isEmpty()) {
-            $planQuery = NewCampPlan::query()->where('created_by', auth()->id());
+            $planQuery = NewCampPlan::query()->oldest();
 
             if ($editingPlanId > 0) {
                 $plan = (clone $planQuery)->whereKey($editingPlanId)->first();
