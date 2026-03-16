@@ -9,28 +9,30 @@
             </div>
             <div class="card-toolbar flex-row-fluid justify-content-end gap-3 direction-column flex-md-row align-items-md-center">
                 @can('camp-reports.summary.export')
-                    <div class="d-flex flex-wrap gap-2">
-                    <div class="gap-2">
-                        <button
-                            type="button"
-                            class="btn btn-success d-inline-flex align-items-center gap-2"
-                            id="prepare-summary-export-btn"
-                            data-user-id="{{ auth()->id() }}"
-                            data-prepare-url="{{ route('camp-reports.summary.prepare') }}"
-                            data-export-url="{{ route('camp-reports.summary.export') }}"
-                            data-default-label="@lang('dashboard.export_pdf')"
-                            data-loading-label="@lang('dashboard.preparing_data')"
-                            data-timeout-message="@lang('dashboard.export_taking_too_long')"
-                            data-realtime-unavailable-message="@lang('dashboard.export_realtime_unavailable')"
-                            data-prepare-failed-message="@lang('dashboard.export_prepare_failed')"
-                            data-missing-token-message="@lang('dashboard.export_missing_token')"
-                            data-progress-initial-label="@lang('dashboard.export_preparing_pdf')"
-                            data-progress-ready-label="@lang('dashboard.export_ready_starting_download')"
-                            data-progress-template="@lang('dashboard.export_preparing_pdf_progress')"
-                        >
-                            <i class="bi bi-file-earmark-pdf"></i>
-                            <span>@lang('dashboard.export_pdf')</span>
-                        </button>
+                <div class="gap-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            <button
+                                type="button"
+                                class="btn btn-success d-inline-flex align-items-center gap-2"
+                                id="prepare-summary-export-btn"
+                                data-user-id="{{ auth()->id() }}"
+                                data-prepare-url="{{ route('camp-reports.summary.prepare') }}"
+                                data-export-url="{{ route('camp-reports.summary.export') }}"
+                                data-default-label="@lang('dashboard.export_pdf')"
+                                data-loading-label="@lang('dashboard.preparing_data')"
+                                data-timeout-message="@lang('dashboard.export_taking_too_long')"
+                                data-realtime-unavailable-message="@lang('dashboard.export_realtime_unavailable')"
+                                data-prepare-failed-message="@lang('dashboard.export_prepare_failed')"
+                                data-missing-token-message="@lang('dashboard.export_missing_token')"
+                                data-progress-initial-label="@lang('dashboard.export_preparing_pdf')"
+                                data-progress-ready-label="@lang('dashboard.export_ready_starting_download')"
+                                data-progress-template="@lang('dashboard.export_preparing_pdf_progress')"
+                            >
+                                <i class="bi bi-file-earmark-pdf"></i>
+                                <span>@lang('dashboard.export_pdf')</span>
+                            </button>       
+                            <a href="{{ route('camp-reports.summary.export') }}" class="btn btn-outline-secondary">@lang('dashboard.download_last_prepared_pdf')</a>
+                        </div>
                         <div id="summary-export-progress" class="mt-3 d-none">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <small id="summary-export-progress-text" class="text-muted">@lang('dashboard.export_preparing_pdf')</small>
@@ -48,8 +50,6 @@
                                 ></div>
                             </div>
                         </div>
-                </div>
-                    <a href="{{ route('camp-reports.summary.export') }}" class="btn btn-outline-secondary">@lang('dashboard.download_last_prepared_pdf')</a>
                 </div>
                 @endcan
             </div>
