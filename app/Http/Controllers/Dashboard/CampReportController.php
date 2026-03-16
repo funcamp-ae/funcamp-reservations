@@ -234,6 +234,9 @@ class CampReportController extends Controller
             'campName' => $campName,
             'items' => $items,
             'plansForExport' => $plansForExport,
+            'generatedAt' => now()->format('Y-m-d H:i:s'),
+            'generatedByName' => auth()->user()?->name ?? '-',
+            'generatedById' => auth()->id() ?? '-',
         ])->render();
 
         $mpdf = new Mpdf([
@@ -247,7 +250,7 @@ class CampReportController extends Controller
             'dir'            => app()->getLocale() === 'ar' ? 'rtl' : 'ltr',
             'default_font'   => 'DejaVuSans',
         ]);
-
+        $mpdf->SetFooter('<div style="text-align:center;">{PAGENO} / {nbpg}</div>');          
         $mpdf->WriteHTML($html);
 
         $filename = __('dashboard.camp_reports_new_camps') . '-' . date('Y-m-d') . '.pdf';

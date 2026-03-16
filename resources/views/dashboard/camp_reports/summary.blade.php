@@ -24,13 +24,16 @@
                             data-realtime-unavailable-message="@lang('dashboard.export_realtime_unavailable')"
                             data-prepare-failed-message="@lang('dashboard.export_prepare_failed')"
                             data-missing-token-message="@lang('dashboard.export_missing_token')"
+                            data-progress-initial-label="@lang('dashboard.export_preparing_pdf')"
+                            data-progress-ready-label="@lang('dashboard.export_ready_starting_download')"
+                            data-progress-template="@lang('dashboard.export_preparing_pdf_progress')"
                         >
                             <i class="bi bi-file-earmark-pdf"></i>
                             <span>@lang('dashboard.export_pdf')</span>
                         </button>
                         <div id="summary-export-progress" class="mt-3 d-none">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <small id="summary-export-progress-text" class="text-muted">Preparing export...</small>
+                                <small id="summary-export-progress-text" class="text-muted">@lang('dashboard.export_preparing_pdf')</small>
                                 <small id="summary-export-progress-percent" class="text-muted">0%</small>
                             </div>
                             <div class="progress" style="height: 8px;">
@@ -164,6 +167,9 @@
         const realtimeUnavailableMessage = button.dataset.realtimeUnavailableMessage || 'Real-time export notifications are unavailable.';
         const prepareFailedMessage = button.dataset.prepareFailedMessage || 'Failed to prepare export data.';
         const missingTokenMessage = button.dataset.missingTokenMessage || 'Missing export token.';
+        const progressInitialLabel = button.dataset.progressInitialLabel || 'Preparing PDF...';
+        const progressReadyLabel = button.dataset.progressReadyLabel || 'Export ready. Starting download...';
+        const progressTemplate = button.dataset.progressTemplate || 'Preparing PDF... (:processed/:total chunks)';
         const userId = button.dataset.userId;
         const progressContainer = document.getElementById('summary-export-progress');
         const progressBar = document.getElementById('summary-export-progress-bar');
@@ -207,7 +213,7 @@
             }
 
             if (progressText) {
-                progressText.textContent = 'Preparing export...';
+                progressText.textContent = progressInitialLabel;
             }
         }
 
@@ -238,8 +244,10 @@
                         const total = Number(eventPayload.total_chunks || 0);
                         const percent = Number(eventPayload.progress_percent || 0);
                         const label = total > 0
-                            ? `Preparing PDF... (${processed}/${total} chunks)`
-                            : 'Preparing PDF...';
+                            ? progressTemplate
+                                .replace(':processed', String(processed))
+                                .replace(':total', String(total))
+                            : progressInitialLabel;
 
                         setProgress(percent, label);
                     })
@@ -249,7 +257,7 @@
                             return;
                         }
                         stopListening();
-                        setProgress(100, 'Export ready. Starting download...');
+                        setProgress(100, progressReadyLabel);
                         button.disabled = false;
                         button.querySelector('span').textContent = originalLabel;
                         const downloadUrl = exportUrl || ("/camp-reports/summary/export/pdf?token=" + token);
@@ -266,7 +274,7 @@
 
             button.disabled = true;
             button.querySelector('span').textContent = loadingLabel;
-            setProgress(0, 'Preparing PDF...');
+            setProgress(0, progressInitialLabel);
 
             const params = new URLSearchParams(window.location.search);
 

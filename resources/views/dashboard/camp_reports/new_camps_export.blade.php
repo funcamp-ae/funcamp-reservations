@@ -15,6 +15,15 @@
         td { text-align: center; }
         .text-start { text-align: left; }
         [dir="rtl"] .text-start { text-align: right; }
+        .footer { margin-top: 16px; }
+        .footer-table td {
+            border: 0;
+            text-align: left;
+            padding: 0;
+            font-size: 10px;
+            color: #666;
+        }
+        [dir="rtl"] .footer-table td { text-align: right; }
     </style>
 </head>
 <body>
@@ -32,7 +41,7 @@
 
             <table>
                 <thead>
-                <tr>
+                <tr >
                     <th style="width: 42px;">{{ __('dashboard.serial') }}</th>
                     <th>{{ __('dashboard.item_name') }}</th>
                     <th style="width: 140px;">{{ __('dashboard.itemStatus') }}</th>
@@ -44,7 +53,7 @@
                 @foreach($plan->items as $idx => $item)
                     <tr>
                         <td>{{ $idx + 1 }}</td>
-                        <td class="text-start">{{ $item->item_name ?: '-' }}</td>
+                        <td class="text-center">{{ $item->item_name ?: '-' }}</td>
                         <td>
                             @if($item->sales_status === 'buy')
                                 {{ __('dashboard.sales_status_buy') }}
@@ -57,7 +66,7 @@
                             @endif
                         </td>
                         <td>{{ $item->requested_qty === null || $item->requested_qty === '' ? '-' : $item->requested_qty }}</td>
-                        <td class="text-start">{{ $item->notes ?: '-' }}</td>
+                        <td class="text-center">{{ $item->notes ?: '-' }}</td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -78,7 +87,7 @@
 
         <table>
             <thead>
-            <tr>
+            <tr style="text-align:center;">
                 <th style="width: 42px;">{{ __('dashboard.serial') }}</th>
                 <th>{{ __('dashboard.item_name') }}</th>
                 <th style="width: 140px;">{{ __('dashboard.sales_status') }}</th>
@@ -88,9 +97,9 @@
             </thead>
             <tbody>
             @forelse($items as $idx => $item)
-                <tr>
+                <tr style="text-align:center;">
                     <td>{{ $idx + 1 }}</td>
-                    <td class="text-start">{{ $item->item_name ?: '-' }}</td>
+                    <td class="text-center">{{ $item->item_name ?: '-' }}</td>
                     <td>
                         @if($item->sales_status === 'buy')
                             {{ __('dashboard.sales_status_buy') }}
@@ -115,6 +124,17 @@
             </tbody>
         </table>
     @endif
+
+    <div class="footer">
+        <table class="footer-table">
+            <tr>
+                <td>
+                    @lang('dashboard.generated_at'): {{ $generatedAt ?? '-' }} |
+                    @lang('dashboard.user'): {{ $generatedByName ?? '-' }} (@lang('dashboard.id'): {{ $generatedById ?? '-' }})
+                </td>
+            </tr>
+        </table>
+    </div>
 </body>
 </html>
 
