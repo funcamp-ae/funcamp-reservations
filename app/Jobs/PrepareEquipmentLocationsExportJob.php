@@ -59,10 +59,13 @@ class PrepareEquipmentLocationsExportJob implements ShouldQueue
                 ->latest()
                 ->get();
 
+            $exportUser = User::query()->find($export->user_id);
+
             $html = view('dashboard.equipment_directories.pdf.all_locations', [
+                'items' => $items,
                 'generatedAt' => now()->format('Y-m-d H:i:s'),
                 'generatedByName' => $exportUser->name ?? '-',
-                'generatedById' => $exportUser->id ,
+                'generatedById' => $exportUser->id ?? '-',
             ])->render();
 
             $mpdf = new Mpdf([
