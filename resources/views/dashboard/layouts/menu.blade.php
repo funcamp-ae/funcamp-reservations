@@ -2180,6 +2180,7 @@
 
             <!--begin::Menu item-->
 
+            @can('equipment.all-locations')
             <div class="menu-item">
 
                 <a href="{{ route('equipment.all-locations') }}" class="menu-link py-3 {{ isActiveRoute('equipment.all-locations') }}">
@@ -2195,6 +2196,7 @@
                 </a>
 
             </div>
+            @endcan
 
             <!--end::Menu item-->
 
