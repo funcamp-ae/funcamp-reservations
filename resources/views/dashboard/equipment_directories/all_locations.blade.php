@@ -4,7 +4,7 @@
 @section('content')
     <div class="card card-flush">
         <div class="card-header align-items-center py-5 gap-2 gap-md-5">
-            <div class="card-title">
+            <div class="card-title d-flex align-items-center flex-column gap-3 ">
                 <h3>@lang('dashboard.equipment_locations_statistics')</h3>
                 <div class="d-flex align-items-center position-relative my-1">
                     <input type="text" class="form-control form-control-solid w-250px ps-14" 
