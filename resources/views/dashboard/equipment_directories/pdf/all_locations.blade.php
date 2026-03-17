@@ -10,8 +10,6 @@
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #000; padding: 10px; text-align: center; font-size: 14px; }
         th { font-weight: bold; background-color: #f2f2f2; }
-        .footer { position: fixed; bottom: 10px; left: 0; right: 0; width: 100%; text-align: center; font-size: 12px; }
-        .footer-table { width: 100%; }
     </style>
 </head>
 <body>
@@ -58,16 +56,9 @@
     </tbody>
 </table>
 
-<div class="footer">
-    <table class="footer-table">
-        <tr>
-            <td>
-                @lang('dashboard.generated_at'): {{ $generatedAt ?? '-' }} |
-                @lang('dashboard.user'): {{ $generatedByName ?? '-' }} (@lang('dashboard.id'): {{ $generatedById ?? '-' }})
-            </td>
-        </tr>
-    </table>
+<div class="position-fixed bottom-0 start-0 p-2">
+    @lang('dashboard.generated_at'): {{ $generatedAt ?? '-' }} |
+    @lang('dashboard.user'): {{ $generatedByName ?? '-' }} (@lang('dashboard.id'): {{ $generatedById ?? '-' }})
 </div>
-
 </body>
 </html>
