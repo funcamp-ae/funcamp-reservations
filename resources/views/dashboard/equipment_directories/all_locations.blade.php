@@ -229,7 +229,6 @@
                         setProgress(percent, label);
                     })
                     .listen('.equipment-location-export.ready', function (eventPayload) {
-                        console.log('Received event:', eventPayload);
                         if (!eventPayload || eventPayload.token !== token) {
                             return;
                         }

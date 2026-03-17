@@ -18,7 +18,7 @@
             left: 0;
             right: 0;
             width: 100%;
-            text-align: center;
+            text-align: end;
             font-size: 12px;
             color: #444;
             padding: 6px 12px;

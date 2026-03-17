@@ -92,7 +92,6 @@ class PrepareEquipmentLocationsExportJob implements ShouldQueue
             ));
             
             $totalChunks = count($chunks);
-
             foreach ($chunks as $index => $chunk) {
                 try {
                     $mpdf->WriteHTML($chunk);
@@ -105,7 +104,6 @@ class PrepareEquipmentLocationsExportJob implements ShouldQueue
                     $chunkWithoutImages = preg_replace('/<img\b[^>]*>/i', '', $chunk);
                     $mpdf->WriteHTML((string) $chunkWithoutImages);
                 }
-
                 if ($export->user_id && $export->token) {
                     event(new EquipmentLocationExportProgress(
                         (int) $export->user_id,

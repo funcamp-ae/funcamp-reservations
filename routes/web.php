@@ -2080,7 +2080,6 @@ Route::get('/equipment-locations/export/status', [EquipmentDirectoryController::
     ->name('equipment.all-locations.export.status')->middleware(['auth']);
 Route::get('/equipment-locations/export', [EquipmentDirectoryController::class, 'exportAllLocationsStatisticsPdf'])
     ->name('equipment.all-locations.export')->middleware(['auth']);
-
 Route::resource('camp-reports', 'Dashboard\CampReportController')
     ->except(['show'])
     ->middleware(['auth', 'permission:camp-reports.index|camp-reports.create|camp-reports.edit|camp-reports.destroy']);
