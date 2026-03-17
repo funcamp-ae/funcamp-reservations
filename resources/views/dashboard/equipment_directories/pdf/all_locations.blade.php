@@ -7,9 +7,22 @@
         body { font-family: XBRiyaz, Arial, sans-serif; }
         h2 { text-align: center; color: red; }
         p { text-align: center; font-size: 14px; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 80px; }
         th, td { border: 1px solid #000; padding: 10px; text-align: center; font-size: 14px; }
         th { font-weight: bold; background-color: #f2f2f2; }
+
+        /* PDF footer: fixed at page bottom */
+        .pdf-footer {
+            position: fixed;
+            bottom: 12px;
+            left: 0;
+            right: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: #444;
+            padding: 6px 12px;
+        }
     </style>
 </head>
 <body>
@@ -56,7 +69,7 @@
     </tbody>
 </table>
 
-<div class="position-fixed bottom-0 start-0 p-2">
+<div class="pdf-footer">
     @lang('dashboard.generated_at'): {{ $generatedAt ?? '-' }} |
     @lang('dashboard.user'): {{ $generatedByName ?? '-' }} (@lang('dashboard.id'): {{ $generatedById ?? '-' }})
 </div>
