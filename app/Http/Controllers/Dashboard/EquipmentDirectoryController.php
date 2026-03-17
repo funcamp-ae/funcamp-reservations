@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Mpdf\Mpdf;
+use App\Models\EquipmentLocationExport;
+use App\Jobs\PrepareEquipmentLocationsExportJob;
 
 class EquipmentDirectoryController extends Controller
 {
@@ -278,6 +280,98 @@ class EquipmentDirectoryController extends Controller
 
         $mpdf->WriteHTML($html);
         return $mpdf->Output("equipment-items-{$equipmentDirectory->id}.pdf", 'D');
+    }
+
+    // ====== All Locations Statistics ======
+    public function allLocationsStatistics()
+    {
+        $items = EquipmentDirectoryItem::with(['directory', 'media'])
+            ->latest()
+            ->get();
+
+        return view('dashboard.equipment_directories.all_locations', compact('items'));
+    }
+
+    public function exportAllLocationsStatisticsPdf(Request $request)
+    {
+        $token = trim((string) $request->query('token', ''));
+        $preparedExport = $token
+            ? EquipmentLocationExport::query()
+                ->where('token', $token)
+                ->first()
+            : EquipmentLocationExport::query()
+                ->where('status', 'ready')
+                ->latest()
+                ->first();
+
+        if (! $preparedExport || $preparedExport->status !== 'ready' || empty($preparedExport->pdf_path) || ! Storage::disk('local')->exists($preparedExport->pdf_path)) {
+            return back()->with('error', 'Please try again in a moment with export PDF.')->withInput();
+        }
+
+        return Storage::disk('local')->download(
+            $preparedExport->pdf_path,
+            __('إحصائية جميع مواقع المعدات') . '-' . date('Y-m-d') . '.pdf'
+        );
+    }
+
+    public function prepareAllLocationsExport(Request $request)
+    {
+        $export = EquipmentLocationExport::query()->create([
+            'user_id' => auth()->id(),
+            'token' => (string) Str::uuid(),
+            'status' => 'pending',
+            'pdf_path' => null,
+            'error_message' => null,
+            'locale' => app()->getLocale(),
+            'prepared_at' => null,
+            'started_at' => null,
+            'finished_at' => null,
+            'expires_at' => now()->addHours(2),
+        ]);
+
+        PrepareEquipmentLocationsExportJob::dispatch($export->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Preparing data ... ',
+            'token' => $export->token,
+            'status' => $export->status,
+            'status_url' => route('equipment.all-locations.export.status', ['token' => $export->token]),
+            'export_url' => route('equipment.all-locations.export', ['token' => $export->token]),
+        ]);
+    }
+
+    public function allLocationsExportStatus(Request $request)
+    {
+        $token = trim((string) $request->query('token', ''));
+
+        if ($token === '') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Missing export token.',
+            ], 422);
+        }
+
+        $export = EquipmentLocationExport::query()
+            ->where('token', $token)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (! $export) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Export request not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'status' => $export->status,
+            'ready' => $export->status === 'ready',
+            'failed' => $export->status === 'failed',
+            'error_message' => $export->error_message,
+            'export_url' => route('equipment.all-locations.export', ['token' => $export->token]),
+        ]);
     }
 
     // ====== PRIVATE ======

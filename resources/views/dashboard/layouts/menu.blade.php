@@ -2104,6 +2104,8 @@
 
         'equipment-directories.index',
 
+        'equipment.all-locations',
+
         'equipment-directories.create',
 
         'equipment-directories.edit',
@@ -2121,6 +2123,8 @@
         <a href="#" class="menu-link py-3 {{areActiveRoutes([
 
             'equipment-directories.index',
+
+            'equipment.all-locations',
 
             'equipment-directories.create',
 
@@ -2167,6 +2171,26 @@
                     </span>
 
                     <span class="menu-title">@lang('dashboard.all_directories')</span>
+
+                </a>
+
+            </div>
+
+            <!--end::Menu item-->
+
+            <!--begin::Menu item-->
+
+            <div class="menu-item">
+
+                <a href="{{ route('equipment.all-locations') }}" class="menu-link py-3 {{ isActiveRoute('equipment.all-locations') }}">
+
+                    <span class="menu-bullet">
+
+                        <span class="bullet bullet-dot"></span>
+
+                    </span>
+
+                    <span class="menu-title">@lang('dashboard.equipment_locations_statistics')</span>
 
                 </a>
 

@@ -107,9 +107,6 @@ return [
     'full_confiscation_message' => 'Full Confiscation Message',
     'confiscation_note' => 'Confiscation Note',
     'confiscated_full' => 'Full Confiscation',
-    'order_details' => 'Reservation Details',
-    'order_id' => 'Reservation Id',
-    'order_date_rev' => 'Order Date',
     'confiscated_partial' => 'Partial Confiscation',
     'confiscation_details' => 'Confiscation Details',
     'partial_confiscation_amount' => 'Partial Confiscation Amount',
@@ -169,7 +166,6 @@ return [
     'source' => 'Source',
     'open_quantity_filter' => 'Open Quantity Filter',
     'Percentage' => 'Percentage',
-    'choose_receiver' => 'Choose Receiver',
     'transactions' => 'Transactions',
     'warning' => 'Warning',
     'submit_fillter' => 'Apply Filter',
@@ -1678,7 +1674,7 @@ return [
     'company_name' => 'Company Name',
     'terms_setting' => 'Terms & Conditions Settings',
     'commercial_license' => 'Terms & Conditions',
-    'expired_price_offer' => 'Price Offer Expiry Date',
+    'expired_price_offer' => 'Expired Price Offer',
     'delayed_time' => 'Select New Date and Time',
     'Bank-account' => 'Transactions',
     'refunds_notes' => 'Refund Notes',
@@ -2595,5 +2591,16 @@ return [
     'cancel_confirm_text' => 'All transactions related to this reservation will be deleted. Do you want to continue?',
     'cancel_confirm_yes' => 'Yes, cancel',
     'cancel_confirm_no' => 'No, keep',
+
+    // Equipment Locations Statistics
+    'equipment_locations_statistics' => 'All Equipment Locations Statistics',
+    'directory_name' => 'Directory Name',
+    'item_name' => 'Item Name',
+    'item_contents' => 'Item Contents',
+    'location' => 'Location',
+    'media' => 'Media',
+    'quantity' => 'Quantity',
+    'additional_notes' => 'Additional Notes',
+    'no_media' => 'No Media',
 
 ];

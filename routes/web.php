@@ -2072,6 +2072,15 @@ Route::get('equipment-directories/export', [EquipmentDirectoryController::class,
 Route::get('equipment-directories/{equipmentDirectory}/items/export', [EquipmentDirectoryController::class, 'exportItemsPdf'])
     ->name('equipment-directories.items.export')->middleware(['auth']);
 
+Route::get('/equipment-locations', [EquipmentDirectoryController::class, 'allLocationsStatistics'])
+    ->name('equipment.all-locations')->middleware(['auth']);
+Route::post('/equipment-locations/export/prepare', [EquipmentDirectoryController::class, 'prepareAllLocationsExport'])
+    ->name('equipment.all-locations.export.prepare')->middleware(['auth']);
+Route::get('/equipment-locations/export/status', [EquipmentDirectoryController::class, 'allLocationsExportStatus'])
+    ->name('equipment.all-locations.export.status')->middleware(['auth']);
+Route::get('/equipment-locations/export', [EquipmentDirectoryController::class, 'exportAllLocationsStatisticsPdf'])
+    ->name('equipment.all-locations.export')->middleware(['auth']);
+
 Route::resource('camp-reports', 'Dashboard\CampReportController')
     ->except(['show'])
     ->middleware(['auth', 'permission:camp-reports.index|camp-reports.create|camp-reports.edit|camp-reports.destroy']);

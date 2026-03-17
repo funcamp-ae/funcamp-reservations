@@ -2299,5 +2299,16 @@ return [
     'google_unlinked_successfully' => 'تم إلغاء ربط حساب Google بنجاح!',
     'error_unlinking_google' => 'خطأ في إلغاء ربط حساب Google. حاول مرة أخرى.',
 
+    // Equipment Locations Statistics
+    'equipment_locations_statistics' => 'إحصائية جميع مواقع المعدات',
+    'directory_name' => 'اسم المجلد',
+    'item_name' => 'اسم الصنف',
+    'item_contents' => 'محتويات الصنف',
+    'location' => 'موقع الصنف',
+    'media' => 'الوسائط',
+    'quantity' => 'الكمية',
+    'additional_notes' => 'ملاحظات إضافية',
+    'no_media' => 'بدون وسائط',
+
 ];
 
