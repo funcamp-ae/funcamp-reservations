@@ -95,7 +95,7 @@ class EquipmentDirectoryController extends Controller
         // ✅ فاليديشن على نفس ستايل OrderCheckinController
         $request->validate([
             'name'        => ['required', 'string', 'max:255'],
-            'contents'    => ['nullable', 'string'],
+            'contents'    => ['required', 'string'],
             'location'    => ['required', 'string', 'max:255'],
             'quantity'    => ['required', 'integer', 'min:1'],
             'notes'       => ['nullable', 'string'],
@@ -167,7 +167,7 @@ class EquipmentDirectoryController extends Controller
         // ✅ نفس الفاليديشن كما في storeItem (نفس ستايل OrderCheckinController)
         $request->validate([
             'name'        => ['required', 'string', 'max:255'],
-            'contents'    => ['nullable', 'string'],
+            'contents'    => ['required', 'string'],
             'location'    => ['required', 'string', 'max:255'],
             'quantity'    => ['required', 'integer', 'min:1'],
             'notes'       => ['nullable', 'string'],
