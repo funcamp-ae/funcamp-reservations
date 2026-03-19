@@ -59,7 +59,7 @@
 
                 {{-- ITEM CONTENTS --}}
                 <div class="row mb-6">
-                    <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.item_contents')</label>
+                    <label class="col-lg-4 col-form-label required fw-bold fs-6">@lang('dashboard.item_contents')</label>
                     <div class="col-lg-8">
                         <textarea name="contents" rows="3" class="form-control" required>{{ old('contents', $item->contents ?? '') }}</textarea>
                     </div>
