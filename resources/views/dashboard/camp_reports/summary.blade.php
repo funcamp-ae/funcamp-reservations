@@ -120,7 +120,7 @@
                             <td>{{ $row->report_subtype ?? '-' }}</td>
                             <td>
                                 @if($row->report_id)
-                                    <a href="{{ route('camp-reports.edit', $row->report_id) }}">{{ $row->item_name }}</a>
+                                    <a href="{{ route('camp-reports.edit', $row->report_id) }}#{{ $row->report_id }}">{{ $row->item_name }}</a>
                                 @else
                                     {{ $row->item_name }}
                                 @endif

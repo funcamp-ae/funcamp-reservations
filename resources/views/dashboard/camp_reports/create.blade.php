@@ -103,7 +103,7 @@
                                 @endphp
 
 
-                                <div class="card mb-4 item-row" data-index="{{ $index }}">
+                                <div class="card mb-4 item-row" data-index="{{ $index }}" id="{{ $item->report_id }}">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h5 class="mb-0">#{{ $index + 1 }}</h5>
                                         <button type="button" class="btn btn-sm btn-icon btn-danger remove-item">
