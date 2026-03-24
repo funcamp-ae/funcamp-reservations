@@ -82,7 +82,11 @@ class PaymentSummaryService
             ])
             ->latest()
             ->take($limit)
-            ->get();
+            ->get()
+            ->unique(function ($surveyResponse) {
+                 return $surveyResponse->reservation->id ;
+                 })->values()->all();
+
     }
 
     /**
