@@ -112,6 +112,18 @@ class PrepareEquipmentLocationsExportJob implements ShouldQueue
                         $totalChunks,
                         round((($index + 1) / $totalChunks) * 100, 2)
                     ));
+                    Log::info('Equipment locations summary export progress event dispatched.', [
+                        'export_id' => $this->exportId,
+                        'user_id' => $export->user_id,
+                        'processed_chunks' => $index + 1,
+                        'total_chunks' => $totalChunks,
+                    ]);
+                }else {
+                    Log::info('Skipping progress event dispatch for equipment locations summary export because user_id or token is missing.', [
+                        'export_id' => $this->exportId,
+                        'user_id' => $export->user_id,
+                        'token' => $export->token,
+                    ]);
                 }
             }
 
@@ -132,11 +144,29 @@ class PrepareEquipmentLocationsExportJob implements ShouldQueue
             ]);
 
             if ($export->user_id && $export->token) {
-                event(new EquipmentLocationExportReady(
-                    (int) $export->user_id,
-                    (string) $export->token,
-                    route('equipment.all-locations.export', ['token' => (string) $export->token])
-                ));
+                Log::info('About to dispatch Equipment locations ready event.', [
+                    'export_id' => $this->exportId,
+                    'user_id' => $export->user_id,
+                ]);
+
+                try {
+                    event(new EquipmentLocationExportReady(
+                        (int) $export->user_id,
+                        (string) $export->token,
+                        route('equipment.all-locations.export', ['token' => (string) $export->token])
+                    ));
+
+                    Log::info('Equipment locations summary export ready event dispatched.', [
+                        'export_id' => $this->exportId,
+                        'user_id' => $export->user_id,
+                    ]);
+                } catch (\Throwable $e) {
+                    Log::error('Failed to dispatch Equipment locations ready event.', [
+                        'export_id' => $this->exportId,
+                        'user_id' => $export->user_id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
 
             app()->setLocale($originalLocale);

@@ -27,4 +27,13 @@ class EquipmentLocationExportReady implements ShouldBroadcastNow
     {
         return 'equipment-location-export.ready';
     }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'userId' => $this->userId,
+            'token' => $this->token,
+            'downloadUrl' => $this->downloadUrl,
+        ];
+    }
 }

@@ -29,4 +29,15 @@ class EquipmentLocationExportProgress implements ShouldBroadcastNow
     {
         return 'equipment-location-export.progress';
     }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'userId' => $this->userId,
+            'token' => $this->token,
+            'processedChunks' => $this->processedChunks,
+            'totalChunks' => $this->totalChunks,
+            'progressPercent' => $this->progressPercent,
+        ];
+    }
 }
