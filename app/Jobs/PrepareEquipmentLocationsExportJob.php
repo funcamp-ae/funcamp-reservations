@@ -171,11 +171,11 @@ class PrepareEquipmentLocationsExportJob implements ShouldQueue
 
                 // If the user requested WhatsApp notification, attempt to send a link preview
                 try {
-                    if (!empty($export->notify_whatsapp) && $exportUser && ($exportUser->full_phone ?? null)) {
+                    if (!empty($export->notify_whatsapp) && $exportUser && ($exportUser->phone ?? null)) {
                         $whats = new WhatsAppService();
                         $downloadUrl = route('equipment.all-locations.export', ['token' => (string) $export->token]);
                         $message = __('dashboard.equipment_locations_export_ready_message', ['url' => $downloadUrl]);
-                        $whats->sendLinkPreview($exportUser->full_phone, $downloadUrl, $message);
+                        $whats->sendLinkPreview($exportUser->phone, $downloadUrl, $message);
                         Log::info('WhatsApp notification sent for equipment locations export.', ['export_id' => $this->exportId, 'user_id' => $export->user_id]);
                     }
                 } catch (\Throwable $e) {
