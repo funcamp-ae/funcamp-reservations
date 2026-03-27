@@ -172,6 +172,21 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
     private function buildSummaryRows(CampReportSummaryExport $export)
     {
         $filters = is_array($export->filters) ? $export->filters : [];
+        $customOrder = $filters['custom_report_subtype_order'] ?? [];
+
+        // If filter was saved as JSON string, decode it
+        if (is_string($customOrder)) {
+            $decoded = json_decode($customOrder, true);
+            $customOrder = is_array($decoded) ? $decoded : [$customOrder];
+        }
+
+        // Build position map: subtype => position index (if an array was provided)
+        $positionMap = [];
+        if (is_array($customOrder)) {
+            foreach ($customOrder as $pos => $id) {
+                $positionMap[(string) $id] = $pos;
+            }
+        }
         $statusLabels = CampReportHelper::itemStatuses();
 
         return CampReportItem::with(['report.service', 'media'])
@@ -234,6 +249,12 @@ class PrepareCampReportSummaryExportJob implements ShouldQueue
                 }
 
                 return true;
+            })
+            // If a custom ordering was provided as an array, apply it
+            ->when(!empty($positionMap), function ($collection) use ($positionMap) {
+                return $collection->sortBy(function ($row) use ($positionMap) {
+                    return $positionMap[(string) $row->report_subtype] ?? PHP_INT_MAX;
+                });
             })
             ->values();
     }

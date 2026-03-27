@@ -54,7 +54,7 @@ class CampReportController extends Controller
             'itemStatuses' => CampReportHelper::itemStatuses(),
             'itemNames' => $itemNames,
             'reportSubtypes' => $reportSubtypes,
-            'filters' => $request->only(['report_type', 'report_subtype', 'item_status', 'item_name']),
+            'filters' => $request->only(['report_type', 'report_subtype', 'item_status', 'item_name', 'custom_report_subtype_order']),
         ]);
     }
 
@@ -284,10 +284,25 @@ class CampReportController extends Controller
 
     public function prepareSummaryExport(Request $request)
     {
+        $incoming = $request->only(['report_type', 'report_subtype', 'item_status', 'item_name']);
+
+        // Normalize custom_report_subtype_order: accept array or JSON string
+        $custom = $request->input('custom_report_subtype_order');
+        if (is_string($custom)) {
+            $decoded = json_decode($custom, true);
+            $custom = is_array($decoded) ? $decoded : [$custom];
+        }
+        if (!is_array($custom)) {
+            $custom = [];
+        }
+
+        $filters = $incoming;
+        $filters['custom_report_subtype_order'] = array_values($custom);
+
         $export = CampReportSummaryExport::query()->create([
             'user_id' => auth()->id(),
             'token' => (string) Str::uuid(),
-            'filters' => $request->only(['report_type', 'report_subtype', 'item_status', 'item_name']),
+            'filters' => $filters,
             'rows' => [],
             'status' => 'pending',
             'pdf_path' => null,

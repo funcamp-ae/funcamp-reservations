@@ -84,6 +84,15 @@
                     </select>
                 </div>
                 <div class="col-md-3">
+                    <label class="form-label">@lang('dashboard.custom_report_subtype_for_pdf')</label>
+                    <select id="export-report-subtype" name="custom_report_subtype_order[]" class="form-select" multiple>
+                        <option value="">@lang('dashboard.all_title', ['page_title' => __('dashboard.custom_report_subtype_for_pdf')])</option>
+                        @foreach ($reportSubtypes as $subtype)
+                            <option value="{{ $subtype }}" {{ (is_array($filters['custom_report_subtype_order'] ?? null) && in_array($subtype, $filters['custom_report_subtype_order'])) ? 'selected' : '' }}>{{ $subtype }}</option>
+                        @endforeach
+                    </select>
+                  </div>
+                <div class="col-md-3">
                     <label class="form-label">@lang('dashboard.itemName')</label>
                     <input type="text" name="item_name" class="form-control" value="{{ $filters['item_name'] ?? '' }}" list="item-name-options">
                     <datalist id="item-name-options">
@@ -176,6 +185,60 @@
         const progressPercentText = document.getElementById('summary-export-progress-percent');
         const progressText = document.getElementById('summary-export-progress-text');
         let currentChannel = null;
+
+        // custom export-specific report subtype input
+        const exportSubtypeEl = document.getElementById('export-report-subtype');
+        let customOrder = [];
+
+        function arrayRemove(arr, val) {
+            const idx = arr.indexOf(val);
+            if (idx !== -1) arr.splice(idx, 1);
+        }
+
+        function initSelectOrderTracking(selectEl, orderArr) {
+            if (!selectEl) return;
+
+            if (window.jQuery && jQuery().select2) {
+                jQuery(selectEl).select2({ width: 'resolve', placeholder: '' });
+
+                jQuery(selectEl).on('select2:select', function (e) {
+                    const val = String(e.params.data.id);
+                    arrayRemove(orderArr, val);
+                    orderArr.push(val);
+                });
+
+                jQuery(selectEl).on('select2:unselect', function (e) {
+                    const val = String(e.params.data.id);
+                    arrayRemove(orderArr, val);
+                });
+
+                const init = Array.from(selectEl.selectedOptions || []).map(o => String(o.value));
+                init.forEach(v => { arrayRemove(orderArr, v); orderArr.push(v); });
+                return;
+            }
+
+            // native fallback: infer order from selection sequence
+            let previousSelected = Array.from(selectEl.selectedOptions || []).map(o => String(o.value));
+            previousSelected.forEach(v => { arrayRemove(orderArr, v); orderArr.push(v); });
+
+            selectEl.addEventListener('change', function () {
+                const current = Array.from(selectEl.selectedOptions || []).map(o => String(o.value));
+                current.forEach(v => {
+                    if (!previousSelected.includes(v)) {
+                        arrayRemove(orderArr, v);
+                        orderArr.push(v);
+                    }
+                });
+                previousSelected.forEach(v => {
+                    if (!current.includes(v)) {
+                        arrayRemove(orderArr, v);
+                    }
+                });
+                previousSelected = current;
+            });
+        }
+
+        initSelectOrderTracking(exportSubtypeEl, customOrder);
 
         function setProgress(percent, labelText) {
             const normalized = Math.max(0, Math.min(100, Number(percent) || 0));
@@ -277,6 +340,23 @@
             setProgress(0, progressInitialLabel);
 
             const params = new URLSearchParams(window.location.search);
+
+            // include custom export report_subtype_order if provided (send as JSON array)
+            try {
+                if (exportSubtypeEl) {
+                    let values = [];
+                    if (customOrder && customOrder.length > 0) {
+                        values = customOrder.slice();
+                    } else {
+                        values = Array.from(exportSubtypeEl.selectedOptions || []).map(o => String(o.value));
+                    }
+                    if (values.length > 0) {
+                        params.set('custom_report_subtype_order', JSON.stringify(values));
+                    }
+                }
+            } catch (e) {
+                // ignore
+            }
 
             try {
                 const response = await fetch(button.dataset.prepareUrl, {
