@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Mpdf\Mpdf;
+use App\Services\WhatsAppService;
 
 class PrepareEquipmentLocationsExportJob implements ShouldQueue
 {
@@ -162,6 +163,23 @@ class PrepareEquipmentLocationsExportJob implements ShouldQueue
                     ]);
                 } catch (\Throwable $e) {
                     Log::error('Failed to dispatch Equipment locations ready event.', [
+                        'export_id' => $this->exportId,
+                        'user_id' => $export->user_id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+
+                // If the user requested WhatsApp notification, attempt to send a link preview
+                try {
+                    if (!empty($export->notify_whatsapp) && $exportUser && ($exportUser->full_phone ?? null)) {
+                        $whats = new WhatsAppService();
+                        $downloadUrl = route('equipment.all-locations.export', ['token' => (string) $export->token]);
+                        $message = __('dashboard.equipment_locations_export_ready_message', ['url' => $downloadUrl]);
+                        $whats->sendLinkPreview($exportUser->full_phone, $downloadUrl, $message);
+                        Log::info('WhatsApp notification sent for equipment locations export.', ['export_id' => $this->exportId, 'user_id' => $export->user_id]);
+                    }
+                } catch (\Throwable $e) {
+                    Log::error('Failed to send WhatsApp notification for equipment locations export.', [
                         'export_id' => $this->exportId,
                         'user_id' => $export->user_id,
                         'error' => $e->getMessage(),

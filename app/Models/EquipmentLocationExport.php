@@ -11,6 +11,7 @@ class EquipmentLocationExport extends Model
 
     protected $fillable = [
         'user_id',
+        'notify_whatsapp',
         'token',
         'filters',
         'rows',
@@ -27,6 +28,7 @@ class EquipmentLocationExport extends Model
     protected $casts = [
         'filters' => 'array',
         'rows' => 'array',
+        'notify_whatsapp' => 'boolean',
         'prepared_at' => 'datetime',
         'started_at' => 'datetime',
         'finished_at' => 'datetime',

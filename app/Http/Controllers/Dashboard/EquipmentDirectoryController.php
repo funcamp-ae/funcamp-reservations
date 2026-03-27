@@ -337,6 +337,7 @@ class EquipmentDirectoryController extends Controller
     {
         $export = EquipmentLocationExport::query()->create([
             'user_id' => auth()->id(),
+            'notify_whatsapp' => $request->boolean('notify_whatsapp'),
             'token' => (string) Str::uuid(),
             'status' => 'pending',
             'pdf_path' => null,
