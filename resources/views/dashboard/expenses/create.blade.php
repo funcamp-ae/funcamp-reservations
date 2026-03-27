@@ -382,6 +382,106 @@
                                         </tr>
                                         <!--end::Table row-->
                                     @endcan
+                                @else
+                                          <tr data-id="{{$expense->id}}">
+                                            <!--begin::Checkbox-->
+                                            <td>
+                                                <div class="form-check form-check-sm form-check-custom form-check-solid">
+                                                    <input class="form-check-input checkSingle" type="checkbox" value="1" id="{{$expense->id}}"/>
+                                                </div>
+                                            </td>
+                                            <!--begin::Expense Item-->
+                                            <td>{{$expense->expenseItem->name ?? '-'}}</td>
+                                            <td>
+                                                <div class="d-flex">
+                                                    <!--end::Thumbnail-->
+                                                    <div class="ms-5">
+                                                        <!--begin::Title-->
+                                                        <a href="#" data-kt-ecommerce-category-filter="search" class="   text-hover-primary fs-5 fw-bolder mb-1">{{$expense->price}}</a>
+                                                        <!--end::Title-->
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{$expense->payment_method ? __('dashboard.' . $expense->payment_method) : __('dashboard.not_specified')}}</td>
+                                            <td>{{$expense->account->name ?? '-'}}</td>
+                                            <td>
+                                                {{ $expense->verified ? __('dashboard.yes') : __('dashboard.no') }} <br>
+                                                @can('expenses.approve')
+                                                @if($expense->verified)
+                                                    <a href="{{ route('order.verified' , [$expense->id , 'expense']) }}" class="btn btn-sm btn-danger">{{ __('dashboard.mark') }} {{ __('dashboard.unverifyed') }}</a>
+                                                @else
+                                                    <a href="{{ route('order.verified' , [$expense->id , 'expense']) }}" class="btn btn-sm btn-success">{{ __('dashboard.mark') }} {{ __('dashboard.verified') }}</a>
+                                                @endif
+                                                @endcan
+                                            </td>
+                                            <td>
+                                                    @php
+                                                        $images = [];
+                                                        if(isset($expense->images)) {
+                                                            if(is_array($expense->images) && count($expense->images) > 0) {
+                                                                $images = $expense->images;
+                                                            } elseif(is_string($expense->images)) {
+                                                                $decoded = json_decode($expense->images, true);
+                                                                if(is_array($decoded) && count($decoded) > 0) {
+                                                                    $images = $decoded;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        if(empty($images) && ($expense->image_path || $expense->image)) {
+                                                            $images[] = $expense->image_path ?? $expense->image;
+                                                        }
+                                                    @endphp
+                                                    
+                                                    @if(count($images) > 0)
+                                                        <button type="button" class="btn btn-sm btn-primary d-flex gap-2 align-items-center justify-content-center" onclick="previewMultipleImages({{ json_encode(array_map(function($img){return asset('storage/' . $img);}, $images)) }}, '{{ $expense->id }}')">
+                                                            <span> {{ count($images) }}</span><i class="fas fa-eye"></i> 
+                                                        </button>
+                                                    @else
+                                                        <span class="text-muted">{{ __('dashboard.no_data') }}</span>
+                                                    @endif
+                                            </td>
+                                            <!--begin::By-->
+                                            <td>
+                                                {{ $expense->handledBy?->name ?? '-' }}
+                                            </td>
+                                            <!--end::By-->
+                                            <td data-kt-ecommerce-category-filter="category_name">
+                                                {{$expense->notes}}
+                                            </td>
+                                            <td>{{ $expense->created_at->format('Y-m-d') }}</td>
+                                            <td>{{ $expense->created_at->format('h:i A') }}</td>
+                                            <!--end::Expense Item-->
+                                            <!--begin::Action-->
+                                            <td class="text-end">
+                                                <a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                                {{ __('dashboard.actions') }}
+                                                <!--begin::Svg Icon | path: icons/duotune/arrows/arr072.svg-->
+                                                <span class="svg-icon svg-icon-5 m-0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                                        <path d="M11.4343 12.7344L7.25 8.55005C6.83579 8.13583 6.16421 8.13584 5.75 8.55005C5.33579 8.96426 5.33579 9.63583 5.75 10.05L11.2929 15.5929C11.6834 15.9835 12.3166 15.9835 12.7071 15.5929L18.25 10.05C18.6642 9.63584 18.6642 8.96426 18.25 8.55005C17.8358 8.13584 17.1642 8.13584 16.75 8.55005L12.5657 12.7344C12.2533 13.0468 11.7467 13.0468 11.4343 12.7344Z" fill="currentColor" />
+                                                    </svg>
+                                                </span>
+                                                <!--end::Svg Icon--></a>
+                                                <!--begin::Menu-->
+                                                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
+                                                    @can('expenses.edit')
+                                                    <div class="menu-item px-3">
+                                                        <a href="#" class="menu-link px-3" onclick="openEditModal({{ $expense->id }}, '{{ $expense->account_id }}', '{{ $expense->expense_item_id }}', '{{ $expense->payment_method }}', '{{ $expense->date }}', '{{ $expense->price }}', '{{ addslashes($expense->notes) }}')">{{ __('actions.edit') }}</a>
+                                                    </div>
+                                                    @endcan
+                                                    @can('expenses.destroy')
+                                                    <!--begin::Menu item-->
+                                                    <div class="menu-item px-3">
+                                                        <a href="#" class="menu-link px-3" data-kt-ecommerce-category-filter="delete_row" data-url="{{route('expenses.destroy', $expense->id)}}" data-id="{{$expense->id}}"> @lang('dashboard.delete')</a>
+                                                    </div>
+                                                    @endcan
+                                                <!--end::Menu item-->
+                                                </div>
+                                                <!--end::Menu-->
+                                            </td>
+                                            <!--end::Action-->
+                                        </tr>
                                 @endif
                                 
                             @endforeach
