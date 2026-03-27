@@ -1013,6 +1013,8 @@ return [
     'add_item_to_directory' => 'Add Item to Directory',
     'directory_status' => 'Status',
     'all_directories' => 'All Equipment Directories',
+    'select_directories_order' => 'Select directories order',
+    'custom_report_subtype_for_pdf' => 'Custom report subtype for PDF',
 
     'camp_reports' => 'Camp Reports',
     'camp_report' => 'Camp Report',

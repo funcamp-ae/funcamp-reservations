@@ -60,6 +60,22 @@ class PrepareEquipmentLocationsExportJob implements ShouldQueue
                 ->latest()
                 ->get();
 
+            // Reorder items according to selection order stored in export.filters
+            $filters = $export->filters ?? [];
+            $selectOrder = $filters['select_order'] ?? [];
+
+            // Build position map: id (string) => position index
+            $positionMap = [];
+            if (is_array($selectOrder)) {
+                foreach ($selectOrder as $pos => $id) {
+                    $positionMap[(string) $id] = $pos;
+                }
+            }
+
+            // Sort using the position map. Keep the result as a Collection
+            $items = $items->sortBy(function (EquipmentDirectoryItem $item) use ($positionMap) {
+                return $positionMap[(string) $item->directory?->id] ?? PHP_INT_MAX;
+            })->values();
             $exportUser = User::query()->find($export->user_id);
 
             $html = view('dashboard.equipment_directories.pdf.all_locations', [

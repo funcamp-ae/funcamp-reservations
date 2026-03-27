@@ -1010,6 +1010,9 @@ return [
     'export' => 'صادرول',
     'all_directories' => 'د تجهیزاتو ټول موقعیتونه',
 
+    'select_directories_order' => 'د فولډرونو د انتخاب ترتیب',
+    'custom_report_subtype_for_pdf' => 'د PDF لپاره دودیز راپور فرعي ډول',
+
     'is_active' => 'دریځ',
     'type' => 'ډول',
     'video' => 'ویډیو',

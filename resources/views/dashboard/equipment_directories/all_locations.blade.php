@@ -8,21 +8,22 @@
                 <h3>@lang('dashboard.equipment_locations_statistics')</h3>
                 <div class="d-flex align-items-center position-relative my-1">
                     <input type="text" class="form-control form-control-solid w-250px ps-14" 
-                        placeholder="@lang('dashboard.search_items')" id="search-input" />
+                    placeholder="@lang('dashboard.search_items')" id="search-input" />
                 </div>
             </div>
             <div class="card-toolbar">
                 <div class="gap-2">
                     <div class="d-flex flex-wrap gap-2">
+                        
                         <button
-                            type="button"
-                            class="btn btn-success d-inline-flex align-items-center gap-2"
-                            id="prepare-equipment-export-btn"
-                            data-user-id="{{ auth()->id() }}"
-                            data-prepare-url="{{ route('equipment.all-locations.export.prepare') }}"
-                            data-export-url="{{ route('equipment.all-locations.export') }}"
-                            data-default-label="@lang('dashboard.export_pdf')"
-                            data-loading-label="@lang('dashboard.preparing_data')"
+                        type="button"
+                        class="btn btn-success d-inline-flex align-items-center gap-2"
+                        id="prepare-equipment-export-btn"
+                        data-user-id="{{ auth()->id() }}"
+                        data-prepare-url="{{ route('equipment.all-locations.export.prepare') }}"
+                        data-export-url="{{ route('equipment.all-locations.export') }}"
+                        data-default-label="@lang('dashboard.export_pdf')"
+                        data-loading-label="@lang('dashboard.preparing_data')"
                             data-timeout-message="@lang('dashboard.export_taking_too_long')"
                             data-realtime-unavailable-message="@lang('dashboard.export_realtime_unavailable')"
                             data-prepare-failed-message="@lang('dashboard.export_prepare_failed')"
@@ -30,30 +31,41 @@
                             data-progress-initial-label="@lang('dashboard.export_preparing_pdf')"
                             data-progress-ready-label="@lang('dashboard.export_ready_starting_download')"
                             data-progress-template="@lang('dashboard.export_preparing_pdf_progress')"
-                        >
+                            >
                             <i class="fas fa-file-pdf"></i>
                             <span>@lang('dashboard.export_pdf')</span>
-                        </button>       
-                        <a href="{{ route('equipment.all-locations.export') }}" class="btn btn-outline-secondary">@lang('dashboard.download_last_prepared_pdf')</a>
-                    </div>
-                    <div id="equipment-export-progress" class="mt-3 d-none">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <small id="equipment-export-progress-text" class="text-muted">@lang('dashboard.export_preparing_pdf')</small>
-                            <small id="equipment-export-progress-percent" class="text-muted">0%</small>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div
-                            id="equipment-export-progress-bar"
-                            class="progress-bar progress-bar-striped progress-bar-animated"
-                            role="progressbar"
-                            style="width: 0%; transition: width 0.35s ease;"
-                            aria-valuemin="0"
+                            </button>       
+                            <a href="{{ route('equipment.all-locations.export') }}" class="btn btn-outline-secondary">@lang('dashboard.download_last_prepared_pdf')</a>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="min-width:320px ">
+                                    <label class="small text-muted mb-1">@lang('dashboard.select_directories_order')</label>
+                                    <select id="select-directories" class="form-select form-select-sm" multiple style="width:100%">
+                                        @foreach($dirOptions as $dId => $dName)
+                                            <option value="{{ $dId }}">{{ $dName }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                
+                            </div>
+                            <div id="equipment-export-progress" class="mt-3 d-none">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small id="equipment-export-progress-text" class="text-muted">@lang('dashboard.export_preparing_pdf')</small>
+                                    <small id="equipment-export-progress-percent" class="text-muted">0%</small>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div
+                                    id="equipment-export-progress-bar"
+                                class="progress-bar progress-bar-striped progress-bar-animated"
+                                role="progressbar"
+                                style="width: 0%; transition: width 0.35s ease;"
+                                aria-valuemin="0"
                             aria-valuemax="100"
                             aria-valuenow="0"
                             ></div>
                         </div>
                     </div>
-                    <div class="form-check form-check-inline align-items-center ms-3">
+                    <div class="form-check form-check-inline align-items-center ms-3 mt-4">
                         <input class="form-check-input" type="checkbox" id="notify-whatsapp" value="1">
                         <label class="form-check-label small ms-1" for="notify-whatsapp">@lang('dashboard.send_me_on_whatsapp_when_finished')</label>
                     </div>
@@ -157,6 +169,64 @@
         const progressPercentText = document.getElementById('equipment-export-progress-percent');
         const progressText = document.getElementById('equipment-export-progress-text');
         let currentChannel = null;
+
+        // Selection order tracking for the multi-select
+        const selectEl = document.getElementById('select-directories');
+        let selectOrder = [];
+
+        function arrayRemove(arr, val) {
+            const idx = arr.indexOf(val);
+            if (idx !== -1) arr.splice(idx, 1);
+        }
+
+        function initSelectOrderTracking(selectEl, orderArr) {
+            if (!selectEl) return;
+
+            // If Select2 is available use its events
+            if (window.jQuery && jQuery().select2) {
+                jQuery(selectEl).select2({ width: 'resolve', placeholder: '' });
+
+                jQuery(selectEl).on('select2:select', function (e) {
+                    const val = String(e.params.data.id);
+                    arrayRemove(orderArr, val);
+                    orderArr.push(val);
+                });
+
+                jQuery(selectEl).on('select2:unselect', function (e) {
+                    const val = String(e.params.data.id);
+                    arrayRemove(orderArr, val);
+                });
+
+                // initialize order if any preselected options
+                const init = Array.from(selectEl.selectedOptions || []).map(o => String(o.value));
+                init.forEach(v => { arrayRemove(orderArr, v); orderArr.push(v); });
+                return;
+            }
+
+            // Fallback for native select: track changes and infer additions/removals
+            let previousSelected = Array.from(selectEl.selectedOptions || []).map(o => String(o.value));
+            previousSelected.forEach(v => { arrayRemove(orderArr, v); orderArr.push(v); });
+
+            selectEl.addEventListener('change', function () {
+                const current = Array.from(selectEl.selectedOptions || []).map(o => String(o.value));
+                // additions
+                current.forEach(v => {
+                    if (!previousSelected.includes(v)) {
+                        arrayRemove(orderArr, v);
+                        orderArr.push(v);
+                    }
+                });
+                // removals
+                previousSelected.forEach(v => {
+                    if (!current.includes(v)) {
+                        arrayRemove(orderArr, v);
+                    }
+                });
+                previousSelected = current;
+            });
+        }
+
+        initSelectOrderTracking(selectEl, selectOrder);
 
         function setProgress(percent, labelText) {
             const normalized = Math.max(0, Math.min(100, Number(percent) || 0));
@@ -262,6 +332,13 @@
             const notifyCheckbox = document.getElementById('notify-whatsapp');
             if (notifyCheckbox) {
                 params.set('notify_whatsapp', notifyCheckbox.checked ? '1' : '0');
+            }
+
+            // include selection order
+            try {
+                params.set('select_order', JSON.stringify(selectOrder));
+            } catch (e) {
+                // ignore
             }
 
             try {

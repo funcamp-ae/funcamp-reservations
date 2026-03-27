@@ -1033,6 +1033,8 @@ return [
     'media_deleted' => 'تم حذف الملف بنجاح',
     'save' => 'حفظ',
     'media' => 'الوسائط',
+    'select_directories_order' => 'ترتيب اختيار المجلدات',
+    'custom_report_subtype_for_pdf' => 'نوع التقرير الفرعي المخصص لملف PDF',
     'export' => 'تصدير',
     'all_directories' => 'جميع مواقع المعدات',
 

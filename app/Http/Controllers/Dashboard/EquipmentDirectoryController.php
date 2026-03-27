@@ -308,7 +308,15 @@ class EquipmentDirectoryController extends Controller
             ->latest()
             ->get();
 
-        return view('dashboard.equipment_directories.all_locations', compact('items'));
+        // Prepare directory options used by the view selects
+        $dirOptions = [];
+        foreach ($items as $it) {
+            if ($it->directory) {
+                $dirOptions[$it->directory->id] = $it->directory->name;
+            }
+        }
+
+        return view('dashboard.equipment_directories.all_locations', compact('items', 'dirOptions'));
     }
 
     public function exportAllLocationsStatisticsPdf(Request $request)
@@ -335,6 +343,20 @@ class EquipmentDirectoryController extends Controller
 
     public function prepareAllLocationsExport(Request $request)
     {
+        // capture selection order (single multi-select)
+        $selectOrder = $request->input('select_order');
+        try {
+            if (is_string($selectOrder)) {
+                $selectOrder = json_decode($selectOrder, true) ?? [];
+            }
+        } catch (\Throwable $e) {
+            $selectOrder = [];
+        }
+
+        $filters = array_filter([
+            'select_order' => is_array($selectOrder) ? array_values($selectOrder) : [],
+        ]);
+
         $export = EquipmentLocationExport::query()->create([
             'user_id' => auth()->id(),
             'notify_whatsapp' => $request->boolean('notify_whatsapp'),
@@ -347,6 +369,7 @@ class EquipmentDirectoryController extends Controller
             'started_at' => null,
             'finished_at' => null,
             'expires_at' => now()->addHours(2),
+            'filters' => $filters,
         ]);
 
         PrepareEquipmentLocationsExportJob::dispatch($export->id);
