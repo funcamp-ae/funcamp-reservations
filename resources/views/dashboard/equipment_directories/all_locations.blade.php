@@ -34,10 +34,6 @@
                             <i class="fas fa-file-pdf"></i>
                             <span>@lang('dashboard.export_pdf')</span>
                         </button>       
-                        <div class="form-check form-check-inline align-items-center ms-3">
-                            <input class="form-check-input" type="checkbox" id="notify-whatsapp" value="1">
-                            <label class="form-check-label small ms-1" for="notify-whatsapp">@lang('dashboard.send_me_on_whatsapp_when_finished')</label>
-                        </div>
                         <a href="{{ route('equipment.all-locations.export') }}" class="btn btn-outline-secondary">@lang('dashboard.download_last_prepared_pdf')</a>
                     </div>
                     <div id="equipment-export-progress" class="mt-3 d-none">
@@ -56,6 +52,10 @@
                             aria-valuenow="0"
                             ></div>
                         </div>
+                    </div>
+                    <div class="form-check form-check-inline align-items-center ms-3">
+                        <input class="form-check-input" type="checkbox" id="notify-whatsapp" value="1">
+                        <label class="form-check-label small ms-1" for="notify-whatsapp">@lang('dashboard.send_me_on_whatsapp_when_finished')</label>
                     </div>
                 </div>
             </div>

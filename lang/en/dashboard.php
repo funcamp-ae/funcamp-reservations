@@ -982,6 +982,7 @@ return [
 
     // PDF Export
     'export_pdf' => 'Export PDF',
+    'send_me_on_whatsapp_when_finished' => 'Send me on WhatsApp when finished',
     'daily_report' => 'Daily Report',
     'prepared_by' => 'Prepared by',
 

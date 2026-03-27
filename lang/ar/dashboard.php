@@ -991,6 +991,7 @@ return [
 
     // PDF Export
     'export_pdf' => 'PDF',
+    'send_me_on_whatsapp_when_finished' => 'أرسل لي على واتساب عند الانتهاء',
     'daily_report' => 'تقرير يومي',
     'prepared_by' => 'أعد بواسطة',
 
