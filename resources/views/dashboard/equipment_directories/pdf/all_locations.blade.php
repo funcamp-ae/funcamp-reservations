@@ -22,6 +22,7 @@
             font-size: 12px;
             color: #444;
             padding: 6px 12px;
+            margin-top: 20px;
         }
     </style>
 </head>
