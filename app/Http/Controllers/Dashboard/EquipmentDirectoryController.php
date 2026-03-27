@@ -8,6 +8,7 @@ use App\Models\EquipmentDirectoryItem;
 use App\Models\EquipmentDirectoryMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Mpdf\Mpdf;
 use App\Models\EquipmentLocationExport;
@@ -70,8 +71,26 @@ class EquipmentDirectoryController extends Controller
 
     public function destroy(EquipmentDirectory $equipmentDirectory)
     {
-        $equipmentDirectory->delete();
-        return back()->with('success', __('Directory deleted successfully'));
+        try {
+            DB::transaction(function () use ($equipmentDirectory) {
+                // Delete each item's media files and records
+                foreach ($equipmentDirectory->items()->with('media')->get() as $item) {
+                    foreach ($item->media as $media) {
+                        Storage::disk('hetzner')->delete($media->file_path);
+                        $media->delete();
+                    }
+
+                    $item->delete();
+                }
+
+                // Finally delete the directory record
+                $equipmentDirectory->delete();
+            });
+
+            return back()->with('success', __('Directory deleted successfully'));
+        } catch (\Throwable $e) {
+            return back()->withErrors(['general' => __('An error occurred while deleting the directory.'), 'details' => $e->getMessage()]);
+        }
     }
 
     // ====== Directory Items ======
