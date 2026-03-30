@@ -6,7 +6,8 @@ use App\Models\Page;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 class Authenticate extends Middleware
 {
     /**
@@ -15,8 +16,12 @@ class Authenticate extends Middleware
      */
     public function handle($request, \Closure $next, ...$guards)
     {
-        $url = $request->url();
-        $page = Page::where('url', $url)->first();
+        $allowestPages = Cache::remember('allowestPages', 360000, function () {
+             return DB::table('pages')->get()->all();
+        });
+        $page =collect($allowestPages)->filter(function ($item) use ($request) {
+            return $item->url === $request->url();
+        })->first();
         
         if ($page) {
             // If page is not available, return 404

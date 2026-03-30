@@ -54,6 +54,9 @@ use App\Http\Requests\UpdateOrderSignInRequest;
 use Illuminate\Validation\Rule;
 use App\Models\WhatsappMessageType ;
 use App\Models\User;
+use App\Jobs\NotifyAdminsOrderApproved;
+use App\Jobs\SendReservationDataWhatsApp;
+use Illuminate\Support\Facades\Cache;
 
 class OrderController extends Controller
 {
@@ -121,11 +124,12 @@ class OrderController extends Controller
 
         $orders = $query->filter($filters)
             ->orderBy('created_at', 'desc')
-            ->with(['payments', 'addons'])
-            ->withSum(['payments as verified_payments_sum' => function ($q) {
-                $q->verified();
+            ->with(['payments', 'addons' , 'customer', 'services' , 'insuranceHandledBy'])
+            ->withSum('items as total_items_price', 'total_price') 
+            ->withSum(['payments as insurance_sum' => function ($q) {
+                $q->where('statement', 'the_insurance');
             }], 'price')
-            ->paginate(100);
+            ->paginate(10);
         return view('dashboard.orders.index', compact('orders'));
     }
 
@@ -148,16 +152,31 @@ class OrderController extends Controller
         // Preserve any preselected service ids from the query before clearing
         $preselectedServiceIds = $request->query('service_ids', []);
         $request->query->replace([]);
-        $customers = Customer::latest()->select('id', 'name')->get();
-        $services = Service::latest()->select('id', 'name', 'price')->get();
+        $customers  = Cache::remember('customers', 3600, function () {
+            return Customer::latest()->select('id', 'name')->get();
+        });
+        $services  = Cache::remember('services', 21600, function () {
+            return Service::latest()->select('id', 'name', 'price')->get();
+        });
 
-        $internalNotes = InternalNote::orderBy('created_at', 'desc')->get();
+        $internalNotes = Cache::remember('internalNotes', 21600, function () {
+            return InternalNote::orderBy('created_at', 'desc')->get();
+        });
+        $whatsappMessageTemplatesType = Cache::remember('whatsappMessageTemplatesType', 21600, function () {
+            return WhatsappMessageTemplate::getTypes() ;
+        });
+        $whatsappMessageTemplates = Cache::remember('whatsappMessageTemplates', 21600, function () {
+            return WhatsappMessageTemplate::active()->get();
+        });
         return view('dashboard.orders.create', [
             'customers' => $customers,
             'services' => $services,
             'internalNotes' => $internalNotes,
             'scheduledDate' => $scheduledDate,
             'preselectedServiceIds' => $preselectedServiceIds,
+            'whatsappMessageTemplatesType' => $whatsappMessageTemplatesType,
+            'whatsappMessageTemplates' => $whatsappMessageTemplates,
+
         ]);
     }
 
@@ -216,7 +235,7 @@ class OrderController extends Controller
         $validatedData = $request->validate([
             'customer_id' => 'required',
             'service_ids' => 'required|array',
-            'service_ids.*' => 'exists:services,id',
+            'service_ids.*' => 'integer',
             'price' => 'required',
             'deposit' => 'nullable',
             'insurance_amount' => 'required',
@@ -232,10 +251,9 @@ class OrderController extends Controller
             'image_after_delivery' => 'nullable',
             'status' => 'required|in:pending_and_show_price,pending_and_Initial_reservation,approved,canceled,delayed,completed',
             'expired_price_offer' => 'required_if:status,pending_and_show_price',
-            'created_by' => 'required|exists:users,id',
             'agree' => 'nullable|in:1,0',
-            'internal_note_id' => 'nullable|array',
-            'internal_note_id.*' => 'exists:internal_notes,id',
+            'internal_note_id.*' => 'nullable|array',
+            'internal_note_id' => 'nullable|integer',
             'delayed_reson' => 'nullable|string',
             'refunds' => 'nullable|in:1,0',
             'refunds_notes' => 'nullable',
@@ -248,6 +266,26 @@ class OrderController extends Controller
             'client_notes' => 'nullable|string'
 
         ]);
+        //  if ($request->service_ids) {
+        //      $valid = DB::table('services')
+        //     ->whereIn('id', $request->service_ids)
+        //     ->count();
+
+        // if ($valid !== count($request->service_ids)) {
+        //     $validator->errors()->add('service_ids', 'Invalid services detected.');
+        // }
+        //  }
+
+        // // Validate internal notes in ONE query
+        // if ($request->internal_note_id) {
+        //     $valid = DB::table('internal_notes')
+        //         ->whereIn('id', $request->internal_note_id)
+        //         ->count();
+
+        //     if ($valid !== count($request->internal_note_id)) {
+        //         $validator->errors()->add('internal_note_id', 'Invalid internal notes.');
+        //     }
+        // }
 
         $validatedData['inventory_withdrawal'] = isset($request->inventory_withdrawal) ? '1' : '0';
         unset($validatedData['service_ids']);
@@ -277,7 +315,7 @@ class OrderController extends Controller
             ->whereHas('services', function ($query) use ($request) {
                 $query->whereIn('service_id', $request->service_ids);
             })
-            ->whereNotIn('status', ['canceled'])
+            ->where('status', '!=', 'canceled')
             ->exists();
 
         if ($existingOrders) {
@@ -305,7 +343,7 @@ class OrderController extends Controller
         // Create or update the internal notes if any were selected
         if (!empty($validatedData['internal_note_id'])) {
             // First, remove any existing order-internal note relationships
-            OrderInternalNote::where('order_id', $order->id)->delete();
+            // OrderInternalNote::where('order_id', $order->id)->delete();
             
             // Create new relationships for each selected note
             foreach ((array)$validatedData['internal_note_id'] as $noteId) {
@@ -320,7 +358,7 @@ class OrderController extends Controller
             }
         } else {
             // Remove all internal notes if none are selected
-            OrderInternalNote::where('order_id', $order->id)->delete();
+            // OrderInternalNote::where('order_id', $order->id)->delete();
         }
         // Distribute the provided total price evenly across selected services
         $servicesData = [];
@@ -336,7 +374,7 @@ class OrderController extends Controller
         }
 
         if ($order->status === 'approved') {
-            $this->notifyAdminsOrderApproved($order);
+            NotifyAdminsOrderApproved::dispatch($order);
         }
 
         return response()->json([
@@ -377,22 +415,35 @@ class OrderController extends Controller
 
     public function edit($id)
     {
-        $order = $this->orderRepository->findOne($id);
+        $order = order::with('addons' , 'customer' , 'expenses' , 'services' , 'payments' , 'paymentLinks' , 'items' , 'internalNotes.internalNote')
+        ->withSum('addons as addonsPrice', 'price')
+        ->findOrFail($id);
         $this->authorize('update', $order);
 
-        $customers = Customer::select('id', 'name')->get();
-        $services = Service::select('id', 'name', 'price')->get();
-        $addonsPrice = OrderAddon::where('order_id', $order->id)->sum('price');
-        $internalNotes = InternalNote::orderBy('created_at', 'desc')->get();
-
-        // Get the order's internal note if it exists
-        $orderInternalNote = OrderInternalNote::with('internalNote')
-            ->where('order_id', $order->id)
-            ->get();
-        foreach ($orderInternalNote as $orderInternalNote) {
+        $customers= Cache::remember('customers', 21600, function () {
+            return Customer::select('id', 'name')->get();
+        });
+        $services= Cache::remember('services', 21600, function () {
+            return Service::select('id', 'name', 'price')->get();
+        });
+        $internalNotes= Cache::remember('internalNotes', 21600, function () {
+            return InternalNote::orderBy('created_at', 'desc')->get();
+        });
+        // Get the order's internal note if it exists (cached per-order)
+        $orderInternalNotes = Cache::remember('orderInternalNote:' . $order->id, 21600, function () use ($order) {
+            return OrderInternalNote::with('internalNote')
+                ->where('order_id', $order->id)
+                ->get();
+        });
+        foreach ($orderInternalNotes as $orderInternalNote) {
             $selectedInternalNote[] = $orderInternalNote->internal_note_id;
         }
-
+        $whatsappMessageTemplatesType = Cache::remember('whatsappMessageTemplatesType', 21600, function () {
+            return WhatsappMessageTemplate::getTypes() ;
+        });
+        $whatsappMessageTemplates= Cache::remember('whatsappMessageTemplates', 21600, function () {
+            return WhatsappMessageTemplate::all() ;
+        });
         // If we have an internal note, use its content, otherwise use the order notes
         $notes = $order->notes;
         
@@ -402,7 +453,7 @@ class OrderController extends Controller
             'order_data' => $order->order_data,
             'invoice' => $order->invoice,
             'receipt' => $order->receipt,
-            'internal_note_content' => $notes
+            'internal_note_content' => $notes,
         ];
 
         // Pass the notes to the order object so they'll be displayed in the form
@@ -411,9 +462,11 @@ class OrderController extends Controller
             'order' => $order,
             'customers' => $customers,
             'services' => $services,
-            'addonsPrice' => $addonsPrice,
+            'addonsPrice' => $order->addonsPrice,
             'additionalNotesData' => $additionalNotesData,
             'internalNotes' => $internalNotes,
+            'whatsappMessageTemplatesType' => $whatsappMessageTemplatesType,
+            'whatsappMessageTemplates' => $whatsappMessageTemplates,
             'selectedInternalNote' => isset($selectedInternalNote) ? $selectedInternalNote : [],
         ]);
     }
@@ -436,11 +489,11 @@ class OrderController extends Controller
         $order = Order::with('services.stocks')->findOrFail($id);
         $this->authorize('update', $order);
         $validatedData = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
+            'customer_id' => 'required',
             'service_ids' => 'required|array',
-            'service_ids.*' => 'exists:services,id',
+            'service_ids.*' => 'required|integer',
             'price' => 'required|numeric',
-            'internal_note_id' => 'nullable|exists:internal_notes,id',
+            'internal_note_id' => 'nullable',
             'notes' => 'nullable|string',
             'deposit' => 'nullable|numeric',
             'insurance_amount' => 'required|numeric',
@@ -461,7 +514,7 @@ class OrderController extends Controller
             'refunds' => 'nullable|in:1,0',
             'refunds_notes' => 'nullable',
             'delayed_time' => 'nullable',
-            'show_price_notes' => 'nullable|string',
+            'show_price_notes' => 'nullable|string',    
             'order_data_notes' => 'nullable|string',
             'invoice_notes' => 'nullable|string',
             'receipt_notes' => 'nullable|string',
@@ -499,18 +552,12 @@ class OrderController extends Controller
             // Set total price directly from request instead of recalculating from services
             $order->price = $request->price;
             $service_ids = array_map('intval', $request->service_ids);
-            \DB::table('order_service')->where('order_id', $order->id)->delete();
+            $order->services()->detach();
 
             // Distribute the provided total price evenly across selected services
             $serviceCount = max(count($service_ids), 1);
             $perServicePrice = (float) $request->price / $serviceCount;
-            foreach ($service_ids as $serviceId) {
-                \DB::table('order_service')->insert([
-                    'order_id' => $order->id,
-                    'service_id' => $serviceId,
-                    'price' => $perServicePrice,
-                ]);
-            }
+            $order->services()->attach($service_ids, ['price' => $perServicePrice]);
             
             // Handle internal notes update
             if (isset($validatedData['internal_note_id'])) {
@@ -535,8 +582,8 @@ class OrderController extends Controller
 
             // Send WhatsApp reservation data message if status changed to approved
             if ($request->status === 'approved' && $order->wasChanged('status')) {
-                $this->sendReservationDataWhatsApp($order);
-                $this->notifyAdminsOrderApproved($order);
+                SendReservationDataWhatsApp::dispatch($order);
+                NotifyAdminsOrderApproved::dispatch($order);
 
             }
 
@@ -1673,107 +1720,5 @@ $request->validate($rules);
         return $this->pdfService->cleanupTempFiles($orderId, $documents);
     }
 
-    private function notifyAdminsOrderApproved(Order $order)
-    {
-        try {
-            $admins = User::role('admin')->get();
-            if ($admins->isEmpty()) {
-                return;
-            }
-
-            $whatsApp = new WhatsAppService();
-            $message = "New order approved\n" .
-                "Order #: {$order->id}\n" .
-                (optional($order->customer)->name ? "Customer: {$order->customer->name}\n" : '') .
-                ($order->date ? "Date: {$order->date}\n" : '') .
-                ($order->time_from ? "From: {$order->time_from}\n" : '') .
-                ($order->time_to ? "To: {$order->time_to}\n" : '') .
-                (isset($order->price) ? "Total: {$order->price}\n" : '') .
-                "Link: " . route('orders.edit', $order->id);
-
-            foreach ($admins as $admin) {
-                if (!empty($admin->phone)) {
-                    $whatsApp->sendTextMessage($admin->phone, $message);
-                }
-            }
-        } catch (\Throwable $e) {
-            \Log::warning('Failed to notify admins via WhatsApp for approved order', [
-                'order_id' => $order->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
-    }
-
-    /**
-     * Send reservation data WhatsApp message when order is approved
-     *
-     * @param Order $order
-     * @return void
-     */
-    private function sendReservationDataWhatsApp(Order $order)
-    {
-        try {
-            // Check if customer has phone number
-            if (!$order->customer || !$order->customer->phone) {
-                Log::warning('Order customer has no phone number for WhatsApp reservation data', [
-                    'order_id' => $order->id,
-                    'customer_id' => $order->customer_id
-                ]);
-                return;
-            }
-
-            // Get the reservation data template
-            $template = WhatsappMessageTemplate::getByType('reservation_data');
-            if (!$template) {
-                Log::warning('No active reservation data template found', ['order_id' => $order->id]);
-                return;
-            }
-
-            // Get service site data for placeholders
-            $serviceSiteData = ServiceSiteAndCustomerService::getLatestForWhatsApp();
-
-            // Get bilingual message
-            $message = $template->getBilingualMessage($order->customer->name, '', $serviceSiteData);
-
-            // Generate PDF
-            $pdfPath = $this->generateTempPdf($order, 'reservation_data');
-
-            // Send WhatsApp message
-            $whatsAppService = new WhatsAppService();
-
-            if ($pdfPath && file_exists($pdfPath)) {
-                $success = $whatsAppService->sendFile(
-                    $order->customer->phone,
-                    $pdfPath,
-                    $message
-                );
-
-                // Clean up temp file
-                if (file_exists($pdfPath)) {
-                    unlink($pdfPath);
-                }
-            } else {
-                // Send text message if PDF generation fails
-                $success = $whatsAppService->sendTextMessage($order->customer->phone, $message);
-            }
-
-            if ($success) {
-                Log::info('WhatsApp reservation data message sent successfully', [
-                    'order_id' => $order->id,
-                    'customer_phone' => $order->customer->phone
-                ]);
-            } else {
-                Log::error('Failed to send WhatsApp reservation data message', [
-                    'order_id' => $order->id,
-                    'customer_phone' => $order->customer->phone
-                ]);
-            }
-        } catch (\Exception $e) {
-            Log::error('WhatsApp reservation data sending failed', [
-                'order_id' => $order->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-        }
-    }
+    // Reservation-data WhatsApp sending is handled by the queued job SendReservationDataWhatsApp
 }

@@ -305,7 +305,7 @@ class Order extends Model
     }    
     public function verifiedPayments()
     {
-        return $this->payments()->where('verified', "1");
+        return $this->payments->where('verified', "1");
     }    
 
     
@@ -316,17 +316,13 @@ class Order extends Model
 
     public function addonsPrice()
     {
-        return OrderAddon::where('order_id', $this->id)->sum('price');
+        return $this->addons->sum('price');
     }    
     public function verifiedAddons()
     {
-       return $this->addons()->wherePivot('verified', true); 
+       return $this->addons->wherePivot('verified', true); 
     }   
 
-    public function verifiedInsurance()
-    {
-        return $this->verifiedPayments()->where('statement', 'the_insurance');
-    }    
 
     public function user()
     {
@@ -342,7 +338,7 @@ class Order extends Model
 
     public function verifiedExpenses()
     {
-        return $this->expenses()->where('verified', true);
+        return $this->expenses->where('verified', true);
     }        
     public function getPreLogoutImagesUrlsAttribute()
     {
@@ -378,28 +374,28 @@ class Order extends Model
 
     public function verifiedInsuranceAmount()
     {
-        return $this->verifiedPayments()->where('statement', 'the_insurance')->sum('price');
+        return $this->insurance_sum;
     }    
 
     public function verifiedWarehouseSalesAmount()
     {
-        return OrderItem::where('verified', true)->where("order_id", $this->id)->sum('total_price');
+        return $this->items->where('verified', true)->where("order_id", $this->id)->sum('total_price');
     }    
 
     public function totalPaymentsPrice()
     {
-        $deposit = $this->payments()->where('statement', 'deposit')->where("verified", "1")->sum('price');
-        $insurances = $this->payments()->where('statement','the_insurance')->where("verified", "1")->sum('price');
-        $addons = $this->verifiedAddons()->sum('order_addon.price');
+        $deposit = $this->payments->where('statement', 'deposit')->where("verified", "1")->sum('price');
+        $insurances = $this->insurance_sum;
+        $addons = $this->verifiedAddons->sum('order_addon.price');
         $warehouseSales = $this->verifiedWarehouseSalesAmount();
         return $this->price - $deposit + $insurances + $addons + $warehouseSales;
     }    
 
     public function totalPaidAmount()
     {
-        $totalPayment = $this->payments()->sum('price');
-        $totalWareHouse = OrderItem::where("order_id", $this->id)->sum('total_price');
-        $addons = $this->addons()->where("verified", true)->sum('order_addon.price');
+        $totalPayment = $this->payments->sum('price');
+        $totalWareHouse = $this->total_items_price;
+        $addons = $this->addons->where("verified", true)->sum('order_addon.price');
         return $totalPayment + $totalWareHouse + $addons;
     }    
         public function totalPrice()
@@ -409,7 +405,7 @@ class Order extends Model
      
     public function verifiedItems()
     {
-        return $this->items()->where('verified', true);
+        return $this->items->where('verified', true);
     }    
 
 

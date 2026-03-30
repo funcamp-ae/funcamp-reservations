@@ -10,14 +10,20 @@ use Spatie\Permission\Models\Permission;
 use Carbon\Carbon;
 use App\Models\Custody;
 use App\Models\Page;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 class CheckRoleMiddleware
 {
     use ApiResponseTrait, AdminFirstRouteTrait;
 
     public function handle($request, Closure $next)
     {
-        $page = Page::where('url', $request->url())->first();
+        $allowestPages = Cache::remember('allowestPages', 360000, function () {
+             return DB::table('pages')->get()->all();
+        });
+        $page =collect($allowestPages)->filter(function ($item) use ($request) {
+            return $item->url === $request->url();
+        })->first();
         // Super Admin bypass - User ID 1 only has all permissions
         if ((isset(auth()->user()->id) && auth()->user()->id == 1) || ($page ? !$page->is_authenticated : false)) {
             return $next($request);

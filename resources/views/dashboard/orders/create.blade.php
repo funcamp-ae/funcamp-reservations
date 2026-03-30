@@ -383,7 +383,7 @@
                         <div class="row mb-8">
                             <label class="col-form-label fw-bold fs-6">@lang('dashboard.select_documents_to_send')</label>
                             <div class="checkbox-list">
-                                @foreach(\App\Models\WhatsappMessageTemplate::getTypes() as $key => $type)
+                                @foreach($whatsappMessageTemplatesType as $key => $type)
                                 <label class="checkbox">
                                     <input type="checkbox" name="documents[]" value="{{ isset($key) ? $key : '' }}">
                                         {{ $type }}
@@ -490,27 +490,21 @@
                                     $allTemplateTypes = array_merge($checkboxTypes, ['receipt' => __('dashboard.receipt') , ]);
                                 @endphp
 
-                                @foreach(\App\Models\WhatsappMessageTemplate::getTypes() as $type => $label)
-                                    @if(\App\Models\WhatsappMessageTemplate::active()->ofType($type)->exists())
-                                        <label class="checkbox">
-                                            <input type="checkbox" name="templates[]" value="{{ $type }}">
-                                            <span></span>
-                                            {{ $label }}
-                                        </label>
-                                    @endif
+                                @foreach($whatsappMessageTemplates as $template)
+                                    @php
+                                        $type = $template->type;
+                                        $label = $template->name;
+                                    @endphp
+                                    <label class="checkbox">
+                                        <input type="checkbox" name="templates[]" value="{{ $type }}">
+                                        <span></span>
+                                        {{ $label }}
+                                    </label>
                                 @endforeach
-
-                                @if(!\App\Models\WhatsappMessageTemplate::active()->whereIn('type', array_keys($allTemplateTypes))->exists())
-                                    <div class="alert alert-warning">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                        @lang('dashboard.no_active_templates_available')
-                                    </div>
-                                @endif
                             </div>
                         </div>
 
                         <!-- Additional Receipts (only show if receipt template is active) -->
-                        @if(\App\Models\WhatsappMessageTemplate::active()->ofType('receipt')->exists())
                             @if(isset($order) && $order->addons->where('pivot.verified', true)->count() > 0)
                                 <div class="row mb-6">
                                     <h6 class="fw-bolder">@lang('dashboard.addon_receipts')</h6>
@@ -524,7 +518,6 @@
                                         @endforeach
                                     </div>
                                 </div>
-                            @endif
 
                             @if(isset($order) && $order->payments->where('verified', true)->count() > 0)
                                 <div class="row mb-6">
