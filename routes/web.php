@@ -2065,8 +2065,6 @@ Route::delete('/equipment-directories/media/{media}', [EquipmentDirectoryControl
     ->name('equipment-directories.media.destroy')->middleware(['auth']);
 
 // PDF Export
-Route::get('/equipment-directories/{equipmentDirectory}/export', [EquipmentDirectoryController::class, 'exportPdf'])
-    ->name('equipment-directories.export')->middleware(['auth']);
 Route::get('equipment-directories/export', [EquipmentDirectoryController::class, 'exportDirectoriesPdf'])
     ->name('equipment-directories.export')->middleware(['auth']);
 Route::get('equipment-directories/{equipmentDirectory}/items/export', [EquipmentDirectoryController::class, 'exportItemsPdf'])
