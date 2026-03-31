@@ -33,9 +33,9 @@ class RegistrationformController extends Controller
             });
             })
             ->latest()
-            ->get();
-
-        return view('dashboard.registration_forms.index', compact('registration_forms'));
+            ->paginate(100);
+        $permissions = auth()->user()->getAllPermissions()->pluck('name')->toArray();
+        return view('dashboard.registration_forms.index', compact('registration_forms', 'permissions'));
     }
 
     /**

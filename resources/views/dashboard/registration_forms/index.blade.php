@@ -1,6 +1,5 @@
 @extends('dashboard.layouts.app')
 @section('pageTitle', __('dashboard.registration_forms'))
-
 @section('content')
     <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
         <div class="post d-flex flex-column-fluid" id="kt_post">
@@ -23,7 +22,7 @@
                                 <input type="text" name="q" value="{{ request('q') }}"
                                     class="form-control form-control-solid w-350px ps-14"
                                     placeholder="{{ __('dashboard.search_rf_placeholder') }}" />
-                            </form>
+                                   
                         </div>
                     </div>
 
@@ -108,14 +107,14 @@
                                             </td>
                                             <td><i class="bi bi-envelope me-1"></i>{{ $rf->email ?? '—' }}</td>
                                             <td class="text-center">
-                                                 @can('bookings.registeration-forms.index')
+                                                 @if(in_array('bookings.registeration-forms.index', $permissions))
                                                 <button type="button"
                                                     class="btn btn-icon btn-light btn-active-light-primary btn-sm rf-view"
                                                     data-details='@json($details)' title="{{ __('dashboard.view_rest') }}">
                                                     <i class="bi bi-eye"></i>
                                                 </button>
-                                                @endcan
-                                            </td>
+                                                @endif
+                                            </td>               
                                             <td class="text-center">
                                                 {{ $rf->created_at->format('Y-m-d') }}
                                             </td>
@@ -124,7 +123,7 @@
                                             </td>
                                             <td class="text-end">
                                                 <div class="btn-group" role="group">
-                                                 @can('bookings.create')
+                                                 @if(in_array('bookings.create', $permissions))
 
                                                     <button type="button"
                                                         class="btn btn-icon btn-light-primary btn-sm rf-book"
@@ -132,15 +131,15 @@
                                                         title="{{ __('dashboard.make_reservation') }}">
                                                     <i class="bi bi-journal-plus"></i>
                                                 </button>
-                                                    @endcan
-                                                 @can('bookings.registeration-forms.edit')
+                                                    @endif
+                                                 @if(in_array('bookings.registeration-forms.edit', $permissions))
                                                     <a href="{{ route('bookings.registeration-forms.edit', $rf->id) }}"
                                                         class="btn btn-icon btn-light-warning btn-sm"
                                                         title="{{ __('dashboard.edit') }}">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </a>
-                                                 @can('bookings.registeration-forms.destroy')
-                                                    @endcan
+                                                 @if(in_array('bookings.registeration-forms.destroy', $permissions) )
+                                                    @endif
                                                     <form action="{{ route('bookings.registeration-forms.destroy', $rf->id) }}"
                                                         method="POST" class="d-inline rf-delete-form">
                                                         @csrf
@@ -151,7 +150,7 @@
                                                             <i class="bi bi-trash"></i>
                                                         </button>
                                                     </form>
-                                                    @endcan
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -164,7 +163,9 @@
                                 </tbody>
                             </table>
                         </div>
-
+                         <div class="d-flex justify-content-end mt-4">
+                            {{ $registration_forms->links('pagination::bootstrap-5') }}
+                         </div>
                     </div>
                 </div>
             </div>
@@ -193,7 +194,6 @@
             </div>
         </div>
     </div>
-
     <div class="modal fade" id="rfConfirmModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
