@@ -123,6 +123,21 @@
                          <div class="row mb-6 text-right">
                             <!--begin::Label-->
                             <label class="col-lg-4 col-form-label fw-bold fs-6">
+                                <span class="">@lang('dashboard.salary')</span>
+                            </label>
+                            <!--end::Label-->
+                            <!--begin::Col-->
+                            <div class="col-lg-8 fv-row fv-plugins-icon-container">
+                                <input style="text-align:right"  type="number" name="salary" step="0.01" class="text-right form-control form-control-lg form-control-solid" placeholder="@lang('dashboard.salary')" value="{{ isset($user) ? $user->salary : old('salary') }}">
+                                <div class="fv-plugins-message-container invalid-feedback"></div>
+                            </div>
+                            <!--end::Col-->
+                        </div>
+                        <!--end::Input group-->
+                         <!--begin::Input group-->
+                         <div class="row mb-6 text-right">
+                            <!--begin::Label-->
+                            <label class="col-lg-4 col-form-label fw-bold fs-6">
                                 <span class="@if(!isset($user)) required @endif">@lang('dashboard.password')</span>
                             </label>
                             <!--end::Label-->

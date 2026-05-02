@@ -195,6 +195,21 @@
                             <!--begin::Input group-->
                             <div class="row mb-6">
                                 <!--begin::Label-->
+                                <label class="col-lg-4 col-form-label fw-bold fs-6">@lang('dashboard.salary')</label>
+                                <!--end::Label-->
+                                <!--begin::Col-->
+                                <div class="col-lg-8 fv-row fv-plugins-icon-container">
+                                    <input type="number" name="salary" step="0.01"
+                                        class="form-control form-control-lg form-control-solid"
+                                        placeholder="@lang('dashboard.salary')" value="{{ auth()->user()->salary }}">
+                                    <div class="fv-plugins-message-container invalid-feedback"></div>
+                                </div>
+                                <!--end::Col-->
+                            </div>
+                            <!--end::Input group-->
+                            <!--begin::Input group-->
+                            <div class="row mb-6">
+                                <!--begin::Label-->
                                 <label class="col-lg-4 col-form-label  fw-bold fs-6">@lang('dashboard.password')</label>
                                 <!--end::Label-->
                                 <!--begin::Col-->

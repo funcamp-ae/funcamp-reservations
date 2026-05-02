@@ -55,6 +55,7 @@ class User extends Authenticatable implements CanResetPasswordContract
         'graduation_year',
         'qualification',
         'job',
+        'salary',
         'google_id',
         'google_token',
         'google_refresh_token'

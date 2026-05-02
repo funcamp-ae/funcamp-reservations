@@ -33,6 +33,7 @@ class CreateUpdateAdminRequest extends FormRequest
                 'image'                  => 'nullable',
                 'is_active'              => 'nullable',
                 'password'              => 'nullable',
+                'salary'                => 'nullable|numeric|min:0',
             ];
 
             }else{
@@ -44,6 +45,7 @@ class CreateUpdateAdminRequest extends FormRequest
                     'image'                  => 'nullable',
                     'is_active'              => 'nullable',
                     'password'              => 'required',
+                    'salary'                => 'nullable|numeric|min:0',
                 ];
             }
     }
