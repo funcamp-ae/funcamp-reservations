@@ -27,11 +27,14 @@ return new class extends Migration
     public function up(): void
     {
         // Step 1: Drop all existing FKs on transactions dynamically
-        // $this->dropExistingForeignKeys();
+        $this->dropExistingForeignKeys();
 
         // Step 2: Re-add confirmed FKs with CASCADE ON DELETE + ON UPDATE
         Schema::table('transactions', function (Blueprint $table) {
-
+            $table->foreign('expense_id')
+                  ->references('id')->on('expenses')
+                  ->cascadeOnDelete()
+                  ->cascadeOnUpdate();
             $table->foreign('general_payment_id')
                   ->references('id')->on('general_payments')
                   ->cascadeOnDelete()
