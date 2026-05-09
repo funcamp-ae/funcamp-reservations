@@ -20,13 +20,13 @@ return new class extends Migration
         // ── Step 2: Re-add with CASCADE ON DELETE + ON UPDATE ─────────────────
         Schema::table('transactions', function (Blueprint $table) {
 
-            // → accounts
-            if ($this->columnExists('transactions', 'account_id')) {
-                $table->foreign('account_id')
-                      ->references('id')->on('accounts')
-                      ->cascadeOnDelete()
-                      ->cascadeOnUpdate();
-            }
+            // // → accounts
+            // if ($this->columnExists('transactions', 'account_id')) {
+            //     $table->foreign('account_id')
+            //           ->references('id')->on('accounts')
+            //           ->cascadeOnDelete()
+            //           ->cascadeOnUpdate();
+            // }
             // → general_payments
             if ($this->columnExists('transactions', 'general_payment_id')) {
                 $table->foreign('general_payment_id')
@@ -78,7 +78,7 @@ return new class extends Migration
         Schema::table('transactions', function (Blueprint $table) {
 
             $foreignKeys = [
-                'transactions_account_id_foreign',
+                // 'transactions_account_id_foreign',
                 'transactions_expense_id_foreign',
                 'transactions_general_payment_id_foreign',
                 'transactions_order_addon_id_foreign',
