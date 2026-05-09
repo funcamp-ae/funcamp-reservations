@@ -39,7 +39,15 @@ return new class extends Migration
                   ->references('id')->on('general_payments')
                   ->cascadeOnDelete()
                   ->cascadeOnUpdate();
+            $table->foreign('order_addon_id')
+                            ->references('id')->on('addons')
+                            ->cascadeOnDelete()
+                            ->cascadeOnUpdate();
 
+            $table->foreign('account_id')
+                            ->references('id')->on('bank_accounts')
+                            ->cascadeOnDelete()
+                            ->cascadeOnUpdate();
 
             $table->foreign('order_id')
                   ->references('id')->on('orders')
