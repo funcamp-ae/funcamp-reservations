@@ -129,7 +129,8 @@ class OrderController extends Controller
             ->withSum(['payments as insurance_sum' => function ($q) {
                 $q->where('statement', 'the_insurance');
             }], 'price')
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
         return view('dashboard.orders.index', compact('orders'));
     }
 
