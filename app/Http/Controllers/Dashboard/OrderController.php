@@ -153,9 +153,7 @@ class OrderController extends Controller
         // Preserve any preselected service ids from the query before clearing
         $preselectedServiceIds = $request->query('service_ids', []);
         $request->query->replace([]);
-        $customers  = Cache::remember('customers', 3600, function () {
-            return Customer::latest()->select('id', 'name')->get();
-        });
+        $customers = Customer::latest()->select('id', 'name')->get();
         $services  = Cache::remember('services', 21600, function () {
             return Service::latest()->select('id', 'name', 'price')->get();
         });
@@ -421,9 +419,7 @@ class OrderController extends Controller
         ->findOrFail($id);
         $this->authorize('update', $order);
 
-        $customers= Cache::remember('customers', 21600, function () {
-            return Customer::select('id', 'name')->get();
-        });
+        $customers = Customer::select('id', 'name')->get();
         $services= Cache::remember('services', 21600, function () {
             return Service::select('id', 'name', 'price')->get();
         });
