@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasColumn('users', 'salary')) {
+            return;
+        }
+
         Schema::table('users', function (Blueprint $table) {
             $table->decimal('salary', 12, 2)->nullable();
         });
