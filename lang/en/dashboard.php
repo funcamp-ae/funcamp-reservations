@@ -1005,6 +1005,8 @@ return [
     'item_contents' => 'Item Contents',
     'location' => 'Location',
     'no_media' => 'No Media',
+    'completed_at' => 'Completion date and time',
+    'completed_at_help' => 'Used only for completed reservations to schedule surveys. Leave blank to keep the existing time or set it automatically on completion. Already sent surveys will not be resent.',
     'existing_media' => 'Existing Media',
     'upload_images_or_videos' => 'You can upload images or videos',
     'manage_items' => 'Manage Items',

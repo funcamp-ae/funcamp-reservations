@@ -237,6 +237,21 @@
                                 </div>
                             </div>
 
+                            @if (isset($order) && $order->exists)
+                                <div class="row mb-6">
+                                    <label for="completed_at" class="col-lg-4 col-form-label fw-bold fs-6">{{ __('dashboard.completed_at') }}</label>
+                                    <div class="col-lg-8">
+                                        <input type="datetime-local" id="completed_at" name="completed_at"
+                                            class="form-control form-control-solid @error('completed_at') is-invalid @enderror"
+                                            value="{{ old('completed_at', $order->completed_at?->format('Y-m-d\TH:i')) }}">
+                                        <div class="form-text">{{ __('dashboard.completed_at_help') }} ({{ config('app.timezone') }})</div>
+                                        @error('completed_at')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            @endif
+
                             @php
                                 $orderStatus = isset($order)
                                   ? ($order->status != 'pending_and_show_price' && $order->status != 'pending_and_Initial_reservation')

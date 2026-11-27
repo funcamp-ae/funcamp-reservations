@@ -102,7 +102,9 @@ class Order extends Model
         parent::boot();
         static::saving(function ($order) {
             if ($order->isDirty('status')) {
-                $order->completed_at = $order->status === 'completed' ? now() : null;
+                $order->completed_at = $order->status === 'completed'
+                    ? ($order->isDirty('completed_at') && $order->completed_at ? $order->completed_at : now())
+                    : null;
             }
         });
         static::creating(function ($order) {

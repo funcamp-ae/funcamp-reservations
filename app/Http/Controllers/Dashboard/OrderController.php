@@ -483,6 +483,9 @@ class OrderController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'completed_at' => 'nullable|date_format:Y-m-d\TH:i|before_or_equal:now',
+        ]);
         $order = Order::with('services.stocks')->findOrFail($id);
         $this->authorize('update', $order);
         $validatedData = $request->validate([
@@ -546,6 +549,9 @@ class OrderController extends Controller
             $validatedData['receipt_notes'] = $request->receipt_notes;
 
             $order->fill($validatedData);
+            if ($order->status === 'completed' && $request->filled('completed_at')) {
+                $order->completed_at = Carbon::createFromFormat('Y-m-d\TH:i', $request->input('completed_at'))->startOfMinute();
+            }
             // Set total price directly from request instead of recalculating from services
             $order->price = $request->price;
             $service_ids = array_map('intval', $request->service_ids);
