@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Log;
 
 class SendWhatsAppEvaluationCommand extends Command
 {
+    public function line($string, $style = null, $verbosity = null)
+    {
+        parent::line('[' . now()->format('Y-m-d H:i:s P') . '] ' . $string, $style, $verbosity);
+    }
+
     /**
      * The name and signature of the console command.
      *
@@ -74,7 +79,7 @@ class SendWhatsAppEvaluationCommand extends Command
             $orders = Order::with(['customer'])
                 ->where('status', 'completed')
                 ->where('is_evaluation_sent', false)
-                ->whereDate('updated_at', '<=', $completedAt->toDateString())
+                ->whereDate('completed_at', '<=', $completedAt->toDateString())
                 ->get();
 
             $this->info("Found {$orders->count()} orders eligible for WhatsApp evaluation.");

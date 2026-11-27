@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Mail;
 
 class SendSurveyEmails extends Command
 {
+    public function line($string, $style = null, $verbosity = null)
+    {
+        parent::line('[' . now()->format('Y-m-d H:i:s P') . '] ' . $string, $style, $verbosity);
+    }
+
     /**
      * The name and signature of the console command.
      *
@@ -65,10 +70,10 @@ class SendSurveyEmails extends Command
         $currentTime = Carbon::now()->format('H:i');
         if ($currentTime !== $sendTime) {
             $this->info("Current time ($currentTime) does not match send time ($sendTime). Skipping.");
-            // return 0;
+            return 0;
         }
         $orders = Order::where('status', 'completed')
-            ->where('updated_at', '<=', $completedAt)
+            ->whereDate('completed_at', '<=', $completedAt->toDateString())
             ->whereDoesntHave('surveyResponses') // Check if the order doesn't have any survey responses
             ->whereDoesntHave('surveyEmailLog') // Check if the order doesn't have any survey email logs
             ->with('customer')

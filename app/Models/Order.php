@@ -29,6 +29,8 @@ class Order extends Model
 {
     use HasFactory, UploadTrait;
 
+    protected $casts = ['completed_at' => 'datetime'];
+
     protected $fillable = [
         'customer_id',
         'price',
@@ -98,6 +100,11 @@ class Order extends Model
     protected static function boot()
     {
         parent::boot();
+        static::saving(function ($order) {
+            if ($order->isDirty('status')) {
+                $order->completed_at = $order->status === 'completed' ? now() : null;
+            }
+        });
         static::creating(function ($order) {
             if (empty($order->order_number)) {
                 $order->order_number = static::generateOrderNumber();

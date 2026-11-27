@@ -7,16 +7,28 @@ use App\Services\WhatsAppService;
 use App\Models\WhatsappMessageTemplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Models\ServiceSiteAndCustomerService ;
-class SendWhatsAppEvaluationJob implements ShouldQueue
+class SendWhatsAppEvaluationJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $order;
+
+    public $tries = 3;
+
+    public $backoff = [60, 300];
+
+    public $uniqueFor = 3600;
+
+    public function uniqueId()
+    {
+        return (string) $this->order->id;
+    }
 
     /**
      * Create a new job instance.
@@ -36,6 +48,10 @@ class SendWhatsAppEvaluationJob implements ShouldQueue
     public function handle()
     {
         try {
+            $this->order->refresh();
+            if ($this->order->status !== 'completed' || $this->order->is_evaluation_sent) {
+                return;
+            }
             // Get the evaluation template (already checked in command, but double-check here)
             $template = WhatsappMessageTemplate::getByType('evaluation');
             if (!$template) {
@@ -78,18 +94,27 @@ class SendWhatsAppEvaluationJob implements ShouldQueue
                     'survey_url' => $surveyUrl
                 ]);
             } else {
-                Log::error('Failed to send WhatsApp evaluation message', [
-                    'order_id' => $this->order->id,
-                    'customer_phone' => $this->order->customer->phone
-                ]);
+                throw new \RuntimeException('WhatsApp provider did not accept the evaluation message. See WhatsApp service logs for details.');
             }
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('WhatsApp evaluation job failed', [
                 'order_id' => $this->order->id,
+                'attempt' => $this->attempts(),
+                'occurred_at' => now()->toIso8601String(),
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
+            throw $e;
         }
+    }
+
+    public function failed(\Throwable $exception)
+    {
+        Log::error('WhatsApp evaluation exhausted retries', [
+            'order_id' => $this->order->id,
+            'occurred_at' => now()->toIso8601String(),
+            'error' => $exception->getMessage(),
+        ]);
     }
 }
